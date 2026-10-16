@@ -74,7 +74,7 @@ Keep a hand-entered list of my investments, in any currency or in gold/silver gr
 | cash deposit | — | 100 % (B1). Interest on it is never in the base (Z-6). |
 | gold / silver | long-term (bullion, default) | 100 % (B2) |
 | gold / silver | personal use (jewellery) | the user's jewellery setting: 100 % or 0 % — **asked** the first time jewellery is added (B2) |
-| stock, fund/ETF | **asked**, no default | trading → 100 %; long-term → the user's **long-term method**, **asked** (per item or once as a portfolio setting): dividends-only (IIFA) → 0 % plus the notice "zakat on your dividends is counted with your cash"; 25 % proxy (NZF) → 25 %; full value → 100 % (B3, B4) |
+| stock, fund/ETF | **asked**, no default | trading → 100 %; long-term → the user's **long-term method**, **asked** (per item or once as a portfolio setting): dividends-only (IIFA) → 0 % of value, and a set-aside of r_z × each "income received" (dividend) on the item, charged once (§9.4, consultant answer (a), IIFA Res 28 (3/4) §3); if the same dividend is also recorded as money in to a cash item in this list, that cash entry shows "Already counted as dividend zakat on {item}?"; 25 % proxy (NZF) → 25 %; full value → 100 % (B3, B4) |
 | sukuk | — | 100 % (B4) |
 | crypto | — | 100 % of market value, with a notice that scholars dispute whether holding it is permissible (B8) |
 | other (real estate, business, pension, …) | asked | **ask** — the user must enter a share; no default (B5–B7) |
@@ -230,7 +230,8 @@ If an item has neither a value update nor a flow inside a period (gold/silver: n
 
 `Z_item = r_z × s × EV_item × (T / Y)`
 r_z and Y = the user's zakat year setting, **always as a matched pair**: lunar 2.5 % / 354.367 (default) or solar 2.577 % / 365 (A1, A2, Z-2). s = zakat share. EV_item is net of held interest. Computed in money (item unit), converted to the base currency at the rate on E (Z-7: fine for a planning figure; UC-3 uses the rate on the zakat date).
-`Z` (portfolio) = Σ Z_item in base currency.
+`Z_div_item = r_z × (sum of money out of kind income dated inside the period)` — only for items on the dividends-only method (s = 0). **No T/Y factor**: each dividend is charged once, when received (consultant answer (a), IIFA Res 28 (3/4) §3). Converted to base at each dividend's date rate.
+`Z` (portfolio) = Σ (Z_item + Z_div_item) in base currency.
 
 - Label everywhere: **"estimated zakat set-aside (planning). Actual zakat is due once a year on your zakat date."** Never "zakat due" or "zakat paid" (Z-3).
 - Each zakat figure's "why" points to its section of zakat-on-investments.md (A9): rate and year (A1/A2), the asset rule (Part B), FX (A7).
@@ -270,7 +271,7 @@ Unless stated: item unit = base currency = EGP; zakat year = **lunar (r = 2.5 %,
 
 **Zakat share defaults and settings**
 
-- **AC-5** Given a new stock with intent "long-term" and long-term method "dividends-only", Then its zakat share is 0 %, its set-aside is 0, and the user is told "zakat on your dividends is counted with your cash".
+- **AC-5** Given a stock with intent "long-term", method "dividends-only", value 50,000 at both ends of 2026, and income received 400 on 2026-03-15 and 600 on 2026-09-15 (zakat year lunar), When viewing year 2026, Then its zakat share is 0 %, the set-aside on its value is 0, and its set-aside = 0.025 × 1,000 = **25.00** (no T/Y factor); When viewing March 2026, Then set-aside = **10.00**; September 2026 = **15.00**; other months = 0.
 - **AC-6** Given a new crypto item, Then its zakat share defaults to 100 % and a notice says scholars dispute whether holding it is permissible.
 - **AC-7** Given a new "other" item (e.g. real estate), When saved without a zakat share, Then it is rejected — no default is applied.
 - **AC-8** Given a first-time user, When setup completes, Then the zakat year, and the long-term method before the first long-term stock/fund is saved, have each been answered by the user; none is applied without being shown.
@@ -388,7 +389,7 @@ Answered by the consultant (Z-1…Z-7 in zakat-on-investments.md) and applied ab
 
 | UX question | Answer |
 |---|---|
-| PM-Q1 dividends-only computation | Consultant owns it: zakat-on-investments.md Z-1 and B3. Story rule today: s = 0 plus the notice (§5.1, AC-5). |
+| PM-Q1 dividends-only computation | Consultant owns it: zakat-on-investments.md Z-1 and B3. Applied: s = 0, set-aside = r_z × dividends in the period, no T/Y (§5.1, §9.4, AC-5). |
 | PM-Q2 what the nisab choice drives | Consultant owns it: zakat-on-investments.md Z-4 / A3. Nisab check is UC-3 (§11). |
 | PM-Q3 stale threshold | Calendar month, no setting (§9.3). |
 | PM-Q4 historical rates from refresh | No; latest only. In-form fetch only when the date needed is today (§6.1, Q9). |
