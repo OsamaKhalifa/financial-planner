@@ -10,14 +10,12 @@ final class Period {
 
   /// Calendar month; the current one ends today (D10, "so far").
   factory Period.month(int year, int month, DateTime today) => Period(
-        s: DateTime.utc(year, month, 0),
-        e: earlier(DateTime.utc(year, month + 1, 0), today),
-      );
+    s: DateTime.utc(year, month, 0),
+    e: earlier(DateTime.utc(year, month + 1, 0), today),
+  );
 
-  factory Period.year(int year, DateTime today) => Period(
-        s: day(year - 1, 12, 31),
-        e: earlier(day(year, 12, 31), today),
-      );
+  factory Period.year(int year, DateTime today) =>
+      Period(s: day(year - 1, 12, 31), e: earlier(day(year, 12, 31), today));
 
   final DateTime s;
   final DateTime e;

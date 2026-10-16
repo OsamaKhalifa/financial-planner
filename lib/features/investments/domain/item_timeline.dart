@@ -23,7 +23,7 @@ final class MissingRate {
 /// other units are converted at the entry's date.
 final class ItemTimeline {
   ItemTimeline(this.aggregate, RateBook rates)
-      : _entries = List.of(aggregate.history)..sort(_byDate) {
+    : _entries = List.of(aggregate.history)..sort(_byDate) {
     for (final e in _entries) {
       final m = switch (e) {
         MoneyIn(:final amount) => amount,
@@ -94,13 +94,19 @@ final class ItemTimeline {
     }
   }
 
+  /// Value of the last checkpoint on or before [d] (binary search).
   static Decimal _at(List<(DateTime, Decimal)> points, DateTime d) {
-    var result = Decimal.zero;
-    for (final p in points) {
-      if (p.$1.isAfter(d)) break;
-      result = p.$2;
+    var lo = 0;
+    var hi = points.length;
+    while (lo < hi) {
+      final mid = (lo + hi) >> 1;
+      if (points[mid].$1.isAfter(d)) {
+        hi = mid;
+      } else {
+        lo = mid + 1;
+      }
     }
-    return result;
+    return lo == 0 ? Decimal.zero : points[lo - 1].$2;
   }
 
   Decimal recordedValueAt(DateTime d) => _at(_values, d);
@@ -110,27 +116,33 @@ final class ItemTimeline {
 
   Decimal netValueAt(DateTime d) => recordedValueAt(d) - heldInterestAt(d);
 
+  /// Entries dated after [s] up to and including [e]; [_entries] is sorted.
+  Iterable<HistoryEntry> _entriesIn(DateTime s, DateTime e) sync* {
+    for (final x in _entries) {
+      if (x.date.isAfter(e)) return;
+      if (x.date.isAfter(s)) yield x;
+    }
+  }
+
   /// Money in (+) and money out (−) dated after [s] up to [e]; never interest.
   List<Flow> flowsIn(DateTime s, DateTime e) => [
-        for (final x in _entries)
-          if (x.date.isAfter(s) && !x.date.isAfter(e) && _amount[x.id] != null)
-            switch (x) {
-              MoneyIn() => Flow(date: x.date, amount: _amount[x.id]!),
-              MoneyOut() => Flow(date: x.date, amount: -_amount[x.id]!),
-              _ => null,
-            },
-      ].nonNulls.toList();
+    for (final x in _entriesIn(s, e))
+      if (_amount[x.id] != null)
+        switch (x) {
+          MoneyIn() => Flow(date: x.date, amount: _amount[x.id]!),
+          MoneyOut() => Flow(date: x.date, amount: -_amount[x.id]!),
+          _ => null,
+        },
+  ].nonNulls.toList();
 
   /// Income received in hand, as positive amounts.
   List<Flow> incomeFlows(DateTime s, DateTime e) => [
-        for (final x in _entries)
-          if (x is MoneyOut &&
-              x.kind == MoneyOutKind.income &&
-              x.date.isAfter(s) &&
-              !x.date.isAfter(e) &&
-              _amount[x.id] != null)
-            Flow(date: x.date, amount: _amount[x.id]!),
-      ];
+    for (final x in _entriesIn(s, e))
+      if (x is MoneyOut &&
+          x.kind == MoneyOutKind.income &&
+          _amount[x.id] != null)
+        Flow(date: x.date, amount: _amount[x.id]!),
+  ];
 
   Decimal incomeIn(DateTime s, DateTime e) =>
       sumOf(incomeFlows(s, e).map((f) => f.amount));
@@ -150,13 +162,13 @@ final class ItemTimeline {
   }
 
   /// A value update or a flow inside (s, e] (§9.3).
-  bool activeIn(DateTime s, DateTime e) => _entries.any(
-        (x) =>
-            x is! InterestRecord && x.date.isAfter(s) && !x.date.isAfter(e),
-      );
+  bool activeIn(DateTime s, DateTime e) =>
+      _entriesIn(s, e).any((x) => x is! InterestRecord);
 
   bool closedAt(DateTime d) =>
-      _entries.any((x) => !x.date.isAfter(d)) && netValueAt(d) <= Decimal.zero;
+      _entries.isNotEmpty &&
+      !_entries.first.date.isAfter(d) &&
+      netValueAt(d) <= Decimal.zero;
 
   DateTime get latestValueDate => _entries
       .where((x) => x is! InterestRecord)

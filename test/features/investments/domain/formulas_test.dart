@@ -10,7 +10,11 @@ Decimal d(String s) => Decimal.parse(s);
 
 void expectNear(Decimal? actual, String expected) {
   expect(actual, isNotNull);
-  expect((actual! - d(expected)).abs() < d('0.005'), isTrue, reason: '$actual vs $expected');
+  expect(
+    (actual! - d(expected)).abs() < d('0.005'),
+    isTrue,
+    reason: '$actual vs $expected',
+  );
 }
 
 void main() {

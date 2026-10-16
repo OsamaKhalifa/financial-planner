@@ -12,6 +12,15 @@ void main() {
     expect(divide(d('1'), d('8')), d('0.125'));
   });
 
+  test('divide truncates toward zero and handles signs and mixed scales', () {
+    expect(divide(d('-2'), d('3')), d('-0.66666666666666666666'));
+    expect(divide(d('2'), d('-3')), d('-0.66666666666666666666'));
+    expect(divide(d('10.50'), d('0.5')), d('21'));
+    expect(divide(d('0'), d('7')), Decimal.zero);
+    expect(divide(d('100'), d('354.367')).scale, 20);
+    expect(divide(d('1000'), d('4000')), d('0.25'));
+  });
+
   test('divide by zero throws instead of returning infinity', () {
     expect(() => divide(d('1'), d('0')), throwsA(anything));
   });

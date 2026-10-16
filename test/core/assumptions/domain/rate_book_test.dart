@@ -14,13 +14,18 @@ const eur = Unit('EUR');
 
 Decimal d(String s) => Decimal.parse(s);
 
-Rate rate(Unit a, Unit b, String r, DateTime on,
-        {RateSource source = RateSource.typed}) =>
-    Rate(from: a, to: b, rate: d(r), asOf: on, source: source);
+Rate rate(
+  Unit a,
+  Unit b,
+  String r,
+  DateTime on, {
+  RateSource source = RateSource.typed,
+}) => Rate(from: a, to: b, rate: d(r), asOf: on, source: source);
 
 void main() {
   test('same unit converts 1:1 without any rate', () {
-    final m = RateBook(const []).convert(Money(d('5'), usd), usd, day(2026, 1, 1));
+    final m = RateBook(const [])
+        .convert(Money(d('5'), usd), usd, day(2026, 1, 1));
     expect(m, Money(d('5'), usd));
   });
 
@@ -34,21 +39,24 @@ void main() {
     expect(book.quote(usd, egp, day(2025, 12, 31)), isNull);
   });
 
-  test('same date: direct beats inverse, a later inverse beats an older direct', () {
-    final same = RateBook([
-      rate(egp, usd, '0.04', day(2026, 1, 1)),
-      rate(usd, egp, '50', day(2026, 1, 1)),
-    ]);
-    final q = same.quote(usd, egp, day(2026, 1, 1))!;
-    expect(q.rate, d('50'));
-    expect(q.inverted, isFalse);
+  test(
+    'same date: direct beats inverse, a later inverse beats an older direct',
+    () {
+      final same = RateBook([
+        rate(egp, usd, '0.04', day(2026, 1, 1)),
+        rate(usd, egp, '50', day(2026, 1, 1)),
+      ]);
+      final q = same.quote(usd, egp, day(2026, 1, 1))!;
+      expect(q.rate, d('50'));
+      expect(q.inverted, isFalse);
 
-    final newerInverse = RateBook([
-      rate(usd, egp, '50', day(2026, 1, 1)),
-      rate(egp, usd, '0.02', day(2026, 2, 1)),
-    ]);
-    expect(newerInverse.quote(usd, egp, day(2026, 3, 1))!.inverted, isTrue);
-  });
+      final newerInverse = RateBook([
+        rate(usd, egp, '50', day(2026, 1, 1)),
+        rate(egp, usd, '0.02', day(2026, 2, 1)),
+      ]);
+      expect(newerInverse.quote(usd, egp, day(2026, 3, 1))!.inverted, isTrue);
+    },
+  );
 
   test('a fetched rate wins only when it is newer than the typed one', () {
     final book = RateBook([

@@ -4,8 +4,18 @@ import 'dart:math' as math;
 
 import 'package:decimal/decimal.dart';
 
-Decimal divide(Decimal a, Decimal b) =>
-    (a / b).toDecimal(scaleOnInfinitePrecision: 20);
+const _scale = 20;
+final _ten = BigInt.from(10);
+
+/// a / b truncated toward zero at 20 decimals. Done on BigInts: the Rational
+/// route (`a / b`) normalises with a gcd on every call, which dominated the
+/// engine's time.
+Decimal divide(Decimal a, Decimal b) {
+  final an = a.shift(a.scale).toBigInt();
+  final bn = b.shift(b.scale).toBigInt();
+  final q = (an * _ten.pow(_scale + b.scale)) ~/ (bn * _ten.pow(a.scale));
+  return Decimal.fromBigInt(q).shift(-_scale);
+}
 
 Decimal sumOf(Iterable<Decimal> values) =>
     values.fold(Decimal.zero, (a, b) => a + b);

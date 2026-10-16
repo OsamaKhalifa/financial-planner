@@ -11,7 +11,10 @@ void main() {
     expect(allUnits.length, 34);
     final codes = allUnits.map((u) => u.code).toList();
     expect(codes, [...codes]..sort());
-    expect(v1Currencies, containsAll([const Unit('SEK'), const Unit('NOK'), const Unit('DKK')]));
+    expect(
+      v1Currencies,
+      containsAll([const Unit('SEK'), const Unit('NOK'), const Unit('DKK')]),
+    );
   });
 
   test('metals are flagged and have no default country', () {

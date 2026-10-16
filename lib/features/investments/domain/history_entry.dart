@@ -12,9 +12,9 @@ sealed class HistoryEntry {
     required this.date,
     DateTime? createdAt,
     DateTime? updatedAt,
-  })  : id = id ?? newId(),
-        createdAt = createdAt ?? DateTime.utc(1970),
-        updatedAt = updatedAt ?? createdAt ?? DateTime.utc(1970);
+  }) : id = id ?? newId(),
+       createdAt = createdAt ?? DateTime.utc(1970),
+       updatedAt = updatedAt ?? createdAt ?? DateTime.utc(1970);
 
   final String id;
   final String investmentId;
@@ -53,7 +53,12 @@ final class MoneyOut extends HistoryEntry {
   final MoneyOutKind kind;
 }
 
-enum InterestKind { keptInside, paidOut, givenAwayFromInside, givenAwayFromPaidOut }
+enum InterestKind {
+  keptInside,
+  paidOut,
+  givenAwayFromInside,
+  givenAwayFromPaidOut,
+}
 
 final class InterestRecord extends HistoryEntry {
   InterestRecord({

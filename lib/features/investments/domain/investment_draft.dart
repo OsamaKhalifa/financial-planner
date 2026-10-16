@@ -74,7 +74,9 @@ List<DraftError> validate(
   required Settings settings,
 }) {
   final errors = <DraftError>[];
-  if (d.name == null || d.name!.trim().isEmpty) errors.add(DraftError.missingName);
+  if (d.name == null || d.name!.trim().isEmpty) {
+    errors.add(DraftError.missingName);
+  }
   if (d.unit == null) errors.add(DraftError.missingUnit);
   _checkDates(d, today, errors);
   _checkFirstPaid(d, errors);
@@ -117,7 +119,8 @@ void _checkTypeFields(
       errors.add(DraftError.missingMarketCountry);
     }
   }
-  final needsIntent = type == AssetType.stock ||
+  final needsIntent =
+      type == AssetType.stock ||
       type == AssetType.fund ||
       type == AssetType.other;
   if (needsIntent && d.intent == null) errors.add(DraftError.missingIntent);
@@ -140,7 +143,8 @@ void _checkShare(
   final stockLike = type == AssetType.stock || type == AssetType.fund;
   if (rule == null) {
     if (stockLike && d.intent == null) return;
-    final longTerm = stockLike &&
+    final longTerm =
+        stockLike &&
         d.intent == Intent.longTerm &&
         settings.longTermMethod == null;
     errors.add(

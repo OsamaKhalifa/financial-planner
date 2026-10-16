@@ -56,7 +56,10 @@ final class ShippedInflation {
         for (final c in raw.entries)
           Country(c.key): {
             for (final y in (c.value as Map<String, dynamic>).entries)
-              int.parse(y.key): divide(Decimal.parse(y.value as String), hundred),
+              int.parse(y.key): divide(
+                Decimal.parse(y.value as String),
+                hundred,
+              ),
           },
       },
     );
@@ -79,9 +82,9 @@ final class InflationOverride {
     required this.rate,
     DateTime? createdAt,
     DateTime? updatedAt,
-  })  : id = id ?? newId(),
-        createdAt = createdAt ?? DateTime.utc(1970),
-        updatedAt = updatedAt ?? createdAt ?? DateTime.utc(1970);
+  }) : id = id ?? newId(),
+       createdAt = createdAt ?? DateTime.utc(1970),
+       updatedAt = updatedAt ?? createdAt ?? DateTime.utc(1970);
 
   final String id;
   final Country country;
@@ -93,9 +96,7 @@ final class InflationOverride {
 
 final class InflationBook {
   InflationBook(this.shipped, List<InflationOverride> overrides)
-      : _overrides = {
-          for (final o in overrides) (o.country, o.year): o.rate,
-        };
+    : _overrides = {for (final o in overrides) (o.country, o.year): o.rate};
 
   final ShippedInflation shipped;
   final Map<(Country, int), Decimal> _overrides;

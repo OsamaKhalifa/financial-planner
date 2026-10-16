@@ -14,7 +14,8 @@ DateTime endOfMonth(DateTime d) => DateTime.utc(d.year, d.month + 1, 0);
 
 DateTime endOfYear(DateTime d) => DateTime.utc(d.year, 12, 31);
 
-int daysInYear(int year) => daysBetween(day(year - 1, 12, 31), day(year, 12, 31));
+int daysInYear(int year) =>
+    daysBetween(day(year - 1, 12, 31), day(year, 12, 31));
 
 DateTime earlier(DateTime a, DateTime b) => a.isBefore(b) ? a : b;
 

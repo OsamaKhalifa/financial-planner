@@ -47,9 +47,9 @@ final class Investment {
     this.notes,
     DateTime? createdAt,
     DateTime? updatedAt,
-  })  : id = id ?? newId(),
-        createdAt = createdAt ?? DateTime.utc(1970),
-        updatedAt = updatedAt ?? createdAt ?? DateTime.utc(1970);
+  }) : id = id ?? newId(),
+       createdAt = createdAt ?? DateTime.utc(1970),
+       updatedAt = updatedAt ?? createdAt ?? DateTime.utc(1970);
 
   final String id;
   final String name;

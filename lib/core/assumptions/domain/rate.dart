@@ -19,9 +19,9 @@ final class Rate {
     this.source = RateSource.typed,
     DateTime? createdAt,
     DateTime? updatedAt,
-  })  : id = id ?? newId(),
-        createdAt = createdAt ?? _epoch,
-        updatedAt = updatedAt ?? createdAt ?? _epoch;
+  }) : id = id ?? newId(),
+       createdAt = createdAt ?? _epoch,
+       updatedAt = updatedAt ?? createdAt ?? _epoch;
 
   final String id;
   final Unit from;

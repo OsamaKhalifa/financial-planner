@@ -26,7 +26,11 @@ void main() {
 
   test('a year before all data has no rate', () {
     final book = InflationBook(
-      ShippedInflation(series: {egy: {2025: d('0.25')}}),
+      ShippedInflation(
+        series: {
+          egy: {2025: d('0.25')},
+        },
+      ),
       const [],
     );
     expect(book.forYear(egy, 2024), isNull);
@@ -34,7 +38,11 @@ void main() {
 
   test('assumed years follow a user override when that is the latest', () {
     final book = InflationBook(
-      ShippedInflation(series: {egy: {2024: d('0.2')}}),
+      ShippedInflation(
+        series: {
+          egy: {2024: d('0.2')},
+        },
+      ),
       [InflationOverride(country: egy, year: 2025, rate: d('0.3'))],
     );
     final y = book.forYear(egy, 2026)!;
@@ -44,7 +52,11 @@ void main() {
 
   test('a period inside one year uses only that year, d / D of it', () {
     final book = InflationBook(
-      ShippedInflation(series: {egy: {2026: d('0.10')}}),
+      ShippedInflation(
+        series: {
+          egy: {2026: d('0.10')},
+        },
+      ),
       const [],
     );
     final p = book.forPeriod(egy, day(2025, 12, 31), day(2026, 12, 31))!;
@@ -54,7 +66,11 @@ void main() {
 
   test('a period touching a year with no data is unavailable', () {
     final book = InflationBook(
-      ShippedInflation(series: {egy: {2026: d('0.10')}}),
+      ShippedInflation(
+        series: {
+          egy: {2026: d('0.10')},
+        },
+      ),
       const [],
     );
     expect(book.forPeriod(egy, day(2025, 11, 30), day(2026, 1, 31)), isNull);
