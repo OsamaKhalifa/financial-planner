@@ -75,7 +75,7 @@ void main() {
       await container.read(settingsProvider.future);
       await container.read(rateBookProvider.future);
       container.read(refreshControllerProvider);
-      await Future<void>.delayed(const Duration(milliseconds: 100));
+      await pumpEventQueue(times: 50);
       expect(requests, isEmpty);
 
       await container.read(refreshControllerProvider.notifier).refresh({

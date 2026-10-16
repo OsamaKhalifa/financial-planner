@@ -229,9 +229,7 @@ void testScreen(
 });
 
 Future<void> settle(WidgetTester tester) async {
-  await tester.runAsync(
-    () => Future<void>.delayed(const Duration(milliseconds: 20)),
-  );
+  await tester.runAsync(() => pumpEventQueue(times: 50));
   await tester.pumpAndSettle();
 }
 

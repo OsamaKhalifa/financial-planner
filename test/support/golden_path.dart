@@ -120,9 +120,7 @@ Future<void> runGoldenPath(WidgetTester tester) async {
   await tapText(l10n().updateAll);
   expect(requests, isEmpty, reason: 'nothing is fetched until asked');
   await tapKey('refresh');
-  await tester.runAsync(
-    () => Future<void>.delayed(const Duration(milliseconds: 50)),
-  );
+  await tester.runAsync(() => pumpEventQueue(times: 50));
   await tester.pumpAndSettle();
   expect(find.byKey(const ValueKey('refresh-status')), findsOneWidget);
   await tester.tap(find.byType(Switch));
