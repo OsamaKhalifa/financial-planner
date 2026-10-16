@@ -39,7 +39,7 @@ Import direction: `presentation → domain ← data`, `features → core`, never
 |---|---|---|
 | `flutter_riverpod` | ^3.4.3 | Owner decision: state management. |
 | `drift` | ^2.35.2 | Owner decision (ADR-0001): SQLite access with typed queries and `watch()` streams. |
-| `drift_flutter` | ^0.3.1 | Opens the DB on device and bundles sqlite via `sqlite3` 3.x build hooks. Replaces `sqlite3_flutter_libs`, which is end-of-life (`0.6.0+eol` on pub.dev). |
+| `drift_flutter` | ^0.3.1 | Opens the DB on device and bundles sqlite via `sqlite3` 3.x build hooks. Not a direct dependency on `sqlite3_flutter_libs` (end-of-life, `0.6.0+eol`); `drift_flutter` 0.3.1 still pulls it (and `sqlcipher_flutter_libs`) in transitively — verified in Phase 0. Revisit when `drift_flutter` drops it. |
 | `path_provider` | ^2.1.6 | `getApplicationSupportDirectory` for the DB file (ADR-0001). `drift_flutter` defaults to the *documents* dir, which is user-visible on iOS — we pass `DriftNativeOptions(databaseDirectory: getApplicationSupportDirectory)`. Already transitive; direct because we call it. |
 | `decimal` | ^3.2.6 | Money is `Decimal` (project rule). Pulls `rational`. |
 | `http` | ^1.6.0 | The one network call (ADR-0003). Chosen over `dart:io HttpClient` for `MockClient`, which makes AC-25/26/29 plain unit tests. |

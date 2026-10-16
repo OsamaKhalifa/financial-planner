@@ -77,7 +77,7 @@ Keep a hand-entered list of my investments, in any currency or in gold/silver gr
 | stock, fund/ETF | **asked**, no default | trading → 100 %; long-term → the user's **long-term method**, **asked** (per item or once as a portfolio setting): dividends-only (IIFA) → 0 % of value, and a set-aside of r_z × each "income received" (dividend) on the item, charged once (§9.4, consultant answer (a), IIFA Res 28 (3/4) §3); if the same dividend is also recorded as money in to a cash item in this list, that cash entry shows "Already counted as dividend zakat on {item}?"; 25 % proxy (NZF) → 25 %; full value → 100 % (B3, B4) |
 | sukuk | — | 100 % (B4) |
 | crypto | — | 100 % of market value, with a notice that scholars dispute whether holding it is permissible (B8) |
-| other (real estate, business, pension, …) | asked | **ask** — the user must enter a share; no default (B5–B7) |
+| other (real estate, business, pension, …) | asked | **ask** — nothing is filled in silently (B5–B7). Where the Shariah file gives a value for the intent (personal use → 0 %, rental → 0 % with rent zakat via cash, trading/resale → 100 %), it is **offered** with its source and applies only when the user confirms it. Business and pension: no value offered. |
 
 ### 5.2 Settings asked once (no silent defaults)
 
@@ -108,6 +108,7 @@ Additional buys and partial sells are in: without them, Yasmin's monthly deposit
 - **Interest (to purify)** (Z-6, Quran 2:278–279):
   - **Held interest H** of an item on a date = interest kept inside the item − interest given away from inside the item, up to that date.
   - For return, gain and zakat, the item's value is **recorded value − H**. So interest never counts as return and never enters the zakat base.
+  - Interest kept inside the item raises the recorded value by that amount on its date (unless a value update is recorded that day), and H by the same amount: no effect on return.
   - Interest paid out to the user: no effect on value or return.
   - Interest given away **from inside the item** lowers the recorded value and H by the same amount: no effect on return.
   - Interest given away **from interest paid out to me** changes neither the item's value nor H: no effect on return.
@@ -148,7 +149,7 @@ Additional buys and partial sells are in: without them, Yasmin's monthly deposit
 ### 6.3 Choosing units (picker order)
 
 Wherever the user chooses a unit (item unit, money in/out unit, rate pair, base currency), the list starts with **up to 5 most-used units**, then all other units alphabetically by code.
-"Most used" = number of the user's investments whose item unit is that unit (open and closed). Ties: alphabetical by code. The base currency is always in the top group (it counts as used even with 0 items). XAU-g and XAG-g are units like any other. Before a base currency exists (first setup), the phone's region currency takes the base currency's place. Alphabetical by code is language-neutral and testable; UX may sort by localized name instead (UX decision).
+"Most used" = number of the user's investments whose item unit is that unit (open and closed). Ties: alphabetical by code. The base currency is always in the top group (it counts as used even with 0 items). XAU-g and XAG-g are units like any other. **v1 unit list:** the architect's 29 currencies (spec §2.1) plus **SEK, NOK, DKK** (Muslims in non-euro Europe), plus XAU-g and XAG-g — not all of ISO 4217. Before a base currency exists (first setup), the phone's region currency takes the base currency's place. Alphabetical by code is language-neutral and testable; UX may sort by localized name instead (UX decision).
 
 ---
 
@@ -199,7 +200,7 @@ Why not "asset type only": the user would recompute money value by hand each tim
 
 ### 9.1 Period and Modified Dietz return
 
-A period runs from the end of day **S** to the end of day **E**; T = E − S in days. Months and years are Gregorian (Q7).
+A period runs from the end of day **S** to the end of day **E**; T = E − S in days. Months and years are Gregorian (Q7). The **current** month or year ends **today** (E = today) and is labelled "so far".
 
 - **BV** = value at end of S (last value on or before S), **EV** = value at end of E. Values are always net of held interest H (§5.4).
 - **Flows** = money in (+) and money out (−) dated after S up to and including E. Interest records are never flows. **CF** = sum of flows.
@@ -218,7 +219,7 @@ Why Modified Dietz: money-weighted ("did *my* money grow"), no iteration (IRR ca
 - **Since-start return** = Modified Dietz with S = start date (BV = first money in, no flow on S), E = latest value date.
 - **Annualised return** = (1 + since-start return)^(365 / T) − 1, **only if T ≥ 365 days**; otherwise not shown (research takeaway 4).
 - With no money in/out after the start, simple ROI = since-start return.
-- **Since-start set-aside, return after set-aside, and real returns** (UX-Q5): the §9.4 and §9.5 formulas over the same period (S = start date, E = latest value date, T = days held), inflation per §8.2 over that period. Labels as in §9.4 and §8.3.
+- **Since-start set-aside, return after set-aside, and real returns** (UX-Q5): the §9.4 and §9.5 formulas over the same period (S = start date, E = latest value date, T = days held), inflation per §8.2 over that period. If the held period includes years switched to "no zakat due", T in the set-aside counts only the days outside those years, and dividends dated in those years are not charged. Labels as in §9.4 and §8.3.
 
 ### 9.3 Staleness
 
@@ -230,13 +231,14 @@ If an item has neither a value update nor a flow inside a period (gold/silver: n
 
 `Z_item = r_z × s × EV_item × (T / Y)`
 r_z and Y = the user's zakat year setting, **always as a matched pair**: lunar 2.5 % / 354.367 (default) or solar 2.577 % / 365 (A1, A2, Z-2). s = zakat share. EV_item is net of held interest. Computed in money (item unit), converted to the base currency at the rate on E (Z-7: fine for a planning figure; UC-3 uses the rate on the zakat date).
-`Z_div_item = r_z × (sum of money out of kind income dated inside the period)` — only for items on the dividends-only method (s = 0). **No T/Y factor**: each dividend is charged once, when received (consultant answer (a), IIFA Res 28 (3/4) §3). Converted to base at each dividend's date rate.
+`Z_div_item = r_z × (sum of money out of kind income dated inside the period)` — only for items on the dividends-only method (s = 0). **No T/Y factor**: each dividend is charged once, when received (consultant answer (a), IIFA Res 28 (3/4) §3). Converted to base at the rate on **each dividend's date** (not at E), because each dividend is charged on its own date.
 `Z` (portfolio) = Σ (Z_item + Z_div_item) in base currency.
 
 - Label everywhere: **"estimated zakat set-aside (planning). Actual zakat is due once a year on your zakat date."** Never "zakat due" or "zakat paid" (Z-3).
 - Each zakat figure's "why" points to its section of zakat-on-investments.md (A9): rate and year (A1/A2), the asset rule (Part B), FX (A7).
 - **Return after zakat set-aside:** `R_z = (EV − BV − CF − Z) / D`.
 - **"No zakat due this year" switch:** if on, Z = 0 for periods in that year. Help text: **"Decide using all your zakatable wealth, not only this list."** (Z-4). The full nisab check is UC-3.
+- **Nisab hint** next to the switch (consultant answer (b)): "Nisab: {weight} {metal} = {amount} {base} on {date} (your {metal} rate)" for the chosen metal (gold 85 g / silver 595 g; both lines if not chosen yet), and "Zakatable total in this list: Σ (value × zakat share)" at today's values and rates. The switch is never set automatically. No rate for the metal → "Add a {metal} rate to see the nisab".
 
 ### 9.5 After inflation
 
@@ -273,7 +275,7 @@ Unless stated: item unit = base currency = EGP; zakat year = **lunar (r = 2.5 %,
 
 - **AC-5** Given a stock with intent "long-term", method "dividends-only", value 50,000 at both ends of 2026, and income received 400 on 2026-03-15 and 600 on 2026-09-15 (zakat year lunar), When viewing year 2026, Then its zakat share is 0 %, the set-aside on its value is 0, and its set-aside = 0.025 × 1,000 = **25.00** (no T/Y factor); When viewing March 2026, Then set-aside = **10.00**; September 2026 = **15.00**; other months = 0.
 - **AC-6** Given a new crypto item, Then its zakat share defaults to 100 % and a notice says scholars dispute whether holding it is permissible.
-- **AC-7** Given a new "other" item (e.g. real estate), When saved without a zakat share, Then it is rejected — no default is applied.
+- **AC-7** Given a new "other" item (e.g. real estate), When saved without a zakat share the user confirmed, Then it is rejected — no default is applied. Given intent "personal use", Then 0 % is offered with its source (B5), and is used only after the user confirms it; Given intent "business" or a pension, Then no value is offered.
 - **AC-8** Given a first-time user, When setup completes, Then the zakat year, and the long-term method before the first long-term stock/fund is saved, have each been answered by the user; none is applied without being shown.
 - **AC-9** Given zakat year = solar, Then r = 2.577 % and Y = 365 are used together; Given lunar, Then 2.5 % and 354.367. No other combination is possible.
 
@@ -345,6 +347,10 @@ Unless stated: item unit = base currency = EGP; zakat year = **lunar (r = 2.5 %,
 - **AC-42** Given base EGP and investments in USD ×3, EGP ×2, SAR ×1, XAU-g ×1, When the user chooses a unit anywhere, Then the list starts **USD, EGP, SAR, XAU-g**, then all other units in code order (AED, AUD, …) without repeating those four.
 - **AC-43** Given investments in 6 different units, none in the base currency, Then the top group is the base currency plus the 4 most used (ties alphabetical by code).
 - **AC-44** Given a new user with no investments and base SAR, Then the list starts with SAR, then all units alphabetical.
+
+**Nisab hint**
+
+- **AC-45** Given base EGP, XAU-g→EGP 5,000 and XAG-g→EGP 60 on 2026-10-16, nisab metal not chosen, items: cash deposit 100,000 (share 100 %) and long-term stock 50,000 (NZF 25 %), When the user looks at the "no zakat due" switch on 2026-10-16, Then it shows "Nisab: 85 g gold = **425,000.00 EGP**" and "Nisab: 595 g silver = **35,700.00 EGP**", "Zakatable total in this list: **112,500.00 EGP**", and the help text from §9.4; and the switch stays as the user left it. Given no gold rate, Then the gold line reads "Add a gold rate to see the nisab".
 
 ---
 
