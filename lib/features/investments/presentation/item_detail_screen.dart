@@ -33,7 +33,10 @@ class ItemDetailScreen extends ConsumerWidget {
     final settings = ref.watch(settingsProvider).value;
     final since = ref.watch(sinceStartProvider(investmentId));
     final matches = items?.where((h) => h.investment.id == investmentId);
-    if (matches == null || matches.isEmpty || settings == null || since == null) {
+    if (matches == null ||
+        matches.isEmpty ||
+        settings == null ||
+        since == null) {
       return Scaffold(
         appBar: AppBar(),
         body: const Center(child: CircularProgressIndicator()),
@@ -75,7 +78,10 @@ class ItemDetailScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
         children: [
-          Text(_subtitle(context, item), style: Theme.of(context).textTheme.bodyMedium),
+          Text(
+            _subtitle(context, item),
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
           const SizedBox(height: 8),
           if (closed)
             Card(
@@ -95,7 +101,8 @@ class ItemDetailScreen extends ConsumerWidget {
           Text(l10n.valueFromDate(context.date(f.period.e))),
           const SizedBox(height: 12),
           _returnsCard(context, ref, since, settings, differs),
-          if (f.toPurify.amount > Decimal.zero) _purifyCard(context, f, item.id),
+          if (f.toPurify.amount > Decimal.zero)
+            _purifyCard(context, f, item.id),
           _zakatLine(context, item, settings),
           const SizedBox(height: 8),
           Text(l10n.history, style: Theme.of(context).textTheme.titleMedium),
@@ -130,7 +137,9 @@ class ItemDetailScreen extends ConsumerWidget {
     final f = since.figures;
     final unitReturns = f.itemUnit;
     final baseReturns = f.base;
-    final item = ref.watch(investmentsProvider).value!
+    final item = ref
+        .watch(investmentsProvider)
+        .value!
         .firstWhere((h) => h.investment.id == investmentId)
         .investment;
     final base = settings.baseCurrency!;
@@ -154,15 +163,25 @@ class ItemDetailScreen extends ConsumerWidget {
               if (differs)
                 Expanded(
                   flex: 2,
-                  child: Text(itemValue ?? '—', textAlign: TextAlign.end, style: style),
+                  child: Text(
+                    itemValue ?? '—',
+                    textAlign: TextAlign.end,
+                    style: style,
+                  ),
                 ),
               Expanded(
                 flex: 2,
-                child: Text(baseValue ?? '—', textAlign: TextAlign.end, style: style),
+                child: Text(
+                  baseValue ?? '—',
+                  textAlign: TextAlign.end,
+                  style: style,
+                ),
               ),
               SizedBox(
                 width: 22,
-                child: why == null ? null : const Icon(Icons.info_outline, size: 18),
+                child: why == null
+                    ? null
+                    : const Icon(Icons.info_outline, size: 18),
               ),
             ],
           ),
@@ -183,18 +202,27 @@ class ItemDetailScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(l10n.sinceStart, style: Theme.of(context).textTheme.titleSmall),
+            Text(
+              l10n.sinceStart,
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
             if (differs)
               Row(
                 children: [
                   const Expanded(flex: 3, child: SizedBox()),
                   Expanded(
                     flex: 2,
-                    child: Text(l10n.colItem(item.unit.code), textAlign: TextAlign.end),
+                    child: Text(
+                      l10n.colItem(item.unit.code),
+                      textAlign: TextAlign.end,
+                    ),
                   ),
                   Expanded(
                     flex: 2,
-                    child: Text(l10n.colItem(base.code), textAlign: TextAlign.end),
+                    child: Text(
+                      l10n.colItem(base.code),
+                      textAlign: TextAlign.end,
+                    ),
                   ),
                   const SizedBox(width: 22),
                 ],
@@ -245,7 +273,9 @@ class ItemDetailScreen extends ConsumerWidget {
               row(
                 l10n.rowRealOwn(context.countryName(f.inflationCountry)),
                 itemValue: pct(unitReturns?.real),
-                why: unitReturns == null ? null : whyReal(context, unitReturns, ownTag),
+                why: unitReturns == null
+                    ? null
+                    : whyReal(context, unitReturns, ownTag),
               ),
             row(
               differs
@@ -253,7 +283,9 @@ class ItemDetailScreen extends ConsumerWidget {
                   : l10n.rowRealOwn(context.countryName(f.homeCountry)),
               itemValue: null,
               baseValue: pct(baseReturns?.real),
-              why: baseReturns == null ? null : whyReal(context, baseReturns, homeTag),
+              why: baseReturns == null
+                  ? null
+                  : whyReal(context, baseReturns, homeTag),
             ),
             Text(l10n.realLabel, style: Theme.of(context).textTheme.bodySmall),
             if (homeTag != null)
@@ -284,7 +316,9 @@ class ItemDetailScreen extends ConsumerWidget {
     final l10n = context.l10n;
     return Card(
       child: ListTile(
-        title: Text(l10n.toPurifyItem(context.money(f.toPurify.amount, f.toPurify.unit))),
+        title: Text(
+          l10n.toPurifyItem(context.money(f.toPurify.amount, f.toPurify.unit)),
+        ),
         subtitle: TextButton(
           onPressed: () => showRecordSheet(
             context,
@@ -325,12 +359,20 @@ class ItemDetailScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(head, key: const ValueKey('zakat-line'), style: Theme.of(context).textTheme.titleSmall),
+          Text(
+            head,
+            key: const ValueKey('zakat-line'),
+            style: Theme.of(context).textTheme.titleSmall,
+          ),
           for (final n in notes) Text(n),
           TextButton(
             onPressed: () => showWhy(
               context,
-              Why(title: l10n.zakatSectionTitle, what: head, source: _source(l10n, item.type)),
+              Why(
+                title: l10n.zakatSectionTitle,
+                what: head,
+                source: _source(l10n, item.type),
+              ),
             ),
             child: Text(l10n.source),
           ),
@@ -351,7 +393,10 @@ class ItemDetailScreen extends ConsumerWidget {
   Widget _historyTile(BuildContext context, HistoryEntry e, Investment item) {
     final l10n = context.l10n;
     final (label, amount) = switch (e) {
-      MoneyIn(:final amount) => (l10n.kindMoneyIn, context.money(amount.amount, amount.unit, signed: true)),
+      MoneyIn(:final amount) => (
+        l10n.kindMoneyIn,
+        context.money(amount.amount, amount.unit, signed: true),
+      ),
       MoneyOut(:final amount, :final kind) => (
         kind == MoneyOutKind.sale ? l10n.kindSale : l10n.kindIncome,
         context.money(-amount.amount, amount.unit, signed: true),
@@ -365,7 +410,10 @@ class ItemDetailScreen extends ConsumerWidget {
         },
         context.money(amount.amount, amount.unit),
       ),
-      ValueUpdate(:final value) => (l10n.kindValue, context.money(value, item.unit)),
+      ValueUpdate(:final value) => (
+        l10n.kindValue,
+        context.money(value, item.unit),
+      ),
     };
     return ListTile(
       key: ValueKey('history-${e.id}'),
@@ -377,4 +425,3 @@ class ItemDetailScreen extends ConsumerWidget {
     );
   }
 }
-

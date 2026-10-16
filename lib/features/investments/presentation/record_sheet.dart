@@ -4,12 +4,12 @@ import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart' hide Intent;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/ids.dart';
 import '../../../core/money/decimal_math.dart';
 import '../../../core/money/money.dart';
 import '../../../core/reference/units.dart';
 import '../domain/history_entry.dart';
 import '../domain/investment.dart';
+import '../../../core/assumptions/assumptions_providers.dart';
 import 'investments_providers.dart';
 import 'widgets/fields.dart';
 import 'widgets/labels.dart';
@@ -26,11 +26,8 @@ Future<void> showRecordSheet(
   context: context,
   isScrollControlled: true,
   useSafeArea: true,
-  builder: (_) => RecordSheet(
-    investmentId: investmentId,
-    editing: editing,
-    preset: preset,
-  ),
+  builder: (_) =>
+      RecordSheet(investmentId: investmentId, editing: editing, preset: preset),
 );
 
 enum _Tab { value, moneyIn, moneyOut, interest }
@@ -107,10 +104,15 @@ class _RecordSheetState extends ConsumerState<RecordSheet> {
         _tab = _Tab.interest;
         _amount.text = amount.amount.toString();
         _unit = amount.unit;
-        _givenAway = kind == InterestKind.givenAwayFromInside ||
+        _givenAway =
+            kind == InterestKind.givenAwayFromInside ||
             kind == InterestKind.givenAwayFromPaidOut;
-        _where = kind == InterestKind.keptInside ? _Where.keptInside : _Where.paidOut;
-        _from = kind == InterestKind.givenAwayFromInside ? _Where.keptInside : _Where.paidOut;
+        _where = kind == InterestKind.keptInside
+            ? _Where.keptInside
+            : _Where.paidOut;
+        _from = kind == InterestKind.givenAwayFromInside
+            ? _Where.keptInside
+            : _Where.paidOut;
     }
   }
 
@@ -149,11 +151,7 @@ class _RecordSheetState extends ConsumerState<RecordSheet> {
       fail(l10n.errBeforeStart(context.date(item.startDate)));
       return;
     }
-    if (amount == null || amount <= Decimal.zero && _tab != _Tab.value) {
-      fail(l10n.errZero);
-      return;
-    }
-    if (amount == null) {
+    if (amount == null || (amount <= Decimal.zero && _tab != _Tab.value)) {
       fail(l10n.errZero);
       return;
     }
@@ -162,7 +160,9 @@ class _RecordSheetState extends ConsumerState<RecordSheet> {
     final existing = widget.editing;
     switch (_tab) {
       case _Tab.value:
-        final value = _perUnit && item.quantity != null ? amount * item.quantity! : amount;
+        final value = _perUnit && item.quantity != null
+            ? amount * item.quantity!
+            : amount;
         final sameDay = h.history
             .whereType<ValueUpdate>()
             .where((v) => v.date == _date && v.id != existing?.id)
@@ -173,8 +173,14 @@ class _RecordSheetState extends ConsumerState<RecordSheet> {
             builder: (c) => AlertDialog(
               title: Text(l10n.replaceValueTitle(context.date(_date))),
               actions: [
-                TextButton(onPressed: () => Navigator.pop(c, false), child: Text(l10n.cancel)),
-                TextButton(onPressed: () => Navigator.pop(c, true), child: Text(l10n.replace)),
+                TextButton(
+                  onPressed: () => Navigator.pop(c, false),
+                  child: Text(l10n.cancel),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(c, true),
+                  child: Text(l10n.replace),
+                ),
               ],
             ),
           );
@@ -213,7 +219,8 @@ class _RecordSheetState extends ConsumerState<RecordSheet> {
         if (after != null) entries.add(_valueOn(item.id, after, h));
       case _Tab.moneyOut:
         final left = parseAmount(_valueLeft.text);
-        final current = calc?.timeline(item.id).recordedValueAt(_date) ?? Decimal.zero;
+        final current =
+            calc?.timeline(item.id).recordedValueAt(_date) ?? Decimal.zero;
         final inItemUnit = unit == item.unit ? amount : null;
         if (left == null && inItemUnit != null && inItemUnit > current) {
           fail(l10n.valueLeftRequired);
@@ -270,13 +277,17 @@ class _RecordSheetState extends ConsumerState<RecordSheet> {
   InterestKind? _interestKind(InvestmentWithHistory h, Decimal amount) {
     final l10n = context.l10n;
     if (!_givenAway) {
-      return _where == _Where.keptInside ? InterestKind.keptInside : InterestKind.paidOut;
+      return _where == _Where.keptInside
+          ? InterestKind.keptInside
+          : InterestKind.paidOut;
     }
     final left = _toPurify(h);
     final available = _from == _Where.keptInside ? left.kept : left.paid;
     if (amount > available) {
       setState(
-        () => _error = l10n.errGivenTooMuch(context.money(available, h.investment.unit)),
+        () => _error = l10n.errGivenTooMuch(
+          context.money(available, h.investment.unit),
+        ),
       );
       return null;
     }
@@ -297,7 +308,10 @@ class _RecordSheetState extends ConsumerState<RecordSheet> {
       SnackBar(
         content: Text(l10n.deleted),
         duration: const Duration(seconds: 10),
-        action: SnackBarAction(label: l10n.undo, onPressed: () => repo.saveEntries([e])),
+        action: SnackBarAction(
+          label: l10n.undo,
+          onPressed: () => repo.saveEntries([e]),
+        ),
       ),
     );
   }
@@ -308,7 +322,10 @@ class _RecordSheetState extends ConsumerState<RecordSheet> {
     final items = ref.watch(investmentsProvider).value;
     final match = items?.where((h) => h.investment.id == widget.investmentId);
     if (match == null || match.isEmpty) {
-      return const SizedBox(height: 200, child: Center(child: CircularProgressIndicator()));
+      return const SizedBox(
+        height: 200,
+        child: Center(child: CircularProgressIndicator()),
+      );
     }
     final h = match.first;
     _init(h);
@@ -318,7 +335,12 @@ class _RecordSheetState extends ConsumerState<RecordSheet> {
     final amount = parseAmount(_amount.text);
     final last = calc?.timeline(item.id).recordedValueAt(_date);
     return Padding(
-      padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + MediaQuery.viewInsetsOf(context).bottom),
+      padding: EdgeInsets.fromLTRB(
+        16,
+        16,
+        16,
+        16 + MediaQuery.viewInsetsOf(context).bottom,
+      ),
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -329,7 +351,10 @@ class _RecordSheetState extends ConsumerState<RecordSheet> {
                 ButtonSegment(value: _Tab.value, label: Text(l10n.tabValue)),
                 ButtonSegment(value: _Tab.moneyIn, label: Text(l10n.tabIn)),
                 ButtonSegment(value: _Tab.moneyOut, label: Text(l10n.tabOut)),
-                ButtonSegment(value: _Tab.interest, label: Text(l10n.tabInterest)),
+                ButtonSegment(
+                  value: _Tab.interest,
+                  label: Text(l10n.tabInterest),
+                ),
               ],
               selected: {_tab},
               onSelectionChanged: (s) => setState(() {
@@ -358,7 +383,10 @@ class _RecordSheetState extends ConsumerState<RecordSheet> {
             Row(
               children: [
                 if (widget.editing != null)
-                  TextButton(onPressed: () => _delete(h), child: Text(l10n.delete)),
+                  TextButton(
+                    onPressed: () => _delete(h),
+                    child: Text(l10n.delete),
+                  ),
                 const Spacer(),
                 FilledButton(
                   key: const ValueKey('record-save'),
@@ -381,7 +409,7 @@ class _RecordSheetState extends ConsumerState<RecordSheet> {
   ) {
     final l10n = context.l10n;
     final item = h.investment;
-    final base = ref.read(unitOrderProvider(item.unit)).units.first;
+    final base = ref.read(settingsProvider).value?.baseCurrency ?? item.unit;
     Widget amountRow(String label) => Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -397,7 +425,11 @@ class _RecordSheetState extends ConsumerState<RecordSheet> {
         if (_tab != _Tab.value)
           OutlinedButton(
             onPressed: () async {
-              final u = await showUnitPicker(context, anchor: base, selected: _unit);
+              final u = await showUnitPicker(
+                context,
+                anchor: base,
+                selected: _unit,
+              );
               if (u != null) setState(() => _unit = u);
             },
             child: Text((_unit ?? item.unit).code),
@@ -416,7 +448,12 @@ class _RecordSheetState extends ConsumerState<RecordSheet> {
             : divide(total, last);
         return [
           if (last != null && last != Decimal.zero)
-            Text(l10n.lastValue(context.money(last, item.unit), context.date(_date))),
+            Text(
+              l10n.lastValue(
+                context.money(last, item.unit),
+                context.date(_date),
+              ),
+            ),
           amountRow(l10n.fieldValue),
           if (item.quantity != null)
             SegmentedButton<bool>(
@@ -427,8 +464,10 @@ class _RecordSheetState extends ConsumerState<RecordSheet> {
               selected: {_perUnit},
               onSelectionChanged: (s) => setState(() => _perUnit = s.first),
             ),
-          if (_perUnit && total != null) Text('= ${context.money(total, item.unit)}'),
-          if (ratio != null && (ratio > Decimal.parse('1.5') || ratio < Decimal.parse('0.5')))
+          if (_perUnit && total != null)
+            Text('= ${context.money(total, item.unit)}'),
+          if (ratio != null &&
+              (ratio > Decimal.parse('1.5') || ratio < Decimal.parse('0.5')))
             Text(
               l10n.typoCheck(ratio.round(scale: 1).toString()),
               key: const ValueKey('typo-check'),
@@ -480,13 +519,22 @@ class _RecordSheetState extends ConsumerState<RecordSheet> {
             Text(l10n.interestWhere),
             SegmentedButton<_Where>(
               segments: [
-                ButtonSegment(value: _Where.paidOut, label: Text(l10n.interestPaidOut)),
-                ButtonSegment(value: _Where.keptInside, label: Text(l10n.interestKeptInside)),
+                ButtonSegment(
+                  value: _Where.paidOut,
+                  label: Text(l10n.interestPaidOut),
+                ),
+                ButtonSegment(
+                  value: _Where.keptInside,
+                  label: Text(l10n.interestKeptInside),
+                ),
               ],
               selected: {_where},
               onSelectionChanged: (s) => setState(() => _where = s.first),
             ),
-            Text(l10n.interestNote, style: Theme.of(context).textTheme.bodySmall),
+            Text(
+              l10n.interestNote,
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
             amountRow(l10n.fieldAmount),
           ] else if (!anyLeft)
             Text(l10n.nothingToPurify)
@@ -495,14 +543,23 @@ class _RecordSheetState extends ConsumerState<RecordSheet> {
             SegmentedButton<_Where>(
               segments: [
                 if (left.kept > Decimal.zero)
-                  ButtonSegment(value: _Where.keptInside, label: Text(l10n.interestKeptInside)),
+                  ButtonSegment(
+                    value: _Where.keptInside,
+                    label: Text(l10n.interestKeptInside),
+                  ),
                 if (left.paid > Decimal.zero)
-                  ButtonSegment(value: _Where.paidOut, label: Text(l10n.interestPaidOut)),
+                  ButtonSegment(
+                    value: _Where.paidOut,
+                    label: Text(l10n.interestPaidOut),
+                  ),
               ],
               selected: {_from},
               onSelectionChanged: (s) => setState(() => _from = s.first),
             ),
-            Text(l10n.givenAwayNote, style: Theme.of(context).textTheme.titleSmall),
+            Text(
+              l10n.givenAwayNote,
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
             Text(
               _from == _Where.keptInside ? l10n.effectKept : l10n.effectPaid,
               style: Theme.of(context).textTheme.bodySmall,

@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/assumptions/assumptions_providers.dart';
 import '../../../core/assumptions/data/rate_refresher.dart';
 import '../../../core/assumptions/domain/rate.dart';
+import '../../../core/money/decimal_math.dart';
 import '../../../core/reference/units.dart';
 import '../domain/history_entry.dart';
 import '../domain/investment.dart';
@@ -54,7 +55,7 @@ class _UpdateAllState extends ConsumerState<UpdateAllScreen> {
   ) async {
     final l10n = context.l10n;
     final messenger = ScaffoldMessenger.of(context);
-    final asOf = _asOf ?? ref.read(todayProvider);
+    final DateTime asOf = _asOf ?? ref.read(todayProvider);
     final assumptions = ref.read(assumptionsRepositoryProvider);
     final investments = ref.read(investmentsRepositoryProvider);
     var rateWrites = 0;
@@ -62,7 +63,9 @@ class _UpdateAllState extends ConsumerState<UpdateAllScreen> {
       for (final (from, to) in ratePairs) {
         final v = parseAmount(_ctl('rate-${from.code}-${to.code}').text);
         if (v == null || v <= Decimal.zero) continue;
-        await assumptions.saveTypedRate(Rate(from: from, to: to, rate: v, asOf: asOf));
+        await assumptions.saveTypedRate(
+          Rate(from: from, to: to, rate: v, asOf: asOf),
+        );
         rateWrites++;
       }
     } on Exception {
@@ -73,7 +76,10 @@ class _UpdateAllState extends ConsumerState<UpdateAllScreen> {
     for (final h in staleItems) {
       final v = parseAmount(_ctl('item-${h.investment.id}').text);
       if (v == null) continue;
-      final same = h.history.whereType<ValueUpdate>().where((e) => e.date == asOf).firstOrNull;
+      final same = h.history
+          .whereType<ValueUpdate>()
+          .where((e) => e.date == asOf)
+          .firstOrNull;
       entries.add(
         ValueUpdate(
           id: same?.id,
@@ -91,9 +97,14 @@ class _UpdateAllState extends ConsumerState<UpdateAllScreen> {
       return;
     }
     if (!mounted) return;
-    final left = (staleItems.length - entries.length) + (ratePairs.length - rateWrites);
+    final left =
+        (staleItems.length - entries.length) + (ratePairs.length - rateWrites);
     messenger.showSnackBar(
-      SnackBar(content: Text(l10n.updatedToast('${entries.length}', '${left < 0 ? 0 : left}'))),
+      SnackBar(
+        content: Text(
+          l10n.updatedToast('${entries.length}', '${left < 0 ? 0 : left}'),
+        ),
+      ),
     );
     Navigator.of(context).pop();
   }
@@ -113,7 +124,7 @@ class _UpdateAllState extends ConsumerState<UpdateAllScreen> {
     }
     final base = settings.baseCurrency!;
     final today = ref.watch(todayProvider);
-    _asOf ??= today;
+    final asOfDate = _asOf ?? today;
     final stale = calc.staleNow();
     final open = [
       for (final h in items)
@@ -144,7 +155,7 @@ class _UpdateAllState extends ConsumerState<UpdateAllScreen> {
                 const SizedBox(height: 8),
                 DateField(
                   label: l10n.asOfLabel,
-                  value: _asOf!,
+                  value: asOfDate,
                   lastDate: today,
                   onChanged: (d) => setState(() => _asOf = d),
                 ),
@@ -158,16 +169,26 @@ class _UpdateAllState extends ConsumerState<UpdateAllScreen> {
                   Padding(
                     padding: const EdgeInsets.all(16),
                     child: Text(
-                      l10n.allUpToDate(MaterialLocalizations.of(context).formatMonthYear(today)),
+                      l10n.allUpToDate(
+                        MaterialLocalizations.of(context)
+                            .formatMonthYear(today),
+                      ),
                     ),
                   ),
                 if (ratePairs.isNotEmpty) ...[
-                  Text(l10n.ratesStillOld, style: Theme.of(context).textTheme.titleSmall),
-                  for (final (from, to) in ratePairs) _rateRow(context, rates, from, to, today),
+                  Text(
+                    l10n.ratesStillOld,
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
+                  for (final (from, to) in ratePairs)
+                    _rateRow(context, rates, from, to, today),
                 ],
                 if (staleItems.isNotEmpty) ...[
                   const SizedBox(height: 8),
-                  Text(l10n.valuesHeading, style: Theme.of(context).textTheme.titleSmall),
+                  Text(
+                    l10n.valuesHeading,
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
                   for (final h in staleItems) _valueRow(context, calc, h),
                 ],
               ],
@@ -229,7 +250,10 @@ class _UpdateAllState extends ConsumerState<UpdateAllScreen> {
               child: Text(l10n.refreshRates),
             ),
             const SizedBox(height: 8),
-            Text(l10n.refreshHelp, style: Theme.of(context).textTheme.bodySmall),
+            Text(
+              l10n.refreshHelp,
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
             if (state is RefreshRunning) const LinearProgressIndicator(),
             if (status != null)
               Padding(
@@ -242,15 +266,30 @@ class _UpdateAllState extends ConsumerState<UpdateAllScreen> {
     );
   }
 
-  Widget _rateRow(BuildContext context, List<Rate> rates, Unit from, Unit to, DateTime today) {
+  Widget _rateRow(
+    BuildContext context,
+    List<Rate> rates,
+    Unit from,
+    Unit to,
+    DateTime today,
+  ) {
     final l10n = context.l10n;
     final last = rates
-        .where((r) => (r.from == from && r.to == to) || (r.from == to && r.to == from))
-        .fold<Rate?>(null, (a, r) => a == null || r.asOf.isAfter(a.asOf) ? r : a);
+        .where(
+          (r) =>
+              (r.from == from && r.to == to) || (r.from == to && r.to == from),
+        )
+        .fold<Rate?>(
+          null,
+          (a, r) => a == null || r.asOf.isAfter(a.asOf) ? r : a,
+        );
     final hint = last == null
         ? null
         : l10n.lastHint(
-            context.amount(last.from == from ? last.rate : Decimal.one / last.rate.toRational().toDecimal(scaleOnInfinitePrecision: 20)),
+            context.amount(
+              last.from == from ? last.rate : divide(Decimal.one, last.rate),
+              digits: 4,
+            ),
             context.date(last.asOf),
           );
     return Padding(
@@ -265,7 +304,11 @@ class _UpdateAllState extends ConsumerState<UpdateAllScreen> {
     );
   }
 
-  Widget _valueRow(BuildContext context, PortfolioCalculator calc, InvestmentWithHistory h) {
+  Widget _valueRow(
+    BuildContext context,
+    PortfolioCalculator calc,
+    InvestmentWithHistory h,
+  ) {
     final l10n = context.l10n;
     final item = h.investment;
     final tl = calc.timeline(item.id);
@@ -282,7 +325,10 @@ class _UpdateAllState extends ConsumerState<UpdateAllScreen> {
               key: ValueKey('item-${item.id}'),
               controller: ctl,
               label: '${item.name} (${item.unit.code})',
-              suffix: l10n.lastHint(context.amount(last), context.date(lastDate)),
+              suffix: l10n.lastHint(
+                context.amount(last),
+                context.date(lastDate),
+              ),
               onChanged: (_) => setState(() {}),
             ),
           ),

@@ -39,16 +39,26 @@ class NoZakatBlock extends ConsumerWidget {
           Text(
             hint.goldNisab == null
                 ? l10n.nisabNoGold
-                : l10n.nisabGold(context.money(hint.goldNisab!.amount, hint.goldNisab!.unit)),
+                : l10n.nisabGold(
+                    context.money(hint.goldNisab!.amount, hint.goldNisab!.unit),
+                  ),
           ),
           Text(
             hint.silverNisab == null
                 ? l10n.nisabNoSilver
-                : l10n.nisabSilver(context.money(hint.silverNisab!.amount, hint.silverNisab!.unit)),
+                : l10n.nisabSilver(
+                    context.money(
+                      hint.silverNisab!.amount,
+                      hint.silverNisab!.unit,
+                    ),
+                  ),
           ),
           Text(
             l10n.zakatableTotal(
-              context.money(hint.zakatableTotal.amount, hint.zakatableTotal.unit),
+              context.money(
+                hint.zakatableTotal.amount,
+                hint.zakatableTotal.unit,
+              ),
             ),
           ),
         ],

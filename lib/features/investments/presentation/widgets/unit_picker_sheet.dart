@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/reference/countries.dart';
 import '../../../../core/reference/units.dart';
 import '../investments_providers.dart';
 import 'labels.dart';
@@ -110,3 +111,18 @@ class _UnitPickerSheetState extends State<_UnitPickerSheet> {
     );
   }
 }
+
+Future<Country?> showCountryPicker(BuildContext context) =>
+    showModalBottomSheet<Country>(
+      context: context,
+      builder: (_) => ListView(
+        children: [
+          for (final c in v1Countries)
+            ListTile(
+              key: ValueKey('country-${c.iso3}'),
+              title: Text(context.countryName(c)),
+              onTap: () => Navigator.of(context).pop(c),
+            ),
+        ],
+      ),
+    );

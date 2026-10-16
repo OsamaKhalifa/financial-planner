@@ -9,6 +9,7 @@ import '../../../core/reference/units.dart';
 import '../domain/investment.dart';
 import '../domain/period.dart';
 import '../domain/portfolio_calculator.dart';
+import '../../settings/settings_screen.dart';
 import 'assumptions_screen.dart';
 import 'investment_form_screen.dart';
 import 'investments_providers.dart';
@@ -35,7 +36,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   var _sort = _Sort.value;
 
   void _push(Widget screen) =>
-      Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => screen));
+      Navigator.of(context)
+          .push(MaterialPageRoute<void>(builder: (_) => screen));
 
   @override
   Widget build(BuildContext context) {
@@ -48,6 +50,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       appBar: AppBar(
         title: Text(l10n.appTitle),
         actions: [
+          IconButton(
+            tooltip: 'Settings',
+            icon: const Icon(Icons.settings),
+            onPressed: () => _push(const SettingsScreen()),
+          ),
           IconButton(
             tooltip: l10n.assumptions,
             icon: const Icon(Icons.tune),
@@ -98,7 +105,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(l10n.emptyTitle, style: Theme.of(context).textTheme.titleMedium),
+            Text(
+              l10n.emptyTitle,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
             const SizedBox(height: 16),
             FilledButton(
               onPressed: () => _push(const InvestmentFormScreen()),
@@ -115,7 +125,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ])
                   ActionChip(
                     label: Text(label),
-                    onPressed: () => _push(InvestmentFormScreen(presetType: type)),
+                    onPressed: () =>
+                        _push(InvestmentFormScreen(presetType: type)),
                   ),
               ],
             ),
@@ -152,14 +163,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(l10n.totalValue, style: theme.labelLarge),
-            Text(value, key: const ValueKey('total-value'), style: theme.headlineSmall),
+            Text(
+              value,
+              key: const ValueKey('total-value'),
+              style: theme.headlineSmall,
+            ),
             Text(l10n.asOfDate(context.date(today))),
             const SizedBox(height: 8),
             SegmentedButton<ViewUnit>(
               segments: [
                 ButtonSegment(value: ViewUnit.base, label: Text(base.code)),
-                ButtonSegment(value: ViewUnit.goldGrams, label: Text(l10n.viewGold)),
-                ButtonSegment(value: ViewUnit.silverGrams, label: Text(l10n.viewSilver)),
+                ButtonSegment(
+                  value: ViewUnit.goldGrams,
+                  label: Text(l10n.viewGold),
+                ),
+                ButtonSegment(
+                  value: ViewUnit.silverGrams,
+                  label: Text(l10n.viewSilver),
+                ),
               ],
               selected: {_view},
               onSelectionChanged: (s) => setState(() => _view = s.first),
@@ -172,7 +193,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   child: Text(
                     l10n.excludesItems(
                       '${excluded.length}',
-                      excluded.map((e) => context.pair(e.from, e.to)).toSet().join(', '),
+                      excluded
+                          .map((e) => context.pair(e.from, e.to))
+                          .toSet()
+                          .join(', '),
                     ),
                   ),
                 ),
@@ -183,7 +207,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   child: Text(
-                    l10n.toPurifyLine(context.money(inBase.toPurify.amount, base)),
+                    l10n.toPurifyLine(
+                      context.money(inBase.toPurify.amount, base),
+                    ),
                   ),
                 ),
               ),
@@ -200,8 +226,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       pp == null
                           ? l10n.verdictNotAvailable('${today.year}')
                           : pp.kept
-                          ? l10n.verdictKept('${today.year}', context.money(pp.gap, base, signed: true))
-                          : l10n.verdictLost('${today.year}', context.money(pp.gap, base, signed: true)),
+                          ? l10n.verdictKept(
+                              '${today.year}',
+                              context.money(pp.gap, base, signed: true),
+                            )
+                          : l10n.verdictLost(
+                              '${today.year}',
+                              context.money(pp.gap, base, signed: true),
+                            ),
                       style: theme.titleSmall,
                     ),
                     Text(l10n.verdictCaption, style: theme.bodySmall),
@@ -213,7 +245,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           inBase.homeCountry,
                           inBase.totals?.inflation,
                         );
-                        return tag == null ? const SizedBox.shrink() : Text(tag, style: theme.bodySmall);
+                        return tag == null
+                            ? const SizedBox.shrink()
+                            : Text(tag, style: theme.bodySmall);
                       },
                     ),
                   ],
@@ -232,7 +266,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       color: Theme.of(context).colorScheme.secondaryContainer,
       child: ListTile(
         leading: const Icon(Icons.circle, size: 12),
-        title: Text(l10n.staleBanner('${stale.itemIds.length}', '${stale.ratePairs.length}')),
+        title: Text(
+          l10n.staleBanner(
+            '${stale.itemIds.length}',
+            '${stale.ratePairs.length}',
+          ),
+        ),
         trailing: TextButton(
           onPressed: () => _push(const UpdateAllScreen()),
           child: Text(l10n.updateAll),
@@ -253,6 +292,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       children: [
         Text('${l10n.sortLabel}: '),
         DropdownButton<_Sort>(
+          key: const ValueKey('sort'),
           value: _sort,
           items: [
             for (final e in labels.entries)
@@ -277,7 +317,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
   ];
 
-  List<Widget> _list(BuildContext context, List<_Row> rows, StaleNow stale, Unit base) {
+  List<Widget> _list(
+    BuildContext context,
+    List<_Row> rows,
+    StaleNow stale,
+    Unit base,
+  ) {
     final open = rows.where((r) => !r.figures.closed).toList()..sort(_compare);
     final closed = rows.where((r) => r.figures.closed).toList()..sort(_compare);
     return [
@@ -312,7 +357,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ? l10n.pureGrams(context.grams(f.itemUnit?.dietz.ev ?? Decimal.zero))
         : item.market == null
         ? context.assetTypeName(item.type)
-        : l10n.typeAndMarket(context.assetTypeName(item.type), context.marketName(item.market!));
+        : l10n.typeAndMarket(
+            context.assetTypeName(item.type),
+            context.marketName(item.market!),
+          );
     return ListTile(
       key: ValueKey('item-${item.id}'),
       title: Text(item.name),
@@ -321,9 +369,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         children: [
           Text(subtitle),
           if (f.excluded != null)
-            Text(l10n.rateMissingAdd(f.excluded!.from.code, f.excluded!.to.code))
+            Text(
+              l10n.rateMissingAdd(f.excluded!.from.code, f.excluded!.to.code),
+            )
           else if (isStale)
-            Text(item.unit.isMetal ? l10n.metalRateNotUpdated : l10n.notUpdatedThisMonth),
+            Text(
+              item.unit.isMetal
+                  ? l10n.metalRateNotUpdated
+                  : l10n.notUpdatedThisMonth,
+            ),
         ],
       ),
       trailing: Column(

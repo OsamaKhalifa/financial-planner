@@ -24,8 +24,6 @@ final fallbackRatesUrl = Uri.parse(
 const _timeout = Duration(seconds: 10);
 final _gramsPerTroyOunce = Decimal.parse('31.1034768');
 
-typedef UnitPair = (Unit, Unit);
-
 sealed class RefreshResult {
   const RefreshResult();
 }

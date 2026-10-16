@@ -22,12 +22,13 @@ class Why {
   final String? source;
 }
 
-Future<void> showWhy(BuildContext context, Why why) => showModalBottomSheet<void>(
-  context: context,
-  isScrollControlled: true,
-  useSafeArea: true,
-  builder: (_) => WhySheet(why),
-);
+Future<void> showWhy(BuildContext context, Why why) =>
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (_) => WhySheet(why),
+    );
 
 class WhySheet extends StatelessWidget {
   const WhySheet(this.why, {super.key});
@@ -56,8 +57,7 @@ class WhySheet extends StatelessWidget {
         children: [
           Text(why.title, style: textTheme.titleLarge),
           block(l10n.whyWhat, Text(why.what)),
-          if (why.numbers != null)
-            block(l10n.whyNumbers, Text(why.numbers!)),
+          if (why.numbers != null) block(l10n.whyNumbers, Text(why.numbers!)),
           if (why.assumptions.isNotEmpty)
             block(
               l10n.whyAssumptions,

@@ -16,12 +16,36 @@ import 'widgets/unit_picker_sheet.dart';
 enum _Method { dividendsOnly, proxy25, fullValue, perItem, notNow }
 
 const _regionCurrency = {
-  'AE': 'AED', 'AU': 'AUD', 'BD': 'BDT', 'BH': 'BHD', 'CA': 'CAD',
-  'CH': 'CHF', 'CN': 'CNY', 'DK': 'DKK', 'DZ': 'DZD', 'EG': 'EGP',
-  'GB': 'GBP', 'HK': 'HKD', 'ID': 'IDR', 'IN': 'INR', 'JO': 'JOD',
-  'JP': 'JPY', 'KW': 'KWD', 'MA': 'MAD', 'MY': 'MYR', 'NG': 'NGN',
-  'NO': 'NOK', 'OM': 'OMR', 'PK': 'PKR', 'QA': 'QAR', 'SA': 'SAR',
-  'SE': 'SEK', 'SG': 'SGD', 'TN': 'TND', 'TR': 'TRY', 'US': 'USD',
+  'AE': 'AED',
+  'AU': 'AUD',
+  'BD': 'BDT',
+  'BH': 'BHD',
+  'CA': 'CAD',
+  'CH': 'CHF',
+  'CN': 'CNY',
+  'DK': 'DKK',
+  'DZ': 'DZD',
+  'EG': 'EGP',
+  'GB': 'GBP',
+  'HK': 'HKD',
+  'ID': 'IDR',
+  'IN': 'INR',
+  'JO': 'JOD',
+  'JP': 'JPY',
+  'KW': 'KWD',
+  'MA': 'MAD',
+  'MY': 'MYR',
+  'NG': 'NGN',
+  'NO': 'NOK',
+  'OM': 'OMR',
+  'PK': 'PKR',
+  'QA': 'QAR',
+  'SA': 'SAR',
+  'SE': 'SEK',
+  'SG': 'SGD',
+  'TN': 'TND',
+  'TR': 'TRY',
+  'US': 'USD',
   'ZA': 'ZAR',
 };
 
@@ -53,14 +77,16 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
       _Method.perItem => LongTermMethod.perItem,
       _Method.notNow || null => null,
     };
-    await ref.read(settingsActionsProvider).saveSettings(
-      Settings(
-        baseCurrency: _base,
-        homeInflation: _home,
-        zakatYear: _year,
-        longTermMethod: method,
-      ),
-    );
+    await ref
+        .read(settingsActionsProvider)
+        .saveSettings(
+          Settings(
+            baseCurrency: _base,
+            homeInflation: _home,
+            zakatYear: _year,
+            longTermMethod: method,
+          ),
+        );
   }
 
   @override
@@ -73,7 +99,9 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
       },
       child: Scaffold(
         appBar: AppBar(title: Text(l10n.appTitle)),
-        body: SafeArea(child: _step == 0 ? _baseStep(context) : _zakatStep(context)),
+        body: SafeArea(
+          child: _step == 0 ? _baseStep(context) : _zakatStep(context),
+        ),
       ),
     );
   }
@@ -88,7 +116,10 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
           child: ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              Text(l10n.setupBaseTitle, style: Theme.of(context).textTheme.titleLarge),
+              Text(
+                l10n.setupBaseTitle,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
               const SizedBox(height: 8),
               Text(l10n.setupBaseHelp),
               if (base != null && home != null) ...[
@@ -97,12 +128,15 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                   children: [
                     Expanded(
                       child: Text(
-                        l10n.homeInflationLine(context.countryName(home), base.code),
+                        l10n.homeInflationLine(
+                          context.countryName(home),
+                          base.code,
+                        ),
                       ),
                     ),
                     TextButton(
                       onPressed: () async {
-                        final c = await _pickCountry(context);
+                        final c = await showCountryPicker(context);
                         if (c != null) setState(() => _home = c);
                       },
                       child: Text(l10n.change),
@@ -227,26 +261,17 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
     ],
   );
 
-  Widget _bottomBar({required String label, required VoidCallback? onPressed}) =>
-      Padding(
-        padding: const EdgeInsets.all(16),
-        child: SizedBox(
-          width: double.infinity,
+  Widget _bottomBar({
+    required String label,
+    required VoidCallback? onPressed,
+  }) => Padding(
+    padding: const EdgeInsets.all(16),
+    child: Row(
+      children: [
+        Expanded(
           child: FilledButton(onPressed: onPressed, child: Text(label)),
         ),
-      );
+      ],
+    ),
+  );
 }
-
-Future<Country?> _pickCountry(BuildContext context) => showModalBottomSheet<Country>(
-  context: context,
-  builder: (_) => ListView(
-    children: [
-      for (final c in v1Countries)
-        ListTile(
-          key: ValueKey('country-${c.iso3}'),
-          title: Text(context.countryName(c)),
-          onTap: () => Navigator.of(context).pop(c),
-        ),
-    ],
-  ),
-);

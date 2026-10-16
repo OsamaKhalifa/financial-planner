@@ -39,8 +39,7 @@ extension LabelContext on BuildContext {
   String marketName(Market m) =>
       l10n.marketName(m == Market.other ? 'otherMarket' : m.name);
 
-  String pair(Unit from, Unit to) =>
-      isolateLtr('${from.code}→${to.code}');
+  String pair(Unit from, Unit to) => isolateLtr('${from.code}→${to.code}');
 
   String assetTypeName(AssetType t) => switch (t) {
     AssetType.stock => l10n.typeStock,

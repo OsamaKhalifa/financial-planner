@@ -9,6 +9,8 @@ extension type const Unit(String code) {
   bool get isMetal => code.endsWith('-g');
 }
 
+typedef UnitPair = (Unit, Unit);
+
 const xauG = Unit.xauG;
 const xagG = Unit.xagG;
 

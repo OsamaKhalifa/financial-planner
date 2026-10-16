@@ -7,6 +7,7 @@ import '../../../core/assumptions/domain/settings.dart';
 import '../../../core/clock_provider.dart';
 import '../../../core/dates.dart';
 import '../../../core/db/database_provider.dart';
+import '../../../core/reference/countries.dart';
 import '../../../core/reference/units.dart';
 import '../data/drift_investments_repository.dart';
 import '../domain/investment.dart';
@@ -46,11 +47,9 @@ final calculatorProvider = FutureProvider<PortfolioCalculator?>((ref) async {
 
 typedef PeriodKey = (Period, ViewUnit);
 
-final portfolioFiguresProvider =
-    Provider.family<PortfolioFigures?, PeriodKey>(
-      (ref, key) =>
-          ref.watch(calculatorProvider).value?.portfolio(key.$1, key.$2),
-    );
+final portfolioFiguresProvider = Provider.family<PortfolioFigures?, PeriodKey>(
+  (ref, key) => ref.watch(calculatorProvider).value?.portfolio(key.$1, key.$2),
+);
 
 final itemFiguresProvider = Provider.family<ItemFigures?, (String, Period)>(
   (ref, key) => ref.watch(calculatorProvider).value?.item(key.$1, key.$2),
@@ -110,14 +109,46 @@ class SettingsActions {
     await repo.saveSettings(_with(old, longTermMethod: method));
   }
 
+  Future<void> _update(Settings Function(Settings old) change) async {
+    final old = await _ref.read(settingsProvider.future);
+    await _ref.read(assumptionsRepositoryProvider).saveSettings(change(old));
+  }
+
+  Future<void> setBase(Unit base) => _update(
+    (o) => _with(
+      o,
+      baseCurrency: base,
+      keepMethod: true,
+      clearHome: o.homeInflation == null,
+    ),
+  );
+
+  Future<void> setHome(Country c) =>
+      _update((o) => _with(o, homeInflation: c, keepMethod: true));
+
+  Future<void> setZakatYear(ZakatYear y) =>
+      _update((o) => _with(o, zakatYear: y, keepMethod: true));
+
+  Future<void> setJewellery({required bool zakatable}) =>
+      _update((o) => _with(o, jewelleryZakatable: zakatable, keepMethod: true));
+
   Future<void> saveSettings(Settings s) =>
       _ref.read(assumptionsRepositoryProvider).saveSettings(s);
 }
 
-Settings _with(Settings s, {LongTermMethod? longTermMethod}) => Settings(
-  baseCurrency: s.baseCurrency,
-  homeInflation: s.homeInflation,
-  zakatYear: s.zakatYear,
-  longTermMethod: longTermMethod,
-  jewelleryZakatable: s.jewelleryZakatable,
+Settings _with(
+  Settings s, {
+  Unit? baseCurrency,
+  Country? homeInflation,
+  ZakatYear? zakatYear,
+  LongTermMethod? longTermMethod,
+  bool? jewelleryZakatable,
+  bool keepMethod = false,
+  bool clearHome = false,
+}) => Settings(
+  baseCurrency: baseCurrency ?? s.baseCurrency,
+  homeInflation: clearHome ? null : (homeInflation ?? s.homeInflation),
+  zakatYear: zakatYear ?? s.zakatYear,
+  longTermMethod: keepMethod ? s.longTermMethod : longTermMethod,
+  jewelleryZakatable: jewelleryZakatable ?? s.jewelleryZakatable,
 );

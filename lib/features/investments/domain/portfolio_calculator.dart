@@ -185,8 +185,6 @@ final class NisabHint {
   final Money zakatableTotal;
 }
 
-typedef UnitPair = (Unit, Unit);
-
 final class StaleNow {
   const StaleNow({required this.itemIds, required this.ratePairs});
 
