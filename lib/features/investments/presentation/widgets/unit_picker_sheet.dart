@@ -88,17 +88,7 @@ class _UnitPickerSheetState extends State<_UnitPickerSheet> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: TextField(
-            autofocus: false,
-            decoration: InputDecoration(
-              labelText: context.l10n.searchUnits,
-              prefixIcon: const Icon(Icons.search),
-            ),
-            onChanged: (v) => setState(() => _query = v),
-          ),
-        ),
+        UnitSearchField(onChanged: (v) => setState(() => _query = v)),
         Expanded(
           child: UnitList(
             anchor: widget.anchor,
@@ -126,3 +116,22 @@ Future<Country?> showCountryPicker(BuildContext context) =>
         ],
       ),
     );
+
+/// The search box above the unit list, in the sheet and in the setup.
+class UnitSearchField extends StatelessWidget {
+  const UnitSearchField({super.key, required this.onChanged});
+
+  final ValueChanged<String> onChanged;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.all(16),
+    child: TextField(
+      decoration: InputDecoration(
+        labelText: context.l10n.searchUnits,
+        prefixIcon: const Icon(Icons.search),
+      ),
+      onChanged: onChanged,
+    ),
+  );
+}

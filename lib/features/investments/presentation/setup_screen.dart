@@ -63,6 +63,14 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
   Country? _home;
   ZakatYear _year = ZakatYear.lunar;
   _Method? _method;
+  var _query = '';
+
+  @override
+  void initState() {
+    super.initState();
+    // Most people count in their region's currency: it is already chosen.
+    _base = _anchor;
+  }
 
   Unit get _anchor {
     final region = ui.PlatformDispatcher.instance.locale.countryCode;
@@ -144,8 +152,10 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                   ],
                 ),
               ],
+              UnitSearchField(onChanged: (v) => setState(() => _query = v)),
               UnitList(
                 anchor: _anchor,
+                query: _query,
                 selected: base,
                 shrinkWrap: true,
                 onPick: (u) => setState(() {

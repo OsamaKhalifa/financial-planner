@@ -29,7 +29,7 @@ void main() {
     final rtl = locale == ar;
     group('S1 setup (${locale.languageCode})', () {
       testScreen(
-        'step 1 asks for the base currency and needs an answer to go on',
+        'U1: step 1 asks for the base currency with the region currency already chosen, and has a search',
         (tester) async {
           await pumpScreen(tester, const SetupScreen(), locale: locale);
           final l10n = l10nOf(tester);
@@ -40,10 +40,31 @@ void main() {
             rtl ? TextDirection.rtl : TextDirection.ltr,
           );
           final next = find.widgetWithText(FilledButton, l10n.next);
-          expect(tester.widget<FilledButton>(next).onPressed, isNull);
-
-          await pickEgp(tester);
+          // The test device is in the US: USD is chosen before any tap.
           expect(tester.widget<FilledButton>(next).onPressed, isNotNull);
+          expect(
+            textPlain(l10n.homeInflationLine(l10n.countryName('USA'), 'USD')),
+            findsOneWidget,
+          );
+          expect(
+            find.widgetWithText(TextField, l10n.searchUnits),
+            findsOneWidget,
+          );
+
+          await tester.enterText(
+            find.widgetWithText(TextField, l10n.searchUnits),
+            'egp',
+          );
+          await tester.pumpAndSettle();
+          expect(find.byKey(const ValueKey('unit-USD')), findsNothing);
+          await tester.tap(find.byKey(const ValueKey('unit-EGP')));
+          await tester.pumpAndSettle();
+          await tester.fling(
+            find.byType(ListView).first,
+            const Offset(0, 5000),
+            5000,
+          );
+          await tester.pumpAndSettle();
           expect(
             textPlain(l10n.homeInflationLine(l10n.countryName('EGY'), 'EGP')),
             findsOneWidget,

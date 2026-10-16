@@ -5,6 +5,7 @@ import 'package:flutter/material.dart' hide Intent;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/assumptions/assumptions_providers.dart';
+import '../../../core/assumptions/data/rate_refresher.dart';
 import '../../../core/assumptions/domain/rate.dart';
 import '../../../core/assumptions/domain/rate_book.dart';
 import '../../../core/assumptions/domain/settings.dart';
@@ -20,6 +21,7 @@ import '../domain/investment_draft.dart';
 import '../domain/zakat_rules.dart';
 import 'investments_providers.dart';
 import 'item_detail_screen.dart';
+import 'why_builders.dart';
 import 'why_sheet.dart';
 import 'widgets/fields.dart';
 import 'widgets/labels.dart';
@@ -62,6 +64,11 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
   bool? _chosenJewellery;
   Set<DraftError> _errors = {};
   bool _rateMissing = false;
+  bool _showRateRow = false;
+  String _rateKey = '';
+  bool _fetchAsked = false;
+  bool _customShare = false;
+  Country? _inflation;
   String? _rateError;
   Investment? _editing;
   var _dirty = false;
@@ -132,6 +139,8 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
     _karat = i.purityKarat;
     _fineness = i.purityFineness;
     _notes.text = i.notes ?? '';
+    _inflation = i.inflationOverride;
+    _customShare = i.zakatRule == ZakatRule.custom && i.type != AssetType.other;
     _companyPays = i.zakatRule == ZakatRule.companyPaysZakat;
     if (i.zakatRule == ZakatRule.custom && i.customZakatShare != null) {
       _share.text = (i.customZakatShare! * Decimal.fromInt(100)).toString();
@@ -162,7 +171,8 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
     if (_companyPays && type == AssetType.stock) {
       return ZakatRule.companyPaysZakat;
     }
-    if (type == AssetType.other) {
+    if (type == AssetType.other ||
+        (_customShare && type != AssetType.cashDeposit)) {
       return _share.text.trim().isEmpty ? null : ZakatRule.custom;
     }
     final stockLike = type == AssetType.stock || type == AssetType.fund;
@@ -233,6 +243,12 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
         DraftError.missingGrams,
       });
     }
+    if (_customShare && _type != null && _type != AssetType.cashDeposit) {
+      final share = _shareFraction;
+      if (share == null || share < Decimal.zero || share > Decimal.one) {
+        errors.add(DraftError.shareRequired);
+      }
+    }
     if (_type == null) {
       // Those fields are not shown yet; the type comes first.
       errors.removeAll({
@@ -262,7 +278,10 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
       _rateError = null;
     });
     try {
-      final id = await _persist(rate: needsRate ? rate : null);
+      final typed = _showRateRow && rate != null && rate > Decimal.zero
+          ? rate
+          : null;
+      final id = await _persist(rate: typed);
       if (!mounted) return;
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(context.l10n.savedToast)));
@@ -308,7 +327,7 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
       purityFineness: type == AssetType.silver ? _fineness : null,
       zakatRule: rule,
       customZakatShare: rule == ZakatRule.custom ? _shareFraction : null,
-      inflationOverride: _editing?.inflationOverride,
+      inflationOverride: _inflation,
       notes: _notes.text.trim().isEmpty ? null : _notes.text.trim(),
       createdAt: _editing?.createdAt,
     );
@@ -384,7 +403,15 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
     _paidUnit ??= _unit?.isMetal == true ? settings.baseCurrency : _unit;
     if (_unit == null && _type != null) _applyTypeDefaults();
     final type = _type;
+    final rateKey = '${_paidUnit?.code}>${_unit?.code}@$_start';
+    if (rateKey != _rateKey) {
+      _rateKey = rateKey;
+      _showRateRow = false;
+      _fetchAsked = false;
+    }
     _rateMissing = _needsRate(ref.watch(rateBookProvider).value);
+    // The row stays once shown, so a successful fetch does not make it vanish.
+    if (_rateMissing) _showRateRow = true;
     String? err(Set<DraftError> any, String text) =>
         _errors.any(any.contains) ? text : null;
     final isMetal = type == AssetType.gold || type == AssetType.silver;
@@ -482,11 +509,7 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
               ),
             if (type != null) ..._intentFields(context, type),
             if (type != null) ..._zakatFields(context, type),
-            TextField(
-              controller: _notes,
-              decoration: InputDecoration(labelText: l10n.fieldNotes),
-              onChanged: (_) => _dirty = true,
-            ),
+            _moreSection(context),
             const SizedBox(height: 16),
             FilledButton(
               key: const ValueKey('save'),
@@ -656,7 +679,7 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
           ),
         ],
       ),
-      if (_rateMissing && paid != null) _inlineRate(context, isMetal),
+      if (_showRateRow && paid != null) _inlineRate(context, isMetal),
       if (isMetal) ...[
         AmountField(
           key: const ValueKey('grams'),
@@ -733,11 +756,31 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
     final today = ref.read(todayProvider);
     final paid = parseAmount(_paid.text);
     final rate = parseAmount(_rate.text);
+    final refresh = ref.watch(refreshControllerProvider);
+    final quote = ref.watch(rateBookProvider).value?.quote(from, to, _start!);
     final result = paid == null || rate == null || rate <= Decimal.zero
         ? null
         : isMetal
         ? context.grams(divide(paid, rate))
         : context.money(paid * rate, to);
+    final status = !_fetchAsked
+        ? null
+        : switch (refresh) {
+            RefreshDone(result: RefreshFailed()) => l10n.fetchFailed,
+            RefreshDone(result: RefreshSucceeded(:final notCovered))
+                when notCovered.contains((from, to)) =>
+              l10n.fetchNotCovered(from.code, to.code),
+            _ => null,
+          };
+    final fetched = quote != null && quote.source == RateSource.currencyApi
+        ? l10n.fetchedRateLine(
+            from.code,
+            context.amount(quote.rate, digits: 4),
+            to.code,
+            context.date(quote.asOf),
+            l10n.refreshSource,
+          )
+        : null;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -755,16 +798,65 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
               ),
             ),
             if (_start == today)
-              TextButton(
-                onPressed: () => ref
-                    .read(refreshControllerProvider.notifier)
-                    .refresh({(from, to)}),
-                child: Text(l10n.fetchRate),
-              ),
+              refresh is RefreshRunning
+                  ? const Padding(
+                      padding: EdgeInsets.all(12),
+                      child: SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          key: ValueKey('fetch-progress'),
+                          strokeWidth: 2,
+                        ),
+                      ),
+                    )
+                  : TextButton(
+                      key: const ValueKey('fetch-rate'),
+                      onPressed: () {
+                        setState(() => _fetchAsked = true);
+                        ref.read(refreshControllerProvider.notifier).refresh({
+                          (from, to),
+                        });
+                      },
+                      child: Text(l10n.fetchRate),
+                    ),
           ],
         ),
+        if (status != null) Text(status, key: const ValueKey('fetch-status')),
+        if (fetched != null) Text(fetched, key: const ValueKey('fetched-rate')),
         if (result != null)
           Text(isMetal ? l10n.pureGramsPreview(result) : '= $result'),
+      ],
+    );
+  }
+
+  /// Notes and the inflation series of this item (story §5, AC-31).
+  Widget _moreSection(BuildContext context) {
+    final l10n = context.l10n;
+    return ExpansionTile(
+      key: const ValueKey('more'),
+      title: Text(l10n.moreSection),
+      tilePadding: EdgeInsets.zero,
+      children: [
+        DropdownButtonFormField<Country?>(
+          key: const ValueKey('inflation-series'),
+          initialValue: _inflation,
+          decoration: InputDecoration(labelText: l10n.inflationSeriesField),
+          items: [
+            DropdownMenuItem(
+              value: null,
+              child: Text(l10n.inflationSeriesDefault),
+            ),
+            for (final c in v1Countries)
+              DropdownMenuItem(value: c, child: Text(context.countryName(c))),
+          ],
+          onChanged: (c) => _touch(() => _inflation = c),
+        ),
+        TextField(
+          controller: _notes,
+          decoration: InputDecoration(labelText: l10n.fieldNotes),
+          onChanged: (_) => _dirty = true,
+        ),
       ],
     );
   }
@@ -831,7 +923,11 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
         _intent == Intent.personalUse &&
         _effectiveSettings.jewelleryZakatable == null;
     if (needsJewellery) widgets.add(_jewelleryChoice(context));
-    if (type == AssetType.other) widgets.addAll(_otherShare(context));
+    if (type == AssetType.other) {
+      widgets.addAll(_otherShare(context));
+    } else if (type != AssetType.cashDeposit) {
+      widgets.addAll(_customShareFields(context, type));
+    }
 
     final resolved = _resolvedForDisplay(type);
     widgets.add(
@@ -931,18 +1027,18 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
 
   Why _whyFor(BuildContext context, AssetType type) {
     final l10n = context.l10n;
-    final source = switch (type) {
-      AssetType.cashDeposit => l10n.src_B1,
-      AssetType.gold || AssetType.silver => l10n.src_B2,
-      AssetType.stock || AssetType.fund => l10n.src_B3,
-      AssetType.sukuk => l10n.src_B4,
-      AssetType.crypto => l10n.src_B8,
-      AssetType.other => l10n.src_B5,
+    final section = switch (type) {
+      AssetType.cashDeposit => 'B1',
+      AssetType.gold || AssetType.silver => 'B2',
+      AssetType.stock || AssetType.fund => 'B3',
+      AssetType.sukuk => 'B4',
+      AssetType.crypto => 'B8',
+      AssetType.other => 'B5',
     };
     return Why(
       title: l10n.fieldShare,
       what: _resolvedForDisplay(type).$1,
-      source: source,
+      source: zakatSource(l10n, section, type: type),
     );
   }
 
@@ -1005,6 +1101,55 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
         ),
       ],
     );
+  }
+
+  /// Every type except a cash deposit may override its share (story §5).
+  List<Widget> _customShareFields(BuildContext context, AssetType type) {
+    final l10n = context.l10n;
+    final defaultRule0 = defaultRule(type, _intent, _effectiveSettings);
+    String? was;
+    final unanswered =
+        (defaultRule0 == ZakatRule.longTermPerSetting &&
+            _effectiveSettings.longTermMethod == null) ||
+        (defaultRule0 == ZakatRule.jewelleryPerSetting &&
+            _effectiveSettings.jewelleryZakatable == null);
+    if (defaultRule0 != null && !unanswered) {
+      final probe = Investment(
+        name: '',
+        type: type,
+        unit: const Unit('USD'),
+        startDate: DateTime.utc(2000),
+        zakatRule: defaultRule0,
+      );
+      was = context
+          .percent(resolve(probe, _effectiveSettings).share)
+          .replaceAll('+', '');
+    }
+    return [
+      SwitchListTile(
+        key: const ValueKey('custom-share'),
+        contentPadding: EdgeInsets.zero,
+        title: Text(l10n.customShareSwitch),
+        value: _customShare,
+        onChanged: (v) => _touch(() => _customShare = v),
+      ),
+      if (_customShare) ...[
+        AmountField(
+          key: const ValueKey('share'),
+          controller: _share,
+          label: l10n.fieldShare,
+          error: _errors.contains(DraftError.shareRequired)
+              ? l10n.errShare
+              : null,
+          onChanged: (_) => _touch(() {}),
+        ),
+        if (was != null)
+          Text(
+            l10n.zakatChangedFrom(was),
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+      ],
+    ];
   }
 
   List<Widget> _otherShare(BuildContext context) {

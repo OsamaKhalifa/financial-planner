@@ -113,6 +113,7 @@ Investment item(
   int? karat,
   Decimal? quantity,
   String? name,
+  Decimal? customShare,
 }) => Investment(
   id: id,
   name: name ?? id,
@@ -122,6 +123,7 @@ Investment item(
   unit: unit,
   startDate: start ?? day(2026, 1, 1),
   zakatRule: rule,
+  customZakatShare: customShare,
   purityKarat: karat,
   quantity: quantity,
 );

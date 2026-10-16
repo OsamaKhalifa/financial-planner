@@ -44,6 +44,7 @@ void main() {
           final l10n = l10nOf(tester);
           expect(find.text(l10n.emptyTitle), findsOneWidget);
           expect(find.text(l10n.dataStaysOnPhone), findsOneWidget);
+          expect(find.byType(FloatingActionButton), findsNothing);
           expect(
             Directionality.of(tester.element(find.byType(Scaffold))),
             rtl ? TextDirection.rtl : TextDirection.ltr,

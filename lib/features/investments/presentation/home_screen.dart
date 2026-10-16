@@ -73,7 +73,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       icon: const Icon(Icons.add),
       label: Text(l10n.add),
     );
-    if (items.isEmpty) return scaffold(_empty(context), fab: add);
+    if (items.isEmpty) return scaffold(_empty(context));
 
     final year = Period.year(today.year, today);
     final shown = ref.watch(portfolioFiguresProvider((year, _view)));

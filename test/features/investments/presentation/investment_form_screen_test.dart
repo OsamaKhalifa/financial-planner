@@ -1,5 +1,8 @@
 /* Copyright (c) 2026-Present Osama Khalifa. All rights reserved. */
 
+import 'dart:async';
+import 'dart:io';
+
 import 'package:decimal/decimal.dart';
 import 'package:financial_planner/core/assumptions/domain/settings.dart';
 import 'package:financial_planner/core/dates.dart';
@@ -11,6 +14,7 @@ import 'package:financial_planner/features/investments/presentation/investment_f
 import 'package:financial_planner/features/investments/presentation/item_detail_screen.dart';
 import 'package:flutter/material.dart' hide Intent;
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
 
 import '../../../support/app_harness.dart';
 
@@ -167,7 +171,7 @@ void main() {
           expect(find.text(l10n.zakatReasonCash), findsOneWidget);
           await tester.tap(find.text(l10n.source).last);
           await tester.pumpAndSettle();
-          expect(find.text(l10n.src_B1), findsOneWidget);
+          expect(find.textContaining(l10n.src_B1), findsOneWidget);
           await tester.tapAt(const Offset(10, 10));
           await tester.pumpAndSettle();
 
@@ -233,7 +237,7 @@ void main() {
           expect(find.text(l10n.noticeCrypto), findsOneWidget);
           await tester.tap(find.text(l10n.source).last);
           await tester.pumpAndSettle();
-          expect(find.text(l10n.src_B8), findsOneWidget);
+          expect(find.textContaining(l10n.src_B8), findsOneWidget);
         },
       );
 
@@ -511,6 +515,195 @@ void main() {
           (await saved(tester, h)).single.investment.zakatRule,
           ZakatRule.jewelleryPerSetting,
         );
+      });
+
+      testScreen(
+        'A3: any type but a cash deposit can set its own share, and says what it was',
+        (tester) async {
+          final h = await pumpScreen(
+            tester,
+            const InvestmentFormScreen(presetType: AssetType.crypto),
+            locale: locale,
+            seed: (h) => h.setup(),
+          );
+          final l10n = l10nOf(tester);
+          await type(tester, field(l10n.fieldName), 'Coin');
+          await type(tester, find.byKey(const ValueKey('paid')), '1000');
+          expect(find.byKey(const ValueKey('share')), findsNothing);
+          await tester.ensureVisible(
+            find.byKey(const ValueKey('custom-share')),
+          );
+          await tester.tap(find.byKey(const ValueKey('custom-share')));
+          await tester.pumpAndSettle();
+          expect(
+            textPlain(plain(l10n.zakatChangedFrom('100.00 %'))),
+            findsOneWidget,
+          );
+          await save(tester);
+          expect(find.text(l10n.errShare), findsWidgets);
+          expect(await saved(tester, h), isEmpty);
+          await type(
+            tester,
+            find.descendant(
+              of: find.byKey(const ValueKey('share')),
+              matching: find.byType(TextField),
+            ),
+            '50',
+          );
+          expect(textPlain('50.00 %'), findsWidgets);
+          await save(tester);
+          final item = (await saved(tester, h)).single.investment;
+          expect(item.zakatRule, ZakatRule.custom);
+          expect(item.customZakatShare, Decimal.parse('0.5'));
+        },
+      );
+
+      testScreen('A3: a cash deposit has no share override', (tester) async {
+        await pumpScreen(
+          tester,
+          const InvestmentFormScreen(presetType: AssetType.cashDeposit),
+          locale: locale,
+          seed: (h) => h.setup(),
+        );
+        expect(find.byKey(const ValueKey('custom-share')), findsNothing);
+      });
+
+      testScreen(
+        'U3: the inflation series of an item can be chosen under More',
+        (tester) async {
+          final h = await pumpScreen(
+            tester,
+            const InvestmentFormScreen(presetType: AssetType.cashDeposit),
+            locale: locale,
+            seed: (h) => h.setup(base: usd),
+          );
+          final l10n = l10nOf(tester);
+          await type(tester, field(l10n.fieldName), 'USD held in Egypt');
+          await type(tester, find.byKey(const ValueKey('paid')), '1000');
+          await tester.ensureVisible(find.byKey(const ValueKey('more')));
+          await tester.tap(find.byKey(const ValueKey('more')));
+          await tester.pumpAndSettle();
+          expect(find.text(l10n.inflationSeriesDefault), findsOneWidget);
+          await tester.tap(find.byKey(const ValueKey('inflation-series')));
+          await tester.pumpAndSettle();
+          await tester.tap(find.text(l10n.countryName('EGY')).last);
+          await tester.pumpAndSettle();
+          await save(tester);
+          expect(
+            (await saved(tester, h)).single.investment.inflationOverride,
+            egy,
+          );
+        },
+      );
+
+      group('fetch in the form', () {
+        Future<Harness> usdStockPaidInEgp(WidgetTester tester) async {
+          final h = await pumpScreen(
+            tester,
+            const InvestmentFormScreen(presetType: AssetType.stock),
+            locale: locale,
+            seed: (h) => h.setup(),
+          );
+          final l10n = l10nOf(tester);
+          await type(tester, field(l10n.fieldName), 'US stock');
+          await pickMarket(tester, l10n.marketName('nasdaq'));
+          await tapText(tester, l10n.intentTrading);
+          await tester.tap(find.widgetWithText(OutlinedButton, 'USD').first);
+          await tester.pumpAndSettle();
+          await tester.tap(find.byKey(const ValueKey('unit-EGP')));
+          await tester.pumpAndSettle();
+          await type(tester, find.byKey(const ValueKey('paid')), '50000');
+          return h;
+        }
+
+        testScreen(
+          'a fetched rate is shown under the field with its date and source, the row stays, and saving needs no typing',
+          (tester) async {
+            final h = await usdStockPaidInEgp(tester);
+            final l10n = l10nOf(tester);
+            h.handler = (_) async => http.Response(
+              '{"date":"2026-10-15","usd":{"usd":1,"egp":50}}',
+              200,
+            );
+            await tester.ensureVisible(
+              find.byKey(const ValueKey('fetch-rate')),
+            );
+            await tester.tap(find.byKey(const ValueKey('fetch-rate')));
+            await settle(tester);
+            expect(find.byKey(const ValueKey('inline-rate')), findsOneWidget);
+            expect(
+              textPlain(
+                plain(
+                  l10n
+                      .fetchedRateLine(
+                        'EGP',
+                        '0.0200',
+                        'USD',
+                        'x',
+                        l10n.refreshSource,
+                      )
+                      .split(' · ')
+                      .first,
+                ),
+              ),
+              findsOneWidget,
+            );
+            expect(find.textContaining(l10n.refreshSource), findsOneWidget);
+            expect(h.requests.length, 1);
+            await save(tester);
+            final item = (await saved(tester, h)).single;
+            expect(item.investment.unit, usd);
+            expect(item.history.whereType<MoneyIn>().single.amount.unit, egp);
+          },
+        );
+
+        testScreen('a failed fetch says so and keeps the field', (
+          tester,
+        ) async {
+          final h = await usdStockPaidInEgp(tester);
+          final l10n = l10nOf(tester);
+          h.handler = (_) async => throw const SocketException('offline');
+          await tester.ensureVisible(find.byKey(const ValueKey('fetch-rate')));
+          await tester.tap(find.byKey(const ValueKey('fetch-rate')));
+          await settle(tester);
+          expect(find.text(l10n.fetchFailed), findsOneWidget);
+          expect(find.byKey(const ValueKey('inline-rate')), findsOneWidget);
+          expect(find.byKey(const ValueKey('fetch-rate')), findsOneWidget);
+        });
+
+        testScreen('a pair the source does not cover is named', (tester) async {
+          final h = await usdStockPaidInEgp(tester);
+          final l10n = l10nOf(tester);
+          h.handler = (_) async =>
+              http.Response('{"date":"2026-10-15","usd":{"usd":1}}', 200);
+          await tester.ensureVisible(find.byKey(const ValueKey('fetch-rate')));
+          await tester.tap(find.byKey(const ValueKey('fetch-rate')));
+          await settle(tester);
+          expect(
+            textPlain(plain(l10n.fetchNotCovered('EGP', 'USD'))),
+            findsOneWidget,
+          );
+          expect(find.byKey(const ValueKey('inline-rate')), findsOneWidget);
+        });
+
+        testScreen('a spinner shows while the fetch runs', (tester) async {
+          final h = await usdStockPaidInEgp(tester);
+          final answer = Completer<http.Response>();
+          h.handler = (_) => answer.future;
+          await tester.ensureVisible(find.byKey(const ValueKey('fetch-rate')));
+          await tester.tap(find.byKey(const ValueKey('fetch-rate')));
+          await tester.pump();
+          expect(find.byKey(const ValueKey('fetch-progress')), findsOneWidget);
+          expect(find.byKey(const ValueKey('fetch-rate')), findsNothing);
+          answer.complete(
+            http.Response(
+              '{"date":"2026-10-15","usd":{"usd":1,"egp":50}}',
+              200,
+            ),
+          );
+          await settle(tester);
+          expect(find.byKey(const ValueKey('fetch-progress')), findsNothing);
+        });
       });
 
       testScreen('leaving a changed form asks before discarding', (
