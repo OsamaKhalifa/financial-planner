@@ -8,7 +8,7 @@ Features use AI only through `AiClient` (`lib/core/ai/ai_client.dart`): one meth
 
 v1 has one real implementation, `CloudAiClient`. It does **not** call an AI vendor. It calls our own Cloudflare Worker (`ai-proxy/`) with a vendor-neutral body — `{instruction, input, maxOutputTokens}` → `{text}`. Only the Worker knows the vendor (Gemini today, in `ai-proxy/src/gemini.ts`).
 
-Cloud AI is **opt-in**: `aiCloudEnabledProvider` is `false` by default. Off, or without proxy config, every call throws `AiUnavailable`. Features must handle that.
+Cloud AI is **opt-in**: `aiSettingsProvider.cloudEnabled` is `false` by default. Off, or without proxy config, every call throws `AiUnavailable`. Features must handle that.
 
 ## Why
 
@@ -19,6 +19,14 @@ Cloud AI is **opt-in**: `aiCloudEnabledProvider` is `false` by default. Off, or 
 
 Like ADR-0001, this is an approved exception to "no interface with a single implementation": on-device clients (Apple Foundation Models, Gemini Nano) are the planned second implementation.
 
+## Own Gemini key (added 2026-10-16)
+
+A user may enter their own Gemini key in Settings (`lib/features/settings/settings_screen.dart`). Then `aiClientProvider` gives `GeminiAiClient`, which calls Google **directly** — the key and the data never pass through our Worker. Without an own key, the shared Worker route is used.
+
+- The switch and the key live in `AiSettingsStore` (`lib/core/ai/ai_settings.dart`) on top of `flutter_secure_storage` (Keychain / Keystore). No repository interface: settings never move to a server.
+- The key goes in the `x-goog-api-key` header, never in a URL.
+- **Accepted cost:** the Gemini mapping now exists twice — `ai-proxy/src/gemini.ts` and `lib/core/ai/gemini_ai_client.dart`. A vendor change touches both, still no feature.
+
 ## Rules
 
 - Features import `ai_client.dart` and `ai_providers.dart` only. Never `cloud_ai_client.dart`, never a vendor SDK.
@@ -28,7 +36,7 @@ Like ADR-0001, this is an approved exception to "no interface with a single impl
 
 ## What we do NOT build now
 
-No streaming, chat history, tool calls, images, prompt registry, response cache, on-device client, or persisted consent (a settings feature will own that).
+No streaming, chat history, tool calls, images, prompt registry, response cache, or on-device client.
 
 ## Known limits
 

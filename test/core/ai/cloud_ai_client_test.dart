@@ -10,14 +10,15 @@ import 'package:http/testing.dart';
 void main() {
   const prompt = AiPrompt(instruction: 'Be brief.', input: 'Hello');
 
-  CloudAiClient clientWith(MockClientHandler handler,
-          {Duration timeout = const Duration(seconds: 5)}) =>
-      CloudAiClient(
-        httpClient: MockClient(handler),
-        proxyUrl: Uri.parse('https://proxy.example.dev'),
-        appToken: 'token-1',
-        timeout: timeout,
-      );
+  CloudAiClient clientWith(
+    MockClientHandler handler, {
+    Duration timeout = const Duration(seconds: 5),
+  }) => CloudAiClient(
+    httpClient: MockClient(handler),
+    proxyUrl: Uri.parse('https://proxy.example.dev'),
+    appToken: 'token-1',
+    timeout: timeout,
+  );
 
   test('sends the neutral request and returns the text', () async {
     late http.Request sent;
@@ -40,13 +41,19 @@ void main() {
   });
 
   test('429 becomes AiQuotaExceeded with retry-after', () async {
-    final client = clientWith((_) async =>
-        http.Response('', 429, headers: {'retry-after': '30'}));
+    final client = clientWith(
+      (_) async => http.Response('', 429, headers: {'retry-after': '30'}),
+    );
 
     await expectLater(
       client.complete(prompt),
-      throwsA(isA<AiQuotaExceeded>().having(
-          (e) => e.retryAfter, 'retryAfter', const Duration(seconds: 30))),
+      throwsA(
+        isA<AiQuotaExceeded>().having(
+          (e) => e.retryAfter,
+          'retryAfter',
+          const Duration(seconds: 30),
+        ),
+      ),
     );
   });
 
@@ -60,21 +67,27 @@ void main() {
     for (final body in ['not json', '{"answer":"x"}', '{"text":3}']) {
       final client = clientWith((_) async => http.Response(body, 200));
 
-      await expectLater(client.complete(prompt), throwsA(isA<AiFailure>()),
-          reason: body);
+      await expectLater(
+        client.complete(prompt),
+        throwsA(isA<AiFailure>()),
+        reason: body,
+      );
     }
   });
 
   test('network error becomes AiFailure', () async {
-    final client =
-        clientWith((_) async => throw http.ClientException('offline'));
+    final client = clientWith(
+      (_) async => throw http.ClientException('offline'),
+    );
 
     await expectLater(client.complete(prompt), throwsA(isA<AiFailure>()));
   });
 
   test('timeout becomes AiFailure', () async {
-    final client = clientWith((_) => Completer<http.Response>().future,
-        timeout: const Duration(milliseconds: 10));
+    final client = clientWith(
+      (_) => Completer<http.Response>().future,
+      timeout: const Duration(milliseconds: 10),
+    );
 
     await expectLater(client.complete(prompt), throwsA(isA<AiFailure>()));
   });

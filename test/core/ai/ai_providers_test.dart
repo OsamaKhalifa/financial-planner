@@ -1,46 +1,65 @@
 import 'package:financial_planner/core/ai/ai_client.dart';
 import 'package:financial_planner/core/ai/ai_providers.dart';
+import 'package:financial_planner/core/ai/ai_settings.dart';
 import 'package:financial_planner/core/ai/cloud_ai_client.dart';
+import 'package:financial_planner/core/ai/gemini_ai_client.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/fake_ai_client.dart';
 
 void main() {
   const prompt = AiPrompt(instruction: 'i', input: 'x');
-  final config = AiProxyConfig(
-      url: Uri.parse('https://proxy.example.dev'), appToken: 't');
+  final proxy = AiProxyConfig(
+    url: Uri.parse('https://proxy.example.dev'),
+    appToken: 't',
+  );
 
-  test('cloud AI is off by default, so calls are unavailable', () async {
+  Future<AiClient> clientFor(
+    Map<String, String> stored, {
+    AiProxyConfig? config,
+  }) async {
+    FlutterSecureStorage.setMockInitialValues(stored);
     final container = ProviderContainer.test(
-        overrides: [aiProxyConfigProvider.overrideWithValue(config)]);
+      overrides: [aiProxyConfigProvider.overrideWithValue(config)],
+    );
+    await container.read(aiSettingsProvider.future);
+    return container.read(aiClientProvider);
+  }
 
-    await expectLater(container.read(aiClientProvider).complete(prompt),
-        throwsA(isA<AiUnavailable>()));
+  test('off by default, even with a key and a proxy', () async {
+    final client = await clientFor({'ai.ownGeminiKey': 'k'}, config: proxy);
+
+    await expectLater(client.complete(prompt), throwsA(isA<AiUnavailable>()));
   });
 
-  test('switched on but not configured is unavailable', () async {
-    final container = ProviderContainer.test(
-        overrides: [aiProxyConfigProvider.overrideWithValue(null)]);
-    container.read(aiCloudEnabledProvider.notifier).set(true);
+  test('on with own key goes straight to Gemini', () async {
+    final client = await clientFor({
+      'ai.cloudEnabled': 'true',
+      'ai.ownGeminiKey': 'k',
+    }, config: proxy);
 
-    await expectLater(container.read(aiClientProvider).complete(prompt),
-        throwsA(isA<AiUnavailable>()));
+    expect(client, isA<GeminiAiClient>());
   });
 
-  test('switched on and configured gives the cloud client', () {
-    final container = ProviderContainer.test(
-        overrides: [aiProxyConfigProvider.overrideWithValue(config)]);
-    container.read(aiCloudEnabledProvider.notifier).set(true);
+  test('on without own key uses the shared proxy', () async {
+    final client = await clientFor({'ai.cloudEnabled': 'true'}, config: proxy);
 
-    expect(container.read(aiClientProvider), isA<CloudAiClient>());
+    expect(client, isA<CloudAiClient>());
   });
 
-  test('features can swap in a fake without knowing the real client',
-      () async {
+  test('on with no key and no proxy is unavailable', () async {
+    final client = await clientFor({'ai.cloudEnabled': 'true'});
+
+    await expectLater(client.complete(prompt), throwsA(isA<AiUnavailable>()));
+  });
+
+  test('features can swap in a fake without knowing the real client', () async {
     final fake = FakeAiClient(reply: 'canned');
     final container = ProviderContainer.test(
-        overrides: [aiClientProvider.overrideWithValue(fake)]);
+      overrides: [aiClientProvider.overrideWithValue(fake)],
+    );
 
     final reply = await container.read(aiClientProvider).complete(prompt);
 

@@ -13,8 +13,8 @@ class CloudAiClient implements AiClient {
     required Uri proxyUrl,
     required this._appToken,
     this._timeout = const Duration(seconds: 30),
-  })  : _http = httpClient,
-        _endpoint = proxyUrl.resolve('/v1/complete');
+  }) : _http = httpClient,
+       _endpoint = proxyUrl.resolve('/v1/complete');
 
   final http.Client _http;
   final Uri _endpoint;
