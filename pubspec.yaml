@@ -33,10 +33,16 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.8
   flutter_riverpod: ^3.4.3
+  drift: ^2.35.2
+  drift_flutter: ^0.3.1
+  path_provider: ^2.1.6
+  decimal: ^3.2.6
   http: ^1.6.0
   flutter_secure_storage: ^11.2.0
+  intl: ^0.20.3
+  flutter_localizations:
+    sdk: flutter
 
 dev_dependencies:
   flutter_test:
@@ -48,6 +54,8 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+  drift_dev: ^2.35.1
+  build_runner: ^2.16.2
   integration_test:
     sdk: flutter
 
@@ -61,6 +69,10 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+  generate: true
+
+  assets:
+    - assets/inflation/
 
   # To add assets to your application, add an assets section, like this:
   # assets:
