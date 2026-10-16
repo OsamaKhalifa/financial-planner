@@ -60,27 +60,32 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               helperText:
                   'Get a free key at aistudio.google.com. '
                   'Stored only on this phone.',
+              helperMaxLines: 2,
               hintText: hasOwnKey ? 'A key is saved' : null,
             ),
           ),
         ),
-        OverflowBar(
-          alignment: MainAxisAlignment.end,
-          children: [
-            TextButton(
-              onPressed: hasOwnKey
-                  ? () => notifier.setOwnGeminiKey(null)
-                  : null,
-              child: const Text('Remove key'),
-            ),
-            FilledButton(
-              onPressed: () async {
-                await notifier.setOwnGeminiKey(_keyController.text);
-                _keyController.clear();
-              },
-              child: const Text('Save key'),
-            ),
-          ],
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+          child: OverflowBar(
+            alignment: MainAxisAlignment.end,
+            spacing: 8,
+            children: [
+              TextButton(
+                onPressed: hasOwnKey
+                    ? () => notifier.setOwnGeminiKey(null)
+                    : null,
+                child: const Text('Remove key'),
+              ),
+              FilledButton(
+                onPressed: () async {
+                  await notifier.setOwnGeminiKey(_keyController.text);
+                  _keyController.clear();
+                },
+                child: const Text('Save key'),
+              ),
+            ],
+          ),
         ),
         ListTile(
           leading: const Icon(Icons.info_outline),

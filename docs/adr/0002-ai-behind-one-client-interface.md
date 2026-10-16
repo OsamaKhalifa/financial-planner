@@ -54,6 +54,8 @@ No streaming, chat history, tool calls, images, prompt registry, response cache,
 2. In `ai-proxy/`: `npm ci`, `npx wrangler login`, `npx wrangler secret put GEMINI_API_KEY`, `npx wrangler secret put APP_TOKEN` (a long random string), `npx wrangler deploy`.
 3. Run the app with `--dart-define=AI_PROXY_URL=<worker url> --dart-define=AI_APP_TOKEN=<same token>`.
 
+**Live test** (real Gemini, real device storage, local Worker): put your key in `~/.config/financial-planner/ai.env` (outside the repo), boot an iOS simulator, run `tool/ai_live_test.sh`. Not part of CI — it needs a key and spends quota.
+
 ## Trigger to revisit
 
 A feature needs streaming or multi-turn chat, the on-device client is built, or the app gets real user accounts (then replace `APP_TOKEN` with per-user auth).
