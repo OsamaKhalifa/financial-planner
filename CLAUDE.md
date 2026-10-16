@@ -10,6 +10,7 @@ Storage: SQLite via Drift, **always behind a repository interface** — a server
 - **No over-engineering.** Three similar lines is fine. Do not design for hypotheticals.
 - **Constructor injection** everywhere. No service locators, no globals.
 - **No comments explaining WHAT.** Only non-obvious WHY.
+- **Questions to the owner go only through the Claude desktop question prompt** (the AskUserQuestion card, or the question box at the end of a turn), so he sees his input is needed. Never leave a question only in message text.
 - **Commit and push freely** on feature branches and open PRs without asking (side project — this overrides the global "ask before committing" rule). Only the human merges to `main`.
 - **Never add Claude/AI attribution** to commits, PRs, or review comments.
 - **Never fix a bug before you understand the root cause.** Reproduce, write a failing test, then fix.

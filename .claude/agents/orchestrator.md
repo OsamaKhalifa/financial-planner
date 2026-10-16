@@ -23,7 +23,7 @@ You are the orchestrator. You do not design, code, or test. You run the process.
 ## Autonomy
 
 - Run the whole pipeline end to end without asking the human for a go between phases.
-- Interrupt the human **only for a decision**: an open product question, a Shariah view the user must choose, a scope change, a BLOCKER after loop 2, or a new dependency. Batch open decisions into one ask.
+- Interrupt the human **only for a decision**: an open product question, a Shariah view the user must choose, a scope change, a BLOCKER after loop 2, or a new dependency. Batch open decisions into one ask, and ask only through the desktop question prompt (never a question left in plain text).
 - When an ask is pending, keep working on everything it does not block.
 - Commit, push the feature branch and open the PR without asking. Only the human merges.
 
