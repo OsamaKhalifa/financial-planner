@@ -3,8 +3,8 @@ import 'package:http/http.dart' as http;
 
 import 'ai_client.dart';
 import 'ai_settings.dart';
+import 'ai_vendors.dart';
 import 'cloud_ai_client.dart';
-import 'gemini_ai_client.dart';
 
 class AiProxyConfig {
   const AiProxyConfig({required this.url, required this.appToken});
@@ -31,16 +31,18 @@ final aiClientProvider = Provider<AiClient>((ref) {
   if (!settings.cloudEnabled) {
     return const _UnavailableAiClient('Cloud AI is turned off.');
   }
-  final ownKey = settings.ownGeminiKey;
+  final vendor = vendorById(ref.watch(aiVendorsProvider), settings.vendorId);
+  final apiKey = settings.apiKey;
   final config = ref.watch(aiProxyConfigProvider);
-  if (ownKey == null && config == null) {
+  if (vendor != null && apiKey == null) {
+    return _UnavailableAiClient('Add your ${vendor.name} key in Settings.');
+  }
+  if (vendor == null && config == null) {
     return const _UnavailableAiClient('AI proxy is not configured.');
   }
   final httpClient = http.Client();
   ref.onDispose(httpClient.close);
-  if (ownKey != null) {
-    return GeminiAiClient(httpClient: httpClient, apiKey: ownKey);
-  }
+  if (vendor != null) return vendor.createClient(httpClient, apiKey!);
   return CloudAiClient(
     httpClient: httpClient,
     proxyUrl: config!.url,

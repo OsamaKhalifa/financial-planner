@@ -1,38 +1,65 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+import 'ai_vendors.dart';
+
 class AiSettings {
-  const AiSettings({this.cloudEnabled = false, this.ownGeminiKey});
+  const AiSettings({
+    this.cloudEnabled = false,
+    this.vendorId,
+    this.apiKeys = const {},
+  });
 
   /// The user's opt-in. Off by default: data stays on the device.
   final bool cloudEnabled;
 
-  /// When set, requests go straight to Google with this key instead of
-  /// through the app's shared proxy.
-  final String? ownGeminiKey;
+  /// Null means the app's shared AI service. Otherwise the [AiVendor.id] the
+  /// user brings their own key for.
+  final String? vendorId;
+
+  /// One key per vendor, so switching vendor keeps the other keys.
+  final Map<String, String> apiKeys;
+
+  String? get apiKey => apiKeys[vendorId];
 }
 
-/// Secure storage because the Gemini key is a secret. Settings never move to
-/// a server, so no repository interface (ADR-0001 does not apply).
+/// Secure storage because API keys are secrets. Settings never move to a
+/// server, so no repository interface (ADR-0001 does not apply).
 class AiSettingsStore {
   const AiSettingsStore(this._storage);
 
   final FlutterSecureStorage _storage;
 
   static const _cloudEnabledKey = 'ai.cloudEnabled';
-  static const _ownGeminiKeyKey = 'ai.ownGeminiKey';
+  static const _vendorKey = 'ai.vendor';
+  static String _apiKeyKey(String vendorId) => 'ai.apiKey.$vendorId';
 
-  Future<AiSettings> read() async => AiSettings(
-    cloudEnabled: await _storage.read(key: _cloudEnabledKey) == 'true',
-    ownGeminiKey: await _storage.read(key: _ownGeminiKeyKey),
-  );
+  /// A stored vendor that is no longer offered falls back to the shared
+  /// service.
+  Future<AiSettings> read(List<String> vendorIds) async {
+    final apiKeys = <String, String>{};
+    for (final id in vendorIds) {
+      final key = await _storage.read(key: _apiKeyKey(id));
+      if (key != null) apiKeys[id] = key;
+    }
+    final vendorId = await _storage.read(key: _vendorKey);
+    return AiSettings(
+      cloudEnabled: await _storage.read(key: _cloudEnabledKey) == 'true',
+      vendorId: vendorIds.contains(vendorId) ? vendorId : null,
+      apiKeys: apiKeys,
+    );
+  }
 
   Future<void> writeCloudEnabled(bool enabled) =>
       _storage.write(key: _cloudEnabledKey, value: '$enabled');
 
-  Future<void> writeOwnGeminiKey(String? key) => key == null
-      ? _storage.delete(key: _ownGeminiKeyKey)
-      : _storage.write(key: _ownGeminiKeyKey, value: key);
+  Future<void> writeVendor(String? vendorId) => vendorId == null
+      ? _storage.delete(key: _vendorKey)
+      : _storage.write(key: _vendorKey, value: vendorId);
+
+  Future<void> writeApiKey(String vendorId, String? key) => key == null
+      ? _storage.delete(key: _apiKeyKey(vendorId))
+      : _storage.write(key: _apiKeyKey(vendorId), value: key);
 }
 
 final aiSettingsStoreProvider = Provider<AiSettingsStore>(
@@ -48,24 +75,49 @@ class AiSettingsNotifier extends AsyncNotifier<AiSettings> {
   AiSettingsStore get _store => ref.read(aiSettingsStoreProvider);
 
   @override
-  Future<AiSettings> build() => _store.read();
+  Future<AiSettings> build() => _store.read([
+    for (final vendor in ref.watch(aiVendorsProvider)) vendor.id,
+  ]);
 
   Future<void> setCloudEnabled(bool enabled) async {
     final current = await future;
     await _store.writeCloudEnabled(enabled);
     state = AsyncData(
-      AiSettings(cloudEnabled: enabled, ownGeminiKey: current.ownGeminiKey),
+      AiSettings(
+        cloudEnabled: enabled,
+        vendorId: current.vendorId,
+        apiKeys: current.apiKeys,
+      ),
+    );
+  }
+
+  /// Null selects the app's shared service.
+  Future<void> selectVendor(String? vendorId) async {
+    final current = await future;
+    await _store.writeVendor(vendorId);
+    state = AsyncData(
+      AiSettings(
+        cloudEnabled: current.cloudEnabled,
+        vendorId: vendorId,
+        apiKeys: current.apiKeys,
+      ),
     );
   }
 
   /// A null or blank key removes it.
-  Future<void> setOwnGeminiKey(String? key) async {
+  Future<void> setApiKey(String vendorId, String? key) async {
     final current = await future;
     final trimmed = key?.trim();
     final value = (trimmed == null || trimmed.isEmpty) ? null : trimmed;
-    await _store.writeOwnGeminiKey(value);
+    await _store.writeApiKey(vendorId, value);
+    final apiKeys = {...current.apiKeys};
+    value == null ? apiKeys.remove(vendorId) : apiKeys[vendorId] = value;
     state = AsyncData(
-      AiSettings(cloudEnabled: current.cloudEnabled, ownGeminiKey: value),
+      AiSettings(
+        cloudEnabled: current.cloudEnabled,
+        vendorId: current.vendorId,
+        apiKeys: apiKeys,
+      ),
     );
   }
 }

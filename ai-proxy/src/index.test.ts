@@ -7,12 +7,13 @@ afterEach(() => {
   globalThis.fetch = realFetch;
 });
 
-function env(allowed = true): Env {
+function env(perIp = true, global = true): Env {
   return {
     GEMINI_API_KEY: "key",
     GEMINI_MODEL: "model-x",
     APP_TOKEN: "secret",
-    RATE_LIMITER: { limit: async () => ({ success: allowed }) },
+    RATE_LIMITER: { limit: async () => ({ success: perIp }) },
+    GLOBAL_LIMITER: { limit: async () => ({ success: global }) },
   };
 }
 
@@ -30,10 +31,16 @@ function call(body: unknown, { token = "secret", path = "/v1/complete", e = env(
 const valid = { instruction: "Be brief.", input: "Hi", maxOutputTokens: 64 };
 
 function stubGemini(status: number, body: unknown, headers: Record<string, string> = {}) {
+  return stubGeminiSequence([{ status, body, headers }]);
+}
+
+/** Answers in order; the last answer repeats. */
+function stubGeminiSequence(answers: { status: number; body: unknown; headers?: Record<string, string> }[]) {
   const calls: { url: string; init: RequestInit }[] = [];
   globalThis.fetch = async (url, init) => {
+    const a = answers[Math.min(calls.length, answers.length - 1)];
     calls.push({ url: String(url), init: init! });
-    return new Response(JSON.stringify(body), { status, headers });
+    return new Response(JSON.stringify(a.body), { status: a.status, headers: a.headers ?? {} });
   };
   return calls;
 }
@@ -55,10 +62,17 @@ test("rejects unknown paths", async () => {
   assert.equal((await call(valid, { path: "/other" })).status, 404);
 });
 
-test("returns 429 when the rate limit is hit", async () => {
+test("returns 429 when the per-IP limit is hit", async () => {
   const res = await call(valid, { e: env(false) });
   assert.equal(res.status, 429);
   assert.equal(res.headers.get("retry-after"), "60");
+});
+
+test("returns 429 without calling Gemini when the global limit is hit", async () => {
+  const calls = stubGemini(200, {});
+  const res = await call(valid, { e: env(true, false) });
+  assert.equal(res.status, 429);
+  assert.equal(calls.length, 0);
 });
 
 test("rejects a bad body", async () => {
@@ -79,4 +93,21 @@ test("maps other Gemini errors and empty replies to 502", async () => {
   assert.equal((await call(valid)).status, 502);
   stubGemini(200, { candidates: [] });
   assert.equal((await call(valid)).status, 502);
+});
+
+test("retries a Gemini 503 once", async () => {
+  const calls = stubGeminiSequence([
+    { status: 503, body: {} },
+    { status: 200, body: { candidates: [{ content: { parts: [{ text: "ok" }] } }] } },
+  ]);
+  const res = await call(valid);
+  assert.equal(res.status, 200);
+  assert.deepEqual(await res.json(), { text: "ok" });
+  assert.equal(calls.length, 2);
+});
+
+test("a second Gemini 503 becomes 502", async () => {
+  const calls = stubGemini(503, {});
+  assert.equal((await call(valid)).status, 502);
+  assert.equal(calls.length, 2);
 });

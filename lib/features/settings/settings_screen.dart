@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/ai/ai_settings.dart';
+import '../../core/ai/ai_vendors.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -11,6 +12,9 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+  // Radio value for the app's shared service; vendors use their own ids.
+  static const _shared = '';
+
   final _keyController = TextEditingController();
 
   @override
@@ -33,64 +37,110 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   Widget _aiSection(BuildContext context, AiSettings settings) {
     final notifier = ref.read(aiSettingsProvider.notifier);
-    final hasOwnKey = settings.ownGeminiKey != null;
+    final vendors = ref.watch(aiVendorsProvider);
+    final vendor = vendorById(vendors, settings.vendorId);
+    final heading = Theme.of(context).textTheme.titleSmall;
     return ListView(
       children: [
-        ListTile(
-          title: Text('AI', style: Theme.of(context).textTheme.titleSmall),
-        ),
+        ListTile(title: Text('AI', style: heading)),
         SwitchListTile(
           title: const Text('Use cloud AI'),
           subtitle: const Text(
             'When on, the text you send to AI leaves your phone and goes to '
-            'Google. On free use, Google may use it to improve its products.',
+            'the AI provider you choose below.',
           ),
           value: settings.cloudEnabled,
           onChanged: notifier.setCloudEnabled,
         ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: TextField(
-            controller: _keyController,
-            obscureText: true,
-            autocorrect: false,
-            enableSuggestions: false,
-            decoration: InputDecoration(
-              labelText: 'Your own Gemini key (optional)',
-              helperText:
-                  'Get a free key at aistudio.google.com. '
-                  'Stored only on this phone.',
-              hintText: hasOwnKey ? 'A key is saved' : null,
+        if (settings.cloudEnabled) ...[
+          ListTile(title: Text('AI provider', style: heading)),
+          RadioGroup<String>(
+            groupValue: vendor?.id ?? _shared,
+            onChanged: (id) {
+              _keyController.clear();
+              notifier.selectVendor(id == null || id == _shared ? null : id);
+            },
+            child: Column(
+              children: [
+                const RadioListTile<String>(
+                  value: _shared,
+                  title: Text("App's shared AI"),
+                  subtitle: Text(
+                    "No key needed. Free use is limited and shared by all "
+                    "users. Text goes through the app's server.",
+                  ),
+                ),
+                for (final v in vendors)
+                  RadioListTile<String>(
+                    value: v.id,
+                    title: Text(v.name),
+                    subtitle: Text('Your own key. ${v.dataNotice}'),
+                  ),
+              ],
             ),
           ),
+          if (vendor != null) ..._keyFields(vendor, settings, notifier),
+        ],
+        ListTile(
+          leading: const Icon(Icons.info_outline),
+          title: Text(_status(settings, vendor)),
         ),
-        OverflowBar(
+      ],
+    );
+  }
+
+  List<Widget> _keyFields(
+    AiVendor vendor,
+    AiSettings settings,
+    AiSettingsNotifier notifier,
+  ) {
+    final hasKey = settings.apiKey != null;
+    return [
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: TextField(
+          controller: _keyController,
+          obscureText: true,
+          autocorrect: false,
+          enableSuggestions: false,
+          decoration: InputDecoration(
+            labelText: '${vendor.name} API key',
+            helperText: '${vendor.keyHelp} Stored only on this phone.',
+            helperMaxLines: 2,
+            hintText: hasKey ? 'A key is saved' : null,
+          ),
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+        child: OverflowBar(
           alignment: MainAxisAlignment.end,
+          spacing: 8,
           children: [
             TextButton(
-              onPressed: hasOwnKey
-                  ? () => notifier.setOwnGeminiKey(null)
+              onPressed: hasKey
+                  ? () => notifier.setApiKey(vendor.id, null)
                   : null,
               child: const Text('Remove key'),
             ),
             FilledButton(
               onPressed: () async {
-                await notifier.setOwnGeminiKey(_keyController.text);
+                await notifier.setApiKey(vendor.id, _keyController.text);
                 _keyController.clear();
               },
               child: const Text('Save key'),
             ),
           ],
         ),
-        ListTile(
-          leading: const Icon(Icons.info_outline),
-          title: Text(switch ((settings.cloudEnabled, hasOwnKey)) {
-            (false, _) => 'Cloud AI is off.',
-            (true, true) => 'Using your own Gemini key.',
-            (true, false) => "Using the app's shared AI service.",
-          }),
-        ),
-      ],
-    );
+      ),
+    ];
+  }
+
+  String _status(AiSettings settings, AiVendor? vendor) {
+    if (!settings.cloudEnabled) return 'Cloud AI is off.';
+    if (vendor == null) return "Using the app's shared AI service.";
+    return settings.apiKey == null
+        ? 'Add your ${vendor.name} key to use it.'
+        : 'Using your own ${vendor.name} key.';
   }
 }
