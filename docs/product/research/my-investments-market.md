@@ -28,7 +28,7 @@
 5. **Skip time-weighted return.** Getquin's own help shows it can say "positive" while the user lost money. Our question is "did *my* wealth keep its value", which is money-weighted.
 6. **Keep every value update as history, and show when a value is old** (Kubera). With manual entry, staleness is the biggest quality risk; hiding it makes month views lie.
 7. **Zakatable base can be a share of value** (Wahed uses proxies). So the item needs a zakat share, not only yes/no. The numbers must come from our Islamic consultant.
-8. **Manual entry is enough for v1.** No evidence forces a price API: Kubera's core use is manual, and Musaffa offers manual add. A price feed would also break "no data leaves the device". It stays an open decision (BRD §9 #1), not an assumption.
+8. *(Superseded 2026-10-16 by owner decision Q2: v1 adds an optional, user-triggered online refresh of FX and gold/silver rates — see the story §6.1.)* **Manual entry is enough for v1.** No evidence forces a price API: Kubera's core use is manual, and Musaffa offers manual add. A price feed would also break "no data leaves the device". It stays an open decision (BRD §9 #1), not an assumption.
 9. **Inflation is always a user-visible assumption** where it exists (Snowball shows and lets the user edit assumptions). We do the same: the user enters the rate; we never hide it.
 
 ## Not verified

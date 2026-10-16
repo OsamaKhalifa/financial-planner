@@ -297,3 +297,36 @@ Story: `docs/product/stories/my-investments.md` §12. Each answer points to the 
 7. **Every "why" text for a zakat figure** links to the section of this file (A9). Line 6 says the rules are placeholders; once items 1–6 are done, it can point here.
 
 No BLOCKER. Nothing in the story computes or hides a riba figure in a way that helps the user deal in riba. Item 4 closes the one gap: today, interest would be counted as profit.
+
+### UX questions (docs/product/ux/my-investments.md PM-Q1, PM-Q2)
+
+**(a) How "dividends only" is computed (B3; IIFA Res 28 (3/4) §3, Res 2 (2/2) [V])**
+- **What the user enters:** nothing new. The existing money-out kind **"Income received"** on the share/fund item is the dividend.
+- **Share of the holding's value:** s = 0. No set-aside on the market value.
+- **Set-aside for a period:** `r_z × (sum of "Income received" dated inside the period)`.
+  - It is **not** multiplied by T/Y. The IIFA charges 2.5% once on the dividend after a year from receipt. Setting it aside when the dividend arrives is a planning choice (early set-aside, Z-3), so each dividend is charged exactly once.
+  - Over a full year, the total is r_z × that year's dividends.
+- **Rate:** the same matched r_z as the user's zakat-year setting (A1/A2). Default 2.5%.
+- **Why text:** "Zakat only on dividends you received, as the IIFA rules for shares held for income when company data is unknown. — IIFA Res 28 (3/4) §3."
+- **Edge case (double count):** if the user also records the same dividend as money in to a cash item in this list, it would be counted twice. On that cash item's money-in, show the hint "Already counted as dividend zakat on {item}?". Do not try to resolve it automatically.
+
+**(b) What the nisab choice changes on screen in v1 (A3)**
+- **Show the threshold as a hint** next to the "No zakat due for {year}" switch (S8 Zakat row and the S7 Year overflow):
+  "Nisab: 85 g gold = 425,000 EGP on 16 Oct 2026 (your gold rate)", or 595 g silver.
+- **Next to it, show "Zakatable total in this list:"** Σ (value × zakat share). Add the line "Decide using all your zakatable wealth, not only this list" (Z-4).
+- **The switch is never set automatically.** The list is not all the user's wealth (Z-4), so the app gives the numbers and the user decides.
+- **No rate for the chosen metal:** show "Add a gold rate to see the nisab", with the inline rate entry.
+- **Nisab not chosen yet:** show both lines (gold and silver) and the Source link.
+- Nothing else changes in v1. Full nisab logic stays in UC-3.
+
+### Verdict on the UX doc (docs/product/ux/my-investments.md): **CHANGES_REQUESTED**
+
+1. **S7 ladder example, lines 240 and 399:** "−29.79 EGP" uses 2.5% with Y = 365. With the lunar default, Y = 354.367, so it is **−30.69 EGP**. Recompute the lines below it. PM-Q7 is answered by Z-2: lunar 2.5%/354.367, solar 2.577%/365.
+2. **S3 Pension (lines 71, 117):** the option "On the amount you could withdraw" needs an input for the accessible amount (or %), meaning balance minus penalty and tax (B7). Without it, the app cannot compute that view.
+3. **S3/S4 Crypto:** add the notice "Scholars differ on whether holding crypto is permitted. Those who permit it say zakat is on full market value." Default share 100% (B8). Today the doc has no crypto notice.
+4. **S3 "Other" + Long-term (line 116):** a business or private stake must ask for a zakatable % (B6). It must not reuse the shares method (dividends / 25%), which is for listed shares and funds only. "Other" + Personal use → 0%.
+5. **S5 interest line (line 168):** add "Giving it away does not count as zakat." (B1, Z-6)
+6. **Setup step 2, long-held shares row (line 69):** name the source in each option: "Dividends only (IIFA) · 25 % of value (NZF proxy) · Full value (precaution)". The user should not choose blind before opening Source.
+7. **Nisab hint:** add it as in (b) above. It answers PM-Q2.
+
+Everything else on the Shariah surface passes. That covers: the setup step with nothing pre-selected and lunar as the default; "Not now" asked in context rather than defaulted; the "Estimated set-aside" label and the once-a-year line; the A6 wording on every real figure; interest kept apart from return; the gold view leaving the zakat math unchanged; and `[U]` shown as "source not yet verified". No BLOCKER.
