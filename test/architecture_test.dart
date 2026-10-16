@@ -34,9 +34,11 @@ void main() {
     expect(bad, isEmpty);
   });
 
-  test('package:http only in the rate refresher', () {
+  test('package:http only in the rate refresher and the AI clients', () {
     final bad = violations(
-      (p) => p != 'lib/core/assumptions/data/rate_refresher.dart',
+      (p) =>
+          p != 'lib/core/assumptions/data/rate_refresher.dart' &&
+          !p.startsWith('lib/core/ai/'),
       RegExp(r'''(import|export)\s+['"]package:http/'''),
     );
     expect(bad, isEmpty);

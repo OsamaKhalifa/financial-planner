@@ -1177,6 +1177,1021 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Deleted'**
   String get deleted;
+
+  /// No description provided for @edit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get edit;
+
+  /// No description provided for @valueNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Value now'**
+  String get valueNow;
+
+  /// No description provided for @approxInBase.
+  ///
+  /// In en, this message translates to:
+  /// **'≈ {amount}'**
+  String approxInBase(String amount);
+
+  /// No description provided for @sinceStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Since start'**
+  String get sinceStart;
+
+  /// No description provided for @colItem.
+  ///
+  /// In en, this message translates to:
+  /// **'In {unit}'**
+  String colItem(String unit);
+
+  /// No description provided for @rowGain.
+  ///
+  /// In en, this message translates to:
+  /// **'Gain'**
+  String get rowGain;
+
+  /// No description provided for @rowReturn.
+  ///
+  /// In en, this message translates to:
+  /// **'Return'**
+  String get rowReturn;
+
+  /// No description provided for @rowPerYear.
+  ///
+  /// In en, this message translates to:
+  /// **'Per year'**
+  String get rowPerYear;
+
+  /// No description provided for @rowSetAside.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated zakat set-aside (planning)'**
+  String get rowSetAside;
+
+  /// No description provided for @setAsideNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Actual zakat is due once a year on your zakat date.'**
+  String get setAsideNote;
+
+  /// No description provided for @rowReturnAfter.
+  ///
+  /// In en, this message translates to:
+  /// **'Return after set-aside'**
+  String get rowReturnAfter;
+
+  /// No description provided for @rowRealOwn.
+  ///
+  /// In en, this message translates to:
+  /// **'Real · own market ({country})'**
+  String rowRealOwn(String country);
+
+  /// No description provided for @rowRealBase.
+  ///
+  /// In en, this message translates to:
+  /// **'Real · in your money ({country})'**
+  String rowRealBase(String country);
+
+  /// No description provided for @realLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchasing power (for planning only — zakat is always on today\'s actual value)'**
+  String get realLabel;
+
+  /// No description provided for @byMonthYear.
+  ///
+  /// In en, this message translates to:
+  /// **'By month and year'**
+  String get byMonthYear;
+
+  /// No description provided for @needsRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Needs {from}→{to} rate'**
+  String needsRate(String from, String to);
+
+  /// No description provided for @toPurifyItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Interest to purify: {amount} · not counted as return'**
+  String toPurifyItem(String amount);
+
+  /// No description provided for @recordGivenAway.
+  ///
+  /// In en, this message translates to:
+  /// **'Record given away'**
+  String get recordGivenAway;
+
+  /// No description provided for @history.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get history;
+
+  /// No description provided for @record.
+  ///
+  /// In en, this message translates to:
+  /// **'Record'**
+  String get record;
+
+  /// No description provided for @closedOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Closed on {date}'**
+  String closedOn(String date);
+
+  /// No description provided for @kindMoneyIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Money in'**
+  String get kindMoneyIn;
+
+  /// No description provided for @kindSale.
+  ///
+  /// In en, this message translates to:
+  /// **'Sale'**
+  String get kindSale;
+
+  /// No description provided for @kindIncome.
+  ///
+  /// In en, this message translates to:
+  /// **'Income received'**
+  String get kindIncome;
+
+  /// No description provided for @kindValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Value update'**
+  String get kindValue;
+
+  /// No description provided for @kindInterestKept.
+  ///
+  /// In en, this message translates to:
+  /// **'Interest kept inside'**
+  String get kindInterestKept;
+
+  /// No description provided for @kindInterestPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Interest paid out'**
+  String get kindInterestPaid;
+
+  /// No description provided for @kindGivenInside.
+  ///
+  /// In en, this message translates to:
+  /// **'Interest given away (from inside)'**
+  String get kindGivenInside;
+
+  /// No description provided for @kindGivenPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Interest given away (from paid out)'**
+  String get kindGivenPaid;
+
+  /// No description provided for @tabValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Value'**
+  String get tabValue;
+
+  /// No description provided for @tabIn.
+  ///
+  /// In en, this message translates to:
+  /// **'In'**
+  String get tabIn;
+
+  /// No description provided for @tabOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Out'**
+  String get tabOut;
+
+  /// No description provided for @tabInterest.
+  ///
+  /// In en, this message translates to:
+  /// **'Interest'**
+  String get tabInterest;
+
+  /// No description provided for @interestReceived.
+  ///
+  /// In en, this message translates to:
+  /// **'Received'**
+  String get interestReceived;
+
+  /// No description provided for @interestGivenAway.
+  ///
+  /// In en, this message translates to:
+  /// **'Given away'**
+  String get interestGivenAway;
+
+  /// No description provided for @interestWhere.
+  ///
+  /// In en, this message translates to:
+  /// **'Where is it?'**
+  String get interestWhere;
+
+  /// No description provided for @interestPaidOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid out to me'**
+  String get interestPaidOut;
+
+  /// No description provided for @interestKeptInside.
+  ///
+  /// In en, this message translates to:
+  /// **'Kept inside this item'**
+  String get interestKeptInside;
+
+  /// No description provided for @interestNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Interest is not counted as return and not in the zakat base. It is shown as \"to purify\" so you can give it away.'**
+  String get interestNote;
+
+  /// No description provided for @givenFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'Given from'**
+  String get givenFrom;
+
+  /// No description provided for @givenAwayNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Giving it away does not count as zakat.'**
+  String get givenAwayNote;
+
+  /// No description provided for @effectKept.
+  ///
+  /// In en, this message translates to:
+  /// **'Lowers the item\'s value and the to-purify total by the same amount. Return is not affected.'**
+  String get effectKept;
+
+  /// No description provided for @effectPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Lowers the to-purify total. The item\'s value does not change.'**
+  String get effectPaid;
+
+  /// No description provided for @fieldAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get fieldAmount;
+
+  /// No description provided for @fieldDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get fieldDate;
+
+  /// No description provided for @fieldValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Value'**
+  String get fieldValue;
+
+  /// No description provided for @fieldValueAfter.
+  ///
+  /// In en, this message translates to:
+  /// **'Value after (optional)'**
+  String get fieldValueAfter;
+
+  /// No description provided for @fieldValueLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'Value left'**
+  String get fieldValueLeft;
+
+  /// No description provided for @fieldKind.
+  ///
+  /// In en, this message translates to:
+  /// **'Kind'**
+  String get fieldKind;
+
+  /// No description provided for @lastValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Last: {value} on {date}'**
+  String lastValue(String value, String date);
+
+  /// No description provided for @typoCheck.
+  ///
+  /// In en, this message translates to:
+  /// **'This is {times}× the last value. Check the number.'**
+  String typoCheck(String times);
+
+  /// No description provided for @valueLeftRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'This is more than the item\'s value. Enter what is left (0 or more).'**
+  String get valueLeftRequired;
+
+  /// No description provided for @closesInvestment.
+  ///
+  /// In en, this message translates to:
+  /// **'This closes the investment. It stays in past months.'**
+  String get closesInvestment;
+
+  /// No description provided for @errBeforeStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Can\'t be before the start date ({date})'**
+  String errBeforeStart(String date);
+
+  /// No description provided for @errGivenTooMuch.
+  ///
+  /// In en, this message translates to:
+  /// **'You have {amount} interest still to purify there. Enter that or less.'**
+  String errGivenTooMuch(String amount);
+
+  /// No description provided for @replaceValueTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace the value of {date}?'**
+  String replaceValueTitle(String date);
+
+  /// No description provided for @replace.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace'**
+  String get replace;
+
+  /// No description provided for @nothingToPurify.
+  ///
+  /// In en, this message translates to:
+  /// **'No interest left to give away.'**
+  String get nothingToPurify;
+
+  /// No description provided for @perUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'Per unit'**
+  String get perUnit;
+
+  /// No description provided for @total.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get total;
+
+  /// No description provided for @zakatSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Zakat'**
+  String get zakatSectionTitle;
+
+  /// No description provided for @whyReturnTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Return'**
+  String get whyReturnTitle;
+
+  /// No description provided for @whyReturnWhat.
+  ///
+  /// In en, this message translates to:
+  /// **'Money-weighted return (Modified Dietz): deposits are not profit. Over long periods with large flows it can differ from the exact money-weighted return.'**
+  String get whyReturnWhat;
+
+  /// No description provided for @whyReturnNumbers.
+  ///
+  /// In en, this message translates to:
+  /// **'{r} = ({ev} − {bv} − {cf}) ÷ {d}  (end value − start value − money in/out, ÷ average money invested)'**
+  String whyReturnNumbers(String r, String ev, String bv, String cf, String d);
+
+  /// No description provided for @whySetAsideTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated zakat set-aside (planning)'**
+  String get whySetAsideTitle;
+
+  /// No description provided for @whySetAsideWhat.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate × zakat share × end value × days ÷ year length, in the matched pair you chose. Actual zakat is due once a year on your zakat date.'**
+  String get whySetAsideWhat;
+
+  /// No description provided for @whySetAsideNumbers.
+  ///
+  /// In en, this message translates to:
+  /// **'{z} = {rate} × {share} × {ev} × {days} ÷ {year}'**
+  String whySetAsideNumbers(
+    String z,
+    String rate,
+    String share,
+    String ev,
+    String days,
+    String year,
+  );
+
+  /// No description provided for @whyRealTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Real return'**
+  String get whyRealTitle;
+
+  /// No description provided for @whyRealWhat.
+  ///
+  /// In en, this message translates to:
+  /// **'(1 + return) ÷ (1 + inflation) − 1. For planning only; it never changes the zakat base.'**
+  String get whyRealWhat;
+
+  /// No description provided for @whyRealNumbers.
+  ///
+  /// In en, this message translates to:
+  /// **'return {r}, inflation {i} → {real}'**
+  String whyRealNumbers(String r, String i, String real);
+
+  /// No description provided for @whyGapTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchasing-power gap'**
+  String get whyGapTitle;
+
+  /// No description provided for @whyGapWhat.
+  ///
+  /// In en, this message translates to:
+  /// **'(End value − set-aside) compared with (start value + money in/out + inflation on the average money invested). Zero or more means purchasing power was kept.'**
+  String get whyGapWhat;
+
+  /// No description provided for @whyGapNumbers.
+  ///
+  /// In en, this message translates to:
+  /// **'gap {gap}; needed end value {needed}'**
+  String whyGapNumbers(String gap, String needed);
+
+  /// No description provided for @whyShareTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Zakat share'**
+  String get whyShareTitle;
+
+  /// No description provided for @whyInflationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Inflation'**
+  String get whyInflationTitle;
+
+  /// No description provided for @whyInflationWhat.
+  ///
+  /// In en, this message translates to:
+  /// **'Yearly rates of the series, pro-rated by days for this period.'**
+  String get whyInflationWhat;
+
+  /// No description provided for @monthsYears.
+  ///
+  /// In en, this message translates to:
+  /// **'By month and year'**
+  String get monthsYears;
+
+  /// No description provided for @updateAllTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Update all'**
+  String get updateAllTitle;
+
+  /// No description provided for @refreshRates.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh rates online'**
+  String get refreshRates;
+
+  /// No description provided for @refreshHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloads the same public price list for everyone. Nothing about you is sent.'**
+  String get refreshHelp;
+
+  /// No description provided for @lastRefresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Last refresh: rates as of {date} · {source}'**
+  String lastRefresh(String date, String source);
+
+  /// No description provided for @refreshRunning.
+  ///
+  /// In en, this message translates to:
+  /// **'Refreshing…'**
+  String get refreshRunning;
+
+  /// No description provided for @refreshDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Rates as of {date} · {source} · {count} of your rates updated'**
+  String refreshDone(String date, String source, String count);
+
+  /// No description provided for @refreshFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t refresh. Nothing changed. Your saved rates are still used — type a rate below if you have a newer one.'**
+  String get refreshFailed;
+
+  /// No description provided for @refreshSource.
+  ///
+  /// In en, this message translates to:
+  /// **'currency-api (fawazahmed0)'**
+  String get refreshSource;
+
+  /// No description provided for @asOfLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'As of'**
+  String get asOfLabel;
+
+  /// No description provided for @showAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Show all'**
+  String get showAll;
+
+  /// No description provided for @ratesStillOld.
+  ///
+  /// In en, this message translates to:
+  /// **'Rates still old'**
+  String get ratesStillOld;
+
+  /// No description provided for @valuesHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Values'**
+  String get valuesHeading;
+
+  /// No description provided for @same.
+  ///
+  /// In en, this message translates to:
+  /// **'Same'**
+  String get same;
+
+  /// No description provided for @filledCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{filled} of {total} filled'**
+  String filledCount(String filled, String total);
+
+  /// No description provided for @updatedToast.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated {count} values. {left} still old.'**
+  String updatedToast(String count, String left);
+
+  /// No description provided for @ratesSavedValuesNot.
+  ///
+  /// In en, this message translates to:
+  /// **'Rates saved, values not saved — try again'**
+  String get ratesSavedValuesNot;
+
+  /// No description provided for @allUpToDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Everything is up to date for {month}'**
+  String allUpToDate(String month);
+
+  /// No description provided for @saveUpdatesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Save {count} updates?'**
+  String saveUpdatesTitle(String count);
+
+  /// No description provided for @lastHint.
+  ///
+  /// In en, this message translates to:
+  /// **'last {value} · {date}'**
+  String lastHint(String value, String date);
+
+  /// No description provided for @rateRowLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'1 {from} = ____ {to}'**
+  String rateRowLabel(String from, String to);
+
+  /// No description provided for @periodTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Period view'**
+  String get periodTitle;
+
+  /// No description provided for @allInvestments.
+  ///
+  /// In en, this message translates to:
+  /// **'All investments'**
+  String get allInvestments;
+
+  /// No description provided for @monthLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Month'**
+  String get monthLabel;
+
+  /// No description provided for @yearLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Year'**
+  String get yearLabel;
+
+  /// No description provided for @rowInflation.
+  ///
+  /// In en, this message translates to:
+  /// **'Inflation ({country})'**
+  String rowInflation(String country);
+
+  /// No description provided for @rowRealAfter.
+  ///
+  /// In en, this message translates to:
+  /// **'Real return after set-aside'**
+  String get rowRealAfter;
+
+  /// No description provided for @rowRealBefore.
+  ///
+  /// In en, this message translates to:
+  /// **'Real return before set-aside: {value}'**
+  String rowRealBefore(String value);
+
+  /// No description provided for @inflationForPeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'{value} for this period'**
+  String inflationForPeriod(String value);
+
+  /// No description provided for @verdictKeptTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'KEPT purchasing power, after set-aside'**
+  String get verdictKeptTitle;
+
+  /// No description provided for @verdictLostTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'LOST purchasing power, after set-aside'**
+  String get verdictLostTitle;
+
+  /// No description provided for @neededEnd.
+  ///
+  /// In en, this message translates to:
+  /// **'Needed: end value {value} (return {pct})'**
+  String neededEnd(String value, String pct);
+
+  /// No description provided for @lostGrams.
+  ///
+  /// In en, this message translates to:
+  /// **'Lost {value} after set-aside'**
+  String lostGrams(String value);
+
+  /// No description provided for @keptGrams.
+  ///
+  /// In en, this message translates to:
+  /// **'Kept {value} after set-aside'**
+  String keptGrams(String value);
+
+  /// No description provided for @yardstick.
+  ///
+  /// In en, this message translates to:
+  /// **'Gold is a yardstick, not a price index. In gold, the gram is the measure: there is no inflation step.'**
+  String get yardstick;
+
+  /// No description provided for @notAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Not available'**
+  String get notAvailable;
+
+  /// No description provided for @notAvailableWhy.
+  ///
+  /// In en, this message translates to:
+  /// **'The average money invested in this period is zero or less.'**
+  String get notAvailableWhy;
+
+  /// No description provided for @markersStale.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} items not updated this period'**
+  String markersStale(String count);
+
+  /// No description provided for @markerStaleRate.
+  ///
+  /// In en, this message translates to:
+  /// **'rate not updated in this period'**
+  String get markerStaleRate;
+
+  /// No description provided for @markerNotUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'value not updated'**
+  String get markerNotUpdated;
+
+  /// No description provided for @itemsHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Items'**
+  String get itemsHeading;
+
+  /// No description provided for @excludedHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Excluded'**
+  String get excludedHeading;
+
+  /// No description provided for @excludedLine.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} — {from}→{to} rate missing'**
+  String excludedLine(String name, String from, String to);
+
+  /// No description provided for @basedOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Based on {count} of {total} items'**
+  String basedOn(String count, String total);
+
+  /// No description provided for @toPurifyPeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'Interest to purify: {amount} — not in return, not netted against the set-aside'**
+  String toPurifyPeriod(String amount);
+
+  /// No description provided for @noZakatSwitch.
+  ///
+  /// In en, this message translates to:
+  /// **'No zakat due for {year}'**
+  String noZakatSwitch(String year);
+
+  /// No description provided for @noZakatHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Decide using all your zakatable wealth, not only this list.'**
+  String get noZakatHelp;
+
+  /// No description provided for @noZakatEffect.
+  ///
+  /// In en, this message translates to:
+  /// **'0 — no zakat due this year'**
+  String get noZakatEffect;
+
+  /// No description provided for @nisabGold.
+  ///
+  /// In en, this message translates to:
+  /// **'Nisab: 85 g gold = {amount}'**
+  String nisabGold(String amount);
+
+  /// No description provided for @nisabSilver.
+  ///
+  /// In en, this message translates to:
+  /// **'Nisab: 595 g silver = {amount}'**
+  String nisabSilver(String amount);
+
+  /// No description provided for @nisabNoGold.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a gold rate to see the nisab'**
+  String get nisabNoGold;
+
+  /// No description provided for @nisabNoSilver.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a silver rate to see the nisab'**
+  String get nisabNoSilver;
+
+  /// No description provided for @zakatableTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Zakatable total in this list: {amount}'**
+  String zakatableTotal(String amount);
+
+  /// No description provided for @otherPeriods.
+  ///
+  /// In en, this message translates to:
+  /// **'Other periods'**
+  String get otherPeriods;
+
+  /// No description provided for @measureReturn.
+  ///
+  /// In en, this message translates to:
+  /// **'Return'**
+  String get measureReturn;
+
+  /// No description provided for @measureAfter.
+  ///
+  /// In en, this message translates to:
+  /// **'After set-aside'**
+  String get measureAfter;
+
+  /// No description provided for @measureReal.
+  ///
+  /// In en, this message translates to:
+  /// **'Real after set-aside'**
+  String get measureReal;
+
+  /// No description provided for @assumptionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Assumptions'**
+  String get assumptionsTitle;
+
+  /// No description provided for @baseAndHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Base and home'**
+  String get baseAndHome;
+
+  /// No description provided for @baseLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Base currency: {currency}'**
+  String baseLine(String currency);
+
+  /// No description provided for @baseChangeWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'All totals and months recalculate.'**
+  String get baseChangeWarning;
+
+  /// No description provided for @ratesHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Rates'**
+  String get ratesHeading;
+
+  /// No description provided for @rateLine.
+  ///
+  /// In en, this message translates to:
+  /// **'1 {from} = {rate} {to} · as of {date}'**
+  String rateLine(String from, String rate, String to, String date);
+
+  /// No description provided for @rateTagTyped.
+  ///
+  /// In en, this message translates to:
+  /// **'Typed by you'**
+  String get rateTagTyped;
+
+  /// No description provided for @rateTagFetched.
+  ///
+  /// In en, this message translates to:
+  /// **'{source}'**
+  String rateTagFetched(String source);
+
+  /// No description provided for @rateTypedUsed.
+  ///
+  /// In en, this message translates to:
+  /// **'Your rate is used (source gave {rate})'**
+  String rateTypedUsed(String rate);
+
+  /// No description provided for @rateStaleMarker.
+  ///
+  /// In en, this message translates to:
+  /// **'not updated this month'**
+  String get rateStaleMarker;
+
+  /// No description provided for @rateMissingMarker.
+  ///
+  /// In en, this message translates to:
+  /// **'missing'**
+  String get rateMissingMarker;
+
+  /// No description provided for @noRatesYet.
+  ///
+  /// In en, this message translates to:
+  /// **'Rates appear here when an investment needs one.'**
+  String get noRatesYet;
+
+  /// No description provided for @rateHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rates {from}→{to}'**
+  String rateHistoryTitle(String from, String to);
+
+  /// No description provided for @addRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Add rate'**
+  String get addRate;
+
+  /// No description provided for @editRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit rate'**
+  String get editRate;
+
+  /// No description provided for @swapDirection.
+  ///
+  /// In en, this message translates to:
+  /// **'Swap direction'**
+  String get swapDirection;
+
+  /// No description provided for @inverseLine.
+  ///
+  /// In en, this message translates to:
+  /// **'1 {to} = {rate} {from}'**
+  String inverseLine(String to, String rate, String from);
+
+  /// No description provided for @rateFetchedNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetched rates are overridden by typing a rate for the same date.'**
+  String get rateFetchedNote;
+
+  /// No description provided for @inflationHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Inflation'**
+  String get inflationHeading;
+
+  /// No description provided for @inflationRow.
+  ///
+  /// In en, this message translates to:
+  /// **'{country}'**
+  String inflationRow(String country);
+
+  /// No description provided for @inflationYearLine.
+  ///
+  /// In en, this message translates to:
+  /// **'{year}: {rate} · {tag}'**
+  String inflationYearLine(String year, String rate, String tag);
+
+  /// No description provided for @tagShipped.
+  ///
+  /// In en, this message translates to:
+  /// **'Shipped'**
+  String get tagShipped;
+
+  /// No description provided for @tagYours.
+  ///
+  /// In en, this message translates to:
+  /// **'Yours'**
+  String get tagYours;
+
+  /// No description provided for @tagAssumed.
+  ///
+  /// In en, this message translates to:
+  /// **'Assumed from {year}'**
+  String tagAssumed(String year);
+
+  /// No description provided for @resetToShipped.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset to shipped'**
+  String get resetToShipped;
+
+  /// No description provided for @overrideTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{country} {year}'**
+  String overrideTitle(String country, String year);
+
+  /// No description provided for @inflationPercentField.
+  ///
+  /// In en, this message translates to:
+  /// **'Inflation (%)'**
+  String get inflationPercentField;
+
+  /// No description provided for @errInflation.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a rate from -50 to 1000 %'**
+  String get errInflation;
+
+  /// No description provided for @emptySeries.
+  ///
+  /// In en, this message translates to:
+  /// **'No data for {country}. Add a year to see real figures for items using it.'**
+  String emptySeries(String country);
+
+  /// No description provided for @zakatHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Zakat'**
+  String get zakatHeading;
+
+  /// No description provided for @jewelleryNotAsked.
+  ///
+  /// In en, this message translates to:
+  /// **'Not asked yet'**
+  String get jewelleryNotAsked;
+
+  /// No description provided for @noZakatByYear.
+  ///
+  /// In en, this message translates to:
+  /// **'No zakat due by year'**
+  String get noZakatByYear;
+
+  /// No description provided for @perItemRewritten.
+  ///
+  /// In en, this message translates to:
+  /// **'Items that followed the old method keep it now.'**
+  String get perItemRewritten;
+
+  /// No description provided for @rateAddedToast.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate saved'**
+  String get rateAddedToast;
+
+  /// No description provided for @errRateFuture.
+  ///
+  /// In en, this message translates to:
+  /// **'The rate date cannot be in the future'**
+  String get errRateFuture;
 }
 
 class _AppLocalizationsDelegate

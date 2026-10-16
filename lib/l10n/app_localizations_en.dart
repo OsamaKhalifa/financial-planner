@@ -713,4 +713,632 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deleted => 'Deleted';
+
+  @override
+  String get edit => 'Edit';
+
+  @override
+  String get valueNow => 'Value now';
+
+  @override
+  String approxInBase(String amount) {
+    return '≈ $amount';
+  }
+
+  @override
+  String get sinceStart => 'Since start';
+
+  @override
+  String colItem(String unit) {
+    return 'In $unit';
+  }
+
+  @override
+  String get rowGain => 'Gain';
+
+  @override
+  String get rowReturn => 'Return';
+
+  @override
+  String get rowPerYear => 'Per year';
+
+  @override
+  String get rowSetAside => 'Estimated zakat set-aside (planning)';
+
+  @override
+  String get setAsideNote =>
+      'Actual zakat is due once a year on your zakat date.';
+
+  @override
+  String get rowReturnAfter => 'Return after set-aside';
+
+  @override
+  String rowRealOwn(String country) {
+    return 'Real · own market ($country)';
+  }
+
+  @override
+  String rowRealBase(String country) {
+    return 'Real · in your money ($country)';
+  }
+
+  @override
+  String get realLabel =>
+      'Purchasing power (for planning only — zakat is always on today\'s actual value)';
+
+  @override
+  String get byMonthYear => 'By month and year';
+
+  @override
+  String needsRate(String from, String to) {
+    return 'Needs $from→$to rate';
+  }
+
+  @override
+  String toPurifyItem(String amount) {
+    return 'Interest to purify: $amount · not counted as return';
+  }
+
+  @override
+  String get recordGivenAway => 'Record given away';
+
+  @override
+  String get history => 'History';
+
+  @override
+  String get record => 'Record';
+
+  @override
+  String closedOn(String date) {
+    return 'Closed on $date';
+  }
+
+  @override
+  String get kindMoneyIn => 'Money in';
+
+  @override
+  String get kindSale => 'Sale';
+
+  @override
+  String get kindIncome => 'Income received';
+
+  @override
+  String get kindValue => 'Value update';
+
+  @override
+  String get kindInterestKept => 'Interest kept inside';
+
+  @override
+  String get kindInterestPaid => 'Interest paid out';
+
+  @override
+  String get kindGivenInside => 'Interest given away (from inside)';
+
+  @override
+  String get kindGivenPaid => 'Interest given away (from paid out)';
+
+  @override
+  String get tabValue => 'Value';
+
+  @override
+  String get tabIn => 'In';
+
+  @override
+  String get tabOut => 'Out';
+
+  @override
+  String get tabInterest => 'Interest';
+
+  @override
+  String get interestReceived => 'Received';
+
+  @override
+  String get interestGivenAway => 'Given away';
+
+  @override
+  String get interestWhere => 'Where is it?';
+
+  @override
+  String get interestPaidOut => 'Paid out to me';
+
+  @override
+  String get interestKeptInside => 'Kept inside this item';
+
+  @override
+  String get interestNote =>
+      'Interest is not counted as return and not in the zakat base. It is shown as \"to purify\" so you can give it away.';
+
+  @override
+  String get givenFrom => 'Given from';
+
+  @override
+  String get givenAwayNote => 'Giving it away does not count as zakat.';
+
+  @override
+  String get effectKept =>
+      'Lowers the item\'s value and the to-purify total by the same amount. Return is not affected.';
+
+  @override
+  String get effectPaid =>
+      'Lowers the to-purify total. The item\'s value does not change.';
+
+  @override
+  String get fieldAmount => 'Amount';
+
+  @override
+  String get fieldDate => 'Date';
+
+  @override
+  String get fieldValue => 'Value';
+
+  @override
+  String get fieldValueAfter => 'Value after (optional)';
+
+  @override
+  String get fieldValueLeft => 'Value left';
+
+  @override
+  String get fieldKind => 'Kind';
+
+  @override
+  String lastValue(String value, String date) {
+    return 'Last: $value on $date';
+  }
+
+  @override
+  String typoCheck(String times) {
+    return 'This is $times× the last value. Check the number.';
+  }
+
+  @override
+  String get valueLeftRequired =>
+      'This is more than the item\'s value. Enter what is left (0 or more).';
+
+  @override
+  String get closesInvestment =>
+      'This closes the investment. It stays in past months.';
+
+  @override
+  String errBeforeStart(String date) {
+    return 'Can\'t be before the start date ($date)';
+  }
+
+  @override
+  String errGivenTooMuch(String amount) {
+    return 'You have $amount interest still to purify there. Enter that or less.';
+  }
+
+  @override
+  String replaceValueTitle(String date) {
+    return 'Replace the value of $date?';
+  }
+
+  @override
+  String get replace => 'Replace';
+
+  @override
+  String get nothingToPurify => 'No interest left to give away.';
+
+  @override
+  String get perUnit => 'Per unit';
+
+  @override
+  String get total => 'Total';
+
+  @override
+  String get zakatSectionTitle => 'Zakat';
+
+  @override
+  String get whyReturnTitle => 'Return';
+
+  @override
+  String get whyReturnWhat =>
+      'Money-weighted return (Modified Dietz): deposits are not profit. Over long periods with large flows it can differ from the exact money-weighted return.';
+
+  @override
+  String whyReturnNumbers(String r, String ev, String bv, String cf, String d) {
+    return '$r = ($ev − $bv − $cf) ÷ $d  (end value − start value − money in/out, ÷ average money invested)';
+  }
+
+  @override
+  String get whySetAsideTitle => 'Estimated zakat set-aside (planning)';
+
+  @override
+  String get whySetAsideWhat =>
+      'Rate × zakat share × end value × days ÷ year length, in the matched pair you chose. Actual zakat is due once a year on your zakat date.';
+
+  @override
+  String whySetAsideNumbers(
+    String z,
+    String rate,
+    String share,
+    String ev,
+    String days,
+    String year,
+  ) {
+    return '$z = $rate × $share × $ev × $days ÷ $year';
+  }
+
+  @override
+  String get whyRealTitle => 'Real return';
+
+  @override
+  String get whyRealWhat =>
+      '(1 + return) ÷ (1 + inflation) − 1. For planning only; it never changes the zakat base.';
+
+  @override
+  String whyRealNumbers(String r, String i, String real) {
+    return 'return $r, inflation $i → $real';
+  }
+
+  @override
+  String get whyGapTitle => 'Purchasing-power gap';
+
+  @override
+  String get whyGapWhat =>
+      '(End value − set-aside) compared with (start value + money in/out + inflation on the average money invested). Zero or more means purchasing power was kept.';
+
+  @override
+  String whyGapNumbers(String gap, String needed) {
+    return 'gap $gap; needed end value $needed';
+  }
+
+  @override
+  String get whyShareTitle => 'Zakat share';
+
+  @override
+  String get whyInflationTitle => 'Inflation';
+
+  @override
+  String get whyInflationWhat =>
+      'Yearly rates of the series, pro-rated by days for this period.';
+
+  @override
+  String get monthsYears => 'By month and year';
+
+  @override
+  String get updateAllTitle => 'Update all';
+
+  @override
+  String get refreshRates => 'Refresh rates online';
+
+  @override
+  String get refreshHelp =>
+      'Downloads the same public price list for everyone. Nothing about you is sent.';
+
+  @override
+  String lastRefresh(String date, String source) {
+    return 'Last refresh: rates as of $date · $source';
+  }
+
+  @override
+  String get refreshRunning => 'Refreshing…';
+
+  @override
+  String refreshDone(String date, String source, String count) {
+    return 'Rates as of $date · $source · $count of your rates updated';
+  }
+
+  @override
+  String get refreshFailed =>
+      'Couldn\'t refresh. Nothing changed. Your saved rates are still used — type a rate below if you have a newer one.';
+
+  @override
+  String get refreshSource => 'currency-api (fawazahmed0)';
+
+  @override
+  String get asOfLabel => 'As of';
+
+  @override
+  String get showAll => 'Show all';
+
+  @override
+  String get ratesStillOld => 'Rates still old';
+
+  @override
+  String get valuesHeading => 'Values';
+
+  @override
+  String get same => 'Same';
+
+  @override
+  String filledCount(String filled, String total) {
+    return '$filled of $total filled';
+  }
+
+  @override
+  String updatedToast(String count, String left) {
+    return 'Updated $count values. $left still old.';
+  }
+
+  @override
+  String get ratesSavedValuesNot => 'Rates saved, values not saved — try again';
+
+  @override
+  String allUpToDate(String month) {
+    return 'Everything is up to date for $month';
+  }
+
+  @override
+  String saveUpdatesTitle(String count) {
+    return 'Save $count updates?';
+  }
+
+  @override
+  String lastHint(String value, String date) {
+    return 'last $value · $date';
+  }
+
+  @override
+  String rateRowLabel(String from, String to) {
+    return '1 $from = ____ $to';
+  }
+
+  @override
+  String get periodTitle => 'Period view';
+
+  @override
+  String get allInvestments => 'All investments';
+
+  @override
+  String get monthLabel => 'Month';
+
+  @override
+  String get yearLabel => 'Year';
+
+  @override
+  String rowInflation(String country) {
+    return 'Inflation ($country)';
+  }
+
+  @override
+  String get rowRealAfter => 'Real return after set-aside';
+
+  @override
+  String rowRealBefore(String value) {
+    return 'Real return before set-aside: $value';
+  }
+
+  @override
+  String inflationForPeriod(String value) {
+    return '$value for this period';
+  }
+
+  @override
+  String get verdictKeptTitle => 'KEPT purchasing power, after set-aside';
+
+  @override
+  String get verdictLostTitle => 'LOST purchasing power, after set-aside';
+
+  @override
+  String neededEnd(String value, String pct) {
+    return 'Needed: end value $value (return $pct)';
+  }
+
+  @override
+  String lostGrams(String value) {
+    return 'Lost $value after set-aside';
+  }
+
+  @override
+  String keptGrams(String value) {
+    return 'Kept $value after set-aside';
+  }
+
+  @override
+  String get yardstick =>
+      'Gold is a yardstick, not a price index. In gold, the gram is the measure: there is no inflation step.';
+
+  @override
+  String get notAvailable => 'Not available';
+
+  @override
+  String get notAvailableWhy =>
+      'The average money invested in this period is zero or less.';
+
+  @override
+  String markersStale(String count) {
+    return '$count items not updated this period';
+  }
+
+  @override
+  String get markerStaleRate => 'rate not updated in this period';
+
+  @override
+  String get markerNotUpdated => 'value not updated';
+
+  @override
+  String get itemsHeading => 'Items';
+
+  @override
+  String get excludedHeading => 'Excluded';
+
+  @override
+  String excludedLine(String name, String from, String to) {
+    return '$name — $from→$to rate missing';
+  }
+
+  @override
+  String basedOn(String count, String total) {
+    return 'Based on $count of $total items';
+  }
+
+  @override
+  String toPurifyPeriod(String amount) {
+    return 'Interest to purify: $amount — not in return, not netted against the set-aside';
+  }
+
+  @override
+  String noZakatSwitch(String year) {
+    return 'No zakat due for $year';
+  }
+
+  @override
+  String get noZakatHelp =>
+      'Decide using all your zakatable wealth, not only this list.';
+
+  @override
+  String get noZakatEffect => '0 — no zakat due this year';
+
+  @override
+  String nisabGold(String amount) {
+    return 'Nisab: 85 g gold = $amount';
+  }
+
+  @override
+  String nisabSilver(String amount) {
+    return 'Nisab: 595 g silver = $amount';
+  }
+
+  @override
+  String get nisabNoGold => 'Add a gold rate to see the nisab';
+
+  @override
+  String get nisabNoSilver => 'Add a silver rate to see the nisab';
+
+  @override
+  String zakatableTotal(String amount) {
+    return 'Zakatable total in this list: $amount';
+  }
+
+  @override
+  String get otherPeriods => 'Other periods';
+
+  @override
+  String get measureReturn => 'Return';
+
+  @override
+  String get measureAfter => 'After set-aside';
+
+  @override
+  String get measureReal => 'Real after set-aside';
+
+  @override
+  String get assumptionsTitle => 'Assumptions';
+
+  @override
+  String get baseAndHome => 'Base and home';
+
+  @override
+  String baseLine(String currency) {
+    return 'Base currency: $currency';
+  }
+
+  @override
+  String get baseChangeWarning => 'All totals and months recalculate.';
+
+  @override
+  String get ratesHeading => 'Rates';
+
+  @override
+  String rateLine(String from, String rate, String to, String date) {
+    return '1 $from = $rate $to · as of $date';
+  }
+
+  @override
+  String get rateTagTyped => 'Typed by you';
+
+  @override
+  String rateTagFetched(String source) {
+    return '$source';
+  }
+
+  @override
+  String rateTypedUsed(String rate) {
+    return 'Your rate is used (source gave $rate)';
+  }
+
+  @override
+  String get rateStaleMarker => 'not updated this month';
+
+  @override
+  String get rateMissingMarker => 'missing';
+
+  @override
+  String get noRatesYet => 'Rates appear here when an investment needs one.';
+
+  @override
+  String rateHistoryTitle(String from, String to) {
+    return 'Rates $from→$to';
+  }
+
+  @override
+  String get addRate => 'Add rate';
+
+  @override
+  String get editRate => 'Edit rate';
+
+  @override
+  String get swapDirection => 'Swap direction';
+
+  @override
+  String inverseLine(String to, String rate, String from) {
+    return '1 $to = $rate $from';
+  }
+
+  @override
+  String get rateFetchedNote =>
+      'Fetched rates are overridden by typing a rate for the same date.';
+
+  @override
+  String get inflationHeading => 'Inflation';
+
+  @override
+  String inflationRow(String country) {
+    return '$country';
+  }
+
+  @override
+  String inflationYearLine(String year, String rate, String tag) {
+    return '$year: $rate · $tag';
+  }
+
+  @override
+  String get tagShipped => 'Shipped';
+
+  @override
+  String get tagYours => 'Yours';
+
+  @override
+  String tagAssumed(String year) {
+    return 'Assumed from $year';
+  }
+
+  @override
+  String get resetToShipped => 'Reset to shipped';
+
+  @override
+  String overrideTitle(String country, String year) {
+    return '$country $year';
+  }
+
+  @override
+  String get inflationPercentField => 'Inflation (%)';
+
+  @override
+  String get errInflation => 'Enter a rate from -50 to 1000 %';
+
+  @override
+  String emptySeries(String country) {
+    return 'No data for $country. Add a year to see real figures for items using it.';
+  }
+
+  @override
+  String get zakatHeading => 'Zakat';
+
+  @override
+  String get jewelleryNotAsked => 'Not asked yet';
+
+  @override
+  String get noZakatByYear => 'No zakat due by year';
+
+  @override
+  String get perItemRewritten =>
+      'Items that followed the old method keep it now.';
+
+  @override
+  String get rateAddedToast => 'Rate saved';
+
+  @override
+  String get errRateFuture => 'The rate date cannot be in the future';
 }

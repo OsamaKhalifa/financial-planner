@@ -714,4 +714,631 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get deleted => 'تم الحذف';
+
+  @override
+  String get edit => 'تعديل';
+
+  @override
+  String get valueNow => 'القيمة الآن';
+
+  @override
+  String approxInBase(String amount) {
+    return '≈ $amount';
+  }
+
+  @override
+  String get sinceStart => 'منذ البداية';
+
+  @override
+  String colItem(String unit) {
+    return 'بـ $unit';
+  }
+
+  @override
+  String get rowGain => 'الربح';
+
+  @override
+  String get rowReturn => 'العائد';
+
+  @override
+  String get rowPerYear => 'سنويًا';
+
+  @override
+  String get rowSetAside => 'المخصص التقديري للزكاة (للتخطيط)';
+
+  @override
+  String get setAsideNote => 'الزكاة الفعلية تجب مرة في السنة في يوم وجوبها.';
+
+  @override
+  String get rowReturnAfter => 'العائد بعد المخصص';
+
+  @override
+  String rowRealOwn(String country) {
+    return 'حقيقي · سوق الأصل ($country)';
+  }
+
+  @override
+  String rowRealBase(String country) {
+    return 'حقيقي · بعملتك ($country)';
+  }
+
+  @override
+  String get realLabel =>
+      'القوة الشرائية (للتخطيط فقط — الزكاة دائمًا على القيمة الفعلية اليوم)';
+
+  @override
+  String get byMonthYear => 'حسب الشهر والسنة';
+
+  @override
+  String needsRate(String from, String to) {
+    return 'يحتاج سعر $from→$to';
+  }
+
+  @override
+  String toPurifyItem(String amount) {
+    return 'فوائد يجب التخلص منها: $amount · لا تُحتسب عائدًا';
+  }
+
+  @override
+  String get recordGivenAway => 'تسجيل ما تم التخلص منه';
+
+  @override
+  String get history => 'السجل';
+
+  @override
+  String get record => 'تسجيل';
+
+  @override
+  String closedOn(String date) {
+    return 'أُغلق بتاريخ $date';
+  }
+
+  @override
+  String get kindMoneyIn => 'إيداع';
+
+  @override
+  String get kindSale => 'بيع';
+
+  @override
+  String get kindIncome => 'دخل مُستلم';
+
+  @override
+  String get kindValue => 'تحديث القيمة';
+
+  @override
+  String get kindInterestKept => 'فوائد باقية داخل الاستثمار';
+
+  @override
+  String get kindInterestPaid => 'فوائد مدفوعة لي';
+
+  @override
+  String get kindGivenInside => 'فوائد تم التخلص منها (من داخل الاستثمار)';
+
+  @override
+  String get kindGivenPaid => 'فوائد تم التخلص منها (من المدفوعة)';
+
+  @override
+  String get tabValue => 'القيمة';
+
+  @override
+  String get tabIn => 'إيداع';
+
+  @override
+  String get tabOut => 'سحب';
+
+  @override
+  String get tabInterest => 'فوائد';
+
+  @override
+  String get interestReceived => 'مستلمة';
+
+  @override
+  String get interestGivenAway => 'تم التخلص منها';
+
+  @override
+  String get interestWhere => 'أين هي؟';
+
+  @override
+  String get interestPaidOut => 'مدفوعة لي';
+
+  @override
+  String get interestKeptInside => 'باقية داخل الاستثمار';
+
+  @override
+  String get interestNote =>
+      'لا تُحتسب الفوائد عائدًا ولا تدخل في الوعاء الزكوي. وتظهر \"للتخلص منها\" لتتخلص منها.';
+
+  @override
+  String get givenFrom => 'التخلص منها من';
+
+  @override
+  String get givenAwayNote => 'التخلص من الفوائد لا يُحتسب زكاة.';
+
+  @override
+  String get effectKept =>
+      'يخفض قيمة الاستثمار والمطلوب التخلص منه بالمقدار نفسه. العائد لا يتأثر.';
+
+  @override
+  String get effectPaid => 'يخفض المطلوب التخلص منه. قيمة الاستثمار لا تتغير.';
+
+  @override
+  String get fieldAmount => 'المبلغ';
+
+  @override
+  String get fieldDate => 'التاريخ';
+
+  @override
+  String get fieldValue => 'القيمة';
+
+  @override
+  String get fieldValueAfter => 'القيمة بعد العملية (اختياري)';
+
+  @override
+  String get fieldValueLeft => 'القيمة المتبقية';
+
+  @override
+  String get fieldKind => 'النوع';
+
+  @override
+  String lastValue(String value, String date) {
+    return 'آخر قيمة: $value بتاريخ $date';
+  }
+
+  @override
+  String typoCheck(String times) {
+    return 'هذا $times أضعاف آخر قيمة. تحقق من الرقم.';
+  }
+
+  @override
+  String get valueLeftRequired =>
+      'هذا أكبر من قيمة الاستثمار. أدخل ما تبقى (صفر أو أكثر).';
+
+  @override
+  String get closesInvestment =>
+      'سيُغلق هذا الاستثمار ويبقى في الأشهر السابقة.';
+
+  @override
+  String errBeforeStart(String date) {
+    return 'لا يمكن أن يكون قبل تاريخ البداية ($date)';
+  }
+
+  @override
+  String errGivenTooMuch(String amount) {
+    return 'لديك $amount من الفوائد المتبقية للتخلص منها هناك. أدخل هذا المبلغ أو أقل.';
+  }
+
+  @override
+  String replaceValueTitle(String date) {
+    return 'استبدال قيمة $date؟';
+  }
+
+  @override
+  String get replace => 'استبدال';
+
+  @override
+  String get nothingToPurify => 'لا توجد فوائد متبقية للتخلص منها.';
+
+  @override
+  String get perUnit => 'للوحدة';
+
+  @override
+  String get total => 'الإجمالي';
+
+  @override
+  String get zakatSectionTitle => 'الزكاة';
+
+  @override
+  String get whyReturnTitle => 'العائد';
+
+  @override
+  String get whyReturnWhat =>
+      'عائد موزون بالمال (طريقة ديتز المعدلة): الإيداعات ليست ربحًا. وقد يختلف في الفترات الطويلة ذات التدفقات الكبيرة عن العائد الموزون الدقيق.';
+
+  @override
+  String whyReturnNumbers(String r, String ev, String bv, String cf, String d) {
+    return '$r = ($ev − $bv − $cf) ÷ $d  (القيمة النهائية − قيمة البداية − الإيداعات والسحوبات ÷ متوسط المال المستثمر)';
+  }
+
+  @override
+  String get whySetAsideTitle => 'المخصص التقديري للزكاة (للتخطيط)';
+
+  @override
+  String get whySetAsideWhat =>
+      'النسبة × نسبة الزكاة × القيمة النهائية × الأيام ÷ طول السنة، وفق الزوج المتطابق الذي اخترته. الزكاة الفعلية تجب مرة في السنة في يوم وجوبها.';
+
+  @override
+  String whySetAsideNumbers(
+    String z,
+    String rate,
+    String share,
+    String ev,
+    String days,
+    String year,
+  ) {
+    return '$z = $rate × $share × $ev × $days ÷ $year';
+  }
+
+  @override
+  String get whyRealTitle => 'العائد الحقيقي';
+
+  @override
+  String get whyRealWhat =>
+      '(1 + العائد) ÷ (1 + التضخم) − 1. للتخطيط فقط ولا يغيّر الوعاء الزكوي.';
+
+  @override
+  String whyRealNumbers(String r, String i, String real) {
+    return 'العائد $r، التضخم $i ← $real';
+  }
+
+  @override
+  String get whyGapTitle => 'فرق القوة الشرائية';
+
+  @override
+  String get whyGapWhat =>
+      '(القيمة النهائية − المخصص) مقارنة بـ (قيمة البداية + الإيداعات والسحوبات + التضخم على متوسط المال المستثمر). صفر أو أكثر يعني أن القوة الشرائية حُفظت.';
+
+  @override
+  String whyGapNumbers(String gap, String needed) {
+    return 'الفرق $gap؛ القيمة النهائية المطلوبة $needed';
+  }
+
+  @override
+  String get whyShareTitle => 'نسبة الزكاة';
+
+  @override
+  String get whyInflationTitle => 'التضخم';
+
+  @override
+  String get whyInflationWhat =>
+      'معدلات السلسلة السنوية موزعة على أيام هذه الفترة.';
+
+  @override
+  String get monthsYears => 'حسب الشهر والسنة';
+
+  @override
+  String get updateAllTitle => 'تحديث الكل';
+
+  @override
+  String get refreshRates => 'تحديث الأسعار عبر الإنترنت';
+
+  @override
+  String get refreshHelp =>
+      'ينزّل قائمة الأسعار العامة نفسها للجميع. لا يُرسل أي شيء عنك.';
+
+  @override
+  String lastRefresh(String date, String source) {
+    return 'آخر تحديث: أسعار بتاريخ $date · $source';
+  }
+
+  @override
+  String get refreshRunning => 'جارٍ التحديث…';
+
+  @override
+  String refreshDone(String date, String source, String count) {
+    return 'أسعار بتاريخ $date · $source · تم تحديث $count من أسعارك';
+  }
+
+  @override
+  String get refreshFailed =>
+      'تعذّر التحديث. لم يتغير شيء. ما زالت أسعارك المحفوظة مستخدمة — اكتب سعرًا أدناه إن توفر لديك أحدث.';
+
+  @override
+  String get refreshSource => 'currency-api (fawazahmed0)';
+
+  @override
+  String get asOfLabel => 'بتاريخ';
+
+  @override
+  String get showAll => 'عرض الكل';
+
+  @override
+  String get ratesStillOld => 'أسعار ما زالت قديمة';
+
+  @override
+  String get valuesHeading => 'القيم';
+
+  @override
+  String get same => 'كما هي';
+
+  @override
+  String filledCount(String filled, String total) {
+    return 'تمت تعبئة $filled من $total';
+  }
+
+  @override
+  String updatedToast(String count, String left) {
+    return 'تم تحديث $count قيم. بقي $left قديمة.';
+  }
+
+  @override
+  String get ratesSavedValuesNot =>
+      'حُفظت الأسعار ولم تُحفظ القيم — حاول مرة أخرى';
+
+  @override
+  String allUpToDate(String month) {
+    return 'كل شيء محدّث لشهر $month';
+  }
+
+  @override
+  String saveUpdatesTitle(String count) {
+    return 'حفظ $count تحديثات؟';
+  }
+
+  @override
+  String lastHint(String value, String date) {
+    return 'آخر قيمة $value · $date';
+  }
+
+  @override
+  String rateRowLabel(String from, String to) {
+    return '1 $from = ____ $to';
+  }
+
+  @override
+  String get periodTitle => 'عرض الفترات';
+
+  @override
+  String get allInvestments => 'كل الاستثمارات';
+
+  @override
+  String get monthLabel => 'شهر';
+
+  @override
+  String get yearLabel => 'سنة';
+
+  @override
+  String rowInflation(String country) {
+    return 'التضخم ($country)';
+  }
+
+  @override
+  String get rowRealAfter => 'العائد الحقيقي بعد المخصص';
+
+  @override
+  String rowRealBefore(String value) {
+    return 'العائد الحقيقي قبل المخصص: $value';
+  }
+
+  @override
+  String inflationForPeriod(String value) {
+    return '$value لهذه الفترة';
+  }
+
+  @override
+  String get verdictKeptTitle => 'حافظت القوة الشرائية بعد المخصص';
+
+  @override
+  String get verdictLostTitle => 'فقدت القوة الشرائية بعد المخصص';
+
+  @override
+  String neededEnd(String value, String pct) {
+    return 'المطلوب: قيمة نهائية $value (عائد $pct)';
+  }
+
+  @override
+  String lostGrams(String value) {
+    return 'خسارة $value بعد المخصص';
+  }
+
+  @override
+  String keptGrams(String value) {
+    return 'زيادة $value بعد المخصص';
+  }
+
+  @override
+  String get yardstick =>
+      'الذهب مقياس وليس مؤشر أسعار. بالذهب يكون الغرام هو المقياس: لا توجد خطوة تضخم.';
+
+  @override
+  String get notAvailable => 'غير متاح';
+
+  @override
+  String get notAvailableWhy =>
+      'متوسط المال المستثمر في هذه الفترة صفر أو أقل.';
+
+  @override
+  String markersStale(String count) {
+    return '$count استثمارات لم تُحدَّث في هذه الفترة';
+  }
+
+  @override
+  String get markerStaleRate => 'السعر لم يُحدَّث في هذه الفترة';
+
+  @override
+  String get markerNotUpdated => 'القيمة لم تُحدَّث';
+
+  @override
+  String get itemsHeading => 'الاستثمارات';
+
+  @override
+  String get excludedHeading => 'مستثناة';
+
+  @override
+  String excludedLine(String name, String from, String to) {
+    return '$name — سعر $from→$to غير متوفر';
+  }
+
+  @override
+  String basedOn(String count, String total) {
+    return 'بناءً على $count من $total استثمارات';
+  }
+
+  @override
+  String toPurifyPeriod(String amount) {
+    return 'فوائد يجب التخلص منها: $amount — ليست في العائد ولا تُخصم من المخصص';
+  }
+
+  @override
+  String noZakatSwitch(String year) {
+    return 'لا زكاة مستحقة لسنة $year';
+  }
+
+  @override
+  String get noZakatHelp =>
+      'قرّر بالنظر إلى كل مالك الزكوي لا إلى هذه القائمة وحدها.';
+
+  @override
+  String get noZakatEffect => '0 — لا زكاة مستحقة هذه السنة';
+
+  @override
+  String nisabGold(String amount) {
+    return 'النصاب: 85 غرامًا من الذهب = $amount';
+  }
+
+  @override
+  String nisabSilver(String amount) {
+    return 'النصاب: 595 غرامًا من الفضة = $amount';
+  }
+
+  @override
+  String get nisabNoGold => 'أضِف سعر الذهب لترى النصاب';
+
+  @override
+  String get nisabNoSilver => 'أضِف سعر الفضة لترى النصاب';
+
+  @override
+  String zakatableTotal(String amount) {
+    return 'إجمالي الوعاء الزكوي في هذه القائمة: $amount';
+  }
+
+  @override
+  String get otherPeriods => 'فترات أخرى';
+
+  @override
+  String get measureReturn => 'العائد';
+
+  @override
+  String get measureAfter => 'بعد المخصص';
+
+  @override
+  String get measureReal => 'حقيقي بعد المخصص';
+
+  @override
+  String get assumptionsTitle => 'الافتراضات';
+
+  @override
+  String get baseAndHome => 'العملة الأساسية والتضخم المحلي';
+
+  @override
+  String baseLine(String currency) {
+    return 'العملة الأساسية: $currency';
+  }
+
+  @override
+  String get baseChangeWarning => 'ستُعاد حسابات كل الإجماليات والأشهر.';
+
+  @override
+  String get ratesHeading => 'الأسعار';
+
+  @override
+  String rateLine(String from, String rate, String to, String date) {
+    return '1 $from = $rate $to · بتاريخ $date';
+  }
+
+  @override
+  String get rateTagTyped => 'أدخلته أنت';
+
+  @override
+  String rateTagFetched(String source) {
+    return '$source';
+  }
+
+  @override
+  String rateTypedUsed(String rate) {
+    return 'يُستخدم سعرك (المصدر أعطى $rate)';
+  }
+
+  @override
+  String get rateStaleMarker => 'لم يُحدَّث هذا الشهر';
+
+  @override
+  String get rateMissingMarker => 'غير متوفر';
+
+  @override
+  String get noRatesYet => 'تظهر الأسعار هنا عندما يحتاج استثمار إلى سعر.';
+
+  @override
+  String rateHistoryTitle(String from, String to) {
+    return 'أسعار $from→$to';
+  }
+
+  @override
+  String get addRate => 'إضافة سعر';
+
+  @override
+  String get editRate => 'تعديل السعر';
+
+  @override
+  String get swapDirection => 'عكس الاتجاه';
+
+  @override
+  String inverseLine(String to, String rate, String from) {
+    return '1 $to = $rate $from';
+  }
+
+  @override
+  String get rateFetchedNote =>
+      'يمكن تجاوز الأسعار المجلوبة بكتابة سعر لليوم نفسه.';
+
+  @override
+  String get inflationHeading => 'التضخم';
+
+  @override
+  String inflationRow(String country) {
+    return '$country';
+  }
+
+  @override
+  String inflationYearLine(String year, String rate, String tag) {
+    return '$year: $rate · $tag';
+  }
+
+  @override
+  String get tagShipped => 'مضمّن';
+
+  @override
+  String get tagYours => 'لك';
+
+  @override
+  String tagAssumed(String year) {
+    return 'مفترض من $year';
+  }
+
+  @override
+  String get resetToShipped => 'العودة إلى المضمّن';
+
+  @override
+  String overrideTitle(String country, String year) {
+    return '$country $year';
+  }
+
+  @override
+  String get inflationPercentField => 'التضخم ( %)';
+
+  @override
+  String get errInflation => 'أدخل نسبة بين -50 و 1000 %';
+
+  @override
+  String emptySeries(String country) {
+    return 'لا توجد بيانات لـ $country. أضِف سنة لترى الأرقام الحقيقية للاستثمارات التي تستخدمها.';
+  }
+
+  @override
+  String get zakatHeading => 'الزكاة';
+
+  @override
+  String get jewelleryNotAsked => 'لم يُسأل بعد';
+
+  @override
+  String get noZakatByYear => 'عدم وجوب الزكاة حسب السنة';
+
+  @override
+  String get perItemRewritten =>
+      'الاستثمارات التي كانت تتبع الطريقة السابقة تحتفظ بها الآن.';
+
+  @override
+  String get rateAddedToast => 'تم حفظ السعر';
+
+  @override
+  String get errRateFuture => 'لا يمكن أن يكون تاريخ السعر في المستقبل';
 }

@@ -1,4 +1,4 @@
-# ADR-0002 — AI behind one client interface and our own proxy
+# ADR-0005 — AI behind one client interface and our own proxy
 
 **Status:** accepted · 2026-10-16 · decided by @OsamaKhalifa
 
