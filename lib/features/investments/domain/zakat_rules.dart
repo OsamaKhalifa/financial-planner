@@ -47,9 +47,9 @@ ZakatRule? defaultRule(AssetType type, Intent? intent, Settings settings) {
       return switch (intent) {
         Intent.trading => ZakatRule.trading100,
         Intent.longTerm => switch (settings.longTermMethod) {
-            null || LongTermMethod.perItem => null,
-            _ => ZakatRule.longTermPerSetting,
-          },
+          null || LongTermMethod.perItem => null,
+          _ => ZakatRule.longTermPerSetting,
+        },
         _ => null,
       };
     case AssetType.sukuk:
@@ -72,16 +72,16 @@ ZakatOffer? offeredShare(AssetType type, Intent? intent) {
 
 ResolvedZakat resolve(Investment item, Settings settings) {
   ResolvedZakat full(String section, [ZakatNotice? notice]) => ResolvedZakat(
-        share: Decimal.one,
-        onDividends: false,
-        sourceSection: section,
-        notice: notice,
-      );
+    share: Decimal.one,
+    onDividends: false,
+    sourceSection: section,
+    notice: notice,
+  );
   ResolvedZakat part(String share, String section) => ResolvedZakat(
-        share: Decimal.parse(share),
-        onDividends: false,
-        sourceSection: section,
-      );
+    share: Decimal.parse(share),
+    onDividends: false,
+    sourceSection: section,
+  );
   final dividends = ResolvedZakat(
     share: Decimal.zero,
     onDividends: true,
@@ -95,7 +95,13 @@ ResolvedZakat resolve(Investment item, Settings settings) {
     case ZakatRule.bullion100:
       return full('B2');
     case ZakatRule.jewelleryPerSetting:
-      return settings.jewelleryZakatable == true ? full('B2') : part('0', 'B2');
+      return switch (settings.jewelleryZakatable) {
+        true => full('B2'),
+        false => part('0', 'B2'),
+        null => throw StateError(
+          'Jewellery ruling must be answered before "${item.name}" is used.',
+        ),
+      };
     case ZakatRule.trading100:
     case ZakatRule.longTermFullValue:
       return full('B3');
@@ -105,8 +111,8 @@ ResolvedZakat resolve(Investment item, Settings settings) {
         LongTermMethod.proxy25 => part('0.25', 'B3'),
         LongTermMethod.fullValue => full('B3'),
         _ => throw StateError(
-            'Long-term method must be answered before "${item.name}" is used.',
-          ),
+          'Long-term method must be answered before "${item.name}" is used.',
+        ),
       };
     case ZakatRule.longTermDividendsOnly:
       return dividends;

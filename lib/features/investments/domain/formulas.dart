@@ -80,9 +80,7 @@ Decimal setAside({
   required Decimal ev,
   required int days,
   required Decimal dividends,
-  required bool noZakatYear,
 }) {
-  if (noZakatYear) return Decimal.zero;
   final onValue = divide(
     year.r * share * ev * Decimal.fromInt(days),
     year.days,

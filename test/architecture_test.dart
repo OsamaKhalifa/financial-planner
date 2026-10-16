@@ -4,11 +4,12 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
-List<File> dartFiles() => Directory('lib')
-    .listSync(recursive: true)
-    .whereType<File>()
-    .where((f) => f.path.endsWith('.dart') && !f.path.contains('/l10n/'))
-    .toList();
+List<File> dartFiles() =>
+    Directory('lib')
+        .listSync(recursive: true)
+        .whereType<File>()
+        .where((f) => f.path.endsWith('.dart') && !f.path.contains('/l10n/'))
+        .toList();
 
 String norm(File f) => f.path.replaceAll('\\', '/');
 
@@ -41,11 +42,10 @@ void main() {
     expect(bad, isEmpty);
   });
 
-  test('no double in money code outside decimal_math.dart', () {
+  test('double only in decimal_math.dart (and generated l10n)', () {
     final bad = violations(
       (p) =>
-          p.startsWith('lib/core/money/') &&
-          p != 'lib/core/money/decimal_math.dart',
+          p != 'lib/core/money/decimal_math.dart' && !p.startsWith('lib/l10n/'),
       RegExp(r'\bdouble\b'),
     );
     expect(bad, isEmpty);
@@ -67,7 +67,7 @@ void main() {
   test('core never imports features', () {
     final bad = violations(
       (p) => p.startsWith('lib/core/'),
-      RegExp(r'''import\s+['"]package:financial_planner/features/'''),
+      RegExp(r'''(import|export)\s+['"][^'"]*\bfeatures/'''),
     );
     expect(bad, isEmpty);
   });

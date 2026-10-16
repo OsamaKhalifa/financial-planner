@@ -20,6 +20,8 @@ import 'package:financial_planner/features/investments/domain/period.dart';
 import 'package:financial_planner/features/investments/domain/portfolio_calculator.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../../support/figures_view.dart';
+
 const egp = Unit('EGP');
 const usd = Unit('USD');
 Decimal d(String s) => Decimal.parse(s);

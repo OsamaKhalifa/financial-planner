@@ -14,6 +14,8 @@ import 'package:financial_planner/features/investments/domain/period.dart';
 import 'package:financial_planner/features/investments/domain/portfolio_calculator.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../../support/figures_view.dart';
+
 const egp = Unit('EGP');
 const usd = Unit('USD');
 Decimal d(String s) => Decimal.parse(s);
@@ -24,15 +26,14 @@ PortfolioCalculator calc(
   List<Rate> rates = const [],
   Set<int> noZakatYears = const {},
   DateTime? now,
-}) =>
-    PortfolioCalculator(
-      items: items,
-      rates: RateBook(rates),
-      inflation: InflationBook(const ShippedInflation(series: {}), const []),
-      settings: const Settings(baseCurrency: egp, zakatYear: ZakatYear.lunar),
-      noZakatYears: noZakatYears,
-      today: now ?? today,
-    );
+}) => PortfolioCalculator(
+  items: items,
+  rates: RateBook(rates),
+  inflation: InflationBook(const ShippedInflation(series: {}), const []),
+  settings: const Settings(baseCurrency: egp, zakatYear: ZakatYear.lunar),
+  noZakatYears: noZakatYears,
+  today: now ?? today,
+);
 
 InvestmentWithHistory fund(
   String id,
@@ -42,30 +43,41 @@ InvestmentWithHistory fund(
   String? value,
   DateTime? valueOn,
   List<HistoryEntry> more = const [],
-}) =>
-    InvestmentWithHistory(
-      investment: Investment(
-        id: id,
-        name: id,
-        type: AssetType.fund,
-        unit: unit,
-        startDate: start,
-        zakatRule: ZakatRule.trading100,
-      ),
-      history: [
-        MoneyIn(investmentId: id, date: start, amount: Money(d(paid), unit)),
-        if (value != null)
-          ValueUpdate(investmentId: id, date: valueOn!, value: d(value)),
-        ...more,
-      ],
-    );
+}) => InvestmentWithHistory(
+  investment: Investment(
+    id: id,
+    name: id,
+    type: AssetType.fund,
+    unit: unit,
+    startDate: start,
+    zakatRule: ZakatRule.trading100,
+  ),
+  history: [
+    MoneyIn(investmentId: id, date: start, amount: Money(d(paid), unit)),
+    if (value != null)
+      ValueUpdate(investmentId: id, date: valueOn!, value: d(value)),
+    ...more,
+  ],
+);
 
 void main() {
   test('without a rate the item is excluded from base totals but keeps its own-unit figures', () {
-    final c = calc([fund('us', usd, day(2026, 1, 1), '1000', value: '1100', valueOn: day(2026, 4, 30))]);
+    final c = calc([
+      fund(
+        'us',
+        usd,
+        day(2026, 1, 1),
+        '1000',
+        value: '1100',
+        valueOn: day(2026, 4, 30),
+      ),
+    ]);
     final p = c.portfolio(Period.month(2026, 4, today), ViewUnit.base);
     final ex = p.excluded.single;
-    expect((ex.itemId, ex.from, ex.to, ex.date), ('us', usd, egp, day(2026, 4, 30)));
+    expect(
+      (ex.itemId, ex.from, ex.to, ex.date),
+      ('us', usd, egp, day(2026, 4, 30)),
+    );
     expect(p.dietz.ev, Decimal.zero);
     expect(p.items.single.unitDietz.ev, d('1100'));
     expect(p.items.single.base, isNull);
@@ -74,43 +86,71 @@ void main() {
   test('an item not yet started or already closed is not part of a period', () {
     final c = calc([
       fund('late', egp, day(2026, 6, 1), '100'),
-      fund('gone', egp, day(2026, 1, 1), '100', value: '0', valueOn: day(2026, 2, 1)),
+      fund(
+        'gone',
+        egp,
+        day(2026, 1, 1),
+        '100',
+        value: '0',
+        valueOn: day(2026, 2, 1),
+      ),
     ]);
     final p = c.portfolio(Period.month(2026, 4, today), ViewUnit.base);
     expect(p.items, isEmpty);
     expect(p.staleValues, isEmpty);
   });
 
-  test('inflation is optional: no series means no real figures, return stays', () {
-    final c = calc([fund('a', egp, day(2026, 1, 1), '1000', value: '1100', valueOn: day(2026, 12, 31))]);
-    final f = c.item('a', Period.year(2026, day(2027, 1, 1)));
-    expect(f.dietz.r, isNotNull);
-    expect(f.inflation, isNull);
-    expect(f.realBeforeZakat, isNull);
-    expect(f.purchasingPower, isNull);
-  });
+  test(
+    'inflation is optional: no series means no real figures, return stays',
+    () {
+      final c = calc([
+        fund(
+          'a',
+          egp,
+          day(2026, 1, 1),
+          '1000',
+          value: '1100',
+          valueOn: day(2026, 12, 31),
+        ),
+      ]);
+      final f = c.item('a', Period.year(2026, day(2027, 1, 1)));
+      expect(f.dietz.r, isNotNull);
+      expect(f.inflation, isNull);
+      expect(f.realBeforeZakat, isNull);
+      expect(f.purchasingPower, isNull);
+    },
+  );
 
   test('since start: days in a no-zakat year are not charged (Q-3)', () {
-    final item = fund('a', egp, day(2025, 1, 1), '10000',
-        value: '10000',
-        valueOn: day(2026, 12, 31),
-        more: [
-          MoneyOut(
-            investmentId: 'a',
-            date: day(2026, 6, 1),
-            amount: Money(d('100'), egp),
-            kind: MoneyOutKind.income,
-          ),
-        ]);
-    final all = calc([item], now: day(2027, 1, 1)).sinceStart('a').figures.setAside;
-    final skip2026 = calc([item], noZakatYears: {2026}, now: day(2027, 1, 1))
-        .sinceStart('a')
-        .figures
-        .setAside;
+    final item = fund(
+      'a',
+      egp,
+      day(2025, 1, 1),
+      '10000',
+      value: '10000',
+      valueOn: day(2026, 12, 31),
+      more: [
+        MoneyOut(
+          investmentId: 'a',
+          date: day(2026, 6, 1),
+          amount: Money(d('100'), egp),
+          kind: MoneyOutKind.income,
+        ),
+      ],
+    );
+    final all = calc([
+      item,
+    ], now: day(2027, 1, 1)).sinceStart('a').figures.setAside;
+    final skip2026 = calc(
+      [item],
+      noZakatYears: {2026},
+      now: day(2027, 1, 1),
+    ).sinceStart('a').figures.setAside;
     // 729 days held (2025-01-01 to 2026-12-31), 365 of them in 2026.
     final expected = all * d('364') / d('729');
     expect(
-      (skip2026 - expected.toDecimal(scaleOnInfinitePrecision: 10)).abs() < d('0.001'),
+      (skip2026 - expected.toDecimal(scaleOnInfinitePrecision: 10)).abs() <
+          d('0.001'),
       isTrue,
     );
   });
@@ -124,59 +164,112 @@ void main() {
       startDate: day(2025, 12, 31),
       zakatRule: ZakatRule.longTermDividendsOnly,
     );
-    final item = InvestmentWithHistory(investment: inv, history: [
-      MoneyIn(investmentId: 'dv', date: day(2025, 12, 31), amount: Money(d('1000'), egp)),
-      MoneyOut(
-        investmentId: 'dv',
-        date: day(2026, 3, 1),
-        amount: Money(d('400'), egp),
-        kind: MoneyOutKind.income,
-      ),
-    ]);
+    final item = InvestmentWithHistory(
+      investment: inv,
+      history: [
+        MoneyIn(
+          investmentId: 'dv',
+          date: day(2025, 12, 31),
+          amount: Money(d('1000'), egp),
+        ),
+        MoneyOut(
+          investmentId: 'dv',
+          date: day(2026, 3, 1),
+          amount: Money(d('400'), egp),
+          kind: MoneyOutKind.income,
+        ),
+      ],
+    );
     final period = Period.year(2026, day(2027, 1, 1));
-    expect(calc([item], now: day(2027, 1, 1)).item('dv', period).setAside, d('10'));
     expect(
-      calc([item], noZakatYears: {2026}, now: day(2027, 1, 1)).item('dv', period).setAside,
+      calc([item], now: day(2027, 1, 1)).item('dv', period).setAside,
+      d('10'),
+    );
+    expect(
+      calc(
+        [item],
+        noZakatYears: {2026},
+        now: day(2027, 1, 1),
+      ).item('dv', period).setAside,
       Decimal.zero,
     );
   });
 
-  test('a dividend in another currency is charged at the rate of its own date', () {
-    final inv = Investment(
-      id: 'dv',
-      name: 'dv',
-      type: AssetType.stock,
-      unit: usd,
-      startDate: day(2025, 12, 31),
-      zakatRule: ZakatRule.longTermDividendsOnly,
-    );
-    final item = InvestmentWithHistory(investment: inv, history: [
-      MoneyIn(investmentId: 'dv', date: day(2025, 12, 31), amount: Money(d('1000'), usd)),
-      MoneyOut(
-        investmentId: 'dv',
-        date: day(2026, 3, 1),
-        amount: Money(d('100'), usd),
-        kind: MoneyOutKind.income,
-      ),
-    ]);
-    final rates = [
-      Rate(from: usd, to: egp, rate: d('50'), asOf: day(2025, 12, 31)),
-      Rate(from: usd, to: egp, rate: d('40'), asOf: day(2026, 3, 1)),
-      Rate(from: usd, to: egp, rate: d('60'), asOf: day(2026, 12, 31)),
-    ];
-    final f = calc([item], rates: rates, now: day(2027, 1, 1))
-        .item('dv', Period.year(2026, day(2027, 1, 1)));
-    expect(f.setAside, d('100') * d('40') * d('0.025'));
-  });
+  test(
+    'a dividend in another currency is charged at the rate of its own date',
+    () {
+      final inv = Investment(
+        id: 'dv',
+        name: 'dv',
+        type: AssetType.stock,
+        unit: usd,
+        startDate: day(2025, 12, 31),
+        zakatRule: ZakatRule.longTermDividendsOnly,
+      );
+      final item = InvestmentWithHistory(
+        investment: inv,
+        history: [
+          MoneyIn(
+            investmentId: 'dv',
+            date: day(2025, 12, 31),
+            amount: Money(d('1000'), usd),
+          ),
+          MoneyOut(
+            investmentId: 'dv',
+            date: day(2026, 3, 1),
+            amount: Money(d('100'), usd),
+            kind: MoneyOutKind.income,
+          ),
+        ],
+      );
+      final rates = [
+        Rate(from: usd, to: egp, rate: d('50'), asOf: day(2025, 12, 31)),
+        Rate(from: usd, to: egp, rate: d('40'), asOf: day(2026, 3, 1)),
+        Rate(from: usd, to: egp, rate: d('60'), asOf: day(2026, 12, 31)),
+      ];
+      final f = calc(
+        [item],
+        rates: rates,
+        now: day(2027, 1, 1),
+      ).item('dv', Period.year(2026, day(2027, 1, 1)));
+      expect(f.setAside, d('100') * d('40') * d('0.025'));
+    },
+  );
 
   group('stale now (calendar month of today)', () {
     test('lists open items without activity and rate pairs without an entry this month', () {
-      final c = calc([
-        fund('quiet', egp, day(2026, 1, 1), '100'),
-        fund('busy', egp, day(2026, 1, 1), '100', value: '110', valueOn: day(2026, 10, 3)),
-        fund('us', usd, day(2026, 1, 1), '100', value: '110', valueOn: day(2026, 10, 3)),
-        fund('closed', egp, day(2026, 1, 1), '100', value: '0', valueOn: day(2026, 2, 1)),
-      ], rates: [Rate(from: usd, to: egp, rate: d('50'), asOf: day(2026, 9, 30))]);
+      final c = calc(
+        [
+          fund('quiet', egp, day(2026, 1, 1), '100'),
+          fund(
+            'busy',
+            egp,
+            day(2026, 1, 1),
+            '100',
+            value: '110',
+            valueOn: day(2026, 10, 3),
+          ),
+          fund(
+            'us',
+            usd,
+            day(2026, 1, 1),
+            '100',
+            value: '110',
+            valueOn: day(2026, 10, 3),
+          ),
+          fund(
+            'closed',
+            egp,
+            day(2026, 1, 1),
+            '100',
+            value: '0',
+            valueOn: day(2026, 2, 1),
+          ),
+        ],
+        rates: [
+          Rate(from: usd, to: egp, rate: d('50'), asOf: day(2026, 9, 30)),
+        ],
+      );
       final s = c.staleNow();
       expect(s.itemIds, ['quiet']);
       expect(s.ratePairs, [(usd, egp)]);
@@ -196,7 +289,12 @@ void main() {
           ValueUpdate(investmentId: 'g', date: day(2026, 1, 1), value: d('10')),
         ],
       );
-      final c = calc([gold], rates: [Rate(from: xauG, to: egp, rate: d('5000'), asOf: day(2026, 10, 2))]);
+      final c = calc(
+        [gold],
+        rates: [
+          Rate(from: xauG, to: egp, rate: d('5000'), asOf: day(2026, 10, 2)),
+        ],
+      );
       expect(c.staleNow().itemIds, isEmpty);
       expect(c.staleNow().ratePairs, isEmpty);
     });
@@ -205,16 +303,144 @@ void main() {
   test('unitUsage counts open and closed items by item unit', () {
     final c = calc([
       fund('a', usd, day(2026, 1, 1), '1'),
-      fund('b', usd, day(2026, 1, 1), '1', value: '0', valueOn: day(2026, 2, 1)),
+      fund(
+        'b',
+        usd,
+        day(2026, 1, 1),
+        '1',
+        value: '0',
+        valueOn: day(2026, 2, 1),
+      ),
       fund('c', egp, day(2026, 1, 1), '1'),
     ]);
     expect(c.unitUsage(), {usd: 2, egp: 1});
   });
 
   test('a metal rate that is missing makes the grams view unavailable and names the pair', () {
-    final c = calc([fund('a', egp, day(2026, 1, 1), '1000', value: '1100', valueOn: day(2026, 4, 30))]);
+    final c = calc([
+      fund(
+        'a',
+        egp,
+        day(2026, 1, 1),
+        '1000',
+        value: '1100',
+        valueOn: day(2026, 4, 30),
+      ),
+    ]);
     final p = c.portfolio(Period.month(2026, 4, today), ViewUnit.goldGrams);
     expect(p.totals, isNull);
     expect((p.unavailable!.from, p.unavailable!.to), (egp, xauG));
+  });
+
+  group('bug trail from the phase 1 review', () {
+    InvestmentWithHistory goldItem(List<HistoryEntry> history) =>
+        InvestmentWithHistory(
+          investment: Investment(
+            id: 'g',
+            name: 'g',
+            type: AssetType.gold,
+            intent: Intent.longTerm,
+            unit: xauG,
+            startDate: day(2026, 3, 1),
+            purityKarat: 24,
+            zakatRule: ZakatRule.bullion100,
+          ),
+          history: history,
+        );
+
+    test('since-start return of a gold item bought above the market uses money in as its start value (-3.85 %)', () {
+      final g = goldItem([
+        MoneyIn(
+          investmentId: 'g',
+          date: day(2026, 3, 1),
+          amount: Money(d('52000'), egp),
+        ),
+        ValueUpdate(investmentId: 'g', date: day(2026, 3, 1), value: d('10')),
+      ]);
+      const id = 'g';
+      final s = calc(
+        [g],
+        rates: [
+          Rate(from: xauG, to: egp, rate: d('5000'), asOf: day(2026, 3, 1)),
+        ],
+      ).sinceStart(id);
+      expect(
+        ((s.sinceStartReturn ?? Decimal.zero) * d('100') - d('-3.85')).abs() <=
+            d('0.005'),
+        isTrue,
+        reason: 'got ${s.sinceStartReturn}',
+      );
+    });
+
+    test('since-start of a gold item moves to a newer gold rate even without a value update', () {
+      final g = goldItem([
+        MoneyIn(
+          investmentId: 'g',
+          date: day(2026, 3, 1),
+          amount: Money(d('50000'), egp),
+        ),
+        ValueUpdate(investmentId: 'g', date: day(2026, 3, 1), value: d('10')),
+      ]);
+      const id = 'g';
+      final s = calc(
+        [g],
+        rates: [
+          Rate(from: xauG, to: egp, rate: d('5000'), asOf: day(2026, 3, 1)),
+          Rate(from: xauG, to: egp, rate: d('6000'), asOf: day(2026, 6, 1)),
+        ],
+      ).sinceStart(id);
+      expect(s.days, 92);
+      expect(
+        ((s.simpleRoiBase ?? Decimal.zero) * d('100') - d('20')).abs() <=
+            d('0.005'),
+        isTrue,
+        reason: 'got ${s.simpleRoiBase}',
+      );
+    });
+
+    test('an item with a future flow that lacks a rate is not excluded from an earlier period', () {
+      final f = fund(
+        'a',
+        egp,
+        day(2026, 1, 1),
+        '1000',
+        more: [
+          MoneyIn(
+            investmentId: 'a',
+            date: day(2026, 9, 1),
+            amount: Money(d('100'), usd),
+          ),
+        ],
+      );
+      final p = calc([f])
+          .portfolio(Period.month(2026, 4, today), ViewUnit.base);
+      expect(p.excluded, isEmpty);
+      expect(p.dietz.ev, d('1000'));
+    });
+
+    test('computing figures with no zakat year answered throws instead of defaulting to lunar', () {
+      final f = fund(
+        'a',
+        egp,
+        day(2026, 1, 1),
+        '1000',
+        value: '1100',
+        valueOn: day(2026, 4, 30),
+      );
+      expect(
+        () => PortfolioCalculator(
+          items: [f],
+          rates: RateBook(const []),
+          inflation: InflationBook(
+            const ShippedInflation(series: {}),
+            const [],
+          ),
+          settings: const Settings(baseCurrency: egp),
+          noZakatYears: const {},
+          today: today,
+        ).item(f.investment.id, Period.month(2026, 4, today)),
+        throwsStateError,
+      );
+    });
   });
 }

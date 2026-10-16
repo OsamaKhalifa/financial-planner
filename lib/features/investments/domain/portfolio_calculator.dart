@@ -107,19 +107,6 @@ final class ItemFigures {
   final Returns? base;
   final Excluded? excluded;
   final StaleRate? staleRate;
-
-  // Flat views for the base-currency figures (home inflation) and the item-unit
-  // figures (own series). They throw for an item that is [excluded].
-  DietzResult get dietz => base!.dietz;
-  Decimal get setAside => base!.z;
-  Decimal? get returnAfterSetAside => base!.rz;
-  PeriodInflation? get inflation => base!.inflation;
-  Decimal? get realBeforeZakat => base!.real;
-  Decimal? get realAfterSetAside => base!.realAfterZakat;
-  PurchasingPower? get purchasingPower => base!.pp;
-  DietzResult get unitDietz => itemUnit!.dietz;
-  PeriodInflation? get ownInflation => itemUnit!.inflation;
-  Decimal? get ownMarketReal => itemUnit!.real;
 }
 
 final class PortfolioFigures {
@@ -155,17 +142,6 @@ final class PortfolioFigures {
 
   /// The grams view is labelled "gold is a yardstick, not a price index".
   bool get showYardstickLabel => view != ViewUnit.base;
-
-  bool get staleRate => staleRates.isNotEmpty;
-
-  // Flat views of [totals]; they throw when [unavailable].
-  DietzResult get dietz => totals!.dietz;
-  Decimal get setAside => totals!.z;
-  Decimal? get returnAfterSetAside => totals!.rz;
-  PeriodInflation? get inflation => totals!.inflation;
-  Decimal? get realBeforeZakat => totals!.real;
-  Decimal? get realAfterSetAside => totals!.realAfterZakat;
-  PurchasingPower? get purchasingPower => totals!.pp;
 }
 
 final class SinceStartFigures {
@@ -226,13 +202,15 @@ final class PortfolioCalculator {
     required this.settings,
     required this.noZakatYears,
     required this.today,
-  })  : _items = items,
-        _base = settings.baseCurrency!,
-        _year = settings.zakatYear ?? ZakatYear.lunar,
-        _home = settings.homeCountry!,
-        _timelines = {
-          for (final h in items) h.investment.id: ItemTimeline(h, rates),
-        };
+  }) : _items = items,
+       _base = settings.baseCurrency!,
+       _year =
+           settings.zakatYear ??
+           (throw StateError('The zakat year must be answered first.')),
+       _home = settings.homeCountry!,
+       _timelines = {
+         for (final h in items) h.investment.id: ItemTimeline(h, rates),
+       };
 
   final RateBook rates;
   final InflationBook inflation;
@@ -254,7 +232,8 @@ final class PortfolioCalculator {
     final inv = timeline(id).investment;
     if (inv.inflationOverride != null) return inv.inflationOverride!;
     final market = inv.marketCountryResolved;
-    final marketTyped = inv.type == AssetType.stock ||
+    final marketTyped =
+        inv.type == AssetType.stock ||
         inv.type == AssetType.fund ||
         inv.type == AssetType.sukuk;
     if (marketTyped && market != null) return market;
@@ -269,11 +248,16 @@ final class PortfolioCalculator {
     return usage;
   }
 
-  ItemFigures item(String id, Period p) {
+  ItemFigures item(String id, Period p) => _item(id, p);
+
+  /// [startValue] replaces the value at [Period.s]; since-start figures use
+  /// the money paid in (story §9.2), not the first value update.
+  ItemFigures _item(String id, Period p, {Decimal? startValue}) {
     final tl = timeline(id);
     final inv = tl.investment;
     final resolved = resolve(inv, settings);
-    final held = inv.startDate.isBefore(p.e.add(const Duration(days: 1))) &&
+    final held =
+        inv.startDate.isBefore(p.e.add(const Duration(days: 1))) &&
         (!tl.closedAt(p.s) || tl.activeIn(p.s, p.e));
     final staleValue = held && !_hasActivity(tl, p);
 
@@ -282,29 +266,30 @@ final class PortfolioCalculator {
       Returns? base,
       Excluded? excluded,
       StaleRate? staleRate,
-    }) =>
-        ItemFigures(
-          id: id,
-          period: p,
-          held: held,
-          closed: tl.closedAt(p.e),
-          zakat: resolved,
-          inflationCountry: seriesOf(id),
-          homeCountry: _home,
-          toPurify: tl.toPurifyAt(p.e),
-          staleValue: staleValue,
-          itemUnit: itemUnit,
-          base: base,
-          excluded: excluded,
-          staleRate: staleRate,
-        );
+    }) => ItemFigures(
+      id: id,
+      period: p,
+      held: held,
+      closed: tl.closedAt(p.e),
+      zakat: resolved,
+      inflationCountry: seriesOf(id),
+      homeCountry: _home,
+      toPurify: tl.toPurifyAt(p.e),
+      staleValue: staleValue,
+      itemUnit: itemUnit,
+      base: base,
+      excluded: excluded,
+      staleRate: staleRate,
+    );
 
-    if (tl.missing.isNotEmpty) {
-      final m = tl.missing.first;
+    // Entries dated after the period do not affect its figures.
+    final missing = tl.missing.where((m) => !m.date.isAfter(p.e));
+    if (missing.isNotEmpty) {
+      final m = missing.first;
       return make(excluded: Excluded(id, m.from, m.to, m.date));
     }
 
-    final bv = tl.netValueAt(p.s);
+    final bv = startValue ?? tl.netValueAt(p.s);
     final ev = tl.netValueAt(p.e);
     final flows = tl.flowsIn(p.s, p.e);
     final dividends = resolved.onDividends
@@ -326,7 +311,6 @@ final class PortfolioCalculator {
         ev: ev,
         days: days,
         dividends: sumOf(dividends.map((f) => f.amount)),
-        noZakatYear: false,
       );
       return _returns(dz, z, inflation.forPeriod(series, p.s, p.e));
     }
@@ -352,9 +336,13 @@ final class PortfolioCalculator {
 
     final evB = toBase(ev, p.e);
     final bvB = toBase(bv, p.s);
-    final flowsB = [for (final f in flows) Flow(date: f.date, amount: toBase(f.amount, f.date))];
+    final flowsB = [
+      for (final f in flows)
+        Flow(date: f.date, amount: toBase(f.amount, f.date)),
+    ];
     final dividendsB = [
-      for (final f in dividends) Flow(date: f.date, amount: toBase(f.amount, f.date)),
+      for (final f in dividends)
+        Flow(date: f.date, amount: toBase(f.amount, f.date)),
     ];
     if (miss != null) {
       final m = miss!;
@@ -374,9 +362,9 @@ final class PortfolioCalculator {
   }
 
   PortfolioFigures portfolio(Period p, ViewUnit view) {
-    final all = [
-      for (final h in _items) item(h.investment.id, p),
-    ].where((f) => f.held).toList();
+    final all = [for (final h in _items) item(h.investment.id, p)]
+        .where((f) => f.held)
+        .toList();
     final included = all.where((f) => f.base != null).toList();
     final toPurify = _totalToPurify(included, p.e);
     final metal = switch (view) {
@@ -386,7 +374,8 @@ final class PortfolioCalculator {
     };
     final staleRates = {
       for (final f in included)
-        if (f.staleRate != null) (f.staleRate!.from, f.staleRate!.to): f.staleRate!,
+        if (f.staleRate != null)
+          (f.staleRate!.from, f.staleRate!.to): f.staleRate!,
     }.values.toList();
 
     PortfolioFigures make({Returns? totals, MissingRate? unavailable}) =>
@@ -411,9 +400,7 @@ final class PortfolioCalculator {
     var bv = sumOf(bases.map((r) => r.dietz.bv));
     var ev = sumOf(bases.map((r) => r.dietz.ev));
     var z = sumOf(bases.map((r) => r.z));
-    var flows = [
-      for (final r in bases) ...r.dietz.flows.map((w) => w.flow),
-    ];
+    var flows = [for (final r in bases) ...r.dietz.flows.map((w) => w.flow)];
 
     if (metal != null) {
       MissingRate? miss;
@@ -430,7 +417,10 @@ final class PortfolioCalculator {
       ev = toMetal(ev, p.e);
       z = toMetal(z, p.e);
       bv = toMetal(bv, p.s);
-      flows = [for (final f in flows) Flow(date: f.date, amount: toMetal(f.amount, f.date))];
+      flows = [
+        for (final f in flows)
+          Flow(date: f.date, amount: toMetal(f.amount, f.date)),
+      ];
       if (miss != null) return make(unavailable: miss);
     }
 
@@ -442,15 +432,19 @@ final class PortfolioCalculator {
   SinceStartFigures sinceStart(String id) {
     final tl = timeline(id);
     final inv = tl.investment;
-    final end = tl.latestValueDate;
-    final f = item(id, Period(s: inv.startDate, e: end));
-    final flows =
-        tl.flowsIn(inv.startDate.subtract(const Duration(days: 1)), end);
+    final end = _sinceStartEnd(tl);
+    final dayBefore = inv.startDate.subtract(const Duration(days: 1));
+    final paidIn = tl.flowsIn(dayBefore, inv.startDate);
+    final f = _item(
+      id,
+      Period(s: inv.startDate, e: end),
+      startValue: paidIn.isEmpty ? null : sumOf(paidIn.map((x) => x.amount)),
+    );
+    final flows = tl.flowsIn(dayBefore, end);
     final gain = tl.netValueAt(end) - sumOf(flows.map((x) => x.amount));
     final totalIn = _totalIn(flows);
     final inBase = f.base == null ? null : _inBase(inv.unit, flows);
-    final gainBase =
-        inBase == null ? null : f.base!.dietz.ev - inBase.net;
+    final gainBase = inBase == null ? null : f.base!.dietz.ev - inBase.net;
     final days = f.period.days;
     return SinceStartFigures(
       figures: f,
@@ -465,6 +459,15 @@ final class PortfolioCalculator {
       annualised: _annualisedOf(f.itemUnit, days),
       annualisedBase: _annualisedOf(f.base, days),
     );
+  }
+
+  /// Latest value date; for metals also the latest rate, because the item's
+  /// value in money moves with the rate alone (§9.3).
+  DateTime _sinceStartEnd(ItemTimeline tl) {
+    final end = tl.latestValueDate;
+    if (!tl.unit.isMetal) return end;
+    final q = rates.quote(tl.unit, _base, today);
+    return q != null && q.asOf.isAfter(end) ? q.asOf : end;
   }
 
   /// Nisab at today's metal rates, and Σ (value × zakat share) in the base
@@ -578,9 +581,8 @@ final class PortfolioCalculator {
     return Money(total, _base);
   }
 
-  Decimal _totalIn(List<Flow> flows) => sumOf(
-        flows.where((x) => x.amount > Decimal.zero).map((x) => x.amount),
-      );
+  Decimal _totalIn(List<Flow> flows) =>
+      sumOf(flows.where((x) => x.amount > Decimal.zero).map((x) => x.amount));
 
   /// Flows converted at their own dates; null when a rate is missing.
   ({Decimal net, Decimal totalIn})? _inBase(Unit unit, List<Flow> flows) {

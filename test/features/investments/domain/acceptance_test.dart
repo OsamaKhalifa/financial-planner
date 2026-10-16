@@ -28,6 +28,8 @@ import 'package:financial_planner/features/investments/domain/portfolio_calculat
 import 'package:financial_planner/features/investments/domain/zakat_rules.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../../support/figures_view.dart';
+
 // ---------------------------------------------------------------- helpers
 
 const egp = Unit('EGP');
@@ -687,9 +689,8 @@ void main() {
           year: ZakatYear.lunar,
           share: d('1'),
           ev: d('23000'),
-          days: 365,
-          dividends: d('1000'),
-          noZakatYear: true,
+          days: 0,
+          dividends: d('0'),
         ),
         '0',
       );
@@ -1130,6 +1131,7 @@ void main() {
       final s = calc([agg], today: today, rates: rates).sinceStart('g');
       expectPct(s.simpleRoi, '-3.85');
       expectPct(s.simpleRoiBase, '-3.85');
+      expectPct(s.sinceStartReturn, '-3.85');
     });
 
     test('AC-38 one gold-rate update revalues every gold item with no per-item value update', () {

@@ -60,7 +60,6 @@ void main() {
         ev: d('23000'),
         days: 365,
         dividends: d('0'),
-        noZakatYear: false,
       ),
       '592.71',
     );
@@ -71,7 +70,6 @@ void main() {
         ev: d('50000'),
         days: 30,
         dividends: d('400'),
-        noZakatYear: false,
       ),
       '10',
     );
