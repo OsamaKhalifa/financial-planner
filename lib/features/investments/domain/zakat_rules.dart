@@ -32,6 +32,14 @@ final class ZakatOffer {
   final String sourceSection;
 }
 
+/// The per-item rule a portfolio-wide method stands for; null for perItem.
+ZakatRule? explicitLongTermRule(LongTermMethod method) => switch (method) {
+  LongTermMethod.dividendsOnly => ZakatRule.longTermDividendsOnly,
+  LongTermMethod.proxy25 => ZakatRule.longTermProxy25,
+  LongTermMethod.fullValue => ZakatRule.longTermFullValue,
+  LongTermMethod.perItem => null,
+};
+
 /// Null means the user must choose (story §5.1).
 ZakatRule? defaultRule(AssetType type, Intent? intent, Settings settings) {
   switch (type) {

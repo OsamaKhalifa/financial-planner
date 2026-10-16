@@ -69,6 +69,26 @@ final class Investment {
   final DateTime createdAt;
   final DateTime updatedAt;
 
+  Investment withRule(ZakatRule rule, DateTime updatedAt) => Investment(
+    id: id,
+    name: name,
+    type: type,
+    intent: intent,
+    market: market,
+    marketCountry: marketCountry,
+    unit: unit,
+    startDate: startDate,
+    quantity: quantity,
+    purityKarat: purityKarat,
+    purityFineness: purityFineness,
+    zakatRule: rule,
+    customZakatShare: customZakatShare,
+    inflationOverride: inflationOverride,
+    notes: notes,
+    createdAt: createdAt,
+    updatedAt: updatedAt,
+  );
+
   Country? get marketCountryResolved =>
       market == Market.other ? marketCountry : market?.country;
 }

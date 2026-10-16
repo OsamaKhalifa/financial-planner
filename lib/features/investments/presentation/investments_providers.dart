@@ -1,0 +1,123 @@
+/* Copyright (c) 2026-Present Osama Khalifa. All rights reserved. */
+
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../core/assumptions/assumptions_providers.dart';
+import '../../../core/assumptions/domain/settings.dart';
+import '../../../core/clock_provider.dart';
+import '../../../core/dates.dart';
+import '../../../core/db/database_provider.dart';
+import '../../../core/reference/units.dart';
+import '../data/drift_investments_repository.dart';
+import '../domain/investment.dart';
+import '../domain/investments_repository.dart';
+import '../domain/period.dart';
+import '../domain/portfolio_calculator.dart';
+import '../domain/zakat_rules.dart';
+
+final investmentsRepositoryProvider = Provider<InvestmentsRepository>(
+  (ref) => DriftInvestmentsRepository(
+    ref.watch(appDatabaseProvider),
+    ref.watch(clockProvider),
+  ),
+);
+
+final investmentsProvider = StreamProvider<List<InvestmentWithHistory>>(
+  (ref) => ref.watch(investmentsRepositoryProvider).watchAll(),
+);
+
+final todayProvider = Provider<DateTime>(
+  (ref) => today(ref.watch(clockProvider)),
+);
+
+/// Null until the setup is done: figures need a base currency and zakat year.
+final calculatorProvider = FutureProvider<PortfolioCalculator?>((ref) async {
+  final settings = await ref.watch(settingsProvider.future);
+  if (!settings.setupDone) return null;
+  return PortfolioCalculator(
+    items: await ref.watch(investmentsProvider.future),
+    rates: await ref.watch(rateBookProvider.future),
+    inflation: await ref.watch(inflationBookProvider.future),
+    settings: settings,
+    noZakatYears: await ref.watch(noZakatYearsProvider.future),
+    today: ref.watch(todayProvider),
+  );
+});
+
+typedef PeriodKey = (Period, ViewUnit);
+
+final portfolioFiguresProvider =
+    Provider.family<PortfolioFigures?, PeriodKey>(
+      (ref, key) =>
+          ref.watch(calculatorProvider).value?.portfolio(key.$1, key.$2),
+    );
+
+final itemFiguresProvider = Provider.family<ItemFigures?, (String, Period)>(
+  (ref, key) => ref.watch(calculatorProvider).value?.item(key.$1, key.$2),
+);
+
+final sinceStartProvider = Provider.family<SinceStartFigures?, String>(
+  (ref, id) => ref.watch(calculatorProvider).value?.sinceStart(id),
+);
+
+typedef UnitOrder = ({List<Unit> units, int topCount});
+
+/// The unit picker order (AC-42..44): the base, or the phone's region currency
+/// before setup, always in the top group; [topCount] is that group's size.
+final unitOrderProvider = Provider.family<UnitOrder, Unit>((ref, anchor) {
+  final items = ref.watch(investmentsProvider).value ?? const [];
+  final usage = <Unit, int>{};
+  for (final h in items) {
+    usage.update(h.investment.unit, (n) => n + 1, ifAbsent: () => 1);
+  }
+  final used = usage.keys.where((u) => u != anchor).length;
+  return (
+    units: orderedUnits(usage: usage, topAnchor: anchor),
+    topCount: 1 + (used > 4 ? 4 : used),
+  );
+});
+
+final settingsActionsProvider = Provider<SettingsActions>(
+  (ref) => SettingsActions(ref),
+);
+
+/// Changes that touch both settings and items.
+class SettingsActions {
+  SettingsActions(this._ref);
+
+  final Ref _ref;
+
+  /// Switching to "decide per item" first writes the method each affected item
+  /// was following into the item, so nothing changes silently (architect note
+  /// on D7). The items are saved before the setting, so figures never see
+  /// "per item" with an unresolved rule.
+  Future<void> setLongTermMethod(LongTermMethod? method) async {
+    final repo = _ref.read(assumptionsRepositoryProvider);
+    final old = await _ref.read(settingsProvider.future);
+    if (method == LongTermMethod.perItem && old.longTermMethod != null) {
+      final explicit = explicitLongTermRule(old.longTermMethod!);
+      if (explicit != null) {
+        final items = await _ref.read(investmentsProvider.future);
+        final now = _ref.read(clockProvider)();
+        final investments = _ref.read(investmentsRepositoryProvider);
+        for (final h in items) {
+          if (h.investment.zakatRule == ZakatRule.longTermPerSetting) {
+            await investments.update(h.investment.withRule(explicit, now));
+          }
+        }
+      }
+    }
+    await repo.saveSettings(_with(old, longTermMethod: method));
+  }
+
+  Future<void> saveSettings(Settings s) =>
+      _ref.read(assumptionsRepositoryProvider).saveSettings(s);
+}
+
+Settings _with(Settings s, {LongTermMethod? longTermMethod}) => Settings(
+  baseCurrency: s.baseCurrency,
+  homeInflation: s.homeInflation,
+  zakatYear: s.zakatYear,
+  longTermMethod: longTermMethod,
+  jewelleryZakatable: s.jewelleryZakatable,
+);
