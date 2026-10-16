@@ -430,7 +430,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get src_B8 =>
-      'Scholars differ on whether holding crypto is permitted (IIFA Res 237 (24/8) gave no final ruling). Those who permit it say zakat is due on its full market value (B8).';
+      'Scholars differ on whether holding crypto is permitted (IIFA Res 237 (8/24) gave no final ruling). Those who permit it say zakat is due on its full market value (B8).';
 
   @override
   String get src_Z6 =>
@@ -619,7 +619,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get zakatLineCompany => 'Zakat: 0 % — the company pays zakat';
 
   @override
-  String get zakatNeedsChoice => 'Zakat: choose below';
+  String get zakatNeedsChoice =>
+      'Zakat: not set yet — answer the question below';
 
   @override
   String get zakatReasonTrading =>
@@ -642,7 +643,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noticeDividends =>
-      'Zakat on your dividends is counted with your cash.';
+      'Zakat is set aside on dividends received from this item (IIFA Res 28 (3/4)). Don\'t record them again in a cash item.';
 
   @override
   String get noticeCrypto =>
@@ -945,7 +946,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get whySetAsideWhat =>
-      'Rate × zakat share × end value × days ÷ year length, in the matched pair you chose. Actual zakat is due once a year on your zakat date.';
+      'Rate × zakat share × end value × days ÷ year length, plus rate × dividends received (dividends-only method), in the matched pair you chose. Actual zakat is due once a year on your zakat date.';
 
   @override
   String whySetAsideNumbers(
@@ -955,8 +956,9 @@ class AppLocalizationsEn extends AppLocalizations {
     String ev,
     String days,
     String year,
+    String dividends,
   ) {
-    return '$z = $rate × $share × $ev × $days ÷ $year';
+    return '$z = $rate × $share × $ev × $days ÷ $year + $rate × $dividends';
   }
 
   @override
@@ -1341,4 +1343,48 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errRateFuture => 'The rate date cannot be in the future';
+
+  @override
+  String get customShareSwitch => 'Set my own zakat share';
+
+  @override
+  String zakatChangedFrom(String share) {
+    return 'You changed this from $share';
+  }
+
+  @override
+  String get moreSection => 'More';
+
+  @override
+  String get inflationSeriesField => 'Inflation series';
+
+  @override
+  String get inflationSeriesDefault => 'Default for this item';
+
+  @override
+  String get fetchFailed => 'Couldn\'t fetch. Type the rate.';
+
+  @override
+  String fetchNotCovered(String from, String to) {
+    return 'Source has no $from→$to. Type it.';
+  }
+
+  @override
+  String fetchedRateLine(
+    String from,
+    String rate,
+    String to,
+    String date,
+    String source,
+  ) {
+    return '1 $from = $rate $to · as of $date · $source';
+  }
+
+  @override
+  String get src_B6 =>
+      'Business ownership: the owner pays on their share of the zakatable assets (cash, receivables, stock for sale) less short-term debts; fixed assets are not zakatable (IIFA Res 28 (3/4) §2). AAOIFI SS 35 net-assets method — section not yet verified (B6).';
+
+  @override
+  String get src_B7 =>
+      'Pension with withdrawal limits: no zakat until it can be accessed (Dr. Main Al-Qudah, AMJA fatwa 21964); or zakat on the accessible amount after penalty and tax (Fiqh Council of North America — source not yet verified); or the full balance as a precaution (B7).';
 }

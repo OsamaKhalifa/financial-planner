@@ -267,7 +267,7 @@
   "src_B3": "Trading shares: 100 % of market value (IIFA Res 28 (3/4) §3, Res 121 (3/13)). Held long term with no company data: dividends only (IIFA Res 28 §3); or 25 % of value as a proxy (National Zakat Foundation UK); or full value as a precaution. A company that pays zakat itself: shareholder does not pay again (IIFA Res 28 §1) (B3).",
   "src_B4": "Funds and ETFs follow the share rules at fund level. Sukuk: 100 % of face or market value by default, with override (B4); AAOIFI SS 35 and SS 17 section numbers not yet verified.",
   "src_B5": "Personal-use property is not zakatable. Rental property: zakat is not on the property; rent still held counts with cash (IIFA Res 2 (2/2)). Bought to resell: 100 % of market value (B5).",
-  "src_B8": "Scholars differ on whether holding crypto is permitted (IIFA Res 237 (24/8) gave no final ruling). Those who permit it say zakat is due on its full market value (B8).",
+  "src_B8": "Scholars differ on whether holding crypto is permitted (IIFA Res 237 (8/24) gave no final ruling). Those who permit it say zakat is due on its full market value (B8).",
   "src_Z6": "Interest is not the owner's wealth: it is not return and not in the zakat base, and it is given away (Quran 2:278–279). Giving it away does not count as zakat (B1). AAOIFI SS 21 section not yet verified.",
   "src_A6": "Zakat is always on the actual value on the zakat date, never on an inflation-adjusted value (IIFA Res 28 (3/4) §3). The real return is shown for planning only (A6).",
   "src_A3": "Nisab: gold 85 g (20 dinars) and silver 595 g (200 dirhams): Abu Dawud 1573; Bukhari 1447; Muslim 979. Which metal to use for cash is a point of difference (A3).",
@@ -373,14 +373,14 @@
   },
   "zakatLineDividends": "Zakat: on dividends only, when received",
   "zakatLineCompany": "Zakat: 0 % — the company pays zakat",
-  "zakatNeedsChoice": "Zakat: choose below",
+  "zakatNeedsChoice": "Zakat: not set yet — answer the question below",
   "zakatReasonTrading": "You hold this to sell. Trade goods pay 2.5 % of market value.",
   "zakatReasonSavings": "Held as savings: zakat on market value.",
   "zakatReasonCash": "Cash is zakatable in full.",
   "zakatReasonSukuk": "Sukuk: 100 % of value by default.",
   "zakatReasonJewellery": "Worn jewellery: follows your ruling.",
   "zakatReasonCustom": "You set this share yourself.",
-  "noticeDividends": "Zakat on your dividends is counted with your cash.",
+  "noticeDividends": "Zakat is set aside on dividends received from this item (IIFA Res 28 (3/4)). Don't record them again in a cash item.",
   "noticeCrypto": "Scholars differ on whether holding crypto is permitted. Those who permit it say zakat is on its full market value.",
   "companyPays": "Company pays zakat for me (0 %)",
   "jewelleryAsk": "Is worn jewellery zakatable?",
@@ -596,8 +596,8 @@
     }
   },
   "whySetAsideTitle": "Estimated zakat set-aside (planning)",
-  "whySetAsideWhat": "Rate × zakat share × end value × days ÷ year length, in the matched pair you chose. Actual zakat is due once a year on your zakat date.",
-  "whySetAsideNumbers": "{z} = {rate} × {share} × {ev} × {days} ÷ {year}",
+  "whySetAsideWhat": "Rate × zakat share × end value × days ÷ year length, plus rate × dividends received (dividends-only method), in the matched pair you chose. Actual zakat is due once a year on your zakat date.",
+  "whySetAsideNumbers": "{z} = {rate} × {share} × {ev} × {days} ÷ {year} + {rate} × {dividends}",
   "@whySetAsideNumbers": {
     "placeholders": {
       "z": {
@@ -616,6 +616,9 @@
         "type": "String"
       },
       "year": {
+        "type": "String"
+      },
+      "dividends": {
         "type": "String"
       }
     }
@@ -1034,5 +1037,51 @@
   "noZakatByYear": "No zakat due by year",
   "perItemRewritten": "Items that followed the old method keep it now.",
   "rateAddedToast": "Rate saved",
-  "errRateFuture": "The rate date cannot be in the future"
+  "errRateFuture": "The rate date cannot be in the future",
+  "customShareSwitch": "Set my own zakat share",
+  "zakatChangedFrom": "You changed this from {share}",
+  "@zakatChangedFrom": {
+    "placeholders": {
+      "share": {
+        "type": "String"
+      }
+    }
+  },
+  "moreSection": "More",
+  "inflationSeriesField": "Inflation series",
+  "inflationSeriesDefault": "Default for this item",
+  "fetchFailed": "Couldn't fetch. Type the rate.",
+  "fetchNotCovered": "Source has no {from}→{to}. Type it.",
+  "@fetchNotCovered": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "fetchedRateLine": "1 {from} = {rate} {to} · as of {date} · {source}",
+  "@fetchedRateLine": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "rate": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      },
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "src_B6": "Business ownership: the owner pays on their share of the zakatable assets (cash, receivables, stock for sale) less short-term debts; fixed assets are not zakatable (IIFA Res 28 (3/4) §2). AAOIFI SS 35 net-assets method — section not yet verified (B6).",
+  "src_B7": "Pension with withdrawal limits: no zakat until it can be accessed (Dr. Main Al-Qudah, AMJA fatwa 21964); or zakat on the accessible amount after penalty and tax (Fiqh Council of North America — source not yet verified); or the full balance as a precaution (B7)."
 }

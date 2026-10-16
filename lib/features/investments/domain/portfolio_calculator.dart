@@ -50,12 +50,16 @@ final class Returns {
     required this.realAfterZakat,
     required this.pp,
     required this.inflation,
+    required this.dividends,
   });
 
   final DietzResult dietz;
 
   /// Estimated zakat set-aside (planning), in the same unit as [dietz].
   final Decimal z;
+
+  /// Income charged once at its own date (dividends-only method), same unit.
+  final Decimal dividends;
   final Decimal? rz;
 
   /// Null when the inflation series is empty, and in the grams view's real
@@ -309,14 +313,20 @@ final class PortfolioCalculator {
       Country series,
     ) {
       final dz = modifiedDietz(bv: bv, ev: ev, flows: flows, s: p.s, e: p.e);
+      final charged = sumOf(dividends.map((f) => f.amount));
       final z = setAside(
         year: _year,
         share: resolved.share,
         ev: ev,
         days: days,
-        dividends: sumOf(dividends.map((f) => f.amount)),
+        dividends: charged,
       );
-      return _returns(dz, z, inflation.forPeriod(series, p.s, p.e));
+      return _returns(
+        dz,
+        z,
+        inflation.forPeriod(series, p.s, p.e),
+        dividends: charged,
+      );
     }
 
     final unitReturns = returnsOf(bv, ev, flows, dividends, seriesOf(id));
@@ -430,7 +440,17 @@ final class PortfolioCalculator {
 
     final dz = modifiedDietz(bv: bv, ev: ev, flows: flows, s: p.s, e: p.e);
     final infl = metal == null ? inflation.forPeriod(_home, p.s, p.e) : null;
-    return make(totals: _returns(dz, z, infl, grams: metal != null));
+    return make(
+      totals: _returns(
+        dz,
+        z,
+        infl,
+        grams: metal != null,
+        dividends: metal == null
+            ? sumOf(bases.map((r) => r.dividends))
+            : Decimal.zero,
+      ),
+    );
   }
 
   SinceStartFigures sinceStart(String id) {
@@ -559,6 +579,7 @@ final class PortfolioCalculator {
     Decimal z,
     PeriodInflation? infl, {
     bool grams = false,
+    Decimal? dividends,
   }) {
     final i = grams ? Decimal.zero : infl?.i;
     final r = dz.r;
@@ -573,6 +594,7 @@ final class PortfolioCalculator {
       realAfterZakat: showReal && rz != null ? real(rz, i) : null,
       pp: i == null ? null : purchasingPower(dz, z, i),
       inflation: infl,
+      dividends: dividends ?? Decimal.zero,
     );
   }
 

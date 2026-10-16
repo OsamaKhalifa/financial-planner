@@ -225,7 +225,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String toPurifyLine(String amount) {
-    return 'فوائد يجب التخلص منها: $amount';
+    return 'فوائد ربوية للتطهير: $amount';
   }
 
   @override
@@ -410,7 +410,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get src_B1 =>
-      'النقود والأرصدة المصرفية تجب فيها الزكاة كاملة: القرآن 9:34–35؛ سنن أبي داود 1573؛ قرار مجمع الفقه 21 (3/9) (B1).';
+      'النقود والأرصدة المصرفية تجب فيها الزكاة كاملة: القرآن 9:34–35؛ سنن أبي داود 1573؛ قرار مجمع الفقه 21 (9/3) (B1).';
 
   @override
   String get src_B2 =>
@@ -418,7 +418,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get src_B3 =>
-      'أسهم المتاجرة: 100 % من القيمة السوقية (قرار المجمع 28 (4/3) §3، 121 (13/3)). المقتناة للأجل الطويل دون بيانات الشركة: الأرباح الموزعة فقط (قرار 28 §3)، أو 25 % من القيمة تقديرًا (مؤسسة الزكاة الوطنية في بريطانيا)، أو القيمة كاملة احتياطًا. والشركة التي تخرج زكاتها بنفسها لا يزكي المساهم عن سهمه ثانية (قرار 28 §1) (B3).';
+      'أسهم المتاجرة: 100 % من القيمة السوقية (قرار المجمع 28 (3/4) §3، 121 (3/13)). المقتناة للأجل الطويل دون بيانات الشركة: الأرباح الموزعة فقط (قرار 28 §3)، أو 25 % من القيمة تقديرًا (مؤسسة الزكاة الوطنية في بريطانيا)، أو القيمة كاملة احتياطًا. والشركة التي تخرج زكاتها بنفسها لا يزكي المساهم عن سهمه ثانية (قرار 28 §1) (B3).';
 
   @override
   String get src_B4 =>
@@ -438,7 +438,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get src_A6 =>
-      'الزكاة تكون دائمًا على القيمة الفعلية يوم وجوبها لا على قيمة معدّلة بالتضخم (قرار المجمع 28 (4/3) §3). ويُعرض العائد الحقيقي للتخطيط فقط (A6).';
+      'الزكاة تكون دائمًا على القيمة الفعلية يوم وجوبها لا على قيمة معدّلة بالتضخم (قرار المجمع 28 (3/4) §3). ويُعرض العائد الحقيقي للتخطيط فقط (A6).';
 
   @override
   String get src_A3 =>
@@ -467,7 +467,7 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get whyToPurifyTitle => 'فوائد يجب التخلص منها';
+  String get whyToPurifyTitle => 'فوائد ربوية للتطهير';
 
   @override
   String get whyToPurifyWhat =>
@@ -620,7 +620,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get zakatLineCompany => 'الزكاة: 0 % — الشركة تخرج زكاتها';
 
   @override
-  String get zakatNeedsChoice => 'الزكاة: اختر أدناه';
+  String get zakatNeedsChoice => 'الزكاة: لم تُحدد بعد — أجب عن السؤال أدناه';
 
   @override
   String get zakatReasonTrading =>
@@ -643,7 +643,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get zakatReasonCustom => 'حددت هذه النسبة بنفسك.';
 
   @override
-  String get noticeDividends => 'زكاة أرباحك الموزعة تُحسب مع نقودك.';
+  String get noticeDividends =>
+      'يُخصص مبلغ للزكاة عن الأرباح الموزعة المستلمة من هذا الاستثمار (قرار المجمع 28 (3/4)). لا تسجلها مرة أخرى في استثمار نقدي.';
 
   @override
   String get noticeCrypto =>
@@ -776,7 +777,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String toPurifyItem(String amount) {
-    return 'فوائد يجب التخلص منها: $amount · لا تُحتسب عائدًا';
+    return 'فوائد ربوية للتطهير: $amount · لا تُحتسب عائدًا';
   }
 
   @override
@@ -944,7 +945,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get whySetAsideWhat =>
-      'النسبة × نسبة الزكاة × القيمة النهائية × الأيام ÷ طول السنة، وفق الزوج المتطابق الذي اخترته. الزكاة الفعلية تجب مرة في السنة في يوم وجوبها.';
+      'النسبة × نسبة الزكاة × القيمة النهائية × الأيام ÷ طول السنة، مضافًا إليها النسبة × الأرباح الموزعة المستلمة (طريقة الأرباح فقط)، وفق الزوج المتطابق الذي اخترته. الزكاة الفعلية تجب مرة في السنة في يوم وجوبها.';
 
   @override
   String whySetAsideNumbers(
@@ -954,8 +955,9 @@ class AppLocalizationsAr extends AppLocalizations {
     String ev,
     String days,
     String year,
+    String dividends,
   ) {
-    return '$z = $rate × $share × $ev × $days ÷ $year';
+    return '$z = $rate × $share × $ev × $days ÷ $year + $rate × $dividends';
   }
 
   @override
@@ -1165,7 +1167,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String toPurifyPeriod(String amount) {
-    return 'فوائد يجب التخلص منها: $amount — ليست في العائد ولا تُخصم من المخصص';
+    return 'فوائد ربوية للتطهير: $amount — ليست في العائد ولا تُخصم من المخصص';
   }
 
   @override
@@ -1341,4 +1343,48 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get errRateFuture => 'لا يمكن أن يكون تاريخ السعر في المستقبل';
+
+  @override
+  String get customShareSwitch => 'أحدد نسبة الزكاة بنفسي';
+
+  @override
+  String zakatChangedFrom(String share) {
+    return 'غيّرت هذا من $share';
+  }
+
+  @override
+  String get moreSection => 'المزيد';
+
+  @override
+  String get inflationSeriesField => 'سلسلة التضخم';
+
+  @override
+  String get inflationSeriesDefault => 'الافتراضي لهذا الاستثمار';
+
+  @override
+  String get fetchFailed => 'تعذّر الجلب. اكتب السعر.';
+
+  @override
+  String fetchNotCovered(String from, String to) {
+    return 'المصدر لا يوفر $from→$to. اكتبه.';
+  }
+
+  @override
+  String fetchedRateLine(
+    String from,
+    String rate,
+    String to,
+    String date,
+    String source,
+  ) {
+    return '1 $from = $rate $to · بتاريخ $date · $source';
+  }
+
+  @override
+  String get src_B6 =>
+      'ملكية نشاط تجاري: يزكي المالك حصته من الأصول الزكوية (النقد والديون المرجوة والبضاعة المعدة للبيع) مطروحًا منها الديون قصيرة الأجل، ولا زكاة في الأصول الثابتة (قرار المجمع 28 (3/4) §2). طريقة صافي الأصول في المعيار الشرعي 35 لأيوفي — رقم البند لم يُتحقق منه بعد (B6).';
+
+  @override
+  String get src_B7 =>
+      'معاش تقاعدي بقيود على السحب: لا زكاة حتى يمكن الوصول إليه (د. مين القضاة، فتوى أمجا 21964)؛ أو الزكاة على المبلغ المتاح بعد الغرامة والضريبة (مجلس الفقه لأمريكا الشمالية — المصدر لم يُتحقق منه بعد)؛ أو الرصيد كاملًا احتياطًا (B7).';
 }

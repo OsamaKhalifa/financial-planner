@@ -1,5 +1,6 @@
 /* Copyright (c) 2026-Present Osama Khalifa. All rights reserved. */
 
+import 'package:decimal/decimal.dart';
 import 'package:financial_planner/core/assumptions/domain/settings.dart';
 import 'package:financial_planner/core/dates.dart';
 import 'package:financial_planner/core/reference/markets.dart';
@@ -280,9 +281,112 @@ void main() {
           await scrollTo(tester, find.text(l10n.source).last);
           await tester.tap(find.text(l10n.source).last);
           await tester.pumpAndSettle();
-          expect(find.text(l10n.src_B3), findsOneWidget);
+          expect(find.textContaining(l10n.src_B3), findsOneWidget);
         },
       );
+
+      testScreen(
+        'C1: the zakat source follows the asset: crypto cites its own section, not the shares ruling',
+        (tester) async {
+          await pumpScreen(
+            tester,
+            const ItemDetailScreen(investmentId: 'coin'),
+            locale: locale,
+            seed: (h) async {
+              await h.setup();
+              await h.addItem(
+                item(
+                  'coin',
+                  type: AssetType.crypto,
+                  intent: null,
+                  rule: ZakatRule.crypto100,
+                ),
+                [
+                  moneyIn('coin', day(2026, 1, 1), '1000'),
+                  value('coin', day(2026, 10, 1), '1200'),
+                ],
+              );
+            },
+          );
+          final l10n = l10nOf(tester);
+          await scrollTo(tester, find.text(l10n.source).last);
+          await tester.tap(find.text(l10n.source).last);
+          await tester.pumpAndSettle();
+          expect(find.textContaining(l10n.src_B8), findsOneWidget);
+          expect(find.textContaining(l10n.src_B3), findsNothing);
+          expect(find.textContaining(l10n.src_A1A2), findsOneWidget);
+        },
+      );
+
+      testScreen(
+        'C5: an "other" item cites real estate, business and pension rulings',
+        (tester) async {
+          await pumpScreen(
+            tester,
+            const ItemDetailScreen(investmentId: 'flat'),
+            locale: locale,
+            seed: (h) async {
+              await h.setup();
+              await h.addItem(
+                item(
+                  'flat',
+                  type: AssetType.other,
+                  intent: Intent.rental,
+                  rule: ZakatRule.custom,
+                  customShare: Decimal.zero,
+                ),
+                [moneyIn('flat', day(2026, 1, 1), '1000')],
+              );
+            },
+          );
+          final l10n = l10nOf(tester);
+          await scrollTo(tester, find.text(l10n.source).last);
+          await tester.tap(find.text(l10n.source).last);
+          await tester.pumpAndSettle();
+          for (final src in [l10n.src_B5, l10n.src_B6, l10n.src_B7]) {
+            expect(find.textContaining(src), findsOneWidget);
+          }
+        },
+      );
+
+      testScreen('C2: the set-aside formula includes the dividends received', (
+        tester,
+      ) async {
+        await pumpScreen(
+          tester,
+          const ItemDetailScreen(investmentId: 'div'),
+          locale: locale,
+          seed: (h) async {
+            await h.setup(method: LongTermMethod.dividendsOnly);
+            await h.addItem(
+              item(
+                'div',
+                type: AssetType.stock,
+                market: Market.egx,
+                intent: Intent.longTerm,
+                rule: ZakatRule.longTermPerSetting,
+                start: day(2025, 12, 31),
+              ),
+              [
+                moneyIn('div', day(2025, 12, 31), '50000'),
+                moneyOut(
+                  'div',
+                  day(2026, 3, 15),
+                  '400',
+                  kind: MoneyOutKind.income,
+                ),
+                value('div', day(2026, 10, 1), '50000'),
+              ],
+            );
+          },
+        );
+        final l10n = l10nOf(tester);
+        await tester.tap(find.text(l10n.rowSetAside));
+        await tester.pumpAndSettle();
+        expect(find.text(l10n.whySetAsideWhat), findsOneWidget);
+        expect(textPlain(plain('+ 2.50 % × 400.00 EGP')), findsOneWidget);
+        expect(textPlain('10.00 EGP'), findsWidgets);
+      });
 
       testScreen('AC-21: without the rate the base column asks for it', (
         tester,

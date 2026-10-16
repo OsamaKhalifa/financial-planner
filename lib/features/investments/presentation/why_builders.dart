@@ -5,6 +5,8 @@ import 'package:flutter/widgets.dart';
 
 import '../../../core/assumptions/domain/settings.dart';
 import '../../../core/reference/units.dart';
+import '../../../l10n/app_localizations.dart';
+import '../domain/investment.dart';
 import '../domain/portfolio_calculator.dart';
 import '../domain/zakat_rules.dart';
 import 'why_sheet.dart';
@@ -31,14 +33,32 @@ Why whyReturn(BuildContext context, Returns r, Unit unit) {
   );
 }
 
+/// The ruling text behind a zakat share: the rate and year (A1/A2) plus the
+/// asset section the item resolved to (Part B).
+String zakatSource(AppLocalizations l10n, String section, {AssetType? type}) {
+  final asset = type == AssetType.other
+      ? '${l10n.src_B5}\n\n${l10n.src_B6}\n\n${l10n.src_B7}'
+      : switch (section) {
+          'B1' => l10n.src_B1,
+          'B2' => l10n.src_B2,
+          'B3' => l10n.src_B3,
+          'B4' => l10n.src_B4,
+          'B5' => l10n.src_B5,
+          'B8' => l10n.src_B8,
+          _ => null,
+        };
+  return [l10n.src_A1A2, ?asset].join('\n\n');
+}
+
 Why whySetAside(
   BuildContext context,
   Returns r,
   ResolvedZakat zakat,
   ZakatYear year,
   int days,
-  Unit unit,
-) {
+  Unit unit, {
+  AssetType? type,
+}) {
   final l10n = context.l10n;
   return Why(
     title: l10n.whySetAsideTitle,
@@ -50,12 +70,13 @@ Why whySetAside(
       context.money(r.dietz.ev, unit),
       '$days',
       year.days.toString(),
+      context.money(r.dividends, unit),
     ),
     assumptions: [
       l10n.zakatYearTitle,
       if (zakat.onDividends) l10n.noticeDividends,
     ],
-    source: '${l10n.src_A1A2}\n\n${l10n.src_B3}',
+    source: zakatSource(l10n, zakat.sourceSection, type: type),
   );
 }
 

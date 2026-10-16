@@ -10,7 +10,6 @@ import '../domain/history_entry.dart';
 import '../domain/investment.dart';
 import '../domain/portfolio_calculator.dart';
 import '../domain/zakat_rules.dart';
-import '../../../l10n/app_localizations.dart';
 import 'investment_form_screen.dart';
 import 'investments_providers.dart';
 import 'period_screen.dart';
@@ -262,6 +261,7 @@ class ItemDetailScreen extends ConsumerWidget {
                       year,
                       f.period.days,
                       base,
+                      type: item.type,
                     ),
             ),
             row(
@@ -335,25 +335,20 @@ class ItemDetailScreen extends ConsumerWidget {
 
   Widget _zakatLine(BuildContext context, Investment item, Settings settings) {
     final l10n = context.l10n;
-    final String head;
-    final List<String> notes = [];
-    try {
-      final r = resolve(item, settings);
-      head = r.onDividends
-          ? l10n.zakatLineDividends
-          : item.zakatRule == ZakatRule.companyPaysZakat
-          ? l10n.zakatLineCompany
-          : l10n.zakatLinePercent(context.percent(r.share).replaceAll('+', ''));
+    // A missing zakat answer throws here on purpose: it must not be hidden.
+    final r = resolve(item, settings);
+    final head = r.onDividends
+        ? l10n.zakatLineDividends
+        : item.zakatRule == ZakatRule.companyPaysZakat
+        ? l10n.zakatLineCompany
+        : l10n.zakatLinePercent(context.percent(r.share).replaceAll('+', ''));
+    final notes = [
       switch (r.notice) {
-        case ZakatNotice.dividendsCountedWithCash:
-          notes.add(l10n.noticeDividends);
-        case ZakatNotice.cryptoDisputed:
-          notes.add(l10n.noticeCrypto);
-        case null:
-      }
-    } on StateError {
-      return const SizedBox.shrink();
-    }
+        ZakatNotice.dividendsCountedWithCash => l10n.noticeDividends,
+        ZakatNotice.cryptoDisputed => l10n.noticeCrypto,
+        null => null,
+      },
+    ].nonNulls;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(
@@ -371,7 +366,7 @@ class ItemDetailScreen extends ConsumerWidget {
               Why(
                 title: l10n.zakatSectionTitle,
                 what: head,
-                source: _source(l10n, item.type),
+                source: zakatSource(l10n, r.sourceSection, type: item.type),
               ),
             ),
             child: Text(l10n.source),
@@ -380,15 +375,6 @@ class ItemDetailScreen extends ConsumerWidget {
       ),
     );
   }
-
-  String _source(AppLocalizations l10n, AssetType t) => switch (t) {
-    AssetType.cashDeposit => l10n.src_B1,
-    AssetType.gold || AssetType.silver => l10n.src_B2,
-    AssetType.stock || AssetType.fund => l10n.src_B3,
-    AssetType.sukuk => l10n.src_B4,
-    AssetType.crypto => l10n.src_B8,
-    AssetType.other => l10n.src_B5,
-  };
 
   Widget _historyTile(BuildContext context, HistoryEntry e, Investment item) {
     final l10n = context.l10n;

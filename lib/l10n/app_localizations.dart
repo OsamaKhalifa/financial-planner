@@ -665,7 +665,7 @@ abstract class AppLocalizations {
   /// No description provided for @src_B8.
   ///
   /// In en, this message translates to:
-  /// **'Scholars differ on whether holding crypto is permitted (IIFA Res 237 (24/8) gave no final ruling). Those who permit it say zakat is due on its full market value (B8).'**
+  /// **'Scholars differ on whether holding crypto is permitted (IIFA Res 237 (8/24) gave no final ruling). Those who permit it say zakat is due on its full market value (B8).'**
   String get src_B8;
 
   /// No description provided for @src_Z6.
@@ -1007,7 +1007,7 @@ abstract class AppLocalizations {
   /// No description provided for @zakatNeedsChoice.
   ///
   /// In en, this message translates to:
-  /// **'Zakat: choose below'**
+  /// **'Zakat: not set yet — answer the question below'**
   String get zakatNeedsChoice;
 
   /// No description provided for @zakatReasonTrading.
@@ -1049,7 +1049,7 @@ abstract class AppLocalizations {
   /// No description provided for @noticeDividends.
   ///
   /// In en, this message translates to:
-  /// **'Zakat on your dividends is counted with your cash.'**
+  /// **'Zakat is set aside on dividends received from this item (IIFA Res 28 (3/4)). Don\'t record them again in a cash item.'**
   String get noticeDividends;
 
   /// No description provided for @noticeCrypto.
@@ -1571,13 +1571,13 @@ abstract class AppLocalizations {
   /// No description provided for @whySetAsideWhat.
   ///
   /// In en, this message translates to:
-  /// **'Rate × zakat share × end value × days ÷ year length, in the matched pair you chose. Actual zakat is due once a year on your zakat date.'**
+  /// **'Rate × zakat share × end value × days ÷ year length, plus rate × dividends received (dividends-only method), in the matched pair you chose. Actual zakat is due once a year on your zakat date.'**
   String get whySetAsideWhat;
 
   /// No description provided for @whySetAsideNumbers.
   ///
   /// In en, this message translates to:
-  /// **'{z} = {rate} × {share} × {ev} × {days} ÷ {year}'**
+  /// **'{z} = {rate} × {share} × {ev} × {days} ÷ {year} + {rate} × {dividends}'**
   String whySetAsideNumbers(
     String z,
     String rate,
@@ -1585,6 +1585,7 @@ abstract class AppLocalizations {
     String ev,
     String days,
     String year,
+    String dividends,
   );
 
   /// No description provided for @whyRealTitle.
@@ -2192,6 +2193,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The rate date cannot be in the future'**
   String get errRateFuture;
+
+  /// No description provided for @customShareSwitch.
+  ///
+  /// In en, this message translates to:
+  /// **'Set my own zakat share'**
+  String get customShareSwitch;
+
+  /// No description provided for @zakatChangedFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'You changed this from {share}'**
+  String zakatChangedFrom(String share);
+
+  /// No description provided for @moreSection.
+  ///
+  /// In en, this message translates to:
+  /// **'More'**
+  String get moreSection;
+
+  /// No description provided for @inflationSeriesField.
+  ///
+  /// In en, this message translates to:
+  /// **'Inflation series'**
+  String get inflationSeriesField;
+
+  /// No description provided for @inflationSeriesDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Default for this item'**
+  String get inflationSeriesDefault;
+
+  /// No description provided for @fetchFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t fetch. Type the rate.'**
+  String get fetchFailed;
+
+  /// No description provided for @fetchNotCovered.
+  ///
+  /// In en, this message translates to:
+  /// **'Source has no {from}→{to}. Type it.'**
+  String fetchNotCovered(String from, String to);
+
+  /// No description provided for @fetchedRateLine.
+  ///
+  /// In en, this message translates to:
+  /// **'1 {from} = {rate} {to} · as of {date} · {source}'**
+  String fetchedRateLine(
+    String from,
+    String rate,
+    String to,
+    String date,
+    String source,
+  );
+
+  /// No description provided for @src_B6.
+  ///
+  /// In en, this message translates to:
+  /// **'Business ownership: the owner pays on their share of the zakatable assets (cash, receivables, stock for sale) less short-term debts; fixed assets are not zakatable (IIFA Res 28 (3/4) §2). AAOIFI SS 35 net-assets method — section not yet verified (B6).'**
+  String get src_B6;
+
+  /// No description provided for @src_B7.
+  ///
+  /// In en, this message translates to:
+  /// **'Pension with withdrawal limits: no zakat until it can be accessed (Dr. Main Al-Qudah, AMJA fatwa 21964); or zakat on the accessible amount after penalty and tax (Fiqh Council of North America — source not yet verified); or the full balance as a precaution (B7).'**
+  String get src_B7;
 }
 
 class _AppLocalizationsDelegate
