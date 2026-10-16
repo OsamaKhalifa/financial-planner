@@ -10,7 +10,7 @@ Storage: SQLite via Drift, **always behind a repository interface** — a server
 - **No over-engineering.** Three similar lines is fine. Do not design for hypotheticals.
 - **Constructor injection** everywhere. No service locators, no globals.
 - **No comments explaining WHAT.** Only non-obvious WHY.
-- **Ask before committing or pushing.** Always.
+- **Commit and push freely** on feature branches and open PRs without asking (side project — this overrides the global "ask before committing" rule). Only the human merges to `main`.
 - **Never add Claude/AI attribution** to commits, PRs, or review comments.
 - **Never fix a bug before you understand the root cause.** Reproduce, write a failing test, then fix.
 - All money math uses `Decimal`, never `double`.
@@ -18,7 +18,7 @@ Storage: SQLite via Drift, **always behind a repository interface** — a server
 
 ## Agent harness
 
-Seven role agents live in `.claude/agents/`. Rules in [docs/process/agent-loop.md](docs/process/agent-loop.md).
+Eight role agents live in `.claude/agents/` (incl. `retro`, which improves the harness from lessons in `docs/process/lessons.md`). Rules in [docs/process/agent-loop.md](docs/process/agent-loop.md).
 
 **Loop cap: 2.** A reviewer who still blocks after loop 2 → escalate to the human. Correctness or Shariah bugs can force loop 3, must be labeled BLOCKER.
 
@@ -42,4 +42,5 @@ Agents never add scope. Scope changes come from the human only.
 
 - Branches: `feat/<short>`, `fix/<short>`, `chore/<short>`, `docs/<short>`.
 - Commit style: `<type>: <imperative one-liner>`. Body if needed. No AI attribution.
-- Only the human merges to `main`. PRs require 1 approval + green CI.
+- Only the human merges to `main`. PRs require green CI.
+- PR description stays short: what, why, how it was tested. No template.
