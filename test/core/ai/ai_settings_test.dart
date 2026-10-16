@@ -6,40 +6,58 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   setUp(() => FlutterSecureStorage.setMockInitialValues({}));
 
-  test('defaults to off with no key', () async {
+  test('defaults to off, shared service, no keys', () async {
     final settings = await ProviderContainer.test().read(
       aiSettingsProvider.future,
     );
 
     expect(settings.cloudEnabled, isFalse);
-    expect(settings.ownGeminiKey, isNull);
+    expect(settings.vendorId, isNull);
+    expect(settings.apiKeys, isEmpty);
   });
 
   test('saved values survive a restart', () async {
     final first = ProviderContainer.test();
     await first.read(aiSettingsProvider.future);
-    await first.read(aiSettingsProvider.notifier).setCloudEnabled(true);
-    await first.read(aiSettingsProvider.notifier).setOwnGeminiKey('  k-1  ');
+    final notifier = first.read(aiSettingsProvider.notifier);
+    await notifier.setCloudEnabled(true);
+    await notifier.selectVendor('gemini');
+    await notifier.setApiKey('gemini', '  k-1  ');
 
     final settings = await ProviderContainer.test().read(
       aiSettingsProvider.future,
     );
 
     expect(settings.cloudEnabled, isTrue);
-    expect(settings.ownGeminiKey, 'k-1');
+    expect(settings.vendorId, 'gemini');
+    expect(settings.apiKey, 'k-1');
   });
 
   test('a blank key removes the saved key', () async {
-    FlutterSecureStorage.setMockInitialValues({'ai.ownGeminiKey': 'old'});
+    FlutterSecureStorage.setMockInitialValues({'ai.apiKey.gemini': 'old'});
     final container = ProviderContainer.test();
     await container.read(aiSettingsProvider.future);
 
-    await container.read(aiSettingsProvider.notifier).setOwnGeminiKey('  ');
+    await container.read(aiSettingsProvider.notifier).setApiKey('gemini', ' ');
 
-    expect(container.read(aiSettingsProvider).value?.ownGeminiKey, isNull);
+    expect(container.read(aiSettingsProvider).value?.apiKeys, isEmpty);
     expect(
-      await const FlutterSecureStorage().read(key: 'ai.ownGeminiKey'),
+      await const FlutterSecureStorage().read(key: 'ai.apiKey.gemini'),
       isNull,
     );
+  });
+
+  test('a vendor no longer offered falls back to the shared service', () async {
+    FlutterSecureStorage.setMockInitialValues({
+      'ai.vendor': 'gone',
+      'ai.apiKey.gone': 'k',
+    });
+
+    final settings = await ProviderContainer.test().read(
+      aiSettingsProvider.future,
+    );
+
+    expect(settings.vendorId, isNull);
+    expect(settings.apiKeys, isEmpty);
   });
 }

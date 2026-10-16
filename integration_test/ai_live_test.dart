@@ -40,20 +40,33 @@ void main() {
     await tester.pumpWidget(const ProviderScope(child: MyApp()));
     await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('Settings'));
+    // Finish the page transition first: taps during it are dropped.
     await tester.pumpAndSettle();
+    await _pumpUntilFound(tester, find.text('Cloud AI is off.'));
 
     await tester.tap(find.byType(Switch));
+    await _pumpUntilFound(tester, find.text('Google Gemini'));
     await tester.pumpAndSettle();
+    await tester.tap(find.text('Google Gemini'));
+    await _pumpUntilFound(tester, find.byType(TextField));
     await tester.enterText(find.byType(TextField), _geminiKey);
-    await tester.tap(find.text('Save key'));
+    // Close the keyboard: it covers the buttons on a phone screen.
+    await tester.testTextInput.receiveAction(TextInputAction.done);
     await tester.pumpAndSettle();
-    expect(find.text('Using your own Gemini key.'), findsOneWidget);
+    await tester.ensureVisible(find.text('Save key'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Save key'));
+    await _pumpUntilFound(
+      tester,
+      find.text('Using your own Google Gemini key.'),
+    );
 
     final fresh = ProviderContainer();
     addTearDown(fresh.dispose);
     final saved = await fresh.read(aiSettingsProvider.future);
     expect(saved.cloudEnabled, isTrue);
-    expect(saved.ownGeminiKey, _geminiKey);
+    expect(saved.vendorId, 'gemini');
+    expect(saved.apiKey, _geminiKey);
 
     final client = ProviderScope.containerOf(
       tester.element(find.byType(SettingsScreen)),
@@ -95,4 +108,13 @@ void main() {
 
     await expectLater(client.complete(_pong), throwsA(isA<AiFailure>()));
   }, skip: _noProxy);
+}
+
+/// pumpAndSettle waits for frames only, not for Keychain writes; on a slow
+/// run the screen is checked before the save lands.
+Future<void> _pumpUntilFound(WidgetTester tester, Finder finder) async {
+  for (var i = 0; i < 50 && finder.evaluate().isEmpty; i++) {
+    await tester.pump(const Duration(milliseconds: 100));
+  }
+  expect(finder, findsOneWidget);
 }

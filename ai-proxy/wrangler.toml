@@ -7,10 +7,18 @@ compatibility_date = "2026-10-01"
 # returned 404 for new users in 2026-10). Keep in step with GeminiAiClient.
 GEMINI_MODEL = "gemini-flash-lite-latest"
 
-# Per-IP limit on top of the Gemini free quota.
+# Per-IP limit, so one user cannot use up the shared quota.
 [[ratelimits]]
 name = "RATE_LIMITER"
 namespace_id = "1001"
-simple = { limit = 20, period = 60 }
+simple = { limit = 5, period = 60 }
+
+# Global limit for all users together. Keep it below the Gemini free-tier
+# requests-per-minute of GEMINI_MODEL (AI Studio → Rate limits). Requests over
+# it get 429 here and never reach Google.
+[[ratelimits]]
+name = "GLOBAL_LIMITER"
+namespace_id = "1002"
+simple = { limit = 10, period = 60 }
 
 # Secrets (never in this file): GEMINI_API_KEY, APP_TOKEN — set with `wrangler secret put`.

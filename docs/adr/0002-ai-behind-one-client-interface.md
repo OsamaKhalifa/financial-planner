@@ -19,13 +19,23 @@ Cloud AI is **opt-in**: `aiSettingsProvider.cloudEnabled` is `false` by default.
 
 Like ADR-0001, this is an approved exception to "no interface with a single implementation": on-device clients (Apple Foundation Models, Gemini Nano) are the planned second implementation.
 
-## Own Gemini key (added 2026-10-16)
+## Own key, any vendor (added 2026-10-16)
 
-A user may enter their own Gemini key in Settings (`lib/features/settings/settings_screen.dart`). Then `aiClientProvider` gives `GeminiAiClient`, which calls Google **directly** — the key and the data never pass through our Worker. Without an own key, the shared Worker route is used.
+In Settings (`lib/features/settings/settings_screen.dart`) the user turns cloud AI on, then picks a provider from a list: **App's shared AI** (our Worker, no key) or one of the vendors in `defaultAiVendors` (`lib/core/ai/ai_vendors.dart`) with their own key. Today the list holds Google Gemini only.
 
-- The switch and the key live in `AiSettingsStore` (`lib/core/ai/ai_settings.dart`) on top of `flutter_secure_storage` (Keychain / Keystore). No repository interface: settings never move to a server.
-- The key goes in the `x-goog-api-key` header, never in a URL.
-- **Accepted cost:** the Gemini mapping now exists twice — `ai-proxy/src/gemini.ts` and `lib/core/ai/gemini_ai_client.dart`. A vendor change touches both, still no feature.
+- **Adding a vendor** = write its `AiClient` + add one `AiVendor` entry (id, name, key help, data notice, client factory). The Settings list, key field, storage and `aiClientProvider` pick it up with no change; features never change. `test/support/fake_ai_vendor.dart` proves it in the tests.
+- Vendor names appear only in the vendor's client file and its `AiVendor` entry.
+- With an own key, the vendor client calls the vendor **directly** — the key and the data never pass through our Worker.
+- Settings live in `AiSettingsStore` (`lib/core/ai/ai_settings.dart`) on `flutter_secure_storage` (Keychain / Keystore): `ai.cloudEnabled`, `ai.vendor`, one `ai.apiKey.<vendorId>` per vendor. A stored vendor that is no longer offered falls back to the shared service. No repository interface: settings never move to a server.
+- Keys go in a header, never in a URL.
+- **Accepted cost:** the Gemini mapping exists twice — `ai-proxy/src/gemini.ts` (shared route) and `lib/core/ai/gemini_ai_client.dart` (own key).
+
+## Cost: the shared key never bills
+
+- **Never enable billing** on the Google Cloud project that owns the shared `GEMINI_API_KEY`. Without billing, Gemini cannot charge: over the free limit it answers 429, which the app shows as `AiQuotaExceeded`.
+- The Worker caps traffic before Google sees it: 5 requests/min per IP and 10 requests/min for all users together (`ai-proxy/wrangler.toml`). Keep the global cap below the model's free requests-per-minute (AI Studio → Rate limits). The free requests-per-day can still run out on a busy day; users then get 429 until the next day, never a bill.
+- Cloudflare Workers free plan also never bills; over its daily request limit it returns errors.
+- Own-key users spend their own quota.
 
 ## Rules
 

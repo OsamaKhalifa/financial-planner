@@ -13,6 +13,7 @@ class GeminiAiClient implements AiClient {
     required this._apiKey,
     this._model = defaultModel,
     this._timeout = const Duration(seconds: 30),
+    this._retryDelay = const Duration(seconds: 1),
   }) : _http = httpClient;
 
   static const defaultModel = String.fromEnvironment(
@@ -24,12 +25,22 @@ class GeminiAiClient implements AiClient {
   final String _apiKey;
   final String _model;
   final Duration _timeout;
+  final Duration _retryDelay;
 
   @override
   Future<AiReply> complete(AiPrompt prompt) async {
-    final http.Response response;
+    var response = await _send(prompt);
+    // 503 = Gemini overloaded ("high demand"); it usually clears in a second.
+    if (response.statusCode == 503) {
+      await Future<void>.delayed(_retryDelay);
+      response = await _send(prompt);
+    }
+    return _parse(response);
+  }
+
+  Future<http.Response> _send(AiPrompt prompt) async {
     try {
-      response = await _http
+      return await _http
           .post(
             Uri.https(
               'generativelanguage.googleapis.com',
@@ -63,7 +74,9 @@ class GeminiAiClient implements AiClient {
     } on http.ClientException catch (e) {
       throw AiFailure('AI request failed: ${e.message}');
     }
+  }
 
+  AiReply _parse(http.Response response) {
     final status = response.statusCode;
     if (status == 429) {
       final seconds = int.tryParse(response.headers['retry-after'] ?? '');

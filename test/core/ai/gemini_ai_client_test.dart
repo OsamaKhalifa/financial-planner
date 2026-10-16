@@ -148,4 +148,33 @@ void main() {
       throwsA(isA<AiFailure>()),
     );
   });
+
+  test('a 503 is retried once', () async {
+    var calls = 0;
+    final client = clientWith((_) async {
+      calls++;
+      return calls == 1
+          ? http.Response('{"error":{"code":503}}', 503)
+          : http.Response(
+              reply([
+                {'text': 'ok'},
+              ]),
+              200,
+            );
+    });
+
+    expect((await client.complete(prompt)).text, 'ok');
+    expect(calls, 2);
+  });
+
+  test('a second 503 becomes AiFailure', () async {
+    var calls = 0;
+    final client = clientWith((_) async {
+      calls++;
+      return http.Response('', 503);
+    });
+
+    await expectLater(client.complete(prompt), throwsA(isA<AiFailure>()));
+    expect(calls, 2);
+  });
 }
