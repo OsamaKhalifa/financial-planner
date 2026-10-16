@@ -11,6 +11,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: no runtime data in repo
+        run: |
+          if git ls-files | grep -Ei '\.(db|sqlite3?)(-wal|-shm|-journal)?$|\.backup\.json$|^local/'; then
+            echo "Runtime data file is tracked — remove it."; exit 1
+          fi
       - uses: subosito/flutter-action@v2
         with:
           channel: stable

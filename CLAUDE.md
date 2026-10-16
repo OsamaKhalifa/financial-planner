@@ -14,6 +14,7 @@ Storage: SQLite via Drift, **always behind a repository interface** — a server
 - **Never add Claude/AI attribution** to commits, PRs, or review comments.
 - **Never fix a bug before you understand the root cause.** Reproduce, write a failing test, then fix.
 - All money math uses `Decimal`, never `double`.
+- **Runtime data never lives in the repo.** The DB file goes only in the app sandbox (`path_provider` app-support dir). Tests use an in-memory DB. Anything personal for local testing (sample numbers, exports) goes in `local/` — gitignored. CI fails if a DB file is ever tracked.
 - Every Shariah-related rule must cite a trusted reference (AAOIFI, specific scholar, specific hadith/ayah). No "I think it is halal."
 
 ## Agent harness

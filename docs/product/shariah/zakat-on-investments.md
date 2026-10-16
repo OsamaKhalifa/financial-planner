@@ -250,3 +250,50 @@ Views (user picks):
 | `debt_status` | enum: good / doubtful | B9 (UC-5) | good | yes |
 
 **User-level settings (once, not per item):** `nisab_standard` (gold 85 g / silver 595 g — ask), `zakat_year` (lunar 2.5% default / solar 2.577%), `zakat_date`, `base_currency`, `jewelry_ruling` (zakatable / not — ask), `deduct_short_term_debts` (on by default) + amount, gold and silver price per gram on zakat date, FX rates on zakat date (editable).
+
+---
+
+## Answers to the PM story (Z-1..Z-7)
+
+Story: `docs/product/stories/my-investments.md` §12. Each answer points to the section above that holds the citation.
+
+- **Z-1 — Zakat share per asset type.** Base is **market value on the zakat date** × zakat share. Defaults are in Part B and the last table ("Inputs the app needs"). Long-term shares/funds have no single default: the user picks dividends-only (IIFA Res 28 (3/4), 121 (3/13)), the 25% proxy (NZF), or full value — B3. **Wahed's 30% is not a ruling I can cite**; do not use it, not even as an example in the UI.
+  - Dividends-only means s = 0 for the share itself and zakat falls on the dividends **where they are held** (usually cash). If the cash is not in the list, the app must tell the user "zakat on your dividends is counted with your cash".
+- **Z-2 — Rate and year.** Lunar: r = 2.5%, Y = 354.367 days (mean lunar year). Solar: r = 2.577%, Y = 365 (AAOIFI SS 35 [S]) — A1, A2. **The pair must stay matched.** 2.5% with Y = 365 is neither view: it under-states zakat by ~3% for a lunar payer.
+- **Z-3 — Monthly pro-rata estimate.** **Allowed as a planning figure. No ruling against it, and none needed:** it is a presentation choice, not a zakat calculation. Zakat is due only once, on the zakat date, on total wealth ≥ nisab that has completed a hawl (A3, A4). So the monthly figure must:
+  1. be labelled "estimated zakat set-aside (planning). Actual zakat is due once a year on your zakat date";
+  2. never be called "zakat due" or "zakat paid";
+  3. use r and Y as a matched pair (Z-2);
+  4. be 0 when the user says no zakat is due this year (already in story §9.4).
+  Supporting idea: paying zakat early (*ta'jil*) is allowed by the majority, based on al-Abbas paying early — Abu Dawud 1624, Tirmidhi 678. **[U]**, not verified in this pass. It shows that setting money aside before the due date is fine. It does **not** make a monthly amount due.
+- **Z-4 — Nisab.** Metal and weight: user picks gold 85 g or silver 595 g (A3). Count **pure** gold/silver content: pure g = g × karat/24. This is common practice; I did not verify a primary source for pure vs gross weight **[U]**. If the list is not all the user's wealth, the app cannot decide nisab. Keep the story's yes/no switch ("zakat due this year"), with the help text "decide using all your zakatable wealth, not only this list". The full nisab check belongs to UC-3.
+- **Z-5 — Gold/silver as unit or base.** **No objection.** Gold and silver are *thaman*, and nisab is set in their weight (A8). Base view C is fine as a display. Zakat is still computed per A1–A7 and only then shown in grams. Caution: riba al-fadl (Muslim 1587, A8). The app must never model gold-for-gold at unequal weight, or a deferred gold purchase.
+- **Z-6 — Interest on conventional deposits.** **Do not count it as return. Show it separately as "to purify".**
+  - **Reference:** Quran 2:275 and 2:278–279. 2:279 says "if you repent, you may have your principal", so the owner's right is the principal only. **[V]**
+  - Disposing of non-permissible income for charity (purification), not keeping it: AAOIFI SS 21 (financial papers), purification section **[U]** for the section number.
+  - The interest is not the owner's wealth. It is not part of the zakat base, and giving it away does **not** count as zakat (B1 edge case).
+  - **Story change:** money out kind "interest (to purify)". It is excluded from gain and return, shown as its own total, and never netted against zakat.
+- **Z-7 — FX rate for zakat.** The rate on the zakat due date: Darul Iftaa Mahmudiyyah [S]. Paper money takes the rulings of gold and silver: IIFA Res 21 (9/3) [V]. See A7. In the story's monthly estimate, the period-end rate is fine because it is a planning figure. The real zakat (UC-3) uses the rate on the zakat date.
+
+### Ask at setup vs default (disputed views)
+
+| View | App behaviour | Reason |
+|---|---|---|
+| Nisab metal (gold / silver) | **(a) Ask, no default** | Both views are live among recognized scholars. Neither is a safe default for everyone (A3). |
+| Lunar 2.5% vs solar 2.577% | **(b) Default lunar 2.5%, Y = 354.367** | Both sides accept the lunar year. The dispute is only whether a solar year may be used (A2). Solar stays a setting. |
+| Personal jewelry | **(a) Ask, no default** | A school-level split (Hanafi vs the other three), B2. Asked only if the user adds jewelry. |
+| Long-term shares method | **(a) Ask, no default** (per item, or once as a portfolio setting) | IIFA dividends-only vs NZF 25% proxy vs full value give very different bases (B3). |
+| Pensions | **(a) Ask, no default** | It depends on the user's own withdrawal rules, which the app cannot know (B7). |
+| Crypto | **(b) Default 100% of market value**, with a notice that permissibility is disputed | The dispute is about whether holding it is allowed. Among those who allow it, I know of no lower base [U]. The notice tells the user about the dispute (B8). |
+
+### Verdict on the story's Shariah content: **CHANGES_REQUESTED**
+
+1. **§5 line 61 (Zakat share):** remove "a proxy like Wahed's 30 % for long-held equities". Replace with "per asset type and intent, from zakat-on-investments.md Part B; long-term shares/funds: user picks dividends-only (IIFA) / 25% proxy (NZF) / full value". Add an **intent** field (trading / long-term / personal use). The default share depends on it (B2, B3).
+2. **§5 line 53 (Asset type):** if "other" covers real estate, business or pension, its zakat share must default to **ask**, not 100% or 0% (B5–B7).
+3. **§9.4 lines 185–188 and §10 line 215:** set r_z and Y from the user's zakat-year setting as a matched pair: lunar 2.5% / 354.367 (default), or solar 2.577% / 365. Rename the figure "estimated zakat set-aside (planning)", per Z-3. **Recompute AC-9, AC-10, AC-11, AC-20, AC-23** (lines 233, 238, 239, 260, 263). Example: AC-10 lunar gives Z = 0.025 × 23,000 × 365/354.367 = **592.25**, not 575.00. AC-9 gives **30.69**, not 29.79.
+4. **§5.1 / §4 (Money out kinds):** add the kind "interest (to purify)". Exclude it from gain and return, and show it as its own total (Z-6). Add one AC for this.
+5. **§9.4 line 191 (no-zakat switch):** add the help text "decide using all your zakatable wealth, not only this list" (Z-4).
+6. **§7 (option C):** add one line: "zakat is computed in money per the Shariah file, then shown in grams; no gold-for-gold exchange is modelled" (A8, Muslim 1587).
+7. **Every "why" text for a zakat figure** links to the section of this file (A9). Line 6 says the rules are placeholders; once items 1–6 are done, it can point here.
+
+No BLOCKER. Nothing in the story computes or hides a riba figure in a way that helps the user deal in riba. Item 4 closes the one gap: today, interest would be counted as profit.
