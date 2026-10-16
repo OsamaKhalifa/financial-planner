@@ -18,7 +18,7 @@ The euro area is in the same dataset (`EMU`), so **Eurostat HICP is not needed**
 
 ### Countries
 
-Derived in the script from `lib/core/reference/` (no second list): every country that a v1 currency maps to (spec §2.1) and every market's country. v1 = 29 currencies → 28 countries + `EMU`: ARE, AUS, BGD, BHR, CAN, CHE, CHN, DZA, EGY, EMU, GBR, HKG, IDN, IND, JOR, JPN, KWT, MAR, MYS, NGA, OMN, PAK, QAT, SAU, SGP, TUN, TUR, USA, ZAF. All returned data on the check.
+Derived in the script from `lib/core/reference/` (no second list): every country that a v1 currency maps to (spec §2.1) and every market's country. v1 = 32 currencies → 31 countries + `EMU`: ARE, AUS, BGD, BHR, CAN, CHE, CHN, DNK, DZA, EGY, EMU, GBR, HKG, IDN, IND, JOR, JPN, KWT, MAR, MYS, NGA, NOR, OMN, PAK, QAT, SAU, SGP, SWE, TUN, TUR, USA, ZAF. All returned data on the check.
 
 ### Asset format
 
@@ -30,7 +30,7 @@ Derived in the script from `lib/core/reference/` (no second list): every country
 ```
 
 - Values are **strings** (percent, 2 decimals as published rounding allows) → `Decimal.parse`. `null` years are omitted, so "as of" for a series = its last present year (US → 2024 today; AC-33 "assumed from" logic covers 2025+).
-- Years 2000 onward (~26 years × 29 series ≈ 10 KB).
+- Years 2000 onward (~26 years × 32 series ≈ 10 KB).
 - Loaded once with `rootBundle.loadString` into `ShippedInflation` (core/assumptions) — no repository: it is read-only app content, not user data, and never moves to a server.
 
 ### Script
@@ -39,7 +39,7 @@ Derived in the script from `lib/core/reference/` (no second list): every country
 
 ### User override
 
-Table `inflation_overrides(id, country, year, rate TEXT, created_at, updated_at)`, unique `(country, year)`. Lookup order for (country, year): override → shipped → latest earlier year from the merged view, marked "assumed from YEAR" → none ("series empty"). Because overrides are a separate table, an app update that ships a new shipped value can never overwrite a user value (AC-32); deleting the override row restores the shipped value.
+Table `inflation_overrides(id, country, year, rate TEXT, created_at, updated_at)` — `rate` is a fraction (0.10 = 10 %), the domain's single representation; only the asset uses percent strings, unique `(country, year)`. Lookup order for (country, year): override → shipped → latest earlier year from the merged view, marked "assumed from YEAR" → none ("series empty"). Because overrides are a separate table, an app update that ships a new shipped value can never overwrite a user value (AC-32); deleting the override row restores the shipped value.
 
 ## Why
 

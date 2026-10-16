@@ -30,9 +30,9 @@ Rule of this spec: the engine is pure Dart and holds almost all logic and tests.
 
 ### 2.1 Reference data — `lib/core/reference/`
 
-- `units.dart` — `extension type const Unit(String code)` with `isMetal`, consts `xauG = Unit('XAU-g')`, `xagG`; `const v1Currencies` (29, alphabetical): AED, AUD, BDT, BHD, CAD, CHF, CNY, DZD, EGP, EUR, GBP, HKD, IDR, INR, JOD, JPY, KWD, MAD, MYR, NGN, OMR, PKR, QAR, SAR, SGD, TND, TRY, USD, ZAR (all quoted by the ADR-0003 source; all have World Bank data). `const allUnits = [...v1Currencies, xauG, xagG]`. `Country defaultCountryOf(Unit)` (EUR → `EMU`). `List<Unit> orderedUnits({required Map<Unit,int> usage, required Unit topAnchor})` — story §6.3; `topAnchor` = base, or region currency before setup.
+- `units.dart` — `extension type const Unit(String code)` with `isMetal`, consts `xauG = Unit('XAU-g')`, `xagG`; `v1Currencies` (32, sorted by code): AED, AUD, BDT, BHD, CAD, CHF, CNY, DKK, DZD, EGP, EUR, GBP, HKD, IDR, INR, JOD, JPY, KWD, MAD, MYR, NGN, NOK, OMR, PKR, QAR, SAR, SEK, SGD, TND, TRY, USD, ZAR (PM added SEK/NOK/DKK, story §6.3; all quoted by the ADR-0003 source and all have World Bank data, re-checked 2026-10-16). `allUnits` = currencies + XAU-g + XAG-g, one unmodifiable list sorted by code. `Country defaultCountryOf(Unit)` (EUR → `EMU`). `List<Unit> orderedUnits({required Map<Unit,int> usage, required Unit topAnchor})` — story §6.3; `topAnchor` = base, or region currency before setup.
 - `markets.dart` — `enum Market(country, currency)`: tadawul(SAU, SAR), egx(EGY, EGP), nasdaq(USA, USD), nyse(USA, USD), lse(GBR, GBP), dfm(ARE, AED), adx(ARE, AED), boursaKuwait(KWT, KWD), qse(QAT, QAR), bursaMalaysia(MYS, MYR), bist(TUR, TRY), psx(PAK, PKR), other (country stored on the investment).
-- `countries.dart` — `extension type const Country(String iso3)`; the 29 codes of ADR-0004.
+- `countries.dart` — `extension type const Country(String iso3)`; the 32 codes of ADR-0004.
 
 Names (en/ar) of units, countries and markets are ICU `select` messages in the ARB files (§7), not Dart maps.
 
@@ -61,6 +61,7 @@ final class YearInflation { Decimal rate; int year; InflationProvenance provenan
 final class PeriodInflation { Decimal i; List<YearInflation> years; }
 final class ShippedInflation { String source; String asOfNote; Map<Country, Map<int, Decimal>> series; static ShippedInflation parse(String json); }
 final class InflationOverride { String id; Country country; int year; Decimal rate; DateTime createdAt, updatedAt; }
+// All inflation rates in the domain are fractions (0.10 = 10 %). ShippedInflation.parse converts the asset's percent strings once; the UI converts typed percents.
 final class InflationBook {                          // pure
   InflationBook(ShippedInflation shipped, List<InflationOverride> overrides);
   YearInflation? forYear(Country c, int year);       // override → shipped → latest earlier year (assumed) → null (AC-32, AC-33)
@@ -138,7 +139,7 @@ PurchasingPower? purchasingPower(DietzResult dz, Decimal z, Decimal i);   // §9
 - `bool activeIn(s, e)` — a value update or flow in (s, e] (§9.3); `bool closedAt(d)`; `DateTime latestValueDate`.
 - Missing conversion of a flow into item unit (needs a rate on the flow date) → `MissingRate(pair, date)` collected, never 1:1.
 
-`period.dart` — `enum Granularity { month, year }`; `final class Period { DateTime s, e; }` with `Period.month(y, m, today)`, `Period.year(y, today)` (D10), `Period.sinceStart(item)`; `List<Period> periodsBetween(DateTime first, DateTime today, Granularity)`.
+`period.dart` — `enum Granularity { month, year }`; `final class Period { DateTime s, e; }` with `Period.month(y, m, today)`, `Period.year(y, today)` (D10); the since-start period is built inside `PortfolioCalculator.sinceStart(id)` (no `Period.sinceStart`); `List<Period> periodsBetween(DateTime first, DateTime today, Granularity)`.
 
 `portfolio_calculator.dart` — composes the above. Built once per data change:
 
@@ -156,7 +157,7 @@ final class PortfolioCalculator {
 ```
 
 Rules inside, each one test-named after its AC:
-- **Base conversion:** BV at S, each flow at its date, EV and Z at E (§6.1). A missing rate removes the item from that period's base totals → `Excluded(itemId, from, to, date)` (AC-21). A closing rate dated ≤ S → `StaleRate` marker (AC-22).
+- **Base conversion:** BV at S, each flow at its date, EV and Z at E (§6.1). A missing rate removes the item from that period's base totals → `ItemFigures.excluded` = one `Excluded(itemId, from, to, date)`, the first missing pair (AC-21); only conversions dated on or before E count. A closing rate dated ≤ S → `StaleRate` marker (AC-22).
 - **Item set-aside** in item unit with `resolve(item).share`; dividend part = r × base income in (S, E] when `onDividends`, no T/Y factor; value part converted at E (§9.4, Z-7).
 - **Series per item:** `inflationOverride` → market country (stock; fund/sukuk with market) → home (metals) → `defaultCountryOf(unit)` (AC-31). Home = `settings.homeInflation ?? defaultCountryOf(base)`.
 - **Grams view:** convert base BV at S, flows at their dates, EV and Z at E by the XAU-g/XAG-g→base rate; i = 0; no real figures; label flag (AC-39). A missing metal rate → the grams view is unavailable for that period, with the pair named.
@@ -176,7 +177,7 @@ Every figures object keeps its inputs (BV, EV, CF, D, each flow with weight, eac
 | `investments` | name, asset_type, intent?, market?, market_country?, unit, start_date, quantity?, purity_karat?, purity_fineness?, zakat_rule, custom_zakat_share?, inflation_override?, notes? | — |
 | `history_entries` | investment_id → investments.id **ON DELETE CASCADE**, kind (`money_in`, `sale`, `income`, `interest_kept_inside`, `interest_paid_out`, `interest_given_away_inside`, `interest_given_away_paid_out`, `value_update`), date, amount, unit? (null for value_update) | index (investment_id, date); unique (investment_id, date) where kind = 'value_update' (partial index via `customStatement` in `onCreate`) |
 | `rates` | from_unit, to_unit, rate, as_of, source (`typed` / `currency_api`) | index (from_unit, to_unit, as_of); unique (from_unit, to_unit, as_of, source) — one typed and one fetched per pair-day |
-| `inflation_overrides` | country, year, rate | unique (country, year) |
+| `inflation_overrides` | country, year, rate (fraction, TEXT) | unique (country, year) |
 | `settings` | singleton row (id = `'settings'`): base_currency?, home_inflation?, zakat_year?, long_term_method?, jewellery_zakatable? | — |
 | `no_zakat_years` | year | unique (year) |
 
@@ -187,6 +188,8 @@ Every figures object keeps its inputs (BV, EV, CF, D, each flow with weight, eac
 ## 4. Repositories (ADR-0001)
 
 Errors next to each interface: `NotFound`, `Conflict`, `StorageUnavailable`; implementations map `SqliteException`/`DriftWrappedException` to them.
+
+**Ids and timestamps.** Domain constructors default `id` to `newId()` and `createdAt`/`updatedAt` to the 1970 epoch (a placeholder only). Repositories own the timestamps: on insert both = clock (UTC); on update `updatedAt` = clock and `createdAt` is kept from the row; row → domain mapping always passes `id`, `createdAt`, `updatedAt`. A phase-2 test asserts no stored row has a 1970 timestamp.
 
 `lib/features/investments/domain/investments_repository.dart`
 
@@ -346,7 +349,7 @@ No AC is untestable. None is ambiguous enough to block phase 1; the questions be
 
 1. **S6 "one Save, all or nothing" spans two repositories** (rates + item values). ADR-0001 names exactly this as its revisit trigger. Cheaper: Save writes typed rates in one transaction, then values in another; if the second fails, the screen keeps the value rows and says "Rates saved, values not saved — try again". Rates are independent facts (fetched ones are already saved this way, UX 2.6). Recommend this; otherwise ADR-0001 needs a cross-repository unit of work.
 2. **Why sheet for every number (S9, ~20 number kinds × en/ar).** The largest single piece of phase 4. The engine already carries the inputs, so the cost is templates and strings. Cheaper: ship S9 in phase 4 for the Shariah-required figures (set-aside, zakat share, real returns, gap, to-purify — A6/A9) and the return figure; others show "What it is" only, completed in a follow-up.
-3. **"All units" in the picker** (story §6.3, AC-42 "all other units") — a full ISO 4217 list needs ~150 en/ar names and country mappings with no rate or inflation data behind many of them. Spec uses the curated 29 + XAU-g/XAG-g (Q-4).
+3. **"All units" in the picker** (story §6.3, AC-42 "all other units") — a full ISO 4217 list needs ~150 en/ar names and country mappings with no rate or inflation data behind many of them. Decided by PM: 32 currencies + XAU-g/XAG-g.
 4. **Undo toasts on four delete kinds** — kept, but implemented as "re-save the captured aggregate", not soft-delete columns.
 
 ## 11. Questions for PM
