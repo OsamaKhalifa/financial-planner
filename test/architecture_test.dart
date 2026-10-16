@@ -51,6 +51,19 @@ void main() {
     expect(bad, isEmpty);
   });
 
+  test('pure Dart layers do not import Flutter', () {
+    final bad = violations(
+      (p) =>
+          p.contains('/domain/') ||
+          p.startsWith('lib/core/money/') ||
+          p.startsWith('lib/core/reference/') ||
+          p == 'lib/core/dates.dart' ||
+          p == 'lib/core/ids.dart',
+      RegExp(r'''import\s+['"]package:flutter/'''),
+    );
+    expect(bad, isEmpty);
+  });
+
   test('core never imports features', () {
     final bad = violations(
       (p) => p.startsWith('lib/core/'),
