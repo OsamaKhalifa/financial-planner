@@ -191,7 +191,7 @@ Views (user picks):
 
 ### B8. Crypto
 
-- **Status:** **Disagreement — user choice. Gharar flag.** The IIFA, at its 24th session (Dubai, Nov 2019), Resolution 237 (24/8), did not issue a final ruling and called for more study; a symposium followed in 2021. **[S]** (iifa-aifi.org/en/28253.html — closing statement only). Other national bodies prohibited it (e.g. Egypt's Dar al-Ifta) **[U]**. Scholars who permit holding it generally treat it as money or trade goods → zakat on full market value **[U]**.
+- **Status:** **Disagreement — user choice. Gharar flag.** The IIFA, at its 24th session (Dubai, Nov 2019), Resolution 237 (8/24), did not issue a final ruling and called for more study; a symposium followed in 2021. **[S]** (iifa-aifi.org/en/28253.html — closing statement only). Other national bodies prohibited it (e.g. Egypt's Dar al-Ifta) **[U]**. Scholars who permit holding it generally treat it as money or trade goods → zakat on full market value **[U]**.
 - **App:** if the user holds crypto, show: "Scholars differ on whether this is permitted. If you hold it, most who permit it say zakat is due on its full market value." Default: **100% of market value**; user may set otherwise. No coin lists in v1 (separate `crypto.md`).
 
 ### B9. Debts owed to the user (preview — UC-5)

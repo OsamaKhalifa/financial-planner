@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../clock_provider.dart';
 import '../reference/units.dart';
+import '../storage_exceptions.dart';
 import '../db/database_provider.dart';
 import 'data/drift_assumptions_repository.dart';
 import 'data/rate_refresher.dart';
@@ -86,8 +87,13 @@ class RefreshController extends Notifier<RefreshState> {
   Future<void> refresh(Set<UnitPair> neededPairs) async {
     if (state is RefreshRunning) return;
     state = const RefreshRunning();
-    final result = await ref.read(rateRefresherProvider).refresh(neededPairs);
-    state = RefreshDone(result);
+    try {
+      final result = await ref.read(rateRefresherProvider).refresh(neededPairs);
+      state = RefreshDone(result);
+    } on StorageException catch (e) {
+      // Storing the answer failed: the refresh is over and nothing was saved.
+      state = RefreshDone(RefreshFailed(e.message));
+    }
   }
 }
 

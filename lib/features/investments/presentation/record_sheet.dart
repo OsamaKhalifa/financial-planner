@@ -91,7 +91,14 @@ class _RecordSheetState extends ConsumerState<RecordSheet> {
     switch (e) {
       case ValueUpdate(:final value):
         _tab = _Tab.value;
-        _amount.text = value.toString();
+        _amount.text = _isMetal(h.investment)
+            ? grossGrams(
+                type: h.investment.type,
+                pure: value,
+                karat: h.investment.purityKarat,
+                fineness: h.investment.purityFineness,
+              ).toString()
+            : value.toString();
       case MoneyIn(:final amount):
         _tab = _Tab.moneyIn;
         _amount.text = amount.amount.toString();
@@ -124,6 +131,19 @@ class _RecordSheetState extends ConsumerState<RecordSheet> {
             .value;
     return c != null && c.hasItem(widget.investmentId) ? c : null;
   }
+
+  bool _isMetal(Investment i) =>
+      i.type == AssetType.gold || i.type == AssetType.silver;
+
+  /// What the user typed as gross grams, as the pure grams a value holds.
+  Decimal _asValue(Investment i, Decimal typed) => _isMetal(i)
+      ? pureGrams(
+          type: i.type,
+          gross: typed,
+          karat: i.purityKarat,
+          fineness: i.purityFineness,
+        )
+      : typed;
 
   /// Interest still to give away, per place (item unit).
   ({Decimal kept, Decimal paid}) _toPurify(InvestmentWithHistory h) {
@@ -169,9 +189,10 @@ class _RecordSheetState extends ConsumerState<RecordSheet> {
     final existing = widget.editing;
     switch (_tab) {
       case _Tab.value:
-        final value = _perUnit && item.quantity != null
+        final typed = _perUnit && item.quantity != null
             ? amount * item.quantity!
             : amount;
+        final value = _asValue(item, typed);
         final sameDay = h.history
             .whereType<ValueUpdate>()
             .where((v) => v.date == _date && v.id != existing?.id)
@@ -225,7 +246,9 @@ class _RecordSheetState extends ConsumerState<RecordSheet> {
           ),
         );
         final after = parseAmount(_valueAfter.text);
-        if (after != null) entries.add(_valueOn(item.id, after, h));
+        if (after != null) {
+          entries.add(_valueOn(item.id, _asValue(item, after), h));
+        }
       case _Tab.moneyOut:
         final left = parseAmount(_valueLeft.text);
         final current =
@@ -245,7 +268,9 @@ class _RecordSheetState extends ConsumerState<RecordSheet> {
             createdAt: existing?.createdAt,
           ),
         );
-        if (left != null) entries.add(_valueOn(item.id, left, h));
+        if (left != null) {
+          entries.add(_valueOn(item.id, _asValue(item, left), h));
+        }
       case _Tab.interest:
         final kind = _interestKind(h, amount);
         if (kind == null) return;
@@ -463,7 +488,9 @@ class _RecordSheetState extends ConsumerState<RecordSheet> {
                 context.date(_date),
               ),
             ),
-          amountRow(l10n.fieldValue),
+          amountRow(_isMetal(item) ? l10n.fieldGrams : l10n.fieldValue),
+          if (_isMetal(item) && amount != null)
+            Text(l10n.pureGramsPreview(context.grams(_asValue(item, amount)))),
           if (item.quantity != null)
             SegmentedButton<bool>(
               segments: [

@@ -183,12 +183,16 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
   InvestmentDraft _draft() {
     final type = _type;
     final grossGrams = parseAmount(_grams.text);
-    final pure = type == AssetType.gold && grossGrams != null && _karat != null
-        ? divide(grossGrams * Decimal.fromInt(_karat!), Decimal.fromInt(24))
-        : type == AssetType.silver && grossGrams != null && _fineness != null
-        ? divide(
-            grossGrams * Decimal.fromInt(_fineness!),
-            Decimal.fromInt(1000),
+    final purity = type == AssetType.gold ? _karat : _fineness;
+    final pure =
+        (type == AssetType.gold || type == AssetType.silver) &&
+            grossGrams != null &&
+            purity != null
+        ? pureGrams(
+            type: type!,
+            gross: grossGrams,
+            karat: _karat,
+            fineness: _fineness,
           )
         : null;
     final paid = parseAmount(_paid.text);
@@ -710,9 +714,11 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
     final gross = parseAmount(_grams.text);
     final purity = type == AssetType.gold ? _karat : _fineness;
     if (gross == null || purity == null) return const SizedBox.shrink();
-    final pure = divide(
-      gross * Decimal.fromInt(purity),
-      Decimal.fromInt(type == AssetType.gold ? 24 : 1000),
+    final pure = pureGrams(
+      type: type,
+      gross: gross,
+      karat: _karat,
+      fineness: _fineness,
     );
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),

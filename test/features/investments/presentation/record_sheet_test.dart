@@ -2,7 +2,9 @@
 
 import 'package:decimal/decimal.dart';
 import 'package:financial_planner/core/dates.dart';
+import 'package:financial_planner/core/reference/units.dart';
 import 'package:financial_planner/features/investments/domain/history_entry.dart';
+import 'package:financial_planner/features/investments/domain/investment.dart';
 import 'package:financial_planner/features/investments/presentation/record_sheet.dart';
 import 'package:flutter/material.dart' hide Intent;
 import 'package:flutter_test/flutter_test.dart';
@@ -47,6 +49,25 @@ Future<void> seedFund(
   );
 }
 
+Future<void> seedGold(Harness h, {List<HistoryEntry> more = const []}) async {
+  await h.setup();
+  await h.addItem(
+    item(
+      'a',
+      type: AssetType.gold,
+      unit: xauG,
+      intent: Intent.longTerm,
+      rule: ZakatRule.bullion100,
+      karat: 21,
+    ),
+    [
+      moneyIn('a', day(2026, 1, 1), '70000'),
+      value('a', day(2026, 1, 1), '17.5'),
+      ...more,
+    ],
+  );
+}
+
 Future<void> open(WidgetTester tester) async {
   await tester.tap(find.text('open'));
   await tester.pumpAndSettle();
@@ -81,6 +102,105 @@ void main() {
         editing = null;
         preset = null;
       });
+
+      testScreen(
+        'A1: gold grams are typed gross; the value stored is the pure grams (21k: 20 g = 17.5 g)',
+        (tester) async {
+          final h = await pumpScreen(
+            tester,
+            const _Opener(),
+            locale: locale,
+            seed: seedGold,
+          );
+          final l10n = l10nOf(tester);
+          await open(tester);
+          expect(find.text(l10n.fieldGrams), findsOneWidget);
+          await amount(tester, '20');
+          expect(
+            textPlain(plain(l10n.pureGramsPreview('17.50 g'))),
+            findsOneWidget,
+          );
+          await saveSheet(tester);
+          final values = (await history(
+            tester,
+            h,
+          )).whereType<ValueUpdate>().toList();
+          expect(
+            values.firstWhere((v) => v.date == day(2026, 10, 16)).value,
+            Decimal.parse('17.5'),
+          );
+        },
+      );
+
+      testScreen('A1: 18k gold uses its own purity', (tester) async {
+        final h = await pumpScreen(
+          tester,
+          const _Opener(),
+          locale: locale,
+          seed: (h) async {
+            await h.setup();
+            await h.addItem(
+              item(
+                'a',
+                type: AssetType.gold,
+                unit: xauG,
+                intent: Intent.longTerm,
+                rule: ZakatRule.bullion100,
+                karat: 18,
+              ),
+              [
+                moneyIn('a', day(2026, 1, 1), '40000'),
+                value('a', day(2026, 1, 1), '9'),
+              ],
+            );
+          },
+        );
+        await open(tester);
+        await amount(tester, '12');
+        await saveSheet(tester);
+        final values = (await history(
+          tester,
+          h,
+        )).whereType<ValueUpdate>().toList();
+        expect(
+          values.firstWhere((v) => v.date == day(2026, 10, 16)).value,
+          Decimal.parse('9'),
+        );
+      });
+
+      testScreen(
+        'A1: money in with grams after, and editing a metal value, show gross grams',
+        (tester) async {
+          final entry = value('a', day(2026, 10, 1), '17.5');
+          editing = entry;
+          final h = await pumpScreen(
+            tester,
+            const _Opener(),
+            locale: locale,
+            seed: (h) => seedGold(h, more: [entry]),
+          );
+          await open(tester);
+          expect(
+            tester
+                .widget<TextField>(
+                  find.descendant(
+                    of: find.byKey(const ValueKey('record-amount')),
+                    matching: find.byType(TextField),
+                  ),
+                )
+                .controller!
+                .text,
+            '20',
+          );
+          await amount(tester, '24');
+          await saveSheet(tester);
+          final saved = (await history(
+            tester,
+            h,
+          )).whereType<ValueUpdate>().firstWhere((v) => v.id == entry.id);
+          expect(saved.value, Decimal.parse('21'));
+        },
+      );
 
       testScreen('a value update is saved on today and the sheet closes', (
         tester,

@@ -403,3 +403,47 @@ Answered by the consultant (Z-1…Z-7 in zakat-on-investments.md) and applied ab
 | PM-Q6 pension type; rental | Pension = "other", share asked, no setup question. Rental property = "other" with intent rental; share still asked, no default (§5, AC-7). |
 | PM-Q7 lunar/solar Y | Matched pair: lunar 2.5 % / 354.367, solar 2.577 % / 365 (§9.4, AC-9). |
 | PM-Q8 price × quantity | Yes, as input help; stores the total (§5 Quantity). |
+
+---
+
+## Test map
+
+Owner: QA. Every AC has a test. **D** = `test/features/investments/domain/acceptance_test.dart` (test named `AC-n …`, engine end to end). **R** = repository/data test. **S** = screen test in `test/features/investments/presentation/` (each runs in `en` and `ar`; test named `AC-n: …`). **G** = `test/golden_path_widget_test.dart` + `integration_test/`.
+
+| AC | Proving tests |
+|---|---|
+| 1, 2 | D `AC-1`, `AC-2`; S `investment_form_screen_test` `AC-1` (×2), `AC-2` |
+| 3 | D `AC-3`; R `drift_investments_repository_test` `AC-3: a third value update keeps all three` |
+| 4 | D `AC-4`; R `AC-4: a closed item read back from storage…`; S `item_detail_screen_test` `AC-4` |
+| 5 | D `AC-5`; S `investment_form_screen_test` `AC-5`, `item_detail_screen_test` `AC-5` |
+| 6, 7 | D `AC-6`, `AC-7`; S `investment_form_screen_test` `AC-6`, `AC-7` (×2) |
+| 8 | S `setup_screen_test` `AC-8`; S `investment_form_screen_test` `AC-8` (+ `computing figures with no zakat year…` and `jewellery with no ruling…` in the engine tests: no silent default) |
+| 9 | D `AC-9` |
+| 10, 11 | D `AC-10`, `AC-11` |
+| 12, 13, 14 | D `AC-12`, `AC-13`, `AC-14`; G (April view 4.21 % / 30.69) |
+| 15 | D `AC-15`; S `period_screen_test` `AC-15` |
+| 16 | D `AC-16` |
+| 17, 18 | D `AC-17`, `AC-18`; S `period_screen_test` `AC-17`, `AC-18` (switch + help text) |
+| 19, 19b | D `AC-19`, `AC-19b`; S `home_screen_test` `AC-19`, `item_detail_screen_test` `AC-19`, `record_sheet_test` `AC-19` |
+| 20 | D `AC-20` |
+| 21 | D `AC-21`; S `home_screen_test` `AC-21`, `item_detail_screen_test` `AC-21`, `period_screen_test` `AC-21` |
+| 22 | D `AC-22`; S `period_screen_test` `AC-22` |
+| 23, 24 | D `AC-23`, `AC-24`; S `investment_form_screen_test` `AC-24` |
+| 25 | S `update_all_screen_test` `AC-25`; `rate_refresher_test` `AC-25`; G (zero requests); the harness fails any screen test that makes a request it did not declare |
+| 26, 27 | `rate_refresher_test` `AC-26`, `AC-27`; S `update_all_screen_test` `AC-27` |
+| 28 | D `AC-28`; R `drift_assumptions_repository_test` `AC-28`; `rate_refresher_test` `AC-28`; S `assumptions_screen_test` `AC-28` |
+| 29 | `rate_refresher_test` `AC-29`; S `update_all_screen_test` `AC-29` |
+| 30 | `rate_refresher_test` `AC-30` |
+| 31 | D `AC-31` |
+| 32 | D `AC-32`; R `drift_assumptions_repository_test` `AC-32`; `shipped_inflation_loader_test` `AC-32`; S `inflation_series_screen_test` `AC-32/33`, `AC-32` |
+| 33, 34 | D `AC-33`, `AC-34`; S `inflation_series_screen_test` `AC-32/33` |
+| 35 | S `item_detail_screen_test` `AC-35`, `period_screen_test` `AC-35` |
+| 36, 38 | D `AC-36`, `AC-38` |
+| 37 | D `AC-37` (incl. since-start −3.85 %); S `investment_form_screen_test` `AC-37` |
+| 39 | D `AC-39`; S `period_screen_test` `AC-39` |
+| 40 | D `AC-40`; S `home_screen_test` (stale banner) |
+| 41 | D `AC-41`; S `period_screen_test` `AC-41` |
+| 42, 43, 44 | D `AC-42`, `AC-43`, `AC-44`; S `unit_picker_test` `AC-42`, `AC-43`, `AC-44` |
+| 45 | D `AC-45`; S `period_screen_test` `AC-45` (×2: with and without a gold rate) |
+
+**Known thin spots (not blockers):** AC-9 is proven on the enum only (no test that the setup screen stores the matched pair). AC-12/13/14/16/20/36/38 are proven in the engine, not on screen. AC-25's unit test waits 100 ms of real time; the screen and golden-path tests carry the real guarantee. The D1 budget test (`drift_investments_repository_test`, 12k entries under 200 ms) uses a wall-clock `Stopwatch` and can flake on a slow CI host.

@@ -3,6 +3,7 @@
 import 'package:decimal/decimal.dart';
 
 import '../../../core/ids.dart';
+import '../../../core/money/decimal_math.dart';
 import '../../../core/reference/countries.dart';
 import '../../../core/reference/markets.dart';
 import '../../../core/reference/units.dart';
@@ -102,3 +103,24 @@ final class InvestmentWithHistory {
   final Investment investment;
   final List<HistoryEntry> history;
 }
+
+/// Pure metal in [gross] grams: gold grams × karat ÷ 24, silver × fineness ÷
+/// 1000 (story §5). Every value of a metal item is pure grams.
+Decimal pureGrams({
+  required AssetType type,
+  required Decimal gross,
+  int? karat,
+  int? fineness,
+}) => type == AssetType.gold
+    ? divide(gross * Decimal.fromInt(karat!), Decimal.fromInt(24))
+    : divide(gross * Decimal.fromInt(fineness!), Decimal.fromInt(1000));
+
+/// The gross grams that hold [pure] grams of metal; the inverse of [pureGrams].
+Decimal grossGrams({
+  required AssetType type,
+  required Decimal pure,
+  int? karat,
+  int? fineness,
+}) => type == AssetType.gold
+    ? divide(pure * Decimal.fromInt(24), Decimal.fromInt(karat!))
+    : divide(pure * Decimal.fromInt(1000), Decimal.fromInt(fineness!));
