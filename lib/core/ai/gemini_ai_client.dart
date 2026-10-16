@@ -17,7 +17,7 @@ class GeminiAiClient implements AiClient {
 
   static const defaultModel = String.fromEnvironment(
     'AI_GEMINI_MODEL',
-    defaultValue: 'gemini-2.5-flash',
+    defaultValue: 'gemini-flash-lite-latest',
   );
 
   final http.Client _http;
