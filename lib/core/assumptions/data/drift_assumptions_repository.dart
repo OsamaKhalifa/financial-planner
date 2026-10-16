@@ -31,10 +31,23 @@ class DriftAssumptionsRepository implements AssumptionsRepository {
           .watch()
           .map((rows) => [for (final r in rows) _rateOf(r)]);
 
+  /// A stored id is edited in place (its date may change); a new id upserts on
+  /// (pair, asOf, typed), keeping the existing row's id.
   @override
   Future<void> saveTypedRate(Rate rate) => guardStorage(() async {
     final t = _db.rates;
     final now = _now().toUtc();
+    final edited = await (_db.update(t)..where((r) => r.id.equals(rate.id)))
+        .write(
+          RatesCompanion(
+            fromUnit: Value(rate.from.code),
+            toUnit: Value(rate.to.code),
+            rate: Value(rate.rate),
+            asOf: Value(rate.asOf),
+            updatedAt: Value(now),
+          ),
+        );
+    if (edited > 0) return;
     await _db
         .into(t)
         .insert(

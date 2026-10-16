@@ -57,6 +57,27 @@ void main() {
     expect(stored.single.rate, d('50.00'));
   });
 
+  test(
+    'editing a typed rate keeps its id: a new date and value replace the row',
+    () async {
+      await repo.saveTypedRate(rate('t1', '49.00', day(2026, 10, 15)));
+      await repo.saveTypedRate(rate('t1', '51.00', day(2026, 10, 20)));
+      final stored = await repo.watchRates().first;
+      expect(stored.single.id, 't1');
+      expect(stored.single.rate, d('51.00'));
+      expect(stored.single.asOf, day(2026, 10, 20));
+    },
+  );
+
+  test('moving a typed rate onto a day that already has a typed rate is a Conflict', () async {
+    await repo.saveTypedRate(rate('t1', '49', day(2026, 10, 15)));
+    await repo.saveTypedRate(rate('t2', '50', day(2026, 10, 16)));
+    await expectLater(
+      repo.saveTypedRate(rate('t2', '50', day(2026, 10, 15))),
+      throwsA(isA<Conflict>()),
+    );
+  });
+
   test('fetched rates: existing pair and day is skipped, the count is what was inserted', () async {
     final on = day(2026, 10, 15);
     expect(

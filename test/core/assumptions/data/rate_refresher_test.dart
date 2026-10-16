@@ -70,8 +70,8 @@ void main() {
       );
       addTearDown(container.dispose);
       container.listen(rateBookProvider, (_, _) {});
-    container.listen(settingsProvider, (_, _) {});
-    await container.read(ratesProvider.future);
+      container.listen(settingsProvider, (_, _) {});
+      await container.read(ratesProvider.future);
       await container.read(settingsProvider.future);
       await container.read(rateBookProvider.future);
       container.read(refreshControllerProvider);
