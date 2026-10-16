@@ -113,7 +113,7 @@ class _UpdateAllState extends ConsumerState<UpdateAllScreen> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final calc = ref.watch(calculatorProvider).value;
-    final items = ref.watch(investmentsProvider).value;
+    final items = calc?.items;
     final settings = ref.watch(settingsProvider).value;
     final rates = ref.watch(ratesProvider).value;
     if (calc == null || items == null || settings == null || rates == null) {

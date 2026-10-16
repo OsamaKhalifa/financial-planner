@@ -51,13 +51,23 @@ final portfolioFiguresProvider = Provider.family<PortfolioFigures?, PeriodKey>(
   (ref, key) => ref.watch(calculatorProvider).value?.portfolio(key.$1, key.$2),
 );
 
-final itemFiguresProvider = Provider.family<ItemFigures?, (String, Period)>(
-  (ref, key) => ref.watch(calculatorProvider).value?.item(key.$1, key.$2),
-);
+final itemFiguresProvider = Provider.family<ItemFigures?, (String, Period)>((
+  ref,
+  key,
+) {
+  final calc = ref.watch(calculatorProvider).value;
+  return calc != null && calc.hasItem(key.$1)
+      ? calc.item(key.$1, key.$2)
+      : null;
+});
 
-final sinceStartProvider = Provider.family<SinceStartFigures?, String>(
-  (ref, id) => ref.watch(calculatorProvider).value?.sinceStart(id),
-);
+final sinceStartProvider = Provider.family<SinceStartFigures?, String>((
+  ref,
+  id,
+) {
+  final calc = ref.watch(calculatorProvider).value;
+  return calc != null && calc.hasItem(id) ? calc.sinceStart(id) : null;
+});
 
 typedef UnitOrder = ({List<Unit> units, int topCount});
 

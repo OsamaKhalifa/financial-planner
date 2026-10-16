@@ -70,8 +70,12 @@ class Harness {
   late final DriftInvestmentsRepository investments;
   late final DriftAssumptionsRepository assumptions;
   final List<http.BaseRequest> requests = [];
-  Future<http.Response> Function(http.Request) handler = (_) async =>
+  static Future<http.Response> _noNetwork(http.Request _) async =>
       throw StateError('unexpected network call');
+  Future<http.Response> Function(http.Request) handler = _noNetwork;
+
+  /// True when a test installed its own handler, i.e. expects network traffic.
+  bool get networkExpected => !identical(handler, _noNetwork);
 
   Future<void> setup({
     Unit base = egp,
@@ -215,6 +219,10 @@ void testScreen(
   await tester.pump(const Duration(seconds: 1));
   final h = _active;
   _active = null;
+  // The refresher swallows errors, so a stray request would otherwise pass.
+  if (h != null && !h.networkExpected) {
+    expect(h.requests, isEmpty, reason: 'unexpected network request');
+  }
   if (h != null) await tester.runAsync(h.db.close);
 });
 

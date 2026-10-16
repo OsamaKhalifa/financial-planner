@@ -1,0 +1,15 @@
+/* Copyright (c) 2026-Present Osama Khalifa. All rights reserved. */
+
+import 'package:flutter_test/flutter_test.dart';
+import 'package:integration_test/integration_test.dart';
+
+import '../test/support/golden_path.dart';
+
+void main() {
+  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+
+  testWidgets(
+    'golden path: set up, add, record, update all, April view',
+    runGoldenPath,
+  );
+}

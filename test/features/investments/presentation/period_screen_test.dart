@@ -438,6 +438,33 @@ void main() {
         },
       );
 
+      testScreen(
+        'switching a current-year view to Month opens on the current month',
+        (tester) async {
+          await pumpScreen(
+            tester,
+            const PeriodScreen(initialYear: 2026),
+            locale: locale,
+            seed: (h) async {
+              await h.setup();
+              await h.addItem(item('f'), [
+                moneyIn('f', day(2026, 1, 1), '1000'),
+              ]);
+            },
+          );
+          final l10n = l10nOf(tester);
+          await tester.tap(find.text(l10n.monthLabel));
+          await tester.pumpAndSettle();
+          final ml = MaterialLocalizations.of(
+            tester.element(find.byType(Scaffold)),
+          );
+          expect(
+            find.text(ml.formatMonthYear(day(2026, 10, 16))),
+            findsWidgets,
+          );
+        },
+      );
+
       testScreen('the scope picker narrows the view to one item', (
         tester,
       ) async {

@@ -222,6 +222,12 @@ final class PortfolioCalculator {
   final Country _home;
   final Map<String, ItemTimeline> _timelines;
 
+  /// The items this calculator was built from. Screens read their list from
+  /// here so that list and figures always come from one snapshot.
+  List<InvestmentWithHistory> get items => _items;
+
+  bool hasItem(String id) => _timelines.containsKey(id);
+
   ItemTimeline timeline(String id) => _timelines[id]!;
 
   /// Item's own series: override → market country → home (metals) → country

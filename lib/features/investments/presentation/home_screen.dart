@@ -43,7 +43,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final calc = ref.watch(calculatorProvider).value;
-    final items = ref.watch(investmentsProvider).value;
+    final items = calc?.items;
     final base = ref.watch(settingsProvider).value?.baseCurrency;
     final today = ref.watch(todayProvider);
     Widget scaffold(Widget body, {Widget? fab}) => Scaffold(

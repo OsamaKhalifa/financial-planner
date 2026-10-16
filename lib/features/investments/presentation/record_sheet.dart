@@ -10,6 +10,7 @@ import '../../../core/reference/units.dart';
 import '../domain/history_entry.dart';
 import '../domain/investment.dart';
 import '../../../core/assumptions/assumptions_providers.dart';
+import '../domain/portfolio_calculator.dart';
 import 'investments_providers.dart';
 import 'widgets/fields.dart';
 import 'widgets/labels.dart';
@@ -116,6 +117,14 @@ class _RecordSheetState extends ConsumerState<RecordSheet> {
     }
   }
 
+  /// The calculator, only when it already knows this item.
+  PortfolioCalculator? _calc({bool watch = false}) {
+    final c =
+        (watch ? ref.watch(calculatorProvider) : ref.read(calculatorProvider))
+            .value;
+    return c != null && c.hasItem(widget.investmentId) ? c : null;
+  }
+
   /// Interest still to give away, per place (item unit).
   ({Decimal kept, Decimal paid}) _toPurify(InvestmentWithHistory h) {
     var kept = Decimal.zero;
@@ -140,7 +149,7 @@ class _RecordSheetState extends ConsumerState<RecordSheet> {
   Future<void> _save(InvestmentWithHistory h) async {
     final l10n = context.l10n;
     final item = h.investment;
-    final calc = ref.read(calculatorProvider).value;
+    final calc = _calc();
     final amount = parseAmount(_amount.text);
     String? fail(String? message) {
       setState(() => _error = message);
@@ -331,7 +340,7 @@ class _RecordSheetState extends ConsumerState<RecordSheet> {
     _init(h);
     final item = h.investment;
     final today = ref.watch(todayProvider);
-    final calc = ref.watch(calculatorProvider).value;
+    final calc = _calc(watch: true);
     final amount = parseAmount(_amount.text);
     final last = calc?.timeline(item.id).recordedValueAt(_date);
     return Padding(

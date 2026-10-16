@@ -78,9 +78,9 @@ class _PeriodScreenState extends ConsumerState<PeriodScreen> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final today = ref.watch(todayProvider);
-    final items = ref.watch(investmentsProvider).value;
-    final settings = ref.watch(settingsProvider).value;
     final calc = ref.watch(calculatorProvider).value;
+    final items = calc?.items;
+    final settings = ref.watch(settingsProvider).value;
     if (items == null || settings == null || calc == null) {
       return Scaffold(
         appBar: AppBar(title: Text(l10n.periodTitle)),
@@ -138,7 +138,13 @@ class _PeriodScreenState extends ConsumerState<PeriodScreen> {
               ),
             ],
             selected: {_gran},
-            onSelectionChanged: (s) => setState(() => _gran = s.first),
+            onSelectionChanged: (s) => setState(() {
+              _gran = s.first;
+              // The month view of this year opens on the current month.
+              if (_gran == Granularity.month && _year == today.year) {
+                _month = today.month;
+              }
+            }),
           ),
           if (!scoped)
             Padding(
