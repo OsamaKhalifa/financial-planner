@@ -1068,6 +1068,111 @@ void main() {
           expect(find.byKey(const ValueKey('plan-card')), findsNothing);
         },
       );
+      testScreen(
+        'A1: a double tap on ✓ or Confirm all writes once; a second Skip shows no uncaught Conflict',
+        (tester) async {
+          final h = await pumpScreen(
+            tester,
+            const ItemDetailScreen(investmentId: 'fp'),
+            locale: locale,
+            now: oct17,
+            seed: seedFriend,
+          );
+          final check = find.byKey(const ValueKey('check-payout-2026-04-15'));
+          await tester.tap(check);
+          await tester.tap(check, warnIfMissed: false);
+          await settle(tester);
+          expect(
+            (await historyOf(tester, h, 'fp')).whereType<MoneyOut>().length,
+            1,
+          );
+          final all = find.byKey(const ValueKey('confirm-all'));
+          await tester.tap(all);
+          await tester.tap(all, warnIfMissed: false);
+          await settle(tester);
+          expect(
+            (await historyOf(tester, h, 'fp')).whereType<MoneyOut>().length,
+            3,
+          );
+        },
+      );
+
+      testScreen(
+        'A1: a Skip that fails shows the save error, not an exception',
+        (tester) async {
+          final h = await pumpScreen(
+            tester,
+            const ItemDetailScreen(investmentId: 'fp'),
+            locale: locale,
+            now: oct17,
+            seed: seedFriend,
+          );
+          final l10n = l10nOf(tester);
+          // A skip of the same row stored behind the screen's back: the next
+          // Skip hits the one-skip-per-row index.
+          await tapKey(tester, 'menu-payout-2026-10-15');
+          await tester.runAsync(
+            () => h.investments.saveEntries([
+              PlanSkip(
+                investmentId: 'fp',
+                date: day(2026, 10, 15),
+                plan: PlanKind.payout,
+              ),
+            ]),
+          );
+          await tester.tap(find.text(l10n.skipRow).last);
+          await settle(tester);
+          expect(tester.takeException(), isNull);
+          expect(find.text(l10n.errSave), findsOneWidget);
+          expect(
+            (await historyOf(tester, h, 'fp')).whereType<PlanSkip>().length,
+            1,
+          );
+        },
+      );
+
+      testScreen(
+        'A4: ✓ on a value row stores the gross value, so the net value equals the estimate',
+        (tester) async {
+          final h = await pumpScreen(
+            tester,
+            const ItemDetailScreen(investmentId: 'dep'),
+            locale: locale,
+            now: day(2026, 2, 5),
+            seed: (h) async {
+              await h.setup();
+              await h.addItem(
+                Investment(
+                  id: 'dep',
+                  name: 'Deposit',
+                  type: AssetType.cashDeposit,
+                  unit: egp,
+                  startDate: day(2026, 1, 1),
+                  zakatRule: ZakatRule.cash100,
+                  valueCheckSchedule: Schedule.monthly,
+                  expectedGrowth: Decimal.parse('0.12'),
+                ),
+                [
+                  moneyIn('dep', day(2026, 1, 1), '10000'),
+                  interest(
+                    'dep',
+                    day(2026, 1, 15),
+                    '100',
+                    InterestKind.keptInside,
+                  ),
+                ],
+              );
+            },
+          );
+          await tapKey(tester, 'check-value-2026-02-01');
+          final v = (await historyOf(
+            tester,
+            h,
+            'dep',
+          )).whereType<ValueUpdate>().single;
+          expect(v.value, Decimal.parse('10196.72'));
+        },
+      );
     });
   }
 }

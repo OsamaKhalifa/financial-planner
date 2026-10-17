@@ -343,6 +343,41 @@ void main() {
         );
         expect(find.byKey(const ValueKey('to-confirm-fp')), findsNothing);
       });
+      testScreen(
+        'A5: "oldest first" ignores skip dates (a skip is not an update)',
+        (tester) async {
+          await pumpScreen(
+            tester,
+            const HomeScreen(),
+            locale: locale,
+            seed: (h) async {
+              await h.setup();
+              await h.addItem(item('a', name: 'Fund A'), [
+                moneyIn('a', day(2026, 1, 1), '1000'),
+                value('a', day(2026, 9, 1), '1000'),
+              ]);
+              await h.addItem(item('b', name: 'Fund B'), [
+                moneyIn('b', day(2026, 1, 1), '1000'),
+                value('b', day(2026, 8, 1), '1000'),
+                PlanSkip(
+                  investmentId: 'b',
+                  date: day(2026, 10, 1),
+                  plan: PlanKind.value,
+                ),
+              ]);
+            },
+          );
+          final l10n = l10nOf(tester);
+          await tester.tap(find.byKey(const ValueKey('sort')));
+          await tester.pumpAndSettle();
+          await tester.tap(find.text(l10n.sortOldest).last);
+          await tester.pumpAndSettle();
+          expect(
+            tester.getTopLeft(find.text('Fund B')).dy,
+            lessThan(tester.getTopLeft(find.text('Fund A')).dy),
+          );
+        },
+      );
     });
   }
 }

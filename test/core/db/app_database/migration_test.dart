@@ -217,6 +217,12 @@ void main() {
     final schema = await verifier.schemaAt(1);
     final old = v1.DatabaseAtV1(schema.newConnection());
     await old.batch((b) => _insertV1(b, old));
+    // A real v1 file has the hand-made index; the v1 dump does not.
+    await old.customStatement(
+      'CREATE UNIQUE INDEX history_one_value_update_per_day '
+      'ON history_entries (investment_id, date) '
+      "WHERE kind = 'value_update'",
+    );
     await old.close();
 
     final db = AppDatabase(schema.newConnection());

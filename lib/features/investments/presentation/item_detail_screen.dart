@@ -141,10 +141,9 @@ class ItemDetailScreen extends ConsumerWidget {
     );
   }
 
-  DateTime _closeDate(InvestmentWithHistory h) => h.history.fold(
-    h.investment.startDate,
-    (a, e) => e.date.isAfter(a) ? e.date : a,
-  );
+  DateTime _closeDate(InvestmentWithHistory h) => h.history
+      .where((e) => e is! PlanSkip)
+      .fold(h.investment.startDate, (a, e) => e.date.isAfter(a) ? e.date : a);
 
   String _subtitle(BuildContext context, Investment item) {
     final parts = [
@@ -548,10 +547,16 @@ String _rowLabel(BuildContext context, PlanRow r, Investment item) {
 
 /// The record a check mark writes: at the shown amount, on the row date
 /// (story §5.6); conventional deposit: interest paid out (P-4b).
-HistoryEntry _recordOf(PlanRow r, Investment item) {
+HistoryEntry _recordOf(PlanRow r, ExpectedVsActual plan) {
+  final item = plan.investment;
   final amount = Money(r.expected!, item.unit);
   if (r.kind == PlanKind.value) {
-    return ValueUpdate(investmentId: item.id, date: r.date, value: r.expected!);
+    // The estimate is net; a stored value is gross of interest kept inside.
+    return ValueUpdate(
+      investmentId: item.id,
+      date: r.date,
+      value: r.expected! + plan.timeline.heldInterestAt(r.date),
+    );
   }
   return item.conventionalDeposit
       ? InterestRecord(
@@ -581,14 +586,27 @@ class _ToConfirmCard extends ConsumerStatefulWidget {
 class _ToConfirmCardState extends ConsumerState<_ToConfirmCard> {
   var _all = false;
 
+  /// One write at a time: a second tap must not record twice.
+  var _busy = false;
+
   Investment get _item => widget.plan.investment;
 
   /// Writes [entries] in one transaction and offers one Undo for all of them.
   Future<void> _write(List<HistoryEntry> entries, String done) async {
+    if (_busy) return;
+    setState(() => _busy = true);
     final repo = ref.read(investmentsRepositoryProvider);
     final messenger = ScaffoldMessenger.of(context);
-    final undo = context.l10n.undo;
-    await repo.saveEntries(entries);
+    final l10n = context.l10n;
+    final undo = l10n.undo;
+    try {
+      await repo.saveEntries(entries);
+    } on Exception {
+      messenger.showSnackBar(SnackBar(content: Text(l10n.errSave)));
+      return;
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
     messenger.showSnackBar(
       SnackBar(
         content: Text(done),
@@ -628,9 +646,12 @@ class _ToConfirmCardState extends ConsumerState<_ToConfirmCard> {
                 if (withAmount.isNotEmpty)
                   TextButton(
                     key: const ValueKey('confirm-all'),
-                    onPressed: () => _write([
-                      for (final r in withAmount) _recordOf(r, _item),
-                    ], l10n.recordedAllSnack(withAmount.length)),
+                    onPressed: _busy
+                        ? null
+                        : () => _write([
+                            for (final r in withAmount)
+                              _recordOf(r, widget.plan),
+                          ], l10n.recordedAllSnack(withAmount.length)),
                     child: Text(l10n.confirmAll),
                   ),
               ],
@@ -700,22 +721,25 @@ class _ToConfirmCardState extends ConsumerState<_ToConfirmCard> {
                 constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
                 tooltip: l10n.receivedThisAmount,
                 icon: const Icon(Icons.check),
-                onPressed: () => _write(
-                  [_recordOf(r, _item)],
-                  l10n.recordedSnack(
-                    context.money(r.expected!, _item.unit),
-                    context.date(r.date),
-                  ),
-                ),
+                onPressed: _busy
+                    ? null
+                    : () => _write(
+                        [_recordOf(r, widget.plan)],
+                        l10n.recordedSnack(
+                          context.money(r.expected!, _item.unit),
+                          context.date(r.date),
+                        ),
+                      ),
               )
             else
               TextButton(
                 key: ValueKey('add-$key'),
-                onPressed: edit,
+                onPressed: _busy ? null : edit,
                 child: Text(l10n.addAmount),
               ),
             PopupMenuButton<bool>(
               key: ValueKey('menu-$key'),
+              enabled: !_busy,
               onSelected: (skip) => skip
                   ? _write([
                       PlanSkip(

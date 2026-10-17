@@ -29,7 +29,8 @@ class AppDatabase extends _$AppDatabase {
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (m) => m.createAll(),
     onUpgrade: stepByStep(
-      from1To2: (m, schema) async {
+      // stepByStep does not open a transaction: a failed step must leave v1.
+      from1To2: (m, schema) => transaction(() async {
         final i = schema.investments;
         for (final c in [
           i.payoutSchedule,
@@ -50,7 +51,7 @@ class AppDatabase extends _$AppDatabase {
           "WHERE kind = 'value_update'",
         );
         await m.create(schema.historyOneSkipPerPlanDate);
-      },
+      }),
     ),
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON');

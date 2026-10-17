@@ -105,7 +105,13 @@ class _RecordSheetState extends ConsumerState<RecordSheet> {
     final row = widget.row;
     if (row != null) {
       _date = row.date;
-      _amount.text = row.expected?.toString() ?? '';
+      final held = row.kind == PlanKind.value
+          ? _calc()?.timeline(h.investment.id).heldInterestAt(row.date)
+          : null;
+      // A typed value is gross of interest kept inside; the estimate is net.
+      _amount.text = row.expected == null
+          ? ''
+          : (row.expected! + (held ?? Decimal.zero)).toString();
       if (row.kind == PlanKind.value) {
         _tab = _Tab.value;
       } else if (h.investment.conventionalDeposit) {
