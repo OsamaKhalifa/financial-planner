@@ -20,3 +20,12 @@ int daysInYear(int year) =>
 DateTime earlier(DateTime a, DateTime b) => a.isBefore(b) ? a : b;
 
 DateTime later(DateTime a, DateTime b) => a.isAfter(b) ? a : b;
+
+/// Same day [months] later, or that month's last day; always counted from
+/// [start], never chained (story §5.6 dates, AC-50).
+DateTime addMonths(DateTime start, int months) {
+  final last = DateTime.utc(start.year, start.month + months + 1, 0);
+  return start.day > last.day
+      ? last
+      : DateTime.utc(start.year, start.month + months, start.day);
+}

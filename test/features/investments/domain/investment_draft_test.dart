@@ -106,4 +106,148 @@ void main() {
     );
     expect(validate(d, today: today, settings: setup), isEmpty);
   });
+
+  InvestmentDraft draft(
+    AssetType type, {
+    Intent? intent,
+    ZakatRule? rule,
+    Schedule? payout,
+    String? profit,
+    Schedule? check,
+    String? growth,
+    ProfitBasis? q1,
+    CapitalBack? q2,
+    AccountKind? account,
+  }) => InvestmentDraft(
+    name: 'x',
+    type: type,
+    intent: intent,
+    unit: egp,
+    startDate: day(2026, 1, 1),
+    firstPaid: Money(Decimal.parse('100'), egp),
+    zakatRule: rule,
+    payoutSchedule: payout,
+    expectedProfit: profit == null ? null : Decimal.parse(profit),
+    valueCheckSchedule: check,
+    expectedGrowth: growth == null ? null : Decimal.parse(growth),
+    profitBasis: q1,
+    capitalBack: q2,
+    accountKind: account,
+  );
+
+  List<DraftError> check(InvestmentDraft d) =>
+      validate(d, today: today, settings: setup);
+
+  test('private equity: intent is trading or long-term, Q2 always asked', () {
+    expect(check(draft(AssetType.privateEquity, q2: CapitalBack.no)), [
+      DraftError.missingIntent,
+    ]);
+    expect(
+      check(
+        draft(
+          AssetType.privateEquity,
+          intent: Intent.rental,
+          q2: CapitalBack.no,
+        ),
+      ),
+      [DraftError.missingIntent],
+    );
+    expect(check(draft(AssetType.privateEquity, intent: Intent.trading)), [
+      DraftError.answerCapitalBack,
+    ]);
+    expect(
+      check(
+        draft(
+          AssetType.privateEquity,
+          intent: Intent.trading,
+          q2: CapitalBack.notSure,
+        ),
+      ),
+      isEmpty,
+    );
+  });
+
+  test('private equity long-term: one of three methods, never the 25 % proxy; case C needs none', () {
+    InvestmentDraft lt(ZakatRule? rule, {CapitalBack q2 = CapitalBack.no}) =>
+        draft(
+          AssetType.privateEquity,
+          intent: Intent.longTerm,
+          rule: rule,
+          q2: q2,
+        );
+    expect(check(lt(null)), [DraftError.shareRequired]);
+    expect(check(lt(ZakatRule.longTermProxy25)), [DraftError.shareRequired]);
+    expect(check(lt(ZakatRule.custom)), [DraftError.shareRequired]);
+    expect(check(lt(ZakatRule.longTermDividendsOnly)), isEmpty);
+    expect(check(lt(ZakatRule.longTermFullValue)), isEmpty);
+    expect(check(lt(null, q2: CapitalBack.yes)), isEmpty);
+  });
+
+  test('plan fields: hidden types, schedule needed, % limits (AC-48)', () {
+    expect(
+      check(draft(AssetType.crypto, payout: Schedule.monthly)),
+      contains(DraftError.planNotForType),
+    );
+    expect(check(draft(AssetType.crypto, check: Schedule.monthly)), isEmpty);
+    expect(
+      check(draft(AssetType.cashDeposit, check: Schedule.monthly, growth: '0')),
+      isEmpty,
+    );
+    expect(check(draft(AssetType.sukuk, profit: '0.1')), [
+      DraftError.profitNeedsSchedule,
+    ]);
+    expect(check(draft(AssetType.sukuk, growth: '0.1')), [
+      DraftError.growthNeedsSchedule,
+    ]);
+    expect(
+      check(draft(AssetType.sukuk, payout: Schedule.yearly, profit: '0')),
+      [DraftError.profitNotPositive],
+    );
+    expect(
+      check(draft(AssetType.sukuk, check: Schedule.yearly, growth: '-1')),
+      [DraftError.growthTooLow],
+    );
+    expect(
+      check(draft(AssetType.sukuk, check: Schedule.yearly, growth: '-0.99')),
+      isEmpty,
+    );
+  });
+
+  test('Q1 is required only with a %; the account kind only with a payout schedule (AC-64, AC-70)', () {
+    final pe = draft(
+      AssetType.privateEquity,
+      intent: Intent.trading,
+      q2: CapitalBack.no,
+      payout: Schedule.quarterly,
+      profit: '0.2',
+    );
+    expect(check(pe), [DraftError.answerProfitBasis]);
+    expect(
+      check(
+        draft(
+          AssetType.privateEquity,
+          intent: Intent.trading,
+          q2: CapitalBack.no,
+          payout: Schedule.quarterly,
+          profit: '0.2',
+          q1: ProfitBasis.notSure,
+        ),
+      ),
+      isEmpty,
+    );
+    expect(check(draft(AssetType.cashDeposit, payout: Schedule.monthly)), [
+      DraftError.answerAccountKind,
+    ]);
+    expect(
+      check(
+        draft(
+          AssetType.cashDeposit,
+          payout: Schedule.monthly,
+          account: AccountKind.islamic,
+        ),
+      ),
+      isEmpty,
+    );
+    expect(check(draft(AssetType.cashDeposit)), isEmpty);
+  });
 }

@@ -49,6 +49,7 @@ extension LabelContext on BuildContext {
     AssetType.silver => l10n.typeSilver,
     AssetType.cashDeposit => l10n.typeCash,
     AssetType.crypto => l10n.typeCrypto,
+    AssetType.privateEquity => l10n.typePrivateEquity,
     AssetType.other => l10n.typeOther,
   };
 

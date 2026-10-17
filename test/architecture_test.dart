@@ -73,4 +73,26 @@ void main() {
     );
     expect(bad, isEmpty);
   });
+
+  test('AC-63 actual figures never import the plan', () {
+    final bad = violations(
+      (p) =>
+          p == 'lib/features/investments/domain/portfolio_calculator.dart' ||
+          p == 'lib/features/investments/domain/formulas.dart' ||
+          p == 'lib/features/investments/domain/item_timeline.dart',
+      RegExp(r'''import\s+['"][^'"]*expected_plan\.dart'''),
+    );
+    expect(bad, isEmpty);
+  });
+
+  test(
+    'AC-63 no background work in features: no timers, no periodic streams',
+    () {
+      final bad = violations(
+        (p) => p.startsWith('lib/features/'),
+        RegExp(r'\bTimer\b|Stream\.periodic'),
+      );
+      expect(bad, isEmpty);
+    },
+  );
 }

@@ -1007,6 +1007,10 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
     final notice = switch (r.notice) {
       ZakatNotice.dividendsCountedWithCash => l10n.noticeDividends,
       ZakatNotice.cryptoDisputed => l10n.noticeCrypto,
+      ZakatNotice.profitPayoutsOnly => l10n.noticeProfitPayoutsOnly(
+        context.percent(_effectiveSettings.zakatYear!.r).replaceAll('+', ''),
+      ),
+      ZakatNotice.capitalBackIsDebt => l10n.noticeCapitalBackIsDebt,
       null => null,
     };
     final reason = switch (rule) {
@@ -1033,6 +1037,7 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
       AssetType.stock || AssetType.fund => 'B3',
       AssetType.sukuk => 'B4',
       AssetType.crypto => 'B8',
+      AssetType.privateEquity => 'B6',
       AssetType.other => 'B5',
     };
     return Why(

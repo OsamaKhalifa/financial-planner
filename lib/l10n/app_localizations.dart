@@ -2259,6 +2259,659 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pension with withdrawal limits: no zakat until it can be accessed (Dr. Main Al-Qudah, AMJA fatwa 21964); or zakat on the accessible amount after penalty and tax (Fiqh Council of North America — source not yet verified); or the full balance as a precaution (B7).'**
   String get src_B7;
+
+  /// No description provided for @typePrivateEquity.
+  ///
+  /// In en, this message translates to:
+  /// **'Private equity'**
+  String get typePrivateEquity;
+
+  /// No description provided for @typePrivateEquityHint.
+  ///
+  /// In en, this message translates to:
+  /// **'A stake in a business not on a market — e.g. a friend\'s project.'**
+  String get typePrivateEquityHint;
+
+  /// No description provided for @fieldSharesInProject.
+  ///
+  /// In en, this message translates to:
+  /// **'Shares in the project (optional)'**
+  String get fieldSharesInProject;
+
+  /// No description provided for @peIntentTrading.
+  ///
+  /// In en, this message translates to:
+  /// **'To sell'**
+  String get peIntentTrading;
+
+  /// No description provided for @peIntentLongTerm.
+  ///
+  /// In en, this message translates to:
+  /// **'Long-term (for its profit)'**
+  String get peIntentLongTerm;
+
+  /// No description provided for @zakatPeTrading.
+  ///
+  /// In en, this message translates to:
+  /// **'Zakat: on 100 % of value. You hold this to sell. — IIFA Res 28 (3/4) §3.'**
+  String get zakatPeTrading;
+
+  /// No description provided for @peMethodKnown.
+  ///
+  /// In en, this message translates to:
+  /// **'Known zakatable %'**
+  String get peMethodKnown;
+
+  /// No description provided for @peMethodKnownSource.
+  ///
+  /// In en, this message translates to:
+  /// **'IIFA Res 121 (3/13) §1'**
+  String get peMethodKnownSource;
+
+  /// No description provided for @peMethodProfit.
+  ///
+  /// In en, this message translates to:
+  /// **'Zakat on profit received only'**
+  String get peMethodProfit;
+
+  /// No description provided for @peMethodFull.
+  ///
+  /// In en, this message translates to:
+  /// **'Full value'**
+  String get peMethodFull;
+
+  /// No description provided for @peMethodFullNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Precaution.'**
+  String get peMethodFullNote;
+
+  /// No description provided for @peMethodPick.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick how zakat is counted'**
+  String get peMethodPick;
+
+  /// No description provided for @peMethodsHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'If the project mostly buys and sells goods, most of its value is usually zakatable.'**
+  String get peMethodsHelp;
+
+  /// No description provided for @noticeProfitPayoutsOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Zakat: {rate} of each profit payout you record, not of the project\'s value. Each payout is counted once.'**
+  String noticeProfitPayoutsOnly(String rate);
+
+  /// No description provided for @noticeCapitalBackIsDebt.
+  ///
+  /// In en, this message translates to:
+  /// **'This works like money you lent. Zakat is on the full amount, as a debt owed to you. — IIFA Res 1 (1/2).'**
+  String get noticeCapitalBackIsDebt;
+
+  /// No description provided for @zakatCaseC.
+  ///
+  /// In en, this message translates to:
+  /// **'Zakat on 100 %.'**
+  String get zakatCaseC;
+
+  /// No description provided for @q2CapitalBack.
+  ///
+  /// In en, this message translates to:
+  /// **'If the project loses money, do you still get all your money back?'**
+  String get q2CapitalBack;
+
+  /// No description provided for @answerNo.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get answerNo;
+
+  /// No description provided for @answerYes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get answerYes;
+
+  /// No description provided for @answerNotSure.
+  ///
+  /// In en, this message translates to:
+  /// **'Not sure'**
+  String get answerNotSure;
+
+  /// No description provided for @q1ProfitBasis.
+  ///
+  /// In en, this message translates to:
+  /// **'Is this % a share of the project\'s real profit, or a fixed % of the money you put in?'**
+  String get q1ProfitBasis;
+
+  /// No description provided for @q1Share.
+  ///
+  /// In en, this message translates to:
+  /// **'Share of the real profit'**
+  String get q1Share;
+
+  /// No description provided for @q1Fixed.
+  ///
+  /// In en, this message translates to:
+  /// **'Fixed % of my money'**
+  String get q1Fixed;
+
+  /// No description provided for @errPickOne.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick one. \'Not sure\' is fine.'**
+  String get errPickOne;
+
+  /// No description provided for @noticeCaseB.
+  ///
+  /// In en, this message translates to:
+  /// **'A fixed % of the money you put in is not a valid profit share. In a partnership, your profit must be a part of the project\'s real profit. You may want to change the terms with your partner.'**
+  String get noticeCaseB;
+
+  /// No description provided for @noticeCaseC.
+  ///
+  /// In en, this message translates to:
+  /// **'Your money comes back even if the project loses. This works like a loan. Extra money on a loan is riba. The app shows these payouts as \"to purify\", not as profit.'**
+  String get noticeCaseC;
+
+  /// No description provided for @noticeCaseNotSure.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask your partner two things: Is your profit a part of the real profit? Can you lose money? The answers decide if this is a partnership or a loan.'**
+  String get noticeCaseNotSure;
+
+  /// No description provided for @srcCaseB.
+  ///
+  /// In en, this message translates to:
+  /// **'IIFA Res 30 (5/4) item 4: no guarantee of the capital or a fixed profit; such a clause is void. AAOIFI SS 13 §8/1 — section not yet verified (B6.1).'**
+  String get srcCaseB;
+
+  /// No description provided for @srcCaseC.
+  ///
+  /// In en, this message translates to:
+  /// **'IIFA Res 10 (10/2): an increase on a loan agreed at its start is riba. Quran 2:279 (B6.1).'**
+  String get srcCaseC;
+
+  /// No description provided for @srcCaseNotSure.
+  ///
+  /// In en, this message translates to:
+  /// **'IIFA Res 30 (5/4): profit in a partnership is a share of the real profit (B6.1).'**
+  String get srcCaseNotSure;
+
+  /// No description provided for @caseBTagPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'This item will be tagged Shariah risk. Payouts still count as return. · source not yet verified'**
+  String get caseBTagPreview;
+
+  /// No description provided for @accountKindQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Is this an Islamic account (profit share) or a conventional account (interest)?'**
+  String get accountKindQuestion;
+
+  /// No description provided for @accountIslamic.
+  ///
+  /// In en, this message translates to:
+  /// **'Islamic account (profit share)'**
+  String get accountIslamic;
+
+  /// No description provided for @accountConventional.
+  ///
+  /// In en, this message translates to:
+  /// **'Conventional account (interest)'**
+  String get accountConventional;
+
+  /// No description provided for @errPickAccountKind.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick the account kind'**
+  String get errPickAccountKind;
+
+  /// No description provided for @noticeConventional.
+  ///
+  /// In en, this message translates to:
+  /// **'This is interest. Record it as money out \"interest (to purify)\", not as income.'**
+  String get noticeConventional;
+
+  /// No description provided for @srcZ6.
+  ///
+  /// In en, this message translates to:
+  /// **'Interest is not return and must be given away: Quran 2:278–279 (Z-6).'**
+  String get srcZ6;
+
+  /// No description provided for @expectedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Expected (optional)'**
+  String get expectedTitle;
+
+  /// No description provided for @expectedSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan payouts or value checks. An estimate, not a promise.'**
+  String get expectedSubtitle;
+
+  /// No description provided for @blockPayouts.
+  ///
+  /// In en, this message translates to:
+  /// **'Payouts'**
+  String get blockPayouts;
+
+  /// No description provided for @blockValueChecks.
+  ///
+  /// In en, this message translates to:
+  /// **'Value checks'**
+  String get blockValueChecks;
+
+  /// No description provided for @fieldPayoutSchedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Payout schedule'**
+  String get fieldPayoutSchedule;
+
+  /// No description provided for @fieldValueCheckSchedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Value-check schedule'**
+  String get fieldValueCheckSchedule;
+
+  /// No description provided for @scheduleNone.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get scheduleNone;
+
+  /// No description provided for @scheduleMonthly.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly'**
+  String get scheduleMonthly;
+
+  /// No description provided for @scheduleQuarterly.
+  ///
+  /// In en, this message translates to:
+  /// **'Every 3 months'**
+  String get scheduleQuarterly;
+
+  /// No description provided for @scheduleHalfYearly.
+  ///
+  /// In en, this message translates to:
+  /// **'Every 6 months'**
+  String get scheduleHalfYearly;
+
+  /// No description provided for @scheduleYearly.
+  ///
+  /// In en, this message translates to:
+  /// **'Yearly'**
+  String get scheduleYearly;
+
+  /// No description provided for @fieldExpectedProfit.
+  ///
+  /// In en, this message translates to:
+  /// **'Expected profit (your estimate, % per year)'**
+  String get fieldExpectedProfit;
+
+  /// No description provided for @fieldExpectedGrowth.
+  ///
+  /// In en, this message translates to:
+  /// **'Expected value growth (your estimate, % per year)'**
+  String get fieldExpectedGrowth;
+
+  /// No description provided for @estimateHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'An estimate, not a promise. Not used for zakat or return.'**
+  String get estimateHelp;
+
+  /// No description provided for @payoutPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'= {amount} every {months, plural, =1{month} other{{months} months}} · first on {date}'**
+  String payoutPreview(String amount, int months, String month, String date);
+
+  /// No description provided for @growthPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Your estimate for {date}: {amount} (if nothing else is added or taken out).'**
+  String growthPreview(String date, String amount);
+
+  /// No description provided for @errPickPayoutSchedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a payout schedule, or clear this %.'**
+  String get errPickPayoutSchedule;
+
+  /// No description provided for @errPickValueSchedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a value-check schedule, or clear this %.'**
+  String get errPickValueSchedule;
+
+  /// No description provided for @errProfitPositive.
+  ///
+  /// In en, this message translates to:
+  /// **'Must be more than 0. Leave it empty for no %.'**
+  String get errProfitPositive;
+
+  /// No description provided for @errGrowthTooLow.
+  ///
+  /// In en, this message translates to:
+  /// **'Must be more than −100 %.'**
+  String get errGrowthTooLow;
+
+  /// No description provided for @needsRateForEstimates.
+  ///
+  /// In en, this message translates to:
+  /// **'Needs {pair} rate on {date} for your estimates'**
+  String needsRateForEstimates(String pair, String date);
+
+  /// No description provided for @editRecalculates.
+  ///
+  /// In en, this message translates to:
+  /// **'This recalculates every past month for this item.'**
+  String get editRecalculates;
+
+  /// No description provided for @editRowsRebuilt.
+  ///
+  /// In en, this message translates to:
+  /// **'Rows to confirm are rebuilt for the new dates. Your recorded payouts and values stay.'**
+  String get editRowsRebuilt;
+
+  /// No description provided for @toConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'To confirm · {count}'**
+  String toConfirmTitle(int count);
+
+  /// No description provided for @confirmAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm all as expected'**
+  String get confirmAll;
+
+  /// No description provided for @confirmAllLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm only money that really came in.'**
+  String get confirmAllLine;
+
+  /// No description provided for @rowPayout.
+  ///
+  /// In en, this message translates to:
+  /// **'Expected payout (not received yet)'**
+  String get rowPayout;
+
+  /// No description provided for @rowPayoutPurify.
+  ///
+  /// In en, this message translates to:
+  /// **'Expected payout (to purify when received)'**
+  String get rowPayoutPurify;
+
+  /// No description provided for @rowInterest.
+  ///
+  /// In en, this message translates to:
+  /// **'Expected interest (to purify)'**
+  String get rowInterest;
+
+  /// No description provided for @rowValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Value check'**
+  String get rowValue;
+
+  /// No description provided for @receivedThisAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Received this amount'**
+  String get receivedThisAmount;
+
+  /// No description provided for @addAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Add amount'**
+  String get addAmount;
+
+  /// No description provided for @skipRow.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get skipRow;
+
+  /// No description provided for @noPayoutLine.
+  ///
+  /// In en, this message translates to:
+  /// **'No payout recorded for {from} – {to}. Expected around {date}.'**
+  String noPayoutLine(String from, String to, String date);
+
+  /// No description provided for @noPayoutPartnership.
+  ///
+  /// In en, this message translates to:
+  /// **'In a partnership, no profit means no payout.'**
+  String get noPayoutPartnership;
+
+  /// No description provided for @recordedSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Recorded {amount} on {date}'**
+  String recordedSnack(String amount, String date);
+
+  /// No description provided for @recordedAllSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Recorded {count} as expected'**
+  String recordedAllSnack(int count);
+
+  /// No description provided for @skippedSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Skipped'**
+  String get skippedSnack;
+
+  /// No description provided for @rowsNeedAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 row needs an amount} other{{count} rows need an amount}}'**
+  String rowsNeedAmount(int count);
+
+  /// No description provided for @showMoreRows.
+  ///
+  /// In en, this message translates to:
+  /// **'Show {count} more'**
+  String showMoreRows(int count);
+
+  /// No description provided for @kindSkipped.
+  ///
+  /// In en, this message translates to:
+  /// **'Skipped'**
+  String get kindSkipped;
+
+  /// No description provided for @valueBelowEstimate.
+  ///
+  /// In en, this message translates to:
+  /// **'Value is below your estimate.'**
+  String get valueBelowEstimate;
+
+  /// No description provided for @planCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan vs actual'**
+  String get planCardTitle;
+
+  /// No description provided for @expectedSoFar.
+  ///
+  /// In en, this message translates to:
+  /// **'Expected so far (your estimate)'**
+  String get expectedSoFar;
+
+  /// No description provided for @receivedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Received'**
+  String get receivedLabel;
+
+  /// No description provided for @differenceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Difference'**
+  String get differenceLabel;
+
+  /// No description provided for @receivedSinceStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Received since start: {amount}'**
+  String receivedSinceStart(String amount);
+
+  /// No description provided for @caseCReceived.
+  ///
+  /// In en, this message translates to:
+  /// **'Counted as received. Shown as to purify, not profit.'**
+  String get caseCReceived;
+
+  /// No description provided for @valueVsEstimate.
+  ///
+  /// In en, this message translates to:
+  /// **'Actual {actual} · Your estimate {estimate} · {diff} ({pct})'**
+  String valueVsEstimate(
+    String actual,
+    String estimate,
+    String diff,
+    String pct,
+  );
+
+  /// No description provided for @estimatesFooter.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimates only. Not used for zakat or return.'**
+  String get estimatesFooter;
+
+  /// No description provided for @chartLegend.
+  ///
+  /// In en, this message translates to:
+  /// **'— Actual · - - Your estimate · ○ To confirm'**
+  String get chartLegend;
+
+  /// No description provided for @chartPayoutsSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Payouts chart. Your estimate so far {expected}. Received {received}. {count, plural, =1{1 row} other{{count} rows}} to confirm.'**
+  String chartPayoutsSummary(String expected, String received, int count);
+
+  /// No description provided for @chartValueSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Value chart. Your estimate today {expected}. Last value {actual}. {count, plural, =1{1 row} other{{count} rows}} to confirm.'**
+  String chartValueSummary(String expected, String actual, int count);
+
+  /// No description provided for @stateReceived.
+  ///
+  /// In en, this message translates to:
+  /// **'received'**
+  String get stateReceived;
+
+  /// No description provided for @stateRecorded.
+  ///
+  /// In en, this message translates to:
+  /// **'recorded'**
+  String get stateRecorded;
+
+  /// No description provided for @stateToConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'to confirm'**
+  String get stateToConfirm;
+
+  /// No description provided for @stateSkipped.
+  ///
+  /// In en, this message translates to:
+  /// **'skipped'**
+  String get stateSkipped;
+
+  /// No description provided for @shariahRiskTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Shariah risk'**
+  String get shariahRiskTag;
+
+  /// No description provided for @caseBReturnLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Payouts count as return. · source not yet verified'**
+  String get caseBReturnLine;
+
+  /// No description provided for @changeAnswers.
+  ///
+  /// In en, this message translates to:
+  /// **'Change answers'**
+  String get changeAnswers;
+
+  /// No description provided for @caseCReturnsLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Payouts are not counted as return: your money comes back even if the project loses.'**
+  String get caseCReturnsLine;
+
+  /// No description provided for @kindPayoutPurify.
+  ///
+  /// In en, this message translates to:
+  /// **'Payout · to purify'**
+  String get kindPayoutPurify;
+
+  /// No description provided for @toPurifyIncludesPayouts.
+  ///
+  /// In en, this message translates to:
+  /// **'includes {amount} of payouts'**
+  String toPurifyIncludesPayouts(String amount);
+
+  /// No description provided for @givenAwayFromPayouts.
+  ///
+  /// In en, this message translates to:
+  /// **'Given away from payouts (to purify)'**
+  String get givenAwayFromPayouts;
+
+  /// No description provided for @givenAwayFromPayoutsHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Money from these payouts that you gave to charity. Giving it away does not count as zakat.'**
+  String get givenAwayFromPayoutsHelp;
+
+  /// No description provided for @toConfirmPill.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} to confirm'**
+  String toConfirmPill(int count);
+
+  /// No description provided for @expectedHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Expected {amount} on {date}'**
+  String expectedHeader(String amount, String date);
+
+  /// No description provided for @alsoRecordsPayout.
+  ///
+  /// In en, this message translates to:
+  /// **'This also records the expected payout of {date}.'**
+  String alsoRecordsPayout(String date);
+
+  /// No description provided for @alsoRecordsValue.
+  ///
+  /// In en, this message translates to:
+  /// **'This also records the value check of {date}.'**
+  String alsoRecordsValue(String date);
+
+  /// No description provided for @errOutsideWindow.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a date from {from} to {to}.'**
+  String errOutsideWindow(String from, String to);
+
+  /// No description provided for @periodPayouts.
+  ///
+  /// In en, this message translates to:
+  /// **'Payouts: your estimate {expected} · received {received}'**
+  String periodPayouts(String expected, String received);
 }
 
 class _AppLocalizationsDelegate

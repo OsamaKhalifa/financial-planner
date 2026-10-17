@@ -9,7 +9,17 @@ import '../../../core/reference/markets.dart';
 import '../../../core/reference/units.dart';
 import 'history_entry.dart';
 
-enum AssetType { stock, fund, sukuk, gold, silver, cashDeposit, crypto, other }
+enum AssetType {
+  stock,
+  fund,
+  sukuk,
+  gold,
+  silver,
+  cashDeposit,
+  crypto,
+  privateEquity,
+  other,
+}
 
 enum Intent { trading, longTerm, personalUse, rental }
 
@@ -29,6 +39,29 @@ enum ZakatRule {
   custom,
 }
 
+enum Schedule {
+  monthly(1),
+  quarterly(3),
+  halfYearly(6),
+  yearly(12);
+
+  const Schedule(this.months);
+
+  final int months;
+}
+
+/// P-2 Q1: is the % a share of the real profit or a fixed % of the money in?
+enum ProfitBasis { shareOfProfit, fixedPctOfMoney, notSure }
+
+/// P-2 Q2: does the money come back even if the project loses?
+enum CapitalBack { no, yes, notSure }
+
+/// P-3: asked on a cash deposit with a payout schedule.
+enum AccountKind { islamic, conventional }
+
+/// Shariah file B6.1 cases; [notSure] is the "?" notice.
+enum PeCase { a, b, c, notSure }
+
 final class Investment {
   Investment({
     String? id,
@@ -46,6 +79,13 @@ final class Investment {
     this.customZakatShare,
     this.inflationOverride,
     this.notes,
+    this.payoutSchedule,
+    this.expectedProfit,
+    this.valueCheckSchedule,
+    this.expectedGrowth,
+    this.profitBasis,
+    this.capitalBack,
+    this.accountKind,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) : id = id ?? newId(),
@@ -67,6 +107,17 @@ final class Investment {
   final Decimal? customZakatShare;
   final Country? inflationOverride;
   final String? notes;
+  final Schedule? payoutSchedule;
+
+  /// Fraction per year of the money in, > 0 (story §5.6).
+  final Decimal? expectedProfit;
+  final Schedule? valueCheckSchedule;
+
+  /// Fraction per year, > −1.
+  final Decimal? expectedGrowth;
+  final ProfitBasis? profitBasis;
+  final CapitalBack? capitalBack;
+  final AccountKind? accountKind;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -86,9 +137,41 @@ final class Investment {
     customZakatShare: customZakatShare,
     inflationOverride: inflationOverride,
     notes: notes,
+    payoutSchedule: payoutSchedule,
+    expectedProfit: expectedProfit,
+    valueCheckSchedule: valueCheckSchedule,
+    expectedGrowth: expectedGrowth,
+    profitBasis: profitBasis,
+    capitalBack: capitalBack,
+    accountKind: accountKind,
     createdAt: createdAt,
     updatedAt: updatedAt,
   );
+
+  /// Q2 first; Q1 counts only when a % is set (P-2, architect Q-E4).
+  PeCase? get peCase {
+    if (type != AssetType.privateEquity) return null;
+    if (capitalBack == CapitalBack.yes) return PeCase.c;
+    if (expectedProfit == null) {
+      return switch (capitalBack) {
+        CapitalBack.no => PeCase.a,
+        CapitalBack.notSure => PeCase.notSure,
+        _ => null,
+      };
+    }
+    return switch ((profitBasis, capitalBack)) {
+      (ProfitBasis.notSure, _) || (_, CapitalBack.notSure) => PeCase.notSure,
+      (ProfitBasis.fixedPctOfMoney, CapitalBack.no) => PeCase.b,
+      (ProfitBasis.shareOfProfit, CapitalBack.no) => PeCase.a,
+      _ => null,
+    };
+  }
+
+  /// Derived from the stored answers, so it follows every change (AC-66).
+  bool get shariahRisk => peCase == PeCase.b;
+
+  bool get conventionalDeposit =>
+      type == AssetType.cashDeposit && accountKind == AccountKind.conventional;
 
   Country? get marketCountryResolved =>
       market == Market.other ? marketCountry : market?.country;
