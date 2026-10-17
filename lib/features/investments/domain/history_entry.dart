@@ -88,3 +88,20 @@ final class ValueUpdate extends HistoryEntry {
 
   final Decimal value;
 }
+
+enum PlanKind { payout, value }
+
+/// The user's "skip" on a pending row (story §5.6), dated on the schedule
+/// date. A decision, never an actual record: the timeline drops it.
+final class PlanSkip extends HistoryEntry {
+  PlanSkip({
+    super.id,
+    required super.investmentId,
+    required super.date,
+    required this.plan,
+    super.createdAt,
+    super.updatedAt,
+  });
+
+  final PlanKind plan;
+}

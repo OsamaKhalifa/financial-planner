@@ -44,6 +44,7 @@ String zakatSource(AppLocalizations l10n, String section, {AssetType? type}) {
           'B3' => l10n.src_B3,
           'B4' => l10n.src_B4,
           'B5' => l10n.src_B5,
+          'B6' => l10n.src_B6,
           'B8' => l10n.src_B8,
           _ => null,
         };

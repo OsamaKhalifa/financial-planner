@@ -346,6 +346,10 @@ class ItemDetailScreen extends ConsumerWidget {
       switch (r.notice) {
         ZakatNotice.dividendsCountedWithCash => l10n.noticeDividends,
         ZakatNotice.cryptoDisputed => l10n.noticeCrypto,
+        ZakatNotice.profitPayoutsOnly => l10n.noticeProfitPayoutsOnly(
+          context.percent(settings.zakatYear!.r).replaceAll('+', ''),
+        ),
+        ZakatNotice.capitalBackIsDebt => l10n.noticeCapitalBackIsDebt,
         null => null,
       },
     ].nonNulls;
@@ -400,6 +404,7 @@ class ItemDetailScreen extends ConsumerWidget {
         l10n.kindValue,
         context.money(value, item.unit),
       ),
+      PlanSkip() => (l10n.kindSkipped, ''),
     };
     return ListTile(
       key: ValueKey('history-${e.id}'),

@@ -121,6 +121,7 @@ class _RecordSheetState extends ConsumerState<RecordSheet> {
         _from = kind == InterestKind.givenAwayFromInside
             ? _Where.keptInside
             : _Where.paidOut;
+      case PlanSkip():
     }
   }
 

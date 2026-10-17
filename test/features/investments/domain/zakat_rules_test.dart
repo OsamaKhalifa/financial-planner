@@ -128,4 +128,60 @@ void main() {
     final i = withRule(AssetType.gold, ZakatRule.jewelleryPerSetting);
     expect(() => resolve(i, base), throwsStateError);
   });
+
+  Investment pe(ZakatRule rule, {CapitalBack q2 = CapitalBack.no}) =>
+      Investment(
+        name: 'p',
+        type: AssetType.privateEquity,
+        intent: Intent.longTerm,
+        unit: const Unit('EGP'),
+        startDate: day(2026, 1, 15),
+        zakatRule: rule,
+        customZakatShare: rule == ZakatRule.custom
+            ? Decimal.parse('0.4')
+            : null,
+        capitalBack: q2,
+      );
+
+  test('AC-47 private equity: trading is 100 %, long-term must be picked', () {
+    expect(
+      defaultRule(AssetType.privateEquity, Intent.trading, base),
+      ZakatRule.trading100,
+    );
+    expect(defaultRule(AssetType.privateEquity, Intent.longTerm, base), isNull);
+    const fullValue = Settings(longTermMethod: LongTermMethod.fullValue);
+    expect(
+      defaultRule(AssetType.privateEquity, Intent.longTerm, fullValue),
+      isNull,
+    );
+    expect(offeredShare(AssetType.privateEquity, Intent.trading), isNull);
+  });
+
+  test('AC-47 every private-equity rule cites B6', () {
+    final trading = resolve(pe(ZakatRule.trading100), base);
+    expect((trading.share, trading.sourceSection), (Decimal.one, 'B6'));
+    final known = resolve(pe(ZakatRule.custom), base);
+    expect((known.share, known.sourceSection), (Decimal.parse('0.4'), 'B6'));
+    final profit = resolve(pe(ZakatRule.longTermDividendsOnly), base);
+    expect(profit.share, Decimal.zero);
+    expect(profit.onDividends, isTrue);
+    expect(profit.notice, ZakatNotice.profitPayoutsOnly);
+    expect(profit.sourceSection, 'B6');
+    final full = resolve(pe(ZakatRule.longTermFullValue), base);
+    expect((full.share, full.sourceSection), (Decimal.one, 'B6'));
+  });
+
+  test('AC-65 case C is 100 % as a debt whatever rule is stored (E6)', () {
+    for (final rule in [
+      ZakatRule.longTermDividendsOnly,
+      ZakatRule.custom,
+      ZakatRule.trading100,
+    ]) {
+      final r = resolve(pe(rule, q2: CapitalBack.yes), base);
+      expect(r.share, Decimal.one);
+      expect(r.onDividends, isFalse);
+      expect(r.sourceSection, 'B6');
+      expect(r.notice, ZakatNotice.capitalBackIsDebt);
+    }
+  });
 }

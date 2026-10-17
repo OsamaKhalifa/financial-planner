@@ -98,4 +98,54 @@ void main() {
     expectNear(pp.neededReturn, '0.1');
     expect(pp.kept, isTrue);
   });
+
+  test('AC-49 expectedPayout: 100,000 × 20 % × 3/12 = 5,000.00; 10,000 × 10 % / 12 = 83.33', () {
+    expect(
+      expectedPayout(capital: d('100000'), rate: d('0.20'), months: 3),
+      d('5000.00'),
+    );
+    expect(
+      expectedPayout(capital: d('10000'), rate: d('0.10'), months: 1),
+      d('83.33'),
+    );
+  });
+
+  test(
+    'AC-48/60 expectedValue compounds by days ÷ 365 and is never below 0',
+    () {
+      final start = Flow(date: day(2026, 1, 1), amount: d('10000'));
+      expect(
+        expectedValue(flows: [start], growth: d('-0.10'), on: day(2027, 1, 1)),
+        d('9000.00'),
+      );
+      expect(
+        expectedValue(flows: [start], growth: d('0.12'), on: day(2027, 1, 1)),
+        d('11200.00'),
+      );
+      final flows = [
+        start,
+        Flow(date: day(2026, 4, 1), amount: d('2000')),
+        Flow(date: day(2026, 8, 15), amount: d('-3000')),
+      ];
+      expect(
+        expectedValue(flows: flows, growth: d('0.12'), on: day(2026, 7, 1)),
+        d('12635.39'),
+      );
+      expect(
+        expectedValue(flows: flows, growth: d('0.12'), on: day(2026, 9, 28)),
+        d('9948.16'),
+      );
+      expect(
+        expectedValue(
+          flows: [
+            start,
+            Flow(date: day(2026, 2, 1), amount: d('-20000')),
+          ],
+          growth: Decimal.zero,
+          on: day(2026, 3, 1),
+        ),
+        Decimal.zero,
+      );
+    },
+  );
 }
