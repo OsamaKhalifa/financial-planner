@@ -5,8 +5,7 @@ import 'package:http/http.dart' as http;
 
 import 'ai_client.dart';
 
-/// Calls Gemini directly with the user's own key. The same mapping lives in
-/// `ai-proxy/src/gemini.ts` for the shared route; keep the two in step.
+/// Calls Gemini directly with the user's own key.
 class GeminiAiClient implements AiClient {
   GeminiAiClient({
     required http.Client httpClient,
