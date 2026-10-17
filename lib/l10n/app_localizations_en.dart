@@ -1514,10 +1514,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'This is interest. Record it as money out \"interest (to purify)\", not as income.';
 
   @override
-  String get srcZ6 =>
-      'Interest is not return and must be given away: Quran 2:278–279 (Z-6).';
-
-  @override
   String get expectedTitle => 'Expected (optional)';
 
   @override
@@ -1564,7 +1560,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'An estimate, not a promise. Not used for zakat or return.';
 
   @override
-  String payoutPreview(String amount, int months, String month, String date) {
+  String payoutPreview(String amount, int months, String date) {
     String _temp0 = intl.Intl.pluralLogic(
       months,
       locale: localeName,

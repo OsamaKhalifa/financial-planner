@@ -1127,7 +1127,6 @@
   "accountConventional": "Conventional account (interest)",
   "errPickAccountKind": "Pick the account kind",
   "noticeConventional": "This is interest. Record it as money out \"interest (to purify)\", not as income.",
-  "srcZ6": "Interest is not return and must be given away: Quran 2:278–279 (Z-6).",
   "expectedTitle": "Expected (optional)",
   "expectedSubtitle": "Plan payouts or value checks. An estimate, not a promise.",
   "blockPayouts": "Payouts",
@@ -1150,9 +1149,6 @@
       },
       "months": {
         "type": "int"
-      },
-      "month": {
-        "type": "String"
       },
       "date": {
         "type": "String"

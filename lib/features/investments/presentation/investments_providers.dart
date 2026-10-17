@@ -10,6 +10,7 @@ import '../../../core/db/database_provider.dart';
 import '../../../core/reference/countries.dart';
 import '../../../core/reference/units.dart';
 import '../data/drift_investments_repository.dart';
+import '../domain/expected_plan.dart';
 import '../domain/investment.dart';
 import '../domain/investments_repository.dart';
 import '../domain/period.dart';
@@ -68,6 +69,19 @@ final sinceStartProvider = Provider.family<SinceStartFigures?, String>((
   final calc = ref.watch(calculatorProvider).value;
   return calc != null && calc.hasItem(id) ? calc.sinceStart(id) : null;
 });
+
+/// Rebuilt from the item on every read; nothing is cached or written (E1).
+final expectedProvider = Provider.family<ExpectedVsActual?, String>((ref, id) {
+  final calc = ref.watch(calculatorProvider).value;
+  return calc != null && calc.hasItem(id)
+      ? expectedVsActual(calc.timeline(id), calc.today)
+      : null;
+});
+
+/// Home's "N to confirm" for one item; 0 for a closed item (AC-56).
+final pendingCountProvider = Provider.family<int, String>(
+  (ref, id) => ref.watch(expectedProvider(id))?.toConfirm ?? 0,
+);
 
 typedef UnitOrder = ({List<Unit> units, int topCount});
 

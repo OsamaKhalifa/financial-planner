@@ -9,6 +9,9 @@ import 'package:flutter/material.dart' hide Intent;
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../support/app_harness.dart';
+import '../../../support/plan_seeds.dart';
+
+import 'package:financial_planner/features/investments/domain/history_entry.dart';
 
 final afterYear = day(2027, 1, 15);
 
@@ -483,6 +486,60 @@ void main() {
         expect(valueIn(tester, l10n.rowReturn), '+15.00 %');
         expect(find.byKey(const ValueKey('no-zakat-2026')), findsNothing);
         expect(find.text(l10n.viewGold), findsNothing);
+      });
+      testScreen(
+        'AC-52: item scope shows "Payouts: your estimate 5,000.00 · received 4,000.00 EGP" for July; the portfolio shows no expected figure',
+        (tester) async {
+          await pumpScreen(
+            tester,
+            const PeriodScreen(
+              initialYear: 2026,
+              initialMonth: 7,
+              scopeItemId: 'fp',
+            ),
+            locale: locale,
+            now: day(2026, 10, 17),
+            seed: (h) => seedFriend(
+              h,
+              more: [
+                moneyOut(
+                  'fp',
+                  day(2026, 4, 15),
+                  '5000',
+                  kind: MoneyOutKind.income,
+                ),
+                moneyOut(
+                  'fp',
+                  day(2026, 7, 15),
+                  '4000',
+                  kind: MoneyOutKind.income,
+                ),
+              ],
+            ),
+          );
+          final l10n = l10nOf(tester);
+          expect(
+            plain(
+              tester
+                  .widget<Text>(find.byKey(const ValueKey('period-payouts')))
+                  .data!,
+            ),
+            plain(l10n.periodPayouts('5,000.00 EGP', '4,000.00 EGP')),
+          );
+        },
+      );
+
+      testScreen('AC-62: no expected figure in portfolio scope', (
+        tester,
+      ) async {
+        await pumpScreen(
+          tester,
+          const PeriodScreen(initialYear: 2026, initialMonth: 7),
+          locale: locale,
+          now: day(2026, 10, 17),
+          seed: seedFriend,
+        );
+        expect(find.byKey(const ValueKey('period-payouts')), findsNothing);
       });
     });
   }

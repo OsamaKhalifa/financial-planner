@@ -197,6 +197,7 @@ class _PeriodScreenState extends ConsumerState<PeriodScreen> {
             ),
             _verdict(context, returns, unit, view),
           ],
+          if (scoped) ?_payoutsLine(context, _scope!, period),
           if (portfolio != null && portfolio.toPurify.amount > Decimal.zero)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
@@ -220,6 +221,27 @@ class _PeriodScreenState extends ConsumerState<PeriodScreen> {
           const Divider(),
           ..._others(context, first, today, view, base),
         ],
+      ),
+    );
+  }
+
+  /// Item scope only: expected payouts vs income in this period (AC-52).
+  /// Never in portfolio scope: no expected totals (story §5.6).
+  Widget? _payoutsLine(BuildContext context, String id, Period period) {
+    final plan = ref.watch(expectedProvider(id));
+    if (plan == null || !plan.hasPayoutPlan) return null;
+    final p = plan.payoutsIn(period);
+    final expected = p.expected;
+    if (expected == null) return null;
+    final unit = plan.investment.unit;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Text(
+        context.l10n.periodPayouts(
+          context.money(expected, unit),
+          context.money(p.received, unit),
+        ),
+        key: const ValueKey('period-payouts'),
       ),
     );
   }

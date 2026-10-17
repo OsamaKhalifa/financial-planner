@@ -1514,10 +1514,6 @@ class AppLocalizationsAr extends AppLocalizations {
       'هذه فائدة. سجّلها مالًا خارجًا «فائدة (للتطهير)»، لا دخلًا.';
 
   @override
-  String get srcZ6 =>
-      'الفائدة ليست عائدًا ويجب التخلص منها: سورة البقرة 2:278–279 (Z-6).';
-
-  @override
   String get expectedTitle => 'المتوقع (اختياري)';
 
   @override
@@ -1562,7 +1558,7 @@ class AppLocalizationsAr extends AppLocalizations {
       'تقدير، لا وعد. لا يُستخدم في الزكاة ولا في العائد.';
 
   @override
-  String payoutPreview(String amount, int months, String month, String date) {
+  String payoutPreview(String amount, int months, String date) {
     String _temp0 = intl.Intl.pluralLogic(
       months,
       locale: localeName,

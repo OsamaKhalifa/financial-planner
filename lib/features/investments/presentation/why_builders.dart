@@ -121,3 +121,21 @@ Why whyToPurify(BuildContext context) => Why(
   what: context.l10n.whyToPurifyWhat,
   source: context.l10n.src_Z6,
 );
+
+/// The P-2 notice of a private-equity case, with its source; null for A.
+Why? whyCase(BuildContext context, PeCase? c) {
+  final l10n = context.l10n;
+  final (what, numbers, source) = switch (c) {
+    PeCase.b => (l10n.noticeCaseB, l10n.caseBReturnLine, l10n.srcCaseB),
+    PeCase.c => (l10n.noticeCaseC, null, l10n.srcCaseC),
+    PeCase.notSure => (l10n.noticeCaseNotSure, null, l10n.srcCaseNotSure),
+    PeCase.a || null => (null, null, null),
+  };
+  if (what == null) return null;
+  return Why(
+    title: l10n.typePrivateEquity,
+    what: what,
+    numbers: numbers,
+    source: source,
+  );
+}
