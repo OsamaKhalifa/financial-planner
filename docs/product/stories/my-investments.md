@@ -1,6 +1,6 @@
 # Story — My Investments
 
-**Status:** v1 draft · 2026-10-16 · PM hat · review loop 1 applied (owner decisions + consultant CHANGES_REQUESTED)
+**Status:** v1 draft · 2026-10-16 · PM hat · review loop 1 applied (owner decisions + consultant CHANGES_REQUESTED) · 2026-10-17: added Private equity type and expected vs actual (§5.5, §5.6, AC-46…AC-75, AC-58b; owner Q10–Q15; review loop 1 applied)
 **Owner:** @OsamaKhalifa
 **Research:** [my-investments-market.md](../research/my-investments-market.md)
 **Shariah input:** [zakat-on-investments.md](../shariah/zakat-on-investments.md) — every zakat rule below comes from that file; section names (A1, B3, …) point into it.
@@ -54,8 +54,8 @@ Keep a hand-entered list of my investments, in any currency or in gold/silver gr
 | Field | Req. | User need |
 |---|---|---|
 | **Name** | * | Tell items apart ("Al Rajhi shares", "Gold bar 50 g"). |
-| **Asset type** — stock · fund/ETF · sukuk · gold · silver · cash deposit · crypto · other (real estate, business, pension, anything else) | * | Breakdown by asset class (UC-2); picks the zakat rule set (Part B); decides whether a market or grams are asked. Real estate, business and pension stay under "other" in v1 (Q8). **Pension is not a v1 type**: it is "other", its zakat share is asked per item with B7 as help, so no pension question at setup. |
-| **Intent** — trading · long-term · personal use · rental | * where the Shariah file needs it (below) | Decides the zakatable base: trading vs long-term vs personal use (B2, B3, B5). |
+| **Asset type** — stock · fund/ETF · sukuk · gold · silver · cash deposit · crypto · private equity · other (real estate, pension, anything else) | * | Breakdown by asset class (UC-2); picks the zakat rule set (Part B); decides whether a market or grams are asked. Real estate and pension stay under "other" in v1 (Q8). **Private equity** = a stake in a business not listed on a market, e.g. money put into a friend's project (owner Q10, §5.5). **Pension is not a v1 type**: it is "other", its zakat share is asked per item with B7 as help, so no pension question at setup. |
+| **Intent** — trading · long-term · personal use · rental | * where the Shariah file needs it (below); * for private equity (trading or long-term only) | Decides the zakatable base: trading vs long-term vs personal use (B2, B3, B5, B6). |
 | **Market** (exchange) — e.g. Tadawul, EGX, NASDAQ, NYSE, LSE, DFM, ADX, Boursa Kuwait, QSE, Bursa Malaysia, BIST, PSX, or "other market + country" | * for stock; optional for fund/ETF and sukuk; absent for others | Same ticker exists on several markets; UC-4 screening needs it. Gives the item's **country**, which picks its default inflation series (§8). |
 | **Item unit** | * | What the value is kept in. Default: the market's trading currency for a stock; the base currency otherwise; XAU-g / XAG-g for gold / silver (§7). |
 | **Start date** | * | First money in. Needed for annualised return and for placing money in the right month/year. Not in the future. |
@@ -77,6 +77,8 @@ Keep a hand-entered list of my investments, in any currency or in gold/silver gr
 | stock, fund/ETF | **asked**, no default | trading → 100 %; long-term → the user's **long-term method**, **asked** (per item or once as a portfolio setting): dividends-only (IIFA) → 0 % of value, and a set-aside of r_z × each "income received" (dividend) on the item, charged once (§9.4, consultant answer (a), IIFA Res 28 (3/4) §3); if the same dividend is also recorded as money in to a cash item in this list, that cash entry shows "Already counted as dividend zakat on {item}?"; 25 % proxy (NZF) → 25 %; full value → 100 % (B3, B4) |
 | sukuk | — | 100 % (B4) |
 | crypto | — | 100 % of market value, with a notice that scholars dispute whether holding it is permissible (B8) |
+| private equity | trading (to sell) | 100 % of value, no method question (Shariah file P-1) |
+| private equity | long-term (for its profit) | **asked**, per item, nothing pre-selected (P-1): known zakatable % (user enters it; IIFA Res 121 (3/13) §1) · zakat on profit received only → 0 % of value and r_z × each income payout, charged once (same math as dividends-only, §9.4), with the notice "Zakat: {r_z} of each profit payout you record, not of the project's value. Each payout is counted once." ({r_z} from the zakat year setting) · full value → 100 %. **No 25 % proxy.** Help text from P-1 item 6. If Q2 = yes (case C, §5.5): 100 % offered with the P-1 item 5 text, no method question. |
 | other (real estate, business, pension, …) | asked | **ask** — nothing is filled in silently (B5–B7). Where the Shariah file gives a value for the intent (personal use → 0 %, rental → 0 % with rent zakat via cash, trading/resale → 100 %), it is **offered** with its source and applies only when the user confirms it. Business and pension: no value offered. |
 
 ### 5.2 Settings asked once (no silent defaults)
@@ -103,8 +105,8 @@ All dated, all kept, all editable and deletable by the user:
 Additional buys and partial sells are in: without them, Yasmin's monthly deposit would count as profit (research takeaway 2).
 
 - Money in on date d raises the item's value by that amount (converted to item unit) on d, unless the user records a value update on d.
-- Money out on date d lowers the value by that amount on d, unless the user records the value left. If that would go below 0, the user must enter the value left (≥ 0).
-- Income received in hand = money out (kind: income). Income kept inside the investment is not recorded; it shows up in the next value update.
+- A **sale** on date d lowers the value by that amount on d, unless the user records the value left. If that would go below 0, the user must enter the value left (≥ 0).
+- Income received in hand = money out (kind: income). **Income does not change the recorded value** and never asks for a value left, whatever its size (Q12). Income kept inside the investment is not recorded; it shows up in the next value update.
 - **Interest (to purify)** (Z-6, Quran 2:278–279):
   - **Held interest H** of an item on a date = interest kept inside the item − interest given away from inside the item, up to that date.
   - For return, gain and zakat, the item's value is **recorded value − H**. So interest never counts as return and never enters the zakat base.
@@ -114,6 +116,89 @@ Additional buys and partial sells are in: without them, Yasmin's monthly deposit
   - Interest given away **from interest paid out to me** changes neither the item's value nor H: no effect on return.
   - **To purify** total (per item and overall) = all interest recorded − all interest given away (from both places). Shown on its own, never netted against zakat.
 - No lot tracking, unit prices or FIFO. Needed only for tax (BRD non-goal).
+
+### 5.5 Private equity — **new type** (owner Q10)
+
+Owner's case: Yasmin puts 100,000 EGP into a friend's project and gets profit every quarter at a fixed %.
+
+| Field | For private equity |
+|---|---|
+| Market | absent (not listed). |
+| Intent | required: **trading** (to sell) or **long-term** (for its profit). Personal use and rental are not offered. Why: the zakat share depends on it (Shariah file P-1). |
+| Item unit | default: base currency. |
+| Quantity | optional (e.g. "shares" in the project). |
+| Zakat share | required; per §5.1 (Shariah file P-1). |
+| Expected profit % + payout schedule; expected value growth % + value-check schedule | optional, as for every type (§5.6). |
+
+- Existing "other" items are **not** moved to private equity by themselves: a silent change of type could change the zakat share.
+- Profit received is recorded as **money out, kind income** (§5.3), as today (by hand, or by confirming a pending row, §5.6).
+- **Two questions** (Shariah file P-2; "Not sure" allowed; the answers never block saving): **Q2** "If the project loses money, do you still get all your money back?" (no / yes / not sure) — required on **every** private equity item, because case C changes the zakat base even with no payouts (P-1 item 5); **Q1** "Is this % a share of the project's real profit, or a fixed % of the money you put in?" (share of profit / fixed % of my money / not sure) — required only when an expected profit % is set. The answers pick a **case** and one notice on the item, with a Source link, text exactly as in P-2 (with no % set, Q1 is not asked: Q2 = no → case **A**, since without a % case B cannot happen; Q2 = yes → **C**; Q2 = not sure → the **?** notice):
+  - **A** share of profit + no → no notice; payouts count as return (P-4).
+  - **B** fixed % + no → the P-2 case B notice; payouts count as return (P-4; **owner decision Q14**), and that line shows "source not yet verified" until the consultant's case B open item closes (P-4b). The item gets the stored tag **"Shariah risk"**, shown on the item (owner Q14).
+  - **C** Q2 = yes (any Q1) → the P-2 case C notice; **every income payout on the item is "to purify"**: left out of gain and return, added to the "to purify" total, never netted against zakat (P-4, as Z-6). The user may give them away with the existing record "interest given away" (from interest paid out to me), shown here as **"Given away from payouts (to purify)"** with the help line "Money from these payouts that you gave to charity. Giving it away does not count as zakat." No new record kind. Capital coming back is a sale, not income. Zakat share: 100 % offered with the P-1 item 5 text, no method question.
+  - **?** any "not sure" and Q2 ≠ yes → the P-2 "Ask your partner…" notice; payouts count as return (P-2, P-4). No tag.
+  - Changing Q1/Q2 later re-applies the case, the notice and the tag to **all** past payouts (P-4).
+- For §5.6, case C payouts still count as **received** against the expected payouts: they are what came in.
+- **Note for UC-2 (dashboard, next feature):** a risk view per asset type that uses the stored "Shariah risk" tag. Not in this story (owner Q15).
+
+### 5.6 Expected vs actual — **any type, optional per item** (owner Q11, Q13)
+
+The user knows what was agreed (a % a year, paid every quarter) or what they planned (the fund grows 12 % a year). Today the app shows only what happened. Pain: a payout that never came, or a value nobody checked, goes unnoticed, and recording each one is a chore. This section puts a **pending row** on each schedule date, filled with the expected amount, so recording the actual is one tap. **In-app only**: no notification, no background work (BRD: no notifications in v1).
+
+**Two separate plans, each optional:**
+
+| Plan | Fields | Hidden for |
+|---|---|---|
+| **Expected income** | **payout schedule** (monthly · quarterly · every 6 months · yearly); optional **expected profit %** (> 0) — needs a schedule | gold, silver, crypto (they pay nothing in hand) |
+| **Expected value** | **value-check schedule** (same choices); optional **expected value growth %** (> −100 %; 0 and negative allowed) — needs a schedule | gold, silver (their value moves with the shared metal rate; rate staleness is §9.3) |
+
+Why two schedules, not one: dividends quarterly but a value check monthly is common. One shared schedule would either ask for values too rarely or create payout rows that are not due. Why a schedule may stand alone: a profit share with no fixed % still comes at a fixed cadence, and a value-check row is useful with no growth target (the user types the value).
+
+**Words** (Shariah file P-3): field labels "Expected profit (your estimate, % per year)" and "Expected value growth (your estimate, % per year)", each with "An estimate, not a promise. Not used for zakat or return." Never "interest", "guaranteed", "promised", "fixed return" or "yield" for these figures. A payout not recorded reads "No payout recorded for {period}. Expected around {date}." ({period} = the day after the previous payout date, to d_k; {date} = d_k), never "late", "missed" or "default"; on private equity add "In a partnership, no profit means no payout." A value below the plan reads "Value is below your estimate."
+
+**Per type** (P-3 table): a cash deposit with a payout schedule must answer "Islamic account (profit share) or conventional account (interest)?" before it can be saved (architect Q-E3); conventional shows "This is interest. Record it as money out 'interest (to purify)', not as income." Private equity asks Q1/Q2 (§5.5). Stock, fund/ETF, sukuk, other: no notice. The P-3 notices for gold, silver and crypto are not used: those types have no expected profit field.
+
+**Conventional cash deposit** (P-4b): its payout rows are labelled **"Expected interest (to purify)"**; the check mark records **interest (to purify), paid out to me**, not income; an interest record (not income) resolves the row. This label and the P-3 notice above are the only allowed uses of the word "interest" for expected figures.
+
+**Dates.** Payout dates d_k and check dates c_k = start date + k × m months (m = 1, 3, 6, 12), k = 1, 2, … Always counted from the start date (no drift). If the day does not exist in that month, the last day of the month is used. Why start + one period: it matches the owner's case with no extra field; a deal paid a few days off still matches (window below).
+
+**Expected payout** `P_k = round2( C(d_(k−1)) × p × m / 12 )`, d_0 = start date.
+- p = expected profit %, **per year, of the money in** (not of the value). Why: an agreement is quoted "20 % a year on your money"; per year keeps one number across schedules. When saved, the app shows the amount per payout ("5,000.00 EGP every 3 months"), so a user who meant "% per payout" sees the mistake.
+- **C(date)** = total money in − total money out of kind **sale**, dated on or before that date, in item unit, not below 0. Income does not lower C. Money in another unit is converted at the rate on its own date (§6.1). Missing rate → no expected amounts for the item, and the user is told which pair is missing.
+- Money in or out counts from the **next** payout period. Why: no day weighting; the user corrects the amount when confirming.
+- Rounded to 2 decimals.
+
+**Expected value** `V_exp(t) = round2( max(0, Σ over money in (+) and sales (−) dated on or before t of amount × (1 + g)^((t − date) / 365)) )`. g = expected value growth % per year. Only actual records count; interest records are not flows.
+- Why compound by days/365: same base as the annualised return (§9.2); an item that grows exactly at g with no flows shows annualised return = g.
+- Why sales only: income does not change the recorded value (§5.4, Q12), so it does not change the plan either.
+- V_exp never uses the user's own value updates, so confirming one row never changes another row's amount.
+
+**Pending rows** (owner Q13).
+- One row per schedule date on or before today: a **payout row** (amount P_k, or empty without a %) and a **value row** (amount V_exp(c_k), or empty without a growth %). Rows are created **only when the app opens or the item is viewed**, never in the background. A pending amount follows the current plan until the row is resolved.
+- **Pending is not actual.** A pending row never feeds gain, return, the zakat set-aside, real return, purchasing power, staleness (§9.3), or any total.
+- The user resolves a row in one of three ways:
+  - **Check mark "Received this amount" (one tap, no form):** it becomes actual at the shown amount, dated on the schedule date — a payout row becomes money out, kind income (conventional deposit: interest, above); a value row becomes a value update. A row with no amount has **"Add amount"** instead: the user types the amount, and the row becomes actual on its date.
+  - **Edit, then save:** actual with the amount and date the user typed. The date may move at most **7 days** before or after the row date (architect Q-E2), so it still matches the row. A value may be below the expected value or below the money in.
+  - **Skip:** a payout row shows "No payout recorded for {period}. Expected around {date}."; a value row records nothing.
+- **"Confirm all as expected"** on the item, with the line "Confirm only money that really came in." (P-4b): every pending row that has an amount becomes actual at its amount and date, in one action.
+- **Undo** is offered right after a check mark, "Confirm all as expected" or a skip; it removes the records that action made and puts the rows back to pending.
+- **Row labels** (P-4b): a pending payout row reads "Expected payout (not received yet)" (private equity case C: "Expected payout (to purify when received)"; conventional deposit: "Expected interest (to purify)"). Never "profit due" or "owed".
+- **No duplicates:** an actual record entered by hand (income for a payout row, value update for a value row) dated within **7 days** before or after the schedule date resolves that row with its own amount (oldest row first; one record resolves one row). Interest records never resolve a payout row, except on a conventional deposit, where only they do.
+- A payout row still pending from d_k + 8 days also shows the "No payout recorded…" line. Why 7 days: a friend pays a few days off; no setting (no evidence one is needed).
+- Home shows **"N to confirm"**, N = the number of pending rows on open items.
+
+**Shown per item** (expected vs actual):
+- each row: date, expected amount, actual amount, state (pending · received · skipped; value rows: pending · recorded · skipped);
+- payouts since start: **expected so far** = Σ P_k with d_k ≤ today (pending and skipped included); **received** = all actual income; **difference** = received − expected so far;
+- payouts in a month or year view: expected = Σ P_k with d_k inside the period; received = income dated inside the period;
+- at each actual value update: actual (net of held interest H), V_exp, difference in amount and in % of V_exp.
+- **Charts, item screen only** (owner Q13), one at a time with a **Payouts | Value** switch (only the chart(s) the item has a plan for; no switch with one): value — expected line V_exp(t) and actual line through actual value updates only; income — cumulative expected payouts and cumulative actual income. Actual lines use actual records only; pending rows are hollow points at their expected amount.
+
+**Edits.** Changing the %, a schedule or the start date recomputes every date and amount from the start. Actual records stay as they are; pending rows and skips are rebuilt for the new dates. No history of terms in v1.
+
+**Closed item** (full sale, §5.3): no row after the closing date. Rows on or before it can still be resolved; the item is not in the list count.
+
+**What this does not change:** return, gain, zakat set-aside, real return and purchasing power (§9) use actual records only and never an expected figure. No expected real return and no expected after-zakat figure (they would repeat §9.5–9.6 on made-up numbers). **No portfolio totals** of expected figures: items with and without a plan would mix.
 
 ---
 
@@ -231,7 +316,7 @@ If an item has neither a value update nor a flow inside a period (gold/silver: n
 
 `Z_item = r_z × s × EV_item × (T / Y)`
 r_z and Y = the user's zakat year setting, **always as a matched pair**: lunar 2.5 % / 354.367 (default) or solar 2.577 % / 365 (A1, A2, Z-2). s = zakat share. EV_item is net of held interest. Computed in money (item unit), converted to the base currency at the rate on E (Z-7: fine for a planning figure; UC-3 uses the rate on the zakat date).
-`Z_div_item = r_z × (sum of money out of kind income dated inside the period)` — only for items on the dividends-only method (s = 0). **No T/Y factor**: each dividend is charged once, when received (consultant answer (a), IIFA Res 28 (3/4) §3). Converted to base at the rate on **each dividend's date** (not at E), because each dividend is charged on its own date.
+`Z_div_item = r_z × (sum of money out of kind income dated inside the period)` — only for items on the dividends-only method (s = 0), and for private equity on "zakat on profit received only" (Shariah file P-1). **No T/Y factor**: each dividend is charged once, when received (consultant answer (a), IIFA Res 28 (3/4) §3). Converted to base at the rate on **each dividend's date** (not at E), because each dividend is charged on its own date.
 `Z` (portfolio) = Σ (Z_item + Z_div_item) in base currency.
 
 - Label everywhere: **"estimated zakat set-aside (planning). Actual zakat is due once a year on your zakat date."** Never "zakat due" or "zakat paid" (Z-3).
@@ -352,6 +437,46 @@ Unless stated: item unit = base currency = EGP; zakat year = **lunar (r = 2.5 %,
 
 - **AC-45** Given base EGP, XAU-g→EGP 5,000 and XAG-g→EGP 60 on 2026-10-16, nisab metal not chosen, items: cash deposit 100,000 (share 100 %) and long-term stock 50,000 (NZF 25 %), When the user looks at the "no zakat due" switch on 2026-10-16, Then it shows "Nisab: 85 g gold = **425,000.00 EGP**" and "Nisab: 595 g silver = **35,700.00 EGP**", "Zakatable total in this list: **112,500.00 EGP**", and the help text from §9.4; and the switch stays as the user left it. Given no gold rate, Then the gold line reads "Add a gold rate to see the nisab".
 
+**Private equity (§5.5)**
+
+- **AC-46** Given a new private equity item, Then no market is asked, intent offers only trading and long-term, quantity is optional, and the item unit defaults to the base currency; When saved without intent, Then it is rejected and intent is named. Given an existing "other" item, Then after the update it is still "other" with the same zakat share.
+- **AC-47** Given a new private equity item with intent "trading", Then the zakat share is 100 % with no method question. Given intent "long-term", Then the user must pick one of: known zakatable %, zakat on profit received only, full value — nothing pre-selected, no 25 % option, saving without a pick is rejected (P-1). Given "Friend's project" (below) on "profit received only" with income 5,000 on 2026-04-20, 2026-07-14 and 2026-10-20, When viewing year 2026, Then the set-aside on its value is 0 and its set-aside = 0.025 × 15,000 = **375.00** (no T/Y factor), and the item shows "Zakat: 2.5 % of each profit payout you record, not of the project's value. Each payout is counted once." (lunar setting).
+
+**Expected vs actual (§5.6)** — "Friend's project" below = private equity, long-term, EGP, start **2026-01-15**, first money in **100,000**, expected profit **20 %**, payout schedule **quarterly**.
+
+- **AC-48** Given a gold, silver or crypto item, Then no payout schedule or expected profit % is asked; Given gold or silver, Then no value-check schedule or growth % is asked. Given an expected profit % without a payout schedule, or a growth % without a value-check schedule, or expected profit % = 0, or growth % = −100 %, When saving, Then it is rejected. Given a fund, start 2026-01-01, 10,000, growth **−10 %**, Then it saves and V_exp on 2027-01-01 = **9,000.00**. Given a stock with none of the four fields, Then it saves and has no expected figure and no pending row.
+- **AC-49** Given "Friend's project", When saved, Then it shows "5,000.00 EGP every 3 months" (100,000 × 20 % × 3/12) and payout dates **2026-04-15, 2026-07-15, 2026-10-15, 2027-01-15**. Given a fund with 10,000, 10 %, monthly, Then each payout = **83.33**.
+- **AC-50** Given start 2026-01-31 and a monthly schedule, Then the dates are **2026-02-28, 2026-03-31, 2026-04-30**. Given start 2024-02-29 and yearly, Then **2025-02-28, 2026-02-28, 2027-02-28, 2028-02-29**.
+- **AC-51** Given "Friend's project" with no income recorded and the app not opened since 2026-01-15, Then no row is stored before the app opens; When the app is opened on 2026-10-17, Then three pending payout rows exist (2026-04-15, 2026-07-15, 2026-10-15), each **5,000.00**; the April and July rows show "No payout recorded for … Expected around …" and the October row does not (it would from 2026-10-23); since start: expected so far **15,000.00**, received **0.00**, difference **−15,000.00**; each row reads "Expected payout (not received yet)"; Home shows "3 to confirm".
+- **AC-52** Given AC-51 on 2026-10-17, When the user taps "Received this amount" on the April row, Then income 5,000.00 dated 2026-04-15 is recorded with no other input; When the user edits the July row to 4,000 and saves, Then income 4,000.00 dated 2026-07-15; When the user skips the October row, Then it shows "No payout recorded for 2026-07-16 – 2026-10-15. Expected around 2026-10-15. In a partnership, no profit means no payout." Then since start: expected so far **15,000.00**, received **9,000.00**, difference **−6,000.00**; year 2026: **15,000.00 / 9,000.00** (expected / received); July **5,000.00 / 4,000.00**; October **5,000.00 / 0.00**; the item has no pending row.
+- **AC-53** Given AC-51 on 2026-10-17, Then "Confirm all as expected" shows the line "Confirm only money that really came in."; When the user picks it once, Then three income records of 5,000.00 exist, dated 2026-04-15, 2026-07-15 and 2026-10-15; received **15,000.00**, difference **0.00**, and no pending row is left.
+- **AC-54** Given "Friend's project" with income entered by hand: 5,000 on 2026-04-20 and **10,000** on 2026-07-14, When the app is opened on 2026-10-17, Then the April row is received 5,000.00, the July row is received 10,000.00, only the October row is pending, and no extra income record is created; expected so far **15,000.00**, received **15,000.00**, difference **0.00**. Given also income 2,000 on 2026-05-30, Then no row takes it, received = **17,000.00**, difference **+2,000.00**.
+- **AC-55** Given "Friend's project" with money in 20,000 on 2026-08-01 and a sale of 50,000 on 2026-11-01, Then the payouts are 2026-10-15 = **5,000.00**, 2027-01-15 = **6,000.00** (120,000 × 5 %), 2027-04-15 = **3,500.00** (70,000 × 5 %).
+- **AC-56** Given AC-51 (three pending rows), When the user records a full sale of 100,000 on 2026-12-01 with value left 0, Then the item is closed; When it is viewed on 2027-02-01, Then no 2027-01-15 row exists, the three rows can still be confirmed, and Home's "to confirm" count does not include them.
+- **AC-57** Given a payout schedule monthly with no %, start 2026-01-31, and income entered by hand 1,200 on 2026-03-05 and 900 on 2026-04-02, When viewed on 2026-05-07, Then the 2026-02-28 row is received 1,200.00, the 2026-03-31 row is received 900.00, the 2026-04-30 row is pending with no amount and no "No payout recorded" line; its check mark asks for the amount; on 2026-05-10, Then that row shows the "No payout recorded" line; received since start = **2,100.00**; no expected amount is shown.
+- **AC-58** Given a cash deposit (Islamic account), start 2026-01-01, 10,000, expected profit 10 %, monthly, and an interest record of 83.33 "paid out to me" on 2026-02-01 and no income, When viewed on 2026-02-09, Then the 2026-02-01 row (83.33) is still pending and shows the "No payout recorded" line (interest does not resolve it); received = **0.00**.
+- **AC-58b** Given the AC-58 deposit marked **conventional**, Then the 2026-02-01 row reads "Expected interest (to purify)" with **83.33**; When the user taps "Received this amount", Then an interest record 83.33 "paid out to me" dated 2026-02-01 is stored and no income; to purify = **83.33**; the value stays **10,000.00** and the return for February = **0.00 %**. Given instead an interest record 83.33 paid out to me entered by hand on 2026-02-03, Then it resolves the row; Given an income record on 2026-02-03, Then the row stays pending.
+- **AC-59** Given AC-51 after the April row was confirmed (5,000.00), When the user changes the expected profit to 24 %, Then the July and October pending rows show **6,000.00**, the April income stays **5,000.00**, expected so far = **18,000.00**, received = **5,000.00**.
+- **AC-60** Given a fund, start 2026-01-01, 10,000, growth 12 %, no other flows, Then V_exp on 2027-01-01 = **11,200.00**. Given instead money in 2,000 on 2026-04-01 and a value update 12,400 on 2026-07-01, Then at that update V_exp = 10,000 × 1.12^(181/365) + 2,000 × 1.12^(91/365) = **12,635.39**, difference **−235.39 (−1.86 %)**, "Value is below your estimate."; Given then a sale of 3,000 on 2026-08-15 and a value update 10,100 on 2026-09-28, Then V_exp = **9,948.16** (… − 3,000 × 1.12^(44/365)), difference **+151.84 (+1.53 %)**.
+- **AC-61** Given a fund, start 2026-01-01, 10,000, growth 12 %, value check monthly, no other flows, When the app is first opened on 2026-03-05, Then two pending value rows exist: 2026-02-01 = **10,096.72** and 2026-03-01 = **10,184.88**; When the user taps the check mark on February, Then a value update 10,096.72 dated 2026-02-01 is recorded and the March row still shows 10,184.88; When the user edits March to 9,800 and saves, Then a value update 9,800.00 dated 2026-03-01 is recorded, difference **−384.88 (−3.78 %)**. Given instead a value update entered by hand on 2026-02-05, Then it resolves the February row and no second value update is created.
+- **AC-62** Given AC-61 on 2026-03-05 before any row is resolved, Then the item's value chart has the expected line through V_exp, an actual line with the one point 10,000 on 2026-01-01, and hollow points at 10,096.72 (2026-02-01) and 10,184.88 (2026-03-01); after the two rows are resolved as in AC-61, Then the actual line has points 10,000, 10,096.72 and 9,800.00 and there is no hollow point. Given AC-52, Then the income chart shows cumulative expected 5,000 / 10,000 / 15,000 on the three payout dates and cumulative actual 5,000 / 9,000 on 2026-04-15 / 2026-07-15. No expected chart appears outside the item screen.
+- **AC-63** Given AC-51 (three pending rows), Then gain, every return, the zakat set-aside, every real figure, the purchasing-power gap, every portfolio total and the "value not updated" marker equal those of the same item with no plan; removing the plan changes none of them; portfolio totals show no expected figure. Given any pending row, When the app is closed or in the background for any length of time, Then it creates no row, shows no notification and makes no network request.
+
+**Shariah answers for expected profit (§5.5, §5.6)**
+
+- **AC-64** Given any private equity item, even with no schedule and no %, Then Q2 must be answered ("Not sure" allowed) or saving is rejected, and Q1 is not asked; Given Q2 = yes, Then the case C notice shows and 100 % is offered with the P-1 item 5 text. When an expected profit % is set, Then Q1 must be answered too; no answer itself blocks saving. With no % set: Q2 = no → no notice and no tag (case A); Q2 = not sure → the "Ask your partner…" text. With a % set: the notice shown is: share of profit + no → none; fixed % + no → the P-2 case B text; Q2 = yes → the case C text; any "not sure" with Q2 ≠ yes → the "Ask your partner…" text; each with a Source link.
+- **AC-65** Given "Friend's project" with income 5,000 on 2026-04-15 and 5,000 on 2026-07-15 and no value update (value stays 100,000, §5.4), When Q1 = share of profit and Q2 = no (case A), Then since start gain = **10,000.00**, simple ROI = **10.00 %**, to purify = **0.00**; When the user changes Q2 to yes (case C), Then gain = **0.00**, simple ROI = **0.00 %**, to purify = **10,000.00**, the April and July rows still show "received", and the zakat share offered is 100 % with the P-1 item 5 text.
+- **AC-66** Given AC-65 with Q1 = fixed % and Q2 = no (case B), Then gain = **10,000.00** (payouts are return) and that line shows "source not yet verified", the case B notice shows, and the item carries the tag **"Shariah risk"**, still there after the app is closed and reopened; When Q1 is changed to share of profit, Then the tag is gone. Given Q1 = not sure and Q2 = no, or case C, Then no tag.
+- **AC-67** Given a cash deposit with a payout schedule, Then the user is asked "Islamic account (profit share) or conventional account (interest)?"; conventional → the P-3 "This is interest…" notice. Given a stock, fund/ETF, sukuk or other item with an expected profit %, Then no such notice. Given any expected figure, Then its label and help line are the P-3 texts, and the words "interest", "guaranteed", "promised", "fixed return", "yield", "late", "missed" and "default" do not appear in it — except the two allowed uses of "interest" on a conventional deposit: the P-3 notice and the row label "Expected interest (to purify)" (P-4b).
+- **AC-68** Given "Friend's project" (value 100,000) and income 5,000 on 2026-04-15, Then the value stays **100,000.00** with no value update; since start gain = **5,000.00**, simple ROI = **5.00 %**. When the user records income 150,000 on 2026-05-01, Then it saves without asking for a value left and the value stays **100,000.00**. When the user records a sale of 30,000 on 2026-06-01, Then the value = **70,000.00**. Given AC-60's fund plus income 500 on 2026-05-01, Then V_exp on 2026-07-01 is still **12,635.39**.
+- **AC-69** Given the AC-51 April row (2026-04-15), When the user edits its date to 2026-04-22 or 2026-04-08, Then it saves; to 2026-04-23 or 2026-04-07, Then it is rejected.
+- **AC-70** Given a cash deposit with a payout schedule and no Islamic/conventional answer, When saving, Then it is rejected and the question is named. Given a cash deposit with no payout schedule, Then the question is not asked.
+- **AC-71** Given AC-65 in case C (to purify **10,000.00**), When the user records "Given away from payouts (to purify)" 4,000 on 2026-08-01, Then it shows the help line "Money from these payouts that you gave to charity. Giving it away does not count as zakat.", it is stored as "interest given away" from interest paid out to me, to purify = **6,000.00**, gain stays **0.00**, and the zakat set-aside is unchanged.
+- **AC-72** Given AC-51 on 2026-10-17, When the user taps "Received this amount" on April and then Undo, Then no income record exists, the April row is pending at 5,000.00, received = **0.00**, Home shows "3 to confirm"; When the user picks "Confirm all as expected" and then Undo, Then no income record exists and three rows are pending; When the user skips October and then Undo, Then October is pending again.
+- **AC-73** Given AC-57 on 2026-05-10, Then the 2026-04-30 row offers "Add amount" and no "Received this amount"; When the user adds 950, Then income 950.00 dated 2026-04-30 is stored, received since start = **3,050.00**, and the row is received.
+- **AC-74** Given an item with both a payout plan and a value plan, Then its screen shows one chart at a time and the user switches between Payouts and Value; Given an item with only a payout plan, Then only the payouts chart shows and there is no switch.
+- **AC-75** Given AC-51 (3 pending rows) and AC-61's fund (2 pending rows), When Home is viewed, Then it shows "**5** to confirm"; after "Confirm all as expected" on "Friend's project", Then "**2** to confirm".
+
 ---
 
 ## 11. Out of scope (v1)
@@ -367,7 +492,11 @@ Unless stated: item unit = base currency = EGP; zakat year = **lunar (r = 2.5 %,
 - Deducting debts from zakatable wealth (UC-5 / A5).
 - Any gold-for-gold exchange or deferred gold purchase (A8).
 - Inflation figures on debts — never (A6.3; relevant to UC-5).
-- Reminders to update values (BRD: no notifications in v1).
+- Reminders to update values (BRD: no notifications in v1). Pending rows (§5.6) are created and shown only inside the app.
+- Private equity: contract documents, partner lists, the business's own profit-sharing calculation, a history of changed terms (§5.6 recomputes from the start).
+- Expected figures in portfolio totals, expected real or after-zakat figures, pro-rata (day-weighted) expected profit. Charts outside the item screen.
+- A risk view per asset type using the "Shariah risk" tag — goes to UC-2, the dashboard (Q15). This story only stores and shows the tag.
+- A Home "To confirm" filter, and a "Use Private equity" link under "other" (cut in review loop 1).
 - Any advice on what to buy, sell or hold.
 
 ## 12. Shariah touchpoints
@@ -376,6 +505,11 @@ Answered by the consultant (Z-1…Z-7 in zakat-on-investments.md) and applied ab
 - Pure vs gross weight for nisab — practice, primary source **[U]** (Z-4).
 - AAOIFI SS 21 section number for purification **[U]** (Z-6).
 - Named-scholar confirmation of "real return" display — owner may request (A6.2).
+
+Private equity and expected vs actual (2026-10-17): answered in zakat-on-investments.md "Answers for Private equity (2026-10-17)" P-1…P-5 and applied in §5.1, §5.5, §5.6, §9.4 (AC-47, AC-58b, AC-64…AC-67, AC-71; P-3 / P-4b wording in AC-51…53, AC-60). P-1 item 7 replaces UX verdict item 4 for business stakes. Still open on the consultant's side:
+- **Z-8** Case B ruling (fixed % of money, capital not guaranteed) has no primary source yet **[U]**; the "counts as return" line shows "source not yet verified". Owner decided (Q14): payouts count as return, with a "Shariah risk" tag.
+- **Z-9** AAOIFI SS 12 / SS 13 section numbers, incl. periodic payouts as advances on account **[U]**.
+- **Z-10** Pending-row wording: **closed** by P-4b (row labels, "Received this amount", the line under "Confirm all"; §5.6, AC-51…53, AC-58b).
 
 ## 13. Owner decisions and open questions
 
@@ -390,6 +524,12 @@ Answered by the consultant (Z-1…Z-7 in zakat-on-investments.md) and applied ab
 | Q7 | Hawl-year view? | **Decided:** Gregorian only in v1; hawl year with UC-3. |
 | Q8 | Real estate own type? | **Decided:** under "other" in v1. |
 | Q9 | Should a refresh also fill past month-end rates (history), so past months are not stale? | **Decided (orchestrator, scope cut):** not in v1 — a history request is large, and a request tailored to the user's dates would reveal when they invested. Revisit if users report stale past months. |
+| Q10 | Business stakes: own type? | **Decided (owner, 2026-10-17):** new type **"Private equity"**, e.g. money in a friend's project paid a fixed % on a fixed schedule (§5.5). |
+| Q11 | Expected vs actual? | **Decided (owner, 2026-10-17):** for **every** type, optional per item: expected profit % + payout schedule vs income received, with a signal when a payout is late (worded per Shariah file P-3: "No payout recorded…"); expected value growth % + value-check schedule vs value updates, with a "value update due" signal (§5.6). Q13 replaced the signals with pending rows. |
+| Q12 | Should money out of kind **income** lower the recorded value? | **Decided (2026-10-17, review loop 1; architect, consultant P-4b no objection):** no. Only sales lower the value; income never asks for a value left (§5.4, §5.6 V_exp, AC-68). Code change needed: today the value replay subtracts every money out. |
+| Q13 | How does the user record actuals on the schedule? | **Decided (owner, 2026-10-17):** a **pending row** on each payout and value-check date, filled with the expected amount; never actual until confirmed (one-tap check mark, edit then save, or skip → "No payout recorded…"); "Confirm all as expected" per item; created only when the app opens or the item is viewed. Growth % and actual results may be negative. Item screen charts: expected line vs actual line (actual records only), pending points hollow (§5.6). |
+| Q14 | Case B (fixed % of money, capital at risk)? | **Decided (owner, 2026-10-17):** payouts count as return; the item stores and shows the tag **"Shariah risk"**. Case C stays "to purify" (P-4); "not sure" follows P-2 (§5.5). |
+| Q15 | Risk view per asset? | **Decided (owner, 2026-10-17):** goes to UC-2 (dashboard, next feature). Here: store and show the tag only. |
 
 ## 14. Answers to the UX doc's questions (docs/product/ux/my-investments.md)
 

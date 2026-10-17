@@ -1,6 +1,6 @@
 # UX flow — My Investments
 
-**Owner:** ux-expert · **Status:** v1 draft · 2026-10-16 · review loop 1 applied (PM + consultant)
+**Owner:** ux-expert · **Status:** v1 draft · 2026-10-16 · review loop 1 applied (PM + consultant) · 2026-10-17: Private equity + expected vs actual added (§2.12, story §5.5–5.6, AC-46…AC-67)
 **Input:** [story](../stories/my-investments.md) · [market research](../research/my-investments-market.md) · [zakat rules](../shariah/zakat-on-investments.md)
 **Platform note:** one adaptive layout with platform-native controls (Cupertino feel on iOS first, Material 3 on Android); the architect decides the widget strategy.
 **AC numbers** below refer to story §10 as renumbered on 2026-10-16.
@@ -47,6 +47,7 @@ Q5 (real totals), Q6 (no third-unit conversion) and Q7 (Gregorian year) are deci
 | S7 | **Period view** | Main | Month / Year, before/after set-aside, before/after inflation, purchasing-power gap, no-zakat switch with nisab hint. Portfolio or one item (scope picker). |
 | S8 | **Assumptions** | Main | Rates, inflation series, base, home inflation, zakat choices, no-zakat years. Replaces separate "Settings" and "Rates" screens. |
 | S9 | **Why sheet** | Bottom sheet (one component) | Every explanation. |
+| — | *2026-10-17 additions (§2.12)* | no new screen | S3 gets the Private equity type and an **Expected (optional)** block. S4 gets **To confirm** (pending rows), **Plan vs actual** (numbers + charts) and the **Shariah risk** tag. S2 gets a pending badge. S5 opens pre-filled from a pending row. S7 gets one payouts line in item scope. |
 | — | Unit picker, inline rate entry | Shared sheets / rows | Used by S1, S3, S5, S6, S7, S8. |
 
 **Why merge this way:** three jobs — *record* (S3 + S5), *keep current* (S6, S8 for corrections), *judge* (S2, S4, S7). Rates, inflation and zakat choices are all "assumptions behind the numbers", so they live together in S8, and every why sheet deep-links to the exact S8 row.
@@ -283,6 +284,173 @@ Four blocks:
 4. **Source** (zakat, interest and purchasing-power numbers) — ruling text from the zakat file, its reference, verification tag; `[U]` → "source not yet verified". Shipped inflation: dataset and "as of" year.
 Method limits live here (Modified Dietz drift; "not annualised under 1 year").
 
+### 2.12 Private equity and expected vs actual (2026-10-17)
+
+**Input:** story §5.5, §5.6, AC-46…AC-67, owner Q10–Q15 · Shariah file B6, B6.1, B6.2, P-1…P-5.
+**Rule for this section:** no new screen. Every part below extends S2, S3, S4, S5 or S7 and reuses their widgets (Card, ListTile, ChoiceChip, RadioListTile, SegmentedButton, FAB, snackbar with Undo).
+
+**Owner requirement, top priority:** confirming "it went as expected" is **one tap on a check mark, no form**. Edit and Skip are secondary.
+
+#### 2.12.1 Form (S3) — the Private equity type
+
+- **Type list:** "Private equity" sits between Crypto and Other. Subtitle in the picker: "A stake in a business not on a market — e.g. a friend's project."
+- **Fields** (a new column in the 2.3 table):
+
+  | Field | Private equity |
+  |---|---|
+  | Market | — (not asked) |
+  | Item unit | default base |
+  | Start date, Paid, Current value + date | yes, as other types |
+  | Quantity | optional; label "Shares in the project (optional)" |
+  | **Intent** | **To sell · Long-term (for its profit)** — required, nothing pre-selected. Personal use and Rental are not shown (AC-46). |
+  | **Zakat share** | per intent, below (P-1) |
+  | Expected (optional) | yes, §2.12.2 — **open by default** for this type (the owner's case) |
+
+- **Intent → zakat share** (P-1, AC-47). The A9 status line and **Source** sit under the share, as for every type:
+  - **To sell** → 100 %: "Zakat: on 100 % of value. You hold this to sell. — IIFA Res 28 (3/4) §3." No method question.
+  - **Long-term** → three RadioListTiles, nothing pre-selected, save blocked until one is picked ("Pick how zakat is counted"):
+    1. **Known zakatable %** — a % field opens under it. "IIFA Res 121 (3/13) §1".
+    2. **Zakat on profit received only** — share 0 %. Notice under it (consultant, exact): "Zakat: {r_z} of each profit payout you record, not of the project's value. Each payout is counted once." {r_z} = 2.5 % or 2.577 %, from the zakat-year setting. — IIFA Res 28 (3/4) §3 by analogy.
+    3. **Full value** — 100 %. "Precaution."
+    - Help line under the three (P-1 item 6, exact): "If the project mostly buys and sells goods, most of its value is usually zakatable."
+    - **No 25 % option** for this type.
+- **Q2 on every Private equity item** (loop-1 correction): asked in this part of the form, right after Intent, schedule or not: "If the project loses money, do you still get all your money back?" → No · Yes · Not sure. Required; "Not sure" is fine. It sits here, not in the Expected block, because it can change the zakat share (case C). Q1 stays in the Expected block (2.12.2).
+  - **Case C** (Q2 = yes) replaces the three options with one filled line: "Zakat on 100 %. This works like money you lent. Zakat is on the full amount, as a debt owed to you. — IIFA Res 1 (1/2)." + Source. "Custom %" stays available, as for other types. Answering Q2 is the user's own act, so this is not a silent default.
+- **"Other" + Long-term** keeps its B6 help (2.3) unchanged. Existing "other" items are never moved (AC-46).
+
+#### 2.12.2 Form (S3) — the "Expected (optional)" block
+
+One ExpansionTile after the zakat share, before "More". Title: **Expected (optional)**. Subtitle: "Plan payouts or value checks. An estimate, not a promise." Collapsed by default (open for Private equity; open on edit when anything is filled).
+
+Two sub-blocks. Each is hidden per type (story §5.6, AC-48):
+
+| Sub-block | Shown for | Fields |
+|---|---|---|
+| **Payouts** | all types **except** gold, silver, crypto | **Payout schedule** chips: None · Monthly · Every 3 months · Every 6 months · Yearly (None pre-selected = no plan). **Expected profit (your estimate, % per year)** — optional. |
+| **Value checks** | all types **except** gold, silver | **Value-check schedule** chips (same five). **Expected value growth (your estimate, % per year)** — optional; 0 and negative allowed. |
+
+- Under each % field, always (P-3, exact): "An estimate, not a promise. Not used for zakat or return."
+- **Live result line** under the expected profit % (AC-49): "= **5,000.00 EGP every 3 months** · first on 15 Apr 2026". This is how a user who meant "% per payout" sees the mistake. Missing rate → "Needs a USD→EGP rate on 1 Mar 2026 to show amounts · Add" (inline rate entry, 2.8).
+- **Live result line** under the growth %: "Your estimate for 1 Jan 2027: 11,200.00 EGP (if nothing else is added or taken out)."
+- **Validation** (inline, AC-48): % without a schedule → "Pick a payout schedule, or clear this %." Profit % = 0 → "Must be more than 0. Leave it empty for no %." Growth ≤ −100 % → "Must be more than −100 %."
+- **Type questions** — shown under the Payouts sub-block (P-3; loop-1 decisions):
+  - **Cash deposit** (AC-67): shown **when a payout schedule is set**: "Is this an Islamic account (profit share) or a conventional account (interest)?" two ChoiceChips, nothing pre-selected, **required to save** ("Pick the account kind"). Conventional → notice (exact): "This is interest. Record it as money out "interest (to purify)", not as income." + Source (Z-6). Its pending rows then record interest, not income (2.12.3).
+  - **Private equity** (P-2, AC-64): **Q1**, shown only when an expected profit % is set, as three stacked RadioListTiles (the text is long, so no segmented control). Q2 is asked on every Private equity item, in 2.12.1.
+    - **Q1** "Is this % a share of the project's real profit, or a fixed % of the money you put in?" → Share of the real profit · Fixed % of my money · Not sure.
+    - Must be picked; "Not sure" is fine. Unpicked → "Pick one. 'Not sure' is fine." Any answer saves (AC-64).
+    - The **notice** appears live under Q1 when % is set, otherwise under Q2 in 2.12.1. It is a tonal info card (info icon, not error red), with **Source** → S9. Case rules use what was asked (Q2 = yes → C). Texts exact from P-2: case A none · case B "A fixed % of the money…" · case C "Your money comes back even if the project loses…" · "?" "Ask your partner two things…".
+    - Case B also shows a preview of the tag: "This item will be tagged **Shariah risk**. Payouts still count as return. · source not yet verified" (Q14, Z-8).
+  - Stock, fund/ETF, sukuk, other: nothing (AC-67).
+- **Edit with history:** changing Q1/Q2 → the existing "This recalculates every past month for this item." confirm (P-4). Changing a %, a schedule or the start date → "Rows to confirm are rebuilt for the new dates. Your recorded payouts and values stay." (story §5.6 Edits).
+- **Banned words** in every expected label, help line, row and chart (P-3, AC-67): interest, guaranteed, promised, fixed return, yield, late, missed, default. The only "interest" on these screens is the cash-deposit question and notice above, which are about the account, not the estimate.
+
+#### 2.12.3 Item detail (S4) — pending rows ("To confirm")
+
+**New order of S4:** header (+ tag) → **To confirm** → Returns card → **Plan vs actual** → To purify → Zakat line (+ P-2 notice) → History.
+
+**"To confirm" card** — only when the item has pending rows.
+- Card title: "**To confirm · 3**". At the end of the title row: text button **Confirm all as expected**, and under the title the line (P-4b, exact): "Confirm only money that really came in."
+- Rows oldest first (the same order the matching rule uses). One row:
+
+  ```
+  ○  15 Apr 2026   Expected payout (not received yet)
+                                            5,000.00 EGP   [ ✓ ]
+                   No payout recorded for 16 Jan – 15 Apr 2026.
+                   Expected around 15 Apr 2026. In a partnership,
+                   no profit means no payout.                    ⋮
+  ```
+  - **Leading:** hollow circle ○ (pending). Actual history rows use a filled icon. Never colour only: the word "Expected" is always there.
+  - **Label** (P-4b, exact): "Expected payout (not received yet)"; case C: "Expected payout (to purify when received)"; conventional cash deposit: "Expected interest (to purify)"; value rows: "Value check".
+  - **Amount:** end-aligned, normal weight, onSurfaceVariant colour (actual amounts use onSurface). VoiceOver: "Expected payout, not received yet, 15 April 2026, 5,000 Egyptian pounds. Button: Received this amount."
+  - **Trailing: the check mark** — a filled-tonal IconButton, 48 × 48 dp (above the 44 pt minimum), icon ✓, label and tooltip (P-4b, exact) "Received this amount".
+- **One tap on ✓ = done.** No sheet, no dialog. The row leaves the card and appears in History as actual (payout → money out, income; conventional cash deposit → interest (to purify), paid out to me; value → value update), dated on the schedule date, at the shown amount (AC-52, AC-61). Snackbar: "Recorded 5,000.00 EGP on 15 Apr 2026 · **Undo**" (10 s, same as delete Undo). Undo deletes that record and the row is pending again.
+- **Row without an amount** (schedule with no %): the ✓ is replaced by a text button **Add amount**, so the ✓ always means "one tap, done". It opens S5 with only the amount focused (AC-57).
+- **Secondary actions:** tap the row body → **Edit** (S5 pre-filled, below). ⋮ → Edit · Skip. No swipe here: swipe means delete in History, and must not mean skip.
+- **Skip** (no confirm, Undo snackbar): a payout row moves to History as a quiet "Skipped" row with the P-3 line; a value row disappears and records nothing (AC-52). Tapping a skipped row → S5 to record it after all.
+- **"No payout recorded…" line** (P-3, exact) shows under a payout row from schedule date + 8 days (AC-51), and under every skipped row. Style: bodySmall, onSurfaceVariant, **no warning icon, no red**. Never "late", "missed", "due" or "overdue". Private equity adds "In a partnership, no profit means no payout."
+- **Confirm all as expected:** one tap, no dialog; every row **with** an amount becomes actual (AC-53). Snackbar: "Recorded 3 as expected · **Undo**" (Undo removes all three). Rows without an amount stay; the card then says "1 row needs an amount". Button hidden when no row has an amount.
+- **Closed item:** card stays for rows on or before the closing date (AC-56). No Record FAB, as today.
+- **Value row, after recording below the estimate:** the History row shows "Value is below your estimate." (P-3, exact) under the amount. Nothing above the estimate (no praise either).
+
+**S5 opened from a pending row (Edit):** the existing Record sheet, pre-set: kind Out · Income (payout), Interest · Received · Paid out to me (conventional cash deposit) or Value (value check), date = schedule date, amount = expected amount. Header line: "Expected 5,000.00 EGP on 15 Jul 2026". The date picker allows only 15 Jul ± 7 days (8–22 Jul), the same window as the matching rule. Save → actual with the typed amount and date; the row is resolved (AC-52). Below-money-in and below-estimate values are accepted.
+
+**S5 opened from Record (by hand):** when an income or value update is dated within 7 days of a pending row, one line under the date: "This also records the expected payout of 15 Jul 2026." (AC-54, AC-61: no duplicate). Interest never shows this line (AC-58).
+
+#### 2.12.4 Home (S2) — pending rows are visible, not pushed
+
+- **Row badge:** on a list row with pending rows, a small pill on the start side of the row's last line: "**3 to confirm**" (secondaryContainer, text, no red, no number on the app bar or the app icon).
+- **Not added:** no banner, no "No payout recorded" text on Home, no change to the stale banner. Pending rows never feed staleness (AC-63); a confirmed value row is actual and does clear the item's stale mark.
+- Closed items are never counted (AC-56).
+
+#### 2.12.5 Item detail (S4) — "Plan vs actual" card and charts
+
+Shown only when the item has a plan. One card, two parts, a SegmentedButton **Payouts | Value** on top (only the parts the item has; one part → no switch). One chart on screen at a time keeps the card short on small phones.
+
+**Payouts part** (story §5.6 "Shown per item"):
+| Line | Example (AC-52) |
+|---|---|
+| Expected so far (your estimate) | 15,000.00 EGP |
+| Received | 9,000.00 EGP |
+| Difference | **−6,000.00 EGP** (word + sign: "less than your estimate") |
+- Case C: under Received, "Counted as received. Shown as to purify, not profit." (story §5.5).
+- No % and no amounts → only "Received since start: 2,100.00 EGP" (AC-57).
+
+**Value part:** the last actual value update vs the estimate on that date: "Actual 12,400.00 · Your estimate 12,635.39 · **−235.39 (−1.86 %)**" + "Value is below your estimate." (AC-60). Actual is net of interest kept inside (H).
+
+**Footer line, always:** "Estimates only. Not used for zakat or return." (P-3).
+
+**Charts — what they must show** (AC-62). No charting package exists in the app yet; the architect decides how they are drawn. Style: a plain Material 3 line chart inside the card, the same look as the other cards — no shadow, no gradient fill, no 3D, theme colours only.
+
+| | Value chart | Payouts chart |
+|---|---|---|
+| X axis | dates, start date → today | same |
+| Expected | **dashed** line through V_exp(t), outline/secondary colour | **dashed step line**, cumulative expected payouts, steps on each payout date |
+| Actual | **solid** line, primary colour, **filled dots** only at actual value updates (incl. the start value) | **solid step line**, cumulative actual income, steps on each income date |
+| Pending | **hollow circles** at the expected amount on each pending value-check date | **hollow circles** at the cumulative expected amount on each pending payout date |
+| Gone after confirm | the hollow point becomes a filled dot on the actual line | same |
+
+- Height 180 dp (160 on narrow screens). 3 light horizontal grid lines, no vertical ones. Y labels may be short ("100k"); every exact amount is in the rows above and in the tap tooltip, in full ("100,000.00 EGP"), so the "never 1.2M for money" rule (§6) holds for figures.
+- **Legend under the chart, in words:** "— Actual · - - Your estimate · ○ To confirm". Dashed vs solid vs hollow carries the meaning, not colour.
+- Tap or drag on a point → tooltip: date, kind, amount, state (received / recorded / to confirm / skipped).
+- **Accessibility:** the chart is one VoiceOver element with a summary: "Payouts chart. Your estimate so far 15,000. Received 9,000. 1 row to confirm." The rows and numbers above are the table form; nothing is only in the chart.
+- **Only on the item screen** (AC-62, story §11). No chart in S2 or S7.
+
+**S7 (Period view) — item scope only:** one line under the ladder: "Payouts: your estimate 5,000.00 · received 4,000.00 EGP" (AC-52 July). Never in portfolio scope (no expected totals, story §5.6).
+
+#### 2.12.6 Shariah risk tag (case B) and case C "to purify"
+
+**Case B — the tag** (Q14, AC-66):
+- An outlined chip in the S4 header, under the subtitle: ⓘ **Shariah risk**. Tertiary colour, text always there. Not red, not a warning triangle: the app shows the reason, it does not judge the user (P-4).
+- Tap → S9: the P-2 case B notice (exact) + "Payouts count as return. · source not yet verified" (Z-8) + Source IIFA Res 30 (5/4) item 4 → B6.1 + **Change answers** (opens S3 at Q1/Q2).
+- The case B notice also sits in the Zakat-line area of S4 (P-2: "form and detail page").
+- On S2 the tag is **not** shown (Q15: the risk view is UC-2). The tag goes away as soon as Q1 changes (AC-66).
+
+**Case C — "to purify":**
+- S4 Zakat-line area: the case C notice (exact) + Source.
+- History: each income row on the item reads "**Payout · to purify**" instead of "Income".
+- Returns card: gain and return exclude the payouts (AC-65); one line under the card: "Payouts are not counted as return: your money comes back even if the project loses."
+- To-purify card (2.4 step 3): the total includes the payouts; second line "includes 10,000.00 EGP of payouts". **Record given away** reuses the existing "interest given away (from interest paid out to me)" record. On a case C item the S5 option reads (consultant, exact) "**Given away from payouts (to purify)**", help line "Money from these payouts that you gave to charity. Giving it away does not count as zakat."
+- Pending payout rows read "Expected payout (to purify when received)". The ✓ still records them as received (story §5.5).
+- Home "Interest to purify" total includes them. The label stays "to purify" on payouts: they are not interest, so the word "interest" is not added to the payout rows.
+
+#### 2.12.7 Arabic (RTL) and small screens (iPhone SE)
+
+- **RTL:** the pending row mirrors: ○ and date on the right, ✓ on the left. The ✓ glyph itself is not mirrored (not directional). The badge mirrors with the row. Charts: the time axis mirrors (oldest on the right), Y labels move to the right edge — same rule as the S7 stepper. Amounts, %, dates inside a sentence ("16 Jan – 15 Apr 2026") stay one LTR unit each. Q1/Q2 and every P-2/P-3 notice need an Arabic text **reviewed by the consultant** before release; the English is exact Shariah text, a free translation is not enough.
+- **iPhone SE (375 pt wide; check 320 pt too):**
+  - Pending row: date (≈ 72 pt) · label (flex) · ✓ (48 pt). The amount wraps under the label at large Dynamic Type; the ✓ never moves off the row and never shrinks below 48 dp.
+  - "Confirm all as expected" moves under the card title when the title row is too narrow.
+  - Schedule chips use a wrapping row (two lines on SE).
+  - Q1/Q2 options stack, one per line.
+  - Plan vs actual: the three numbers stack (label above number) under 360 pt.
+  - Chart 160 dp high; the legend wraps below it; one chart at a time (the Payouts | Value switch).
+
+#### 2.12.8 Edge cases
+
+- **Missing rate** for money in another unit → no expected amounts; S4 card: "Needs USD→EGP rate on {date} for your estimates · Add" (story §5.6 C(date)).
+- **Plan removed** → To confirm and Plan vs actual disappear; returns, zakat and totals do not change (AC-63).
+- **App in background** → nothing is created; rows appear only on open or on viewing the item (AC-51, AC-63). No notification.
+- **Many old rows** (e.g. monthly plan added two years late → 24 rows): the card shows the 3 oldest + "Show 21 more". "Confirm all" covers all of them; the Undo snackbar covers all of them.
+
 ---
 
 ## 3. Every number: label and where its "why" lives
@@ -310,6 +478,9 @@ Method limits live here (Modified Dietz drift; "not annualised under 1 year").
 | Nisab hint | S7, S8 | Nisab: 85 g gold = {x} · 595 g silver = {y} | grams × your gold/silver rate on {date}; full check is in a later feature | A3, Z-4 |
 | Zakatable total | S7, S8 | Zakatable total in this list | Σ value × share; the list may not be all your wealth | Z-4 |
 | Rate | S6, S8 | 1 USD = {x} EGP · as of {date} | Source + its date, or typed by you; typed wins on the same date | A7 |
+| Expected payout (row / per payout) | S3, S4 | Expected payout · {x} every {n} months | money in − sales before the period × % × months ÷ 12; an estimate, not used for zakat or return | P-3 |
+| Expected so far / Received / Difference | S4, S7 (item) | Expected so far (your estimate) · Received · Difference | Σ expected payouts to today (skipped included) vs all income recorded | P-3 |
+| Your estimate (value) | S4 | Your estimate {x} · difference {y} ({z} %) | money in/out compounded at the growth % by days ÷ 365; never your own value updates | P-3 |
 
 **VoiceOver:** each number reads label + value + unit + marker in one phrase, e.g. "Return since start, plus 15.50 percent, in Egyptian pounds, value not updated this month." Signs read as words.
 
@@ -442,6 +613,61 @@ Home totals are illustrative; S7 uses AC-15.
 └──────────────────────────────────────┘
 ```
 
+**S4 — Item detail with a plan ("Friend's project", AC-51, 17 Oct 2026)**
+```
+┌──────────────────────────────────────┐
+│ ‹ Friend's project             Edit  │
+│ Private equity · Long-term           │
+│ (ⓘ Shariah risk)        ← case B only│
+│ 100,000.00 EGP · value from 15 Jan   │
+│ ┌ To confirm · 3 ──────────────────┐ │
+│ │        [ Confirm all as expected ]│ │
+│ │ Confirm only money that really   │ │
+│ │ came in.                         │ │
+│ │ ○ 15 Apr  Expected payout (not   │ │
+│ │           received yet)          │ │
+│ │           5,000.00 EGP      [ ✓ ] │ │
+│ │   No payout recorded for 16 Jan – │ │
+│ │   15 Apr 2026. Expected around    │ │
+│ │   15 Apr 2026. In a partnership,  │ │
+│ │   no profit means no payout.    ⋮ │ │
+│ │ ○ 15 Jul  Expected payout (not…) │ │
+│ │           5,000.00 EGP      [ ✓ ] │ │
+│ │   No payout recorded for …      ⋮ │ │
+│ │ ○ 15 Oct  Expected payout (not…) │ │
+│ │           5,000.00 EGP      [ ✓ ] │ │
+│ │                                 ⋮ │ │
+│ └──────────────────────────────────┘ │
+│ ┌ Since start … (returns card) ────┐ │
+│ └──────────────────────────────────┘ │
+│ ┌ Plan vs actual  [Payouts | Value]┐ │
+│ │ Expected so far   15,000.00 EGP  │ │
+│ │ Received               0.00 EGP  │ │
+│ │ Difference       −15,000.00 EGP  │ │
+│ │  ▲            ○ ┄┄┄              │ │
+│ │  │      ○ ┄┄┄┘                   │ │
+│ │  │ ┄┄┄┄┘                         │ │
+│ │  └━━━━━━━━━━━━━━━━━━━━━━━━━━━━▶  │ │
+│ │  — Actual · ┄ Your estimate ·    │ │
+│ │  ○ To confirm                    │ │
+│ │ Estimates only. Not used for     │ │
+│ │ zakat or return.                 │ │
+│ └──────────────────────────────────┘ │
+│ Zakat: … · Source ›                  │
+│ History                              │
+│ 15 Jan 2026  ↑ Money in 100,000 EGP  │
+│                          [ Record ]  │
+└──────────────────────────────────────┘
+```
+
+**S2 — list row with pending rows**
+```
+│ Friend's project      100,000.00 EGP│
+│ Private equity               0.00 % │
+│ (3 to confirm)                      │
+│ Sort: Value ▾                       │
+```
+
 ---
 
 ## 5. Exit states (summary)
@@ -484,6 +710,8 @@ Home totals are illustrative; S7 uses AC-15.
 - **Grams view:** zakat computed in money, shown in grams; "yardstick, not a price index"; no gold-for-gold modelled.
 - **`[U]` references** show "source not yet verified". Wahed's 30 % appears nowhere.
 - **Never shown:** buy/sell/hold advice; any inflation-adjusted zakat base.
+- **Private equity (§2.12):** intent to sell → 100 % (Res 28 (3/4) §3); long-term → three methods, no 25 % (P-1); case C → 100 % as a debt (Res 1 (1/2)). Q1/Q2 and the one P-2 notice live in S3 and S4 with Source. Case B → "Shariah risk" tag + "source not yet verified" (Z-8). Case C → payouts "to purify".
+- **Expected figures (§2.12):** P-3 labels and "An estimate, not a promise. Not used for zakat or return." on every field and on the Plan vs actual card; "No payout recorded…" never "late"; "Value is below your estimate."; banned words list in 2.12.2. Cash deposit with a %: Islamic / conventional question (P-3).
 
 ---
 
@@ -495,6 +723,10 @@ Home totals are illustrative; S7 uses AC-15.
 4. **Unit picker** sorts "All" by code with localized name (story lets UX choose).
 5. **Tap-to-fill hint chips** for "other" (e.g. "Use 0 %" for personal use) — the user's tap, not a default, so AC-7 holds.
 6. **Nisab hint** next to the no-zakat switch (consultant Z-4 answer); story §11 keeps the full nisab check in UC-3.
+7. **Undo snackbar** after a one-tap ✓, after "Confirm all as expected" and after Skip (story has no undo; it keeps the one tap safe).
+8. **"Add amount"** button instead of ✓ on a row with no amount, so ✓ always means one tap (story: "it asks for the amount").
+9. **"This also records the expected payout…" hint** in S5.
+10. **Payouts | Value switch** — one chart at a time on S4.
 
 ---
 
@@ -502,3 +734,12 @@ Home totals are illustrative; S7 uses AC-15.
 
 - **PM-Q1 — Dividends-only set-aside: story vs consultant.** Story AC-5: share 0 %, set-aside 0, notice "counted with your cash". Consultant (UX answer (a)): set-aside = r_z × income received in the period, no T/Y, plus a double-count hint on cash money-in. These give different S7 numbers for Khaled. Designed to the story [F-DIV]; which one wins?
 - **PM-Q2 — "Other" + personal use.** Consultant says 0 %; story AC-7 says no default. Designed as an empty field with a "Use 0 %" chip. OK?
+
+*Added 2026-10-17 (§2.12):*
+
+- **PM-Q9 — Q12.** Decided: income payouts no longer lower the value; only sales do. A ✓ on a payout leaves the value and the value chart unchanged.
+- **PM-Q10 — Giving away case C payouts.** Decided: reuse "interest given away (from interest paid out to me)"; label "Given away from payouts (to purify)" + help line (2.12.6).
+- **PM-Q11 — when Q1/Q2 are asked.** Decided: Q2 on every Private equity item (2.12.1); Q1 only when a % is set (2.12.2).
+- **PM-Q12 — "Profit received only" notice.** Decided: consultant text in 2.12.1, with {r_z} from the zakat-year setting.
+- **Gold/silver/crypto P-3 notices.** Decided: not shown (the fields are hidden, AC-48).
+- **PM-Q13 — Arabic texts.** Q1, Q2 and every P-2/P-3 notice need consultant-reviewed Arabic before release.

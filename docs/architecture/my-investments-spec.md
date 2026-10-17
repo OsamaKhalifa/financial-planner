@@ -1,7 +1,7 @@
 # Implementation spec — My Investments
 
-**Owner:** architect · **Status:** v1 · 2026-10-16
-**Inputs:** [story](../product/stories/my-investments.md) (frozen, AC-1…AC-44 + AC-19b) · [zakat file](../product/shariah/zakat-on-investments.md) · [UX flow](../product/ux/my-investments.md) (loop 1 accepted) · ADR-[0001](../adr/0001-data-access-behind-repositories.md), [0002](../adr/0002-project-layout-and-stack.md), [0003](../adr/0003-rate-refresh-source.md), [0004](../adr/0004-shipped-inflation-data.md)
+**Owner:** architect · **Status:** v1 · 2026-10-16 · 2026-10-17: §12 added (Expected vs actual + Private equity, AC-46…AC-67)
+**Inputs:** [story](../product/stories/my-investments.md) (frozen, AC-1…AC-44 + AC-19b; §5.5, §5.6, AC-45…AC-67 added 2026-10-17) · [zakat file](../product/shariah/zakat-on-investments.md) · [UX flow](../product/ux/my-investments.md) (loop 1 accepted) · ADR-[0001](../adr/0001-data-access-behind-repositories.md), [0002](../adr/0002-project-layout-and-stack.md), [0003](../adr/0003-rate-refresh-source.md), [0004](../adr/0004-shipped-inflation-data.md)
 **Pending upstream:** PM is adding a worked number to AC-5 (dividends-only set-aside). The formula below already follows the consultant's rule; only the test value is pending.
 
 Rule of this spec: the engine is pure Dart and holds almost all logic and tests. Repositories store and stream; screens display engine output. Nothing is cached until a measurement says so.
@@ -361,3 +361,234 @@ No AC is untestable. None is ambiguous enough to block phase 1; the questions be
 - **Q-5** Current period ends today (D10): "2026 so far" uses E = today. Confirm.
 - **Q-6** The nisab hint (UX 2.10 step 7) has no AC. Add one, or treat as UX-only?
 - **Q-7** Consultant (UX verdict item 4) says "Other + personal use → 0 %"; story AC-7 says "other" never defaults. Spec follows AC-7.
+
+---
+
+## 12. Addition — Expected vs actual + Private equity (2026-10-17)
+
+**Inputs:** story §5.5, §5.6, AC-46…AC-67, §13 Q10–Q15 · zakat file B6, B6.1, B6.2, P-1…P-5 · UX §2.12 (written 2026-10-17; screen parts in 12.10) · orchestrator decisions on Q-E1…Q-E5 (2026-10-17, 12.11).
+**Scope here:** data model, domain, engine, Drift migration, repository, and how the §2.12 screens use them. Layout is UX's.
+
+### 12.1 Decisions
+
+| # | Decision | Why | Rejected |
+|---|---|---|---|
+| E1 | **Pending rows are derived, never stored.** `expectedVsActual(timeline, today)` rebuilds every row on each read from the item's plan fields + its history. Only the user's decisions are written: check mark / edit → a normal `MoneyOut(kind: income)` (conventional cash deposit: `InterestRecord(paidOut)`, Q-E1) or `ValueUpdate`; skip → one `PlanSkip` entry. | "No data written in the background" (§5.6, AC-51, AC-63) holds by construction: nothing is written until the user taps. The 7-day rule runs on every read, so a record typed by hand in S5 resolves its row with no write-time hook, and deleting it brings the row back. "A pending amount follows the current plan" (AC-59) and "edits recompute from the start" (§5.6 Edits) need no rewrite job. | **Stored generated rows:** needs a write on app open (a write the user did not ask for), a rebuild on every plan edit, a matching hook in `saveEntries` and an un-match hook in `deleteEntry`; two copies of the same fact can drift. |
+| E2 | **A skip is a history entry** (`PlanSkip`, kinds `payout_skipped` / `value_skipped`) in the existing `history_entries` table, dated on the schedule date. | D8 (one history table, one sealed type) already gives one stream, cascade delete, Undo via `restore`, un-skip via `deleteEntries`, one transaction via `saveEntries`. **Only interface change:** `deleteEntry(id)` becomes `deleteEntries(ids)` (12.6), for the one-transaction Undo of "Confirm all". | **Own `plan_skips` table:** a second join in `watchAll` (row product with history), new `skip`/`unskip` methods, `restore` must carry a second list. Cost of E2: `amount` is NOT NULL, so a skip stores `0`; `ItemTimeline` must drop skips (one filter, 12.4). |
+| E3 | **Matching = date window only:** a record resolves row k when `|record.date − d_k| ≤ 7` days. Rows in date order; each takes the earliest unused record in its window (by date, then `createdAt`). Payout rows take `MoneyOut(income)` only (never interest, AC-58) — except a cash deposit with `accountKind == conventional`, whose payout rows take interest received (`keptInside` / `paidOut`) only, never income (Q-E1); value rows take `ValueUpdate` only. A matched record beats a skip on the same row. A skip resolves a row only on its exact date. | One rule for hand-entered and confirmed records. Windows never overlap: the shortest step is 28 days (monthly, February) and a window spans 14 days, so greedy matching is exact (test it). | **A `plan_date` link column on history:** a second matching rule, and links go stale when the schedule changes. Cost of E3 removed by Q-E2: S5 opened from a pending row limits the date to d_k ± 7. |
+| E4 | **Shariah risk tag is derived**, not stored: `Investment.shariahRisk => peCase == PeCase.b`. The stored facts are the two P-2 answers. | AC-66: the tag must follow every change of Q1/Q2; a stored flag is a second copy that can disagree. It survives a restart because the answers do. UC-2 reads the same getter (D1: engine is in memory). | Stored `shariah_risk` column (story Q14 wording "stored tag" is met: it is computed from stored answers). |
+| E5 | **Case C is applied inside `ItemTimeline`**: income of a case C item leaves `flowsIn` and `incomeFlows` and goes into `toPurifyAt`. Giving it away reuses the existing "interest given away — from interest paid out to me" record (`givenAwayFromPaidOut`), no new kind (orchestrator 2026-10-17). | Every figure (Dietz, gain, ROI, set-aside, base totals) reads those three methods (verified in `portfolio_calculator.dart`), so one place changes them all, and P-4 "follows the current answers for all past payouts" is automatic. | A flag on each `MoneyOut`: would need a rewrite of past rows when Q2 changes. |
+| E6 | **Case C zakat is fixed in `resolve`**: for a private-equity item with `peCase == c`, `resolve` returns 100 %, section `B6` (B9 reason), notice `capitalBackIsDebt`, whatever rule is stored. | P-1 item 5 says "no method question"; D7 already resolves at calculation time. Changing Q2 later then needs no rule rewrite. | A new `ZakatRule.debt100` written by the form: a stored rule that must be rewritten whenever Q2 changes. |
+| E7 | **Private equity reuses existing rules**: trading → `trading100`; long-term "known %" → `custom`; "profit received only" → `longTermDividendsOnly` (same math, §9.4, P-1); "full value" → `longTermFullValue`. `resolve` returns section `B6` for every private-equity item. | Same math, same engine path (`onDividends`); only the "why" anchor differs. | New `pe*` rules: four enum values with identical math. |
+| E8 | **Rates are fractions**, like inflation: `expectedProfit = 0.20` for 20 %. Schedule enum `Schedule { monthly(1), quarterly(3), halfYearly(6), yearly(12) }`. | §2.2 rule. The story has "every 6 months"; the zakat file's input table lists monthly/quarterly/yearly only — story wins (the file is the source for rules, not enums). | — |
+| E9 | **Expected amounts are rounded to 2 dp in the domain** (`round(scale: 2)`, half away from zero), an explicit exception to D4. | A confirmed amount becomes a stored record ("5,000.00", "83.33", AC-49, AC-52); display rounding would store 20 dp. | — |
+| E10 | **Charts are one `CustomPaint` widget** (`widgets/plan_chart.dart`, two callers: value chart and income chart). No chart package, no ADR. | Two line series + filled/hollow points + a date axis is ~150 lines; a package (fl_chart, ~1 MB, own RTL and theming rules) costs more than it saves. Revisit if a third chart kind appears (UC-2 dashboard). | fl_chart; syncfusion (licence). |
+| E11 | **Q12: income does not change the recorded value; only sales do** (12.7). | Root cause confirmed in code; case C and closed-item confirms (AC-56) are wrong without it. | Keep the old rule (forces a value re-entry after every payout). |
+
+### 12.2 Domain model changes — `lib/features/investments/domain/`
+
+```dart
+enum AssetType { stock, fund, sukuk, gold, silver, cashDeposit, crypto, privateEquity, other }   // stored by name: 'privateEquity'
+enum Schedule { monthly(1), quarterly(3), halfYearly(6), yearly(12); const Schedule(this.months); final int months; }
+enum ProfitBasis { shareOfProfit, fixedPctOfMoney, notSure }   // P-2 Q1
+enum CapitalBack { no, yes, notSure }                           // P-2 Q2
+enum AccountKind { islamic, conventional }                      // P-3, cash deposit only
+enum PeCase { a, b, c, notSure }
+
+final class Investment {
+  … existing fields …
+  Schedule? payoutSchedule; Decimal? expectedProfit;        // fraction per year, > 0; needs payoutSchedule
+  Schedule? valueCheckSchedule; Decimal? expectedGrowth;    // fraction per year, > −1; needs valueCheckSchedule
+  ProfitBasis? profitBasis;      // privateEquity with expectedProfit only (Q1, Q-E4)
+  CapitalBack? capitalBack;      // every privateEquity item (Q2, Q-E4); never depends on a schedule
+  AccountKind? accountKind;      // cashDeposit with payoutSchedule (Q-E3)
+  PeCase? get peCase;      // null unless privateEquity (capitalBack is then always set — validated). Q2 first:
+                           //   capitalBack yes → c (with or without a %, with or without a schedule)
+                           //   Q1 asked (a % is set):     notSure in Q1 or Q2 → notSure; fixed + no → b; share + no → a
+                           //   Q1 not asked (no %):       no → a; notSure → notSure
+  bool get shariahRisk;    // peCase == b
+}
+// withRule(...) copies the seven new fields.
+
+// history_entry.dart
+enum PlanKind { payout, value }
+final class PlanSkip extends HistoryEntry { PlanKind plan; }   // date = the schedule date; a user decision, never actual
+```
+
+`investment_draft.dart` — `InvestmentDraft` gets the seven fields. New `DraftError`s: `planNotForType` (payout fields on gold/silver/crypto, value fields on gold/silver), `profitNeedsSchedule`, `growthNeedsSchedule`, `profitNotPositive` (≤ 0), `growthTooLow` (≤ −1), `answerProfitBasis` (privateEquity + expectedProfit), `answerCapitalBack` (every privateEquity item) — any value incl. not sure passes, AC-64 — and `answerAccountKind` (cashDeposit + payoutSchedule, Q-E3). Private equity: intent must be trading or long-term, else `missingIntent` (AC-46 "intent is named"); long-term rule must be `custom`, `longTermDividendsOnly` or `longTermFullValue`, else `shareRequired` (AC-47); case C skips the share check (E6). The form clears Q1 when the % is cleared, and the account kind when the payout schedule is cleared. Q2 is never cleared on private equity. So `peCase` is a pure function of what is stored. Case C in `ItemTimeline` (E5) and `resolve` (E6) reads only `peCase`, never a schedule or a %.
+
+`zakat_rules.dart` — `defaultRule(privateEquity, trading) = trading100`, `(privateEquity, longTerm) = null` (must pick); `offeredShare` unchanged (other only); `resolve`: section `B6` for every private-equity item, case C override (E6); new `ZakatNotice.capitalBackIsDebt`. P-2 and P-3 notices are **display** notices derived by the screen from `peCase` / `accountKind`, not zakat notices.
+
+`portfolio_calculator.dart` — **no change.** Private equity falls into the "others → default country of the item unit" series branch (story §8.1; verified: the market branch tests stock/fund/sukuk only). The calculator does not import the plan code (architecture test, 12.8).
+
+### 12.3 Where the expected-amount math lives
+
+- `lib/core/dates.dart` — add `DateTime addMonths(DateTime start, int months)`: same day in month `start.month + months`, or that month's last day (AC-50: 01-31 → 02-28, 03-31, 04-30; 2024-02-29 + 48 → 2028-02-29). Always from the start date, never chained.
+- `lib/features/investments/domain/formulas.dart` — two stateless formulas, Decimal only:
+  - `Decimal expectedPayout({required Decimal capital, required Decimal rate, required int months})` = `round2(capital × rate × months ÷ 12)` (`divide`). AC-49: 100,000 × 0.20 × 3/12 = 5,000.00; 10,000 × 0.10 / 12 = 83.33.
+  - `Decimal expectedValue({required List<Flow> flows, required Decimal growth, required DateTime on})` = `round2(max(0, Σ f.amount × powRatio(1 + growth, divide(daysBetween(f.date, on), 365))))` over flows dated ≤ on. `powRatio` stays the only `double` (D5): its inputs are a growth factor and a day ratio. Verified with a script: AC-60 12,635.39 / 9,948.16, AC-61 10,096.72 / 10,184.88, AC-48 9,000.00.
+- `lib/features/investments/domain/expected_plan.dart` — **new file.** No existing file owns a schedule or a match; keeping it out of `item_timeline.dart` keeps "actual only" structural (AC-63). Pure Dart.
+
+```dart
+enum RowState { pending, resolved, skipped }       // UI words: payout received / value recorded
+final class PlanRow { PlanKind kind; int k; DateTime date; Decimal? expected; RowState state;
+                      HistoryEntry? actual; Decimal? actualAmount;        // matched record, in item unit
+                      bool noPayoutLine; }                                // payout: skipped, or pending and today ≥ date + 8
+final class ValueCheck { DateTime date; Decimal actualNet; Decimal expected; Decimal diff; Decimal? diffPct; }   // at every ValueUpdate after start (AC-60)
+final class ExpectedVsActual {
+  List<PlanRow> payoutRows, valueRows;
+  Decimal? expectedSoFar;          // Σ P_k, d_k ≤ today (pending and skipped incl.); null without a %
+  Decimal received;                // all income since start, matched or not, case C incl. (§5.5, AC-54)
+  Decimal? difference;
+  ({Decimal? expected, Decimal received}) payoutsIn(Period p);   // S7 item scope, AC-52
+  Decimal? expectedValueAt(DateTime t);                         // chart line; null without a growth %
+  List<MissingRate> missing;       // non-empty → every expected amount null, pair named (§5.6)
+  bool get hasPending;
+  PlanRow? pendingRowNear(DateTime d, PlanKind k);              // S5 by hand: "This also records the expected payout of …" (UX 2.12.3)
+}
+ExpectedVsActual? expectedVsActual(ItemTimeline tl, DateTime today);   // null when the item has no schedule
+```
+
+Rules inside, each test-named after its AC:
+- Row dates `d_k = addMonths(start, k × m)`, k ≥ 1, `d_k ≤ today` and `!tl.closedAt(d_k)` (AC-51, AC-56).
+- `C(d)` = money in − sales dated ≤ d, in item unit, not below 0; income never lowers it. `P_k = expectedPayout(C(d_(k−1)), p, m)`, `d_0` = start (AC-55).
+- `V_exp` flows = money in (+) and **sales** (−) — the same entries that move the recorded value after E11 (needs the PM edit in 12.7). Never value updates, never interest.
+- Amounts in other units come from `tl.inItemUnit(entry)` (12.4), so conversion and `MissingRate` stay in one place.
+- Conventional cash deposit (Q-E1): payout rows match interest received (E3); `received` = interest received; the check mark records `InterestRecord(paidOut, d_k, P_k)`, so it lands in "to purify" and never in return (Z-6). Islamic or unanswered: income, as for other types (AC-58 unchanged).
+- Case C payouts still count as received (§5.5).
+
+Providers (`investments_providers.dart`): `expectedProvider.family(String id)` = `expectedVsActual(calc.timeline(id), calc.today)`; `pendingCountProvider.family(String id)` = number of pending rows for the S2 badge (0 for closed items, AC-56). Both read the existing `calculatorProvider`; nothing new is cached.
+
+Writes (screens, through `saveEntries` / `deleteEntries`): check mark → `MoneyOut(income, d_k, P_k)` (conventional: `InterestRecord(paidOut, …)`) or `ValueUpdate(c_k, V_exp)`; "Confirm all as expected" → one `saveEntries` call with every pending row that has an amount (one transaction, AC-53); skip → `saveEntries([PlanSkip(...)])`; every Undo snackbar (✓, Confirm all, Skip) → one `deleteEntries(ids of what was just written)`. Confirming never changes another row's amount: `P_k` reads only money in / sales and `V_exp` reads no value update.
+
+### 12.4 Engine changes — `item_timeline.dart`
+
+1. **Constructor drops `PlanSkip`** before sorting: `_entries` holds actual records only. Without this, `activeIn` and `latestValueDate` (`x is! InterestRecord`) would count a skip as activity.
+2. **E11 (Q12):** in `_replay`, `MoneyOut` lowers `delta` only when `kind == sale`.
+3. **Case C (E5):** `final bool _incomeIsPurify = investment.peCase == PeCase.c`. When true: `flowsIn` and `incomeFlows` skip `MoneyOut(income)`; `toPurifyAt` adds those amounts; `givenAwayFromPaidOut` records still subtract them (AC-19b path, no new kind). AC-65: case A gain 10,000.00, case C gain 0.00 and to purify 10,000.00.
+4. Add `Decimal? inItemUnit(HistoryEntry e) => _amount[e.id];` for the plan.
+
+Dividends-only and "profit received only" zakat are unchanged (`incomeFlows` + `onDividends`); AC-47 375.00 = 0.025 × 15,000 runs through the AC-5 path.
+
+### 12.5 Drift schema v2 + migration — `lib/core/db/`
+
+| Table | Change |
+|---|---|
+| `investments` | add nullable TEXT columns `payout_schedule`, `expected_profit` (Decimal), `value_check_schedule`, `expected_growth` (Decimal), `profit_basis`, `capital_back`, `account_kind`. Existing rows read back as "no plan". `asset_type` gains `privateEquity`; existing `other` rows are untouched (AC-46). |
+| `history_entries` | no column change. New kinds `payout_skipped`, `value_skipped` (amount `0`, unit null). New partial unique index `history_one_skip_per_plan_date ON history_entries (investment_id, kind, date) WHERE kind IN ('payout_skipped','value_skipped')` — one decision per row, a double tap throws `Conflict`. |
+
+Migration path (drift_dev 2.35.1 is already a dev dependency; `make-migrations` and `testWithDataIntegrity` verified present in the pub cache):
+1. **First, on the unchanged v1 code:** add `build.yaml` with `drift_dev` options `databases: {app_database: lib/core/db/app_database.dart}`, `schema_dir: drift_schemas/`, `test_dir: test/core/db/`; run `dart run drift_dev make-migrations` → commits `drift_schemas/app_database/drift_schema_v1.json`. Doing this after the table edit loses the v1 snapshot.
+2. **Move both partial indexes into the table declaration** with `@TableIndex.sql(...)` on `HistoryEntries` (exists in drift 2.35.2). The v1 index keeps its exact name and SQL. Why: the schema verifier compares the migrated database with the dumped schema and reports indexes it does not know as "unexpected entries" (read in `find_differences.dart`); an index made by `customStatement` is invisible to the dump. `onCreate` becomes `m.createAll()`.
+3. `schemaVersion = 2`; `onUpgrade: stepByStep(from1To2: (m, schema) async { addColumn × 7; await customStatement('CREATE UNIQUE INDEX IF NOT EXISTS history_one_value_update_per_day …'); await m.create(schema.historyOneSkipPerPlanDate); })`. `IF NOT EXISTS` because real v1 databases have that index and the dumped v1 schema does not. Only `addColumn` and new indexes — no table rebuild, so no data copy and no FK juggling.
+4. Re-run `make-migrations` → `drift_schema_v2.json`, `lib/core/db/app_database.steps.dart`, `test/core/db/app_database/generated/schema_v1.dart`, `schema_v2.dart`, `test/core/db/app_database/migration_test.dart` (all committed).
+5. **Migration test** (`test/core/db/app_database/migration_test.dart`): the generated schema test 1→2, plus `testWithDataIntegrity(oldVersion: 1, newVersion: 2)` that inserts at v1: an `other` item with every optional column, one history row of every v1 kind (incl. a 20-dp Decimal), a typed and a fetched rate, an inflation override, the settings row, a no-zakat year; then opens `AppDatabase` at v2 and checks through `DriftInvestmentsRepository` / `DriftAssumptionsRepository` that every value is equal, the item is still `other` with the same rule, every plan field is null, and a second value update on the same item and day still throws `Conflict`.
+
+### 12.6 Repository (ADR-0001)
+
+**`InvestmentsRepository` interface:** one change — `Future<void> deleteEntry(String id)` → `Future<void> deleteEntries(List<String> ids)`, one transaction, `NotFound` if any id is unknown (nothing deleted). Why: "Confirm all" Undo removes N records at once (UX 2.12.3); N separate calls could half-undo. Extends the existing method (one caller today, `record_sheet.dart`) instead of adding a second one. Domain types only, async (ADR-0001).
+`drift_investments_repository.dart`: `_investmentRow` / `_investmentOf` map the seven columns (enums by name, Decimals via the existing converter); `_entryRow` / `_entryOf` map `PlanSkip` ↔ `payout_skipped` / `value_skipped`; `deleteEntries` in one `transaction`. `AssumptionsRepository`: no change.
+
+### 12.7 Q12 verdict — income money out and the recorded value
+
+**Root cause confirmed.** `item_timeline.dart` `_replay`: `case MoneyOut() when amount != null: delta -= amount;` — no check of `kind`. It does what story §5.4 says ("Money out … lowers the value"), so it is a story rule problem, not a coding slip. Effect: item worth 100,000 pays 5,000 income → recorded value 95,000 → gain = 95,000 + 5,000 − 100,000 = 0, return ≈ 0 % until the user types the value again.
+
+**Fix is sound: income money out does not change the recorded value; only sales do.**
+- **Capital-keeping items** (private equity, Islamic deposit, rent paid out under "other"): correct without a value re-entry. Required for case C (otherwise case C payouts, left out of flows, would drop the value and give a negative gain) and for AC-56 (a payout confirmed after a full sale would push the value below 0).
+- **Stocks/funds (ex-dividend drop):** between the payout and the next value update the recorded value is too high by the dividend, so that month's return is too high by about the dividend ÷ value (≈ 1–2 % for a quarterly dividend). The next value update corrects it, and Dietz over any period ending on a typed value is exact. Cosmetic, temporary. Mirror of today's error, which is permanent until a re-entry.
+- **Stale marker side effect:** a month with only an income record counts as "active" (§9.3 counts flows), so it is not marked "value not updated" although the value is carried. Same as today; slightly more visible now. Cosmetic.
+- **Dividends-only / profit-received-only zakat:** unaffected. `Z_div` reads `incomeFlows`, never the value, and the value share is 0. AC-5 stays 25.00 / 10.00 / 15.00.
+- **Value-based zakat methods (trading, full value, 25 %):** EV is higher by the dividend until the next update → set-aside slightly higher (r × s × dividend × T/Y). Small, on the safe side, corrected at the next update.
+
+**Existing tests that touch income — none asserts the old drop; none should break:**
+`item_timeline_test` "income is summed separately from sales" (checks `incomeIn` and flow count only); `portfolio_calculator_test` "since start: days in a no-zakat year…" (value update at the end decides EV), "dividends-only income in a no-zakat year…" and "a dividend in another currency…" (share 0); `acceptance_test` AC-5 (adds a value update on each dividend date — a workaround for the old rule; still passes, can be removed); `item_detail_screen_test` AC-5 why sheet (share 0); `record_sheet_test` "income received is a money out of kind income" (40 below the value 1,000); `drift_investments_repository_test` round trip (kind only).
+**New tests:** `item_timeline_test` "income keeps the recorded value; a sale lowers it"; `record_sheet_test` "income above the value does not ask for the value left" (record_sheet.dart line ~256: the `valueLeftRequired` check becomes sale-only).
+**Story text the PM must change with the fix:** §5.4 "Money out on date d lowers the value…" → sales only; the "value left" sentence → sales only; §5.6 V_exp "Why all money out, incl. income" → money in and sales; §13 Q12 → decided. No AC number changes (AC-60 has sales only).
+
+### 12.8 Files, in order (Phase 6; each step ends `flutter analyze` clean, `flutter test` green)
+
+1. `build.yaml` (new) + `dart run drift_dev make-migrations` on v1 → `drift_schemas/app_database/drift_schema_v1.json` (12.5 step 1). **Before any table edit.**
+2. `lib/core/dates.dart` — `addMonths`. Test: `test/core/dates_test.dart` (AC-50).
+3. `lib/features/investments/domain/investment.dart` — `privateEquity`, five enums, seven fields, `withRule`, `peCase`, `shariahRisk`. Test: `investment_test.dart` (case table, AC-66 tag on/off).
+4. `lib/features/investments/domain/history_entry.dart` — `PlanKind`, `PlanSkip`.
+5. `lib/features/investments/domain/item_timeline.dart` — 12.4 items 1–4. Test: `item_timeline_test.dart` (Q12, skip ignored, case C).
+6. `lib/features/investments/domain/formulas.dart` — `expectedPayout`, `expectedValue`. Test: `formulas_test.dart`.
+7. `lib/features/investments/domain/expected_plan.dart` (new). Test: `test/features/investments/domain/expected_plan_test.dart` (new; windows never overlap, oldest row first, matched beats skip, closed item, missing rate, no %, conventional cash matched by interest only, `pendingRowNear`).
+8. `lib/features/investments/domain/zakat_rules.dart` — 12.2. Test: `zakat_rules_test.dart`.
+9. `lib/features/investments/domain/investment_draft.dart` — 12.2. Test: `investment_draft_test.dart`.
+10. `test/features/investments/domain/acceptance_test.dart` — `AC-46` … `AC-67` engine-level cases (AC-63: figures with and without a plan are equal).
+11. `lib/core/db/tables.dart` — seven columns, both partial indexes as `@TableIndex.sql`.
+12. `lib/core/db/app_database.dart` — v2, `createAll`, `stepByStep`; regenerate `app_database.g.dart`; `make-migrations` → `app_database.steps.dart`, v2 json, generated test schemas.
+13. `test/core/db/app_database/migration_test.dart` — 12.5 step 5.
+14. `lib/features/investments/domain/investments_repository.dart` (`deleteEntries`) + `lib/features/investments/data/drift_investments_repository.dart` — 12.6. Test: `drift_investments_repository_test.dart` (round trip of every new field and both skip kinds; skip uniqueness → `Conflict`; `deleteEntries` all-or-nothing; AC-51: reading the plan writes no row — row count before = after).
+15. `test/architecture_test.dart` — `portfolio_calculator.dart` and `formulas.dart` never import `expected_plan.dart` (AC-63); no `Timer`/`Timer.periodic`/`Stream.periodic` under `lib/features/` (AC-63 background).
+16. `lib/features/investments/presentation/investments_providers.dart` — `expectedProvider`, `pendingCountProvider`.
+17. `lib/l10n/app_en.arb` + `app_ar.arb` — every §2.12 string as a single key; P-1 item 5/6, P-2, P-3 texts verbatim; Arabic for these waits for consultant review (UX 2.12.7).
+18. `lib/features/investments/presentation/record_sheet.dart` — 12.10 S5. Test: `record_sheet_test.dart`.
+19. `lib/features/investments/presentation/investment_form_screen.dart` — 12.10 S3. Test: `investment_form_screen_test.dart` (AC-46…49, 64, 67).
+20. `lib/features/investments/presentation/widgets/plan_chart.dart` (new, E10). Test: `test/features/investments/presentation/widgets/plan_chart_test.dart` (semantics summary, en + ar).
+21. `lib/features/investments/presentation/item_detail_screen.dart` (+ `widgets/labels.dart`, `why_builders.dart` for the tag and case notices) — 12.10 S4. Test: `item_detail_screen_test.dart` (AC-51…62, 65, 66).
+22. `lib/features/investments/presentation/home_screen.dart` — 12.10 S2. `period_screen.dart` — item-scope payouts line. Tests: `home_screen_test.dart` (AC-51, 56), `period_screen_test.dart` (AC-52 July).
+
+### 12.9 AC → layer
+
+| AC | Layer |
+|---|---|
+| 46 | `AssetType`, `validate` (intent), migration test (`other` kept) |
+| 47 | `defaultRule`, `validate` (PE rules), `resolve` B6; AC-5 path for 375.00 |
+| 48 | `validate` (plan errors); `expectedValue` (9,000.00); no plan → `expectedVsActual` null |
+| 49, 50 | `expectedPayout`, `addMonths`; S3 amount line |
+| 51, 57, 58 | `expectedVsActual` rows, `noPayoutLine` (date + 8), matching skips interest; R test "no row written" |
+| 52, 53 | S4 actions → `saveEntries` (`MoneyOut` / `PlanSkip`); `payoutsIn` |
+| 54 | matching E3 (10,000 resolves July; 2,000 unmatched, received 17,000) |
+| 55 | `C(d)` from the previous date |
+| 56 | `closedAt` cut-off; `pendingCountProvider` |
+| 59 | rows derived from current fields |
+| 60, 61 | `expectedValue`, `ValueCheck`; value rows |
+| 62 | `expectedValueAt`, rows → `plan_chart.dart` |
+| 63 | architecture test + acceptance "equal with and without plan" |
+| 64, 66 | `peCase`, `shariahRisk`, `validate`; S3/S4 notices |
+| 65 | `ItemTimeline` case C, `resolve` case C |
+| 67 | `accountKind`, ARB texts, word check test |
+
+### 12.10 Screens (UX §2.12) — what each one reads and writes
+
+Layout is UX's; this lists the engine and repository calls only. **CUT by the orchestrator:** the S2 "To confirm (n)" filter chip and the "Use Private equity" link on "other". Not built.
+
+- **S2 Home** (`home_screen.dart`): row pill "n to confirm" when `pendingCountProvider(id) > 0` (closed → 0, AC-56). No banner, no app-bar count. No other change.
+- **S3 Form** (`investment_form_screen.dart`, existing local state + `validate`):
+  - Type list gains Private equity; intent limited to To sell / Long-term; long-term shows the three P-1 options (no 25 %), case C replaces them with the P-1 item 5 line (E6).
+  - **Expected (optional)** `ExpansionTile`: payout and value sub-blocks hidden per type (`planNotForType`); schedule chips map "None" to `null`.
+  - Live lines: "= {P_1} every {m} months · first on {d_1}" from `expectedPayout(firstPaid in item unit, p, m)` + `addMonths(start, m)`; "Your estimate for {start + 1 year}: …" from `expectedValue([first money in], g, addMonths(start, 12))`. Missing rate → the existing inline rate entry.
+  - **Question placement differs from UX 2.12.2 — UX must move them (decisions Q-E3, Q-E4):** on private equity, Q2 is always shown, in the type/intent part of the form and not inside Expected. Case C can exist with no plan. The cash account question shows as soon as a **payout schedule** is picked. Q1 shows only when the % is filled in.
+  - Notices from `peCase` (A none / B / C / notSure) and `accountKind`; case B tag preview from `shariahRisk`. Edit confirms ("recalculates every past month", "rows rebuilt") are text only; nothing extra is written.
+- **S4 Item detail** (`item_detail_screen.dart`):
+  - **To confirm card** = `payoutRows` + `valueRows` with `state == pending`, oldest first; "Show n more" after 3 is display only.
+  - ✓ → one `saveEntries` (12.3 writes) → snackbar Undo → `deleteEntries([id])`.
+  - Row with `expected == null` → "Add amount" → S5.
+  - ⋮ Skip → `saveEntries([PlanSkip])`, Undo → `deleteEntries`.
+  - Confirm all → one `saveEntries`, Undo → one `deleteEntries` with all ids; hidden when no pending row has an amount.
+  - `noPayoutLine` drives the P-3 line; the private equity suffix is added when `type == privateEquity`; case C label "· to purify" when `peCase == c`.
+  - **History list:** shows a `PlanSkip` as a quiet "Skipped" row only while its row's state is `skipped` (a later matched record wins, E3; the stale skip stays stored, harmless). Tapping it opens S5. Value-update rows below their `ValueCheck.expected` show "Value is below your estimate."
+  - **Plan vs actual card:** Payouts part = `expectedSoFar` / `received` / `difference` (no % → `received` only, AC-57); Value part = last `ValueCheck`. The Payouts | Value switch is local widget state.
+  - **Charts** (`widgets/plan_chart.dart`, `CustomPaint`, one widget, two callers; E10). Input is a plain series list built in the screen:
+    - value chart: expected line = `expectedValueAt(t)` sampled at start, every check date, every value-update date and today (a smooth enough curve at ≤ 1 point per month, no extra math); actual = `ValueUpdate` points (`netValueAt`); hollow = pending value rows.
+    - payouts chart: cumulative `expected` steps at row dates; cumulative actual income (case C incl.) steps at record dates; hollow = pending payout rows at the cumulative expected amount.
+    - Dashed/solid/hollow, 3 grid lines, mirrored time axis in RTL, tap tooltip (exact amounts via `format.dart`), one `Semantics` summary label.
+  - Tag chip from `shariahRisk` → S9. Case C notice and returns line from `peCase`; to-purify card already includes the payouts (12.4).
+- **S5 Record sheet** (`record_sheet.dart`):
+  - Opened from a row: kind preset (Out · Income; conventional cash: Interest · paid out to me; Value), date = d_k, amount = expected, header "Expected … on …". The date picker is limited to d_k ± 7 (Q-E2).
+  - Opened by hand: the "This also records the expected payout of {date}" line when `pendingRowNear(date, kind)` is non-null; for conventional cash it is shown on interest received, never on income.
+  - Value-left check for sales only (Q12).
+- **S7 Period view** (`period_screen.dart`): item scope only, one line from `payoutsIn(period)`. Never in portfolio scope.
+
+### 12.11 Questions
+
+All decided by the orchestrator, 2026-10-17. Applied above.
+- **Q-E1 — decided (consultant's fix):** on a conventional cash deposit, the check mark records interest paid out to me, and an interest record within the window resolves the row (E3, 12.3). My "no payout rows" proposal was rejected. **PM:** the story §5.6 matching line ("Interest records never resolve a payout row") and AC-58 need a conventional-deposit exception, plus an AC for it.
+- **Q-E2 — decided:** editing a pending row limits the date to d_k ± 7 (12.10 S5).
+- **Q-E3 — decided:** the account kind is required to save when a cash deposit has a payout schedule (`answerAccountKind`).
+- **Q-E4 — decided (corrected):** on private equity, Q2 is asked on **every** item and required ("not sure" allowed). Q1 is asked only with a %. With no %: Q2 no → A, yes → C, not sure → notSure. Case C does not depend on a schedule. **UX:** 2.12.2 asks both questions only "when a % is filled in" and must change. **PM/consultant:** P-2 says "when expected_profit_pct is set"; the story §5.5 and P-2 need this change, and AC-64 needs a no-% case.
+- **Q-E5 — accepted as cosmetic:** after a schedule or start-date change, old skips are ignored, but they come back if the old dates come back. Not fixed.
+- **Case C give-away — decided:** reuse "interest given away — from interest paid out to me". No new kind (E5, 12.4).
+- **Q12 — fix approved** (E11, 12.7). PM still edits the story text listed in 12.7.

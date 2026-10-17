@@ -1,6 +1,6 @@
 # Zakat on investments ("My Investments" page)
 
-**Owner:** islamic-consultant · **Status:** v0 draft · 2026-10-16
+**Owner:** islamic-consultant · **Status:** v0 draft · 2026-10-16 · updated 2026-10-17 (Private equity, expected profit)
 **Feeds:** "My Investments" story (ROI before/after zakat and inflation), UC-1, UC-3.
 
 ## How to read this file
@@ -173,12 +173,42 @@ Statuses: `Zakatable (full value)`, `Zakatable (part: X%)`, `Zakatable on income
 - **Edge case:** rental income is usually spent before the year ends. Only what is still held on the zakat date counts (it joins cash). Res 2 (2/2) "one year from receipt" vs. the single-date method — in practice, if income goes into a savings balance, it is covered by B1 on the zakat date. **App: v1 adds rental income to cash; it does not track each rent payment's own year.**
 - **Defaults:** personal 0%, rental 0% on property (income via cash), resale 100%. Override: intent only.
 
-### B6. Business ownership / private equity
+### B6. Private equity (app type `privateEquity`) — business ownership, stake in a private project
+
+Example (owner): money put into a friend's project, profit paid on a schedule.
 
 - **Rule:** An owner pays on their share of the business's zakatable assets: cash, receivables (good debts), inventory at market/sale value, less short-term liabilities. Fixed assets (buildings, machines) are not zakatable.
-- **Reference:** IIFA Res 28 (3/4) §2 — the company computes zakat as one person's wealth; same logic for a private business **[V]**; AAOIFI SS 35 (net-assets method) **[U]** sections; trade goods: Abu Dawud 1562 **[U]**.
-- **Private equity / passive stake, no data:** fall back as B3 (dividends only / proxy / full).
-- **Default:** user enters "zakatable portion %" (no safe default exists). If unknown: ask (as B3). Override: yes.
+- **Reference:** IIFA Res 28 (3/4) §2 — the company computes zakat as one person's wealth; same logic for a private business **[V]**; IIFA Res 121 (3/13) §1 — investigate the zakatable part first **[V]**; AAOIFI SS 35 (net-assets method) **[U]** sections; trade goods: Abu Dawud 1562 **[U]**.
+- **Zakat methods the app offers (user picks, nothing pre-selected):**
+  1. **Known zakatable %** — user enters it (the project's cash + receivables + stock of goods, as % of its value). First choice: Res 121 (3/13) §1 asks the owner to find the real zakatable part.
+  2. **Zakat on profit received only** — s = 0; set-aside = r_z × each payout of kind income (same math as dividends-only, §9.4). Valid by analogy: Res 28 (3/4) §3 allows zakat on yield only for shares held for return when the zakatable part cannot be known, citing Res 2 (2/2). A passive stake held for its profit is the same case. **[V]** for the texts; the analogy is my reading.
+  3. **Full value** — precaution.
+  - **Not offered: the 25% NZF proxy.** It comes from listed FTSE 100 balance sheets. It says nothing about a small private project.
+- **Held to sell (trading intent):** if the user holds the stake to sell it for a gain → 100% of value, no method question (Res 28 (3/4) §3, trade rule **[V]**).
+- **Help text under the methods:** "If the project mostly buys and sells goods, most of its value is usually zakatable." (follows from the rule above; no extra source needed).
+- **Capital guaranteed back (see B6.1, case C):** not a stake. It is money lent → zakat as a good debt, 100% of the amount put in (B9, IIFA Res 1 (1/2) **[V]**). The app offers 100% with this reason.
+- **Default:** ask. Override: yes.
+
+### B6.1 Fixed profit % — partnership or loan?
+
+- **Rule:** In a valid partnership (musharakah) or mudarabah, profit is a **share of the actual profit** (e.g. "30% of the profit"). It may not be a lump sum or a **fixed % of the capital**. No partner or manager may guarantee the capital or a profit. A fixed return on guaranteed capital is a loan with a benefit, which is riba.
+- **Reference:**
+  - IIFA Res 30 (5/4), 1988, *Muqaradah and investment certificates*: item 4 — no guarantee from the manager "for the capital or a fixed profit"; if such a clause exists, it is void. Item 6 — no specific amount may be stipulated; only profit (excess over capital) is divided. **[V]** (iifa-aifi.org/en/32300.html)
+  - IIFA Res 10 (10/2), 1985: an increase on a loan agreed at its start is riba. **[V]** (iifa-aifi.org/en/32234.html)
+  - Quran 2:275, 2:278–279 ("you may have your principal"). **[V]**
+  - AAOIFI SS 13 (Mudarabah) §8/1: profit by "agreed percentage of the profit and not … a lump sum or a percentage of the capital"; §8/5: a lump-sum condition voids the contract. **[S]** (excerpts on islamicmarkets.com / islamqa.org fatwacentre 179139; full text paywalled).
+  - AAOIFI SS 12 (Sharikah): same rule for partnership. **[U]** section numbers.
+  - TKBB (Turkey) Participation Finance Standard No. 7, Musharakah, 2025: Art. 17 no profit guarantee for any partner; Art. 19 losses in proportion to capital, "the contrary cannot be agreed upon". **[V]** (tkbb.org.tr PDF)
+  - Do **not** cite "every loan that brings a benefit is riba" as a hadith. It is weak as a hadith; the rule rests on Res 10 (10/2) and the Quran.
+- **Three cases the app must tell apart (two questions, below):**
+  - **A. Share of actual profit, capital at risk** → valid partnership. Payouts are return.
+  - **B. Fixed % of capital, capital at risk** → partnership with an invalid profit term (Res 30 (5/4) item 4: the condition is void). It is not a loan, because the user can lose. In a defective (*fasid*) mudarabah, the profit belongs to the capital owner and the worker gets a fair wage (Hanafi and Shafi'i). **[U]** So the payouts are not riba in themselves. Payouts count as return, with a notice to fix the terms.
+  - **C. Capital guaranteed back (with a fixed % or any set return)** → a loan with a stipulated benefit = riba (Res 10 (10/2), Q 2:279). The user's right is the capital only. Payouts above the capital → "to purify" (Z-6 treatment).
+
+### B6.2 Losses
+
+- **Rule:** In a partnership, losses follow the capital shares (TKBB Std 7 Art. 19 **[V]**; AAOIFI SS 12 **[U]**). In mudarabah, the money loss falls on the capital provider; the manager loses his work, unless he was negligent (Res 30 (5/4) "First, fourth element" and item 4 **[V]**).
+- **App:** nothing new. The user records a lower value with the existing value update. Return and zakat use that value.
 
 ### B7. Retirement / pension accounts with withdrawal limits
 
@@ -229,6 +259,7 @@ Views (user picks):
 3. FCNA retirement-account resolution — primary text.
 4. Muwatta reference on Aisha and jewelry; Abu Dawud 1562 grading.
 5. A named-scholar confirmation for showing real (inflation-adjusted) returns (A6.2), if the owner wants one.
+6. Private equity items (B6.1, P-1..P-5): case B (*fasid* mudarabah) primary text; AAOIFI SS 12 and SS 13 sections; see "Open items for this section" at the end.
 
 ---
 
@@ -236,13 +267,17 @@ Views (user picks):
 
 | Field | Type | Why | Default | User may override? |
 |---|---|---|---|---|
-| `asset_type` | enum: cash, gold, silver, stock, fund, sukuk, real_estate, business, pension, crypto, debt_owed_to_me, other | picks the rule set (Part B) | — (required) | yes (it is their input) |
+| `asset_type` | enum: cash, gold, silver, stock, fund, sukuk, real_estate, business, pension, crypto, debt_owed_to_me, other. **App v1 types:** stock, fund, sukuk, gold, silver, cashDeposit, crypto, **privateEquity** (B6), other | picks the rule set (Part B) | — (required) | yes (it is their input) |
+| `profit_basis` (privateEquity only) | enum: share_of_profit / fixed_pct_of_capital / not_sure | B6.1 cases A/B | — **ask** (required when `expected_profit_pct` is set) | yes |
+| `capital_guaranteed` (privateEquity only) | enum: no / yes / not_sure | B6.1 case C | — **ask** | yes |
+| `expected_profit_pct` + `payout_schedule` | Decimal (% per year) + enum: monthly / quarterly / every 6 months / yearly / none | planning only (Answers 2026-10-17, P-3). **Never used for zakat or return.** | empty (optional, any type) | yes |
+| `expected_value_growth_pct` + `value_check_schedule` | Decimal (% per year) + enum: monthly / quarterly / every 6 months / yearly | planning only (P-3). **Never used for zakat or return.** | empty (optional, any type) | yes |
 | `intent` | enum: trading / long_term / personal_use / rental | trading vs long-term vs personal decides base (B2, B3, B5) | stock, fund: **ask**; gold/silver bullion: long_term (still 100%); jewelry: personal_use; real estate: **ask** | yes |
 | `currency` | ISO code | conversion on zakat date (A7) | base currency | yes |
 | `current_value` (or `quantity` + `unit_price`; for gold/silver `grams` + `purity`) | Decimal | the base is market value on the zakat date, not cost | — | yes |
 | `cost_basis`, `acquired_date` | Decimal, date | ROI only. **Not** used for zakat base or hawl (A4) | — | yes |
 | `zakatable_portion_pct` | Decimal 0–100 | how much of value is zakatable | cash 100; gold/silver bullion 100; jewelry per setting (100 or 0); stock/fund trading 100; stock/fund long-term per chosen method (25 for NZF proxy, 0 + dividends for IIFA fallback, 100 precaution); sukuk 100; money-market 100; real estate personal 0, rental 0 (income via cash), resale 100; business **ask**; pension per method; crypto 100; debt good 100 / doubtful 0 | yes, with the chosen method's reference shown |
-| `long_term_method` | enum: dividends_only (IIFA) / proxy_25 (NZF) / full_value / known_pct | only for long-term stock/fund/business with no exact data (B3) | none — **ask** | yes |
+| `long_term_method` | enum: dividends_only (IIFA) / proxy_25 (NZF) / full_value / known_pct | stock/fund: all four (B3). **privateEquity: known_pct / dividends_only ("profit received only") / full_value — no proxy_25** (B6). Trading intent → 100%, no method. Case C (capital guaranteed) → 100% as a debt (B9) | none — **ask** | yes |
 | `company_pays_zakat` | bool | IIFA Res 28 (3/4) §1 → 0% | false | yes |
 | `dividends_or_income_held` | Decimal | dividends/rent still held on zakat date (or simply included in cash) | 0 | yes |
 | `pension_access` | enum: not_accessible / accessible_after_penalty / full | B7 | **ask** | yes |
@@ -330,3 +365,98 @@ No BLOCKER. Nothing in the story computes or hides a riba figure in a way that h
 7. **Nisab hint:** add it as in (b) above. It answers PM-Q2.
 
 Everything else on the Shariah surface passes. That covers: the setup step with nothing pre-selected and lunar as the default; "Not now" asked in context rather than defaulted; the "Estimated set-aside" label and the once-a-year line; the A6 wording on every real figure; interest kept apart from return; the gold view leaving the zakat math unchanged; and `[U]` shown as "source not yet verified". No BLOCKER.
+
+---
+
+## Answers for Private equity (2026-10-17)
+
+Owner decisions (not reviewed here): new type **Private equity**; optional **expected profit %** + **payout schedule**, and **expected value growth %** + **value-check schedule**, on **every** type. Sources are in B6, B6.1, B6.2, Z-6 and A8. The PM turns each line into an AC.
+
+### P-1. Zakat share for Private equity (B6)
+
+1. Ask the intent: **long-term (for its profit)** or **to sell**.
+2. To sell → 100% of value. No method question.
+3. Long-term → user picks one method, nothing pre-selected:
+   - "Known zakatable %" (user enters %) — IIFA Res 121 (3/13) §1;
+   - "Zakat on profit received only" — s = 0, set-aside = r_z × each payout of kind income, charged once (same math as dividends-only, AC-5) — IIFA Res 28 (3/4) §3 by analogy;
+   - "Full value" — precaution.
+4. **Do not offer the 25% NZF proxy** for Private equity.
+5. If `capital_guaranteed` = yes (case C) → offer 100% with the text "This works like money you lent. Zakat is on the full amount, as a debt owed to you. — IIFA Res 1 (1/2)." No method question.
+6. Help text under the methods: "If the project mostly buys and sells goods, most of its value is usually zakatable."
+7. This replaces UX verdict item 4 for business stakes: "profit received only" **is** allowed for Private equity; the 25% proxy is still not.
+
+### P-2. Fixed % — the two questions and the notices (B6.1)
+
+When to ask (updated 2026-10-17, loop 1):
+- **Q2: on every Private equity item**, at save, required, "Not sure" allowed. This is wider than the orchestrator's "when a schedule is set". Reason: case C changes the zakat base to 100% as a debt (P-1 item 5) even with no payouts. Profit can also be recorded by hand with no schedule. A guaranteed-capital loan without a schedule must still reach case C.
+- **Q1: only when `expected_profit_pct` is set.** With no %, there is no fixed % to test. Case B needs Q1 = fixed %, so it cannot happen without a %. Cases A and "?" follow from Q2 alone.
+- Q1 "Is this % a share of the project's real profit, or a fixed % of the money you put in?" → share of profit / fixed % of my money / not sure.
+- Q2 "If the project loses money, do you still get all your money back?" → no / yes / not sure.
+
+The app saves whatever the user answers. It never blocks saving. It shows one notice on the item (form and detail page), with a "Source" link:
+
+| Answers | Case | Notice (exact text) | Source link |
+|---|---|---|---|
+| share of profit + no | A | none | — |
+| fixed % + no | B | "A fixed % of the money you put in is not a valid profit share. In a partnership, your profit must be a part of the project's real profit. You may want to change the terms with your partner." | IIFA Res 30 (5/4) item 4 → B6.1 |
+| Q2 = yes (any Q1) | C | "Your money comes back even if the project loses. This works like a loan. Extra money on a loan is riba. The app shows these payouts as "to purify", not as profit." | IIFA Res 10 (10/2); Quran 2:279 → B6.1 |
+| any "not sure" (and Q2 ≠ yes) | ? | "Ask your partner two things: Is your profit a part of the real profit? Can you lose money? The answers decide if this is a partnership or a loan." | IIFA Res 30 (5/4) → B6.1 |
+
+### P-3. Expected profit and expected value growth — all types
+
+**Allowed as planning figures on every type.** They are the user's own estimate about their own wealth. They are not a contract term. "Expected profit" is a normal term in Islamic finance (TKBB Std 7 Art. 18 **[V]**). No rule forbids showing it (same reasoning as A6.2, Z-3).
+
+**Wording rules (everywhere these figures appear):**
+- Field labels: "Expected profit (your estimate, % per year)", "Expected value growth (your estimate, % per year)".
+- One line under the field: "An estimate, not a promise. Not used for zakat or return."
+- Never use the words "interest", "guaranteed", "promised", "fixed return" or "yield" for these figures.
+- Never use them in zakat, return, gain or after-inflation math. Those use only recorded money in/out and value updates.
+- Missing payout: "No payout recorded for {period}. Expected around {date}." Not "late", not "missed", not "default". On Private equity add: "In a partnership, no profit means no payout." (A payout before the project's accounts close is an advance on account — AAOIFI SS 13 **[U]** section.)
+- Value below the estimate: "Value is below your estimate." Not "loss against target".
+
+**Types where an expected profit % is itself a flag** (shown once, under the expected-profit field, only when it is filled in):
+
+| Type | Show | Why |
+|---|---|---|
+| cashDeposit | Ask "Is this an Islamic account (profit share) or a conventional account (interest)?" Conventional → notice "This is interest. Record it as money out "interest (to purify)", not as income." Islamic → label stays "Expected profit (estimate)". | Z-6; Quran 2:278–279 **[V]** |
+| gold, silver — **not shown in v1** (field hidden for these types; text kept for later) | "Gold and silver do not earn profit by themselves. If you lend gold and get back more gold, or a fixed % on lent gold, that is riba." | Muslim 1587 **[S]**; A8 |
+| crypto — **not shown in v1** (field hidden; text kept for later) | "Scholars differ on crypto (see B8). A fixed return for lending your coins works like a loan with a benefit." | B8 **[S]**; the loan reading is mine **[U]** |
+| privateEquity | P-2 questions and notices | B6.1 |
+| stock, fund, sukuk, other (incl. rent) | none | Fixed profit is normal in ijara and murabaha sukuk and in rent (Res 2 (2/2) **[V]**). A manager's guarantee inside mudarabah/musharakah sukuk is an issuer issue (AAOIFI Shari'ah Board statement on sukuk, Feb 2008 **[S]**); the user cannot check it; out of v1. |
+
+### P-4. How payouts count (B6.1)
+
+- Case A and case B: payouts (money out, kind income) count as **return**. Case B keeps its notice. The "profit received only" zakat method uses them.
+- Case C: every payout of kind income on the item is shown as **"to purify"**: excluded from gain and return, added to the "to purify" total, never netted against zakat (same as Z-6). Getting the capital back is a sale/withdrawal, not income.
+- The user can change Q1/Q2 at any time. The treatment follows the current answers, for all past payouts.
+- The app shows the reason and the source. It does not judge the user.
+
+### P-4b. Review of the story, 2026-10-17 (pending rows, Z-10, income not lowering value)
+
+- **Owner decision Q14 (case B):** payouts count as return, and the item gets a "Shariah risk" tag. Accepted. The "counts as return" line keeps "source not yet verified" until the open item on case B is closed.
+- **Conventional cash deposit with a payout schedule.** Confirming a pending row must record **"interest (to purify)", paid out to me**, not income. An interest record must resolve that row. The row label is "Expected interest (to purify)". Here the word "interest" is required: it is the truth (Z-6, Quran 2:278–279). This is the one exception to the banned-word rule in P-3. Without it, one tap counts interest as return.
+- **Z-10, pending payout rows:**
+  - Row label: "Expected payout (not received yet)". Never "profit due" or "owed".
+  - Private equity case C: "Expected payout (to purify when received)".
+  - Check-mark label: "Received this amount".
+  - "Confirm all as expected": one line under it, "Confirm only money that really came in."
+  - Reason: a confirmed row becomes the user's own record, and that record feeds return, "to purify" and the zakat set-aside.
+- **Income payouts do not lower the item's value** (architect's choice). No Shariah problem. "Dividends only" and "profit received only" use r_z × the income records, with s = 0, so the item's value does not enter that math. Methods with s > 0 charge on the value still inside the item, which is correct. Income paid out is zakatable where it is held (Z-1 note on cash). Case C: the value stays equal to the money lent, which is the right debt base (B9).
+
+### P-4c. Loop 1 texts (2026-10-17)
+
+- **Case C give-away record** (reuses "interest given away (from interest paid out to me)"). On a case C item, label: **"Given away from payouts (to purify)"**. Help line: "Money from these payouts that you gave to charity. Giving it away does not count as zakat." The word "interest" is not needed here: the case C notice already says why (B6.1, Z-6).
+- **Notice under "Zakat on profit received only"** (replaces the UX proposal in ux/my-investments.md §2.12.1): "Zakat: {r_z} of each profit payout you record, not of the project's value. Each payout is counted once." Source: IIFA Res 28 (3/4) §3, by analogy (B6). {r_z} = 2.5% or 2.577%, from the user's zakat year setting (A1, A2). Fixed "2.5%" is wrong for a solar-year user.
+- **Conventional deposit pending rows:** P-4b stands (orchestrator decision Q-E1).
+
+### P-5. Losses (B6.2)
+
+Nothing new. The existing value update lets the value drop. Return and zakat use that value.
+
+### Open items for this section
+
+- **[U]** Case B ruling (defective mudarabah: profit belongs to the capital owner, worker gets a fair wage). Needs a primary Hanafi/Shafi'i text. Until then, the case B "counts as return" line shows "source not yet verified". **Owner decided (Q14, 2026-10-17):** case B payouts count as return, and the item gets a "Shariah risk" tag.
+- **[U]** AAOIFI SS 12 section numbers; SS 13 §8/1 and §8/5 are **[S]** only.
+- **[U]** AAOIFI SS 13 section on periodic payouts as advances on account.
+- **[U]** Crypto lending as a loan with a benefit.
+- **Before release:** I must review the Arabic text of Q1, Q2, the P-2 notices, the P-3 labels and lines, and the P-4b/P-4c texts. Wording in Arabic decides the fiqh meaning (e.g. ربح vs فائدة).
