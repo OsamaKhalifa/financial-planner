@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:decimal/decimal.dart';
 import 'package:financial_planner/core/assumptions/domain/settings.dart';
 import 'package:financial_planner/core/dates.dart';
+import 'package:financial_planner/core/money/format.dart';
 import 'package:financial_planner/core/reference/markets.dart';
 import 'package:financial_planner/core/reference/units.dart';
 import 'package:financial_planner/features/investments/domain/history_entry.dart';
@@ -72,6 +73,8 @@ Future<Settings> settingsOf(WidgetTester tester, Harness h) async {
   );
   return s;
 }
+
+WidgetTester? tester0;
 
 void main() {
   for (final locale in [en, ar]) {
@@ -749,6 +752,336 @@ void main() {
           final items = await saved(tester, h);
           expect(items.single.investment.name, 'New name');
           expect(items.single.history.length, 2);
+        },
+      );
+      Future<void> peBasics(WidgetTester tester, String name) async {
+        await type(tester, field(l10nOf(tester).fieldName), name);
+        await type(
+          tester,
+          find.descendant(
+            of: find.byKey(const ValueKey('paid')),
+            matching: find.byType(TextField),
+          ),
+          '100000',
+        );
+      }
+
+      Future<void> tapKey(WidgetTester tester, String key) async {
+        final f = find.byKey(ValueKey(key));
+        await tester.ensureVisible(f);
+        await tester.tap(f);
+        await tester.pumpAndSettle();
+      }
+
+      String money(String amount) => plain(
+        l10nOf(tester0!).amountWithUnit(
+          formatAmount(Decimal.parse(amount), locale.languageCode),
+          'EGP',
+        ),
+      );
+
+      testScreen(
+        'AC-46: private equity asks no market, offers only To sell and Long-term, shares are optional, unit is the base; no intent is named',
+        (tester) async {
+          tester0 = tester;
+          final h = await pumpScreen(
+            tester,
+            const InvestmentFormScreen(presetType: AssetType.privateEquity),
+            locale: locale,
+            seed: (h) => h.setup(),
+          );
+          final l10n = l10nOf(tester);
+          expect(find.byKey(const ValueKey('market')), findsNothing);
+          expect(find.text(l10n.peIntentTrading), findsOneWidget);
+          expect(find.text(l10n.peIntentLongTerm), findsOneWidget);
+          expect(find.text(l10n.intentPersonalUse), findsNothing);
+          expect(find.text(l10n.intentRental), findsNothing);
+          expect(field(l10n.fieldSharesInProject), findsOneWidget);
+          expect(textPlain('EGP · '), findsOneWidget);
+          expect(find.text(l10n.typePrivateEquityHint), findsOneWidget);
+          await peBasics(tester, "Friend's project");
+          await tapKey(tester, 'q2-CapitalBack.no');
+          await save(tester);
+          expect(find.text(l10n.errIntent), findsOneWidget);
+          expect(await saved(tester, h), isEmpty);
+          await tapText(tester, l10n.peIntentTrading);
+          await save(tester);
+          final item = (await saved(tester, h)).single.investment;
+          expect(item.type, AssetType.privateEquity);
+          expect(item.unit, egp);
+          expect(item.market, isNull);
+          expect(item.quantity, isNull);
+        },
+      );
+
+      testScreen(
+        'AC-47: to sell is 100 % with no method; long-term asks one of three, nothing picked, no 25 %; profit received only shows the payout notice',
+        (tester) async {
+          tester0 = tester;
+          final h = await pumpScreen(
+            tester,
+            const InvestmentFormScreen(presetType: AssetType.privateEquity),
+            locale: locale,
+            seed: (h) => h.setup(),
+          );
+          final l10n = l10nOf(tester);
+          await peBasics(tester, "Friend's project");
+          await tapKey(tester, 'q2-CapitalBack.no');
+          await tapText(tester, l10n.peIntentTrading);
+          expect(find.text(l10n.zakatPeTrading), findsOneWidget);
+          expect(
+            find.byKey(const ValueKey('pe-method-ZakatRule.custom')),
+            findsNothing,
+          );
+          await tapText(tester, l10n.peIntentLongTerm);
+          for (final o in [
+            l10n.peMethodKnown,
+            l10n.peMethodProfit,
+            l10n.peMethodFull,
+          ]) {
+            expect(find.text(o), findsOneWidget);
+            expect(radioChecked(tester, o), isFalse);
+          }
+          expect(find.text(l10n.longTermProxy25), findsNothing);
+          expect(find.text(l10n.peMethodsHelp), findsOneWidget);
+          await save(tester);
+          expect(find.text(l10n.peMethodPick), findsOneWidget);
+          expect(await saved(tester, h), isEmpty);
+          await tapText(tester, l10n.peMethodProfit);
+          final rate = plain(
+            formatPercent(Decimal.parse('0.025'), locale.languageCode),
+          ).replaceAll('+', '');
+          expect(
+            textPlain(plain(l10n.noticeProfitPayoutsOnly(rate))),
+            findsOneWidget,
+          );
+          await save(tester);
+          final item = (await saved(tester, h)).single.investment;
+          expect(item.zakatRule, ZakatRule.longTermDividendsOnly);
+          expect(item.capitalBack, CapitalBack.no);
+        },
+      );
+
+      testScreen(
+        'AC-48: no plan on gold or silver, no payout plan on crypto; % without schedule, 0 % and −100 % are refused',
+        (tester) async {
+          tester0 = tester;
+          final h = await pumpScreen(
+            tester,
+            const InvestmentFormScreen(presetType: AssetType.gold),
+            locale: locale,
+            seed: (h) => h.setup(),
+          );
+          final l10n = l10nOf(tester);
+          expect(find.byKey(const ValueKey('expected')), findsNothing);
+          await tapText(tester, l10n.typeSilver);
+          expect(find.byKey(const ValueKey('expected')), findsNothing);
+          await tapText(tester, l10n.typeCrypto);
+          await tapText(tester, l10n.expectedTitle);
+          expect(find.byKey(const ValueKey('expected-profit')), findsNothing);
+          expect(find.byKey(const ValueKey('payout-monthly')), findsNothing);
+          expect(find.byKey(const ValueKey('expected-growth')), findsOneWidget);
+          await tapText(tester, l10n.typeFund);
+          await tapText(tester, l10n.intentTrading);
+          await type(tester, field(l10n.fieldName), 'F');
+          await type(
+            tester,
+            find.descendant(
+              of: find.byKey(const ValueKey('paid')),
+              matching: find.byType(TextField),
+            ),
+            '10000',
+          );
+          Finder pct(String key) => find.descendant(
+            of: find.byKey(ValueKey(key)),
+            matching: find.byType(TextField),
+          );
+          await type(tester, pct('expected-profit'), '10');
+          await type(tester, pct('expected-growth'), '-100');
+          await save(tester);
+          expect(find.text(l10n.errPickPayoutSchedule), findsOneWidget);
+          expect(find.text(l10n.errPickValueSchedule), findsOneWidget);
+          await tapKey(tester, 'payout-monthly');
+          await tapKey(tester, 'value-yearly');
+          await type(tester, pct('expected-profit'), '0');
+          await save(tester);
+          expect(find.text(l10n.errProfitPositive), findsOneWidget);
+          expect(find.text(l10n.errGrowthTooLow), findsOneWidget);
+          expect(await saved(tester, h), isEmpty);
+          await type(tester, pct('expected-profit'), '');
+          await type(tester, pct('expected-growth'), '-10');
+          expect(textPlain(money('9000')), findsOneWidget);
+          await save(tester);
+          final item = (await saved(tester, h)).single.investment;
+          expect(item.expectedGrowth, Decimal.parse('-0.1'));
+          expect(item.valueCheckSchedule, Schedule.yearly);
+          expect(item.payoutSchedule, Schedule.monthly);
+          expect(item.expectedProfit, isNull);
+        },
+      );
+
+      testScreen(
+        'AC-49: 100,000 at 20 % every 3 months shows 5,000.00 EGP per payout',
+        (tester) async {
+          tester0 = tester;
+          final h = await pumpScreen(
+            tester,
+            const InvestmentFormScreen(presetType: AssetType.privateEquity),
+            locale: locale,
+            seed: (h) => h.setup(),
+          );
+          final l10n = l10nOf(tester);
+          await peBasics(tester, "Friend's project");
+          await tapText(tester, l10n.peIntentLongTerm);
+          await tapText(tester, l10n.peMethodFull);
+          await tapKey(tester, 'q2-CapitalBack.no');
+          await tapKey(tester, 'payout-quarterly');
+          await type(
+            tester,
+            find.descendant(
+              of: find.byKey(const ValueKey('expected-profit')),
+              matching: find.byType(TextField),
+            ),
+            '20',
+          );
+          final preview = tester
+              .widget<Text>(find.byKey(const ValueKey('payout-preview')))
+              .data!;
+          expect(plain(preview), contains(money('5000')));
+          expect(plain(preview), contains('3'));
+          await tapKey(tester, 'q1-ProfitBasis.shareOfProfit');
+          await save(tester);
+          final item = (await saved(tester, h)).single.investment;
+          expect(item.expectedProfit, Decimal.parse('0.2'));
+          expect(item.payoutSchedule, Schedule.quarterly);
+          expect(item.profitBasis, ProfitBasis.shareOfProfit);
+        },
+      );
+
+      testScreen(
+        'AC-64: Q2 is asked on every private equity item; Q1 only with a %; each case shows its notice',
+        (tester) async {
+          tester0 = tester;
+          final h = await pumpScreen(
+            tester,
+            const InvestmentFormScreen(presetType: AssetType.privateEquity),
+            locale: locale,
+            seed: (h) => h.setup(),
+          );
+          final l10n = l10nOf(tester);
+          await peBasics(tester, 'P');
+          await tapText(tester, l10n.peIntentTrading);
+          expect(find.text(l10n.q2CapitalBack), findsOneWidget);
+          expect(find.text(l10n.q1ProfitBasis), findsNothing);
+          await save(tester);
+          expect(find.text(l10n.errPickOne), findsOneWidget);
+          expect(await saved(tester, h), isEmpty);
+          await tapKey(tester, 'q2-CapitalBack.no');
+          expect(find.byKey(const ValueKey('pe-notice')), findsNothing);
+          await tapKey(tester, 'q2-CapitalBack.notSure');
+          expect(find.text(l10n.noticeCaseNotSure), findsOneWidget);
+          await tapKey(tester, 'q2-CapitalBack.yes');
+          expect(find.text(l10n.noticeCaseC), findsOneWidget);
+          expect(
+            textPlain(plain(l10n.noticeCapitalBackIsDebt)),
+            findsOneWidget,
+          );
+          await tapKey(tester, 'q2-CapitalBack.no');
+          await tapKey(tester, 'payout-quarterly');
+          await type(
+            tester,
+            find.descendant(
+              of: find.byKey(const ValueKey('expected-profit')),
+              matching: find.byType(TextField),
+            ),
+            '20',
+          );
+          expect(find.text(l10n.q1ProfitBasis), findsOneWidget);
+          await save(tester);
+          expect(find.text(l10n.errPickOne), findsOneWidget);
+          await tapKey(tester, 'q1-ProfitBasis.shareOfProfit');
+          expect(find.byKey(const ValueKey('pe-notice')), findsNothing);
+          await tapKey(tester, 'q1-ProfitBasis.fixedPctOfMoney');
+          expect(find.text(l10n.noticeCaseB), findsOneWidget);
+          expect(find.text(l10n.caseBTagPreview), findsOneWidget);
+          await tapKey(tester, 'q1-ProfitBasis.notSure');
+          expect(find.text(l10n.noticeCaseNotSure), findsOneWidget);
+          expect(find.text(l10n.source), findsWidgets);
+          await save(tester);
+          final item = (await saved(tester, h)).single.investment;
+          expect(item.peCase, PeCase.notSure);
+        },
+      );
+
+      testScreen(
+        'AC-67, AC-70: a cash deposit asks the account kind only with a payout schedule; conventional shows the interest notice; stocks show none',
+        (tester) async {
+          tester0 = tester;
+          final h = await pumpScreen(
+            tester,
+            const InvestmentFormScreen(presetType: AssetType.cashDeposit),
+            locale: locale,
+            seed: (h) => h.setup(),
+          );
+          final l10n = l10nOf(tester);
+          await type(tester, field(l10n.fieldName), 'Dep');
+          await type(
+            tester,
+            find.descendant(
+              of: find.byKey(const ValueKey('paid')),
+              matching: find.byType(TextField),
+            ),
+            '10000',
+          );
+          await tapText(tester, l10n.expectedTitle);
+          expect(find.text(l10n.accountKindQuestion), findsNothing);
+          expect(find.text(l10n.fieldExpectedProfit), findsOneWidget);
+          expect(find.text(l10n.estimateHelp), findsNWidgets(2));
+          await tapKey(tester, 'payout-monthly');
+          expect(find.text(l10n.accountKindQuestion), findsOneWidget);
+          await save(tester);
+          expect(find.text(l10n.errPickAccountKind), findsOneWidget);
+          expect(await saved(tester, h), isEmpty);
+          await tapKey(tester, 'account-conventional');
+          expect(
+            find.byKey(const ValueKey('conventional-notice')),
+            findsOneWidget,
+          );
+          await save(tester);
+          expect(
+            (await saved(tester, h)).single.investment.accountKind,
+            AccountKind.conventional,
+          );
+        },
+      );
+
+      testScreen(
+        'AC-67: a stock with an expected profit % shows no account question or notice',
+        (tester) async {
+          tester0 = tester;
+          await pumpScreen(
+            tester,
+            const InvestmentFormScreen(presetType: AssetType.stock),
+            locale: locale,
+            seed: (h) => h.setup(),
+          );
+          final l10n = l10nOf(tester);
+          await tapText(tester, l10n.expectedTitle);
+          await tapKey(tester, 'payout-quarterly');
+          await type(
+            tester,
+            find.descendant(
+              of: find.byKey(const ValueKey('expected-profit')),
+              matching: find.byType(TextField),
+            ),
+            '8',
+          );
+          expect(find.text(l10n.accountKindQuestion), findsNothing);
+          expect(
+            find.byKey(const ValueKey('conventional-notice')),
+            findsNothing,
+          );
+          expect(find.byKey(const ValueKey('pe-notice')), findsNothing);
         },
       );
     });

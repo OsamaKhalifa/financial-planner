@@ -15,6 +15,7 @@ import 'package:flutter/material.dart' hide Intent;
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../support/app_harness.dart';
+import '../../../support/plan_seeds.dart';
 
 Future<void> seedBasic(Harness h) async {
   await h.setup();
@@ -291,6 +292,57 @@ void main() {
           expect(find.byType(ItemDetailScreen), findsOneWidget);
         },
       );
+      testScreen(
+        'AC-51, AC-75: rows show "3 to confirm" and "2 to confirm" (5 in all); after Confirm all on the project only "2"',
+        (tester) async {
+          final h = await pumpScreen(
+            tester,
+            const HomeScreen(),
+            locale: locale,
+            now: day(2026, 10, 17),
+            seed: (h) async {
+              await seedFriend(h);
+              await h.addItem(planFund(start: day(2026, 8, 17)), [
+                moneyIn('fund', day(2026, 8, 17), '10000'),
+              ]);
+            },
+          );
+          final l10n = l10nOf(tester);
+          expect(find.text(l10n.toConfirmPill(3)), findsOneWidget);
+          expect(find.text(l10n.toConfirmPill(2)), findsOneWidget);
+          await tester.runAsync(
+            () => h.investments.saveEntries([
+              for (final m in [4, 7, 10])
+                moneyOut(
+                  'fp',
+                  day(2026, m, 15),
+                  '5000',
+                  kind: MoneyOutKind.income,
+                ),
+            ]),
+          );
+          await settle(tester);
+          expect(find.text(l10n.toConfirmPill(3)), findsNothing);
+          expect(find.text(l10n.toConfirmPill(2)), findsOneWidget);
+        },
+      );
+
+      testScreen('AC-56: a closed item is not counted', (tester) async {
+        await pumpScreen(
+          tester,
+          const HomeScreen(),
+          locale: locale,
+          now: day(2027, 2, 1),
+          seed: (h) => seedFriend(
+            h,
+            more: [
+              moneyOut('fp', day(2026, 12, 1), '100000'),
+              value('fp', day(2026, 12, 1), '0'),
+            ],
+          ),
+        );
+        expect(find.byKey(const ValueKey('to-confirm-fp')), findsNothing);
+      });
     });
   }
 }

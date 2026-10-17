@@ -2476,12 +2476,6 @@ abstract class AppLocalizations {
   /// **'This is interest. Record it as money out \"interest (to purify)\", not as income.'**
   String get noticeConventional;
 
-  /// No description provided for @srcZ6.
-  ///
-  /// In en, this message translates to:
-  /// **'Interest is not return and must be given away: Quran 2:278–279 (Z-6).'**
-  String get srcZ6;
-
   /// No description provided for @expectedTitle.
   ///
   /// In en, this message translates to:
@@ -2570,7 +2564,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'= {amount} every {months, plural, =1{month} other{{months} months}} · first on {date}'**
-  String payoutPreview(String amount, int months, String month, String date);
+  String payoutPreview(String amount, int months, String date);
 
   /// No description provided for @growthPreview.
   ///

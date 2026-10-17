@@ -378,6 +378,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ? l10n.metalRateNotUpdated
                   : l10n.notUpdatedThisMonth,
             ),
+          if (ref.watch(pendingCountProvider(item.id)) case final n when n > 0)
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: DecoratedBox(
+                key: ValueKey('to-confirm-${item.id}'),
+                decoration: ShapeDecoration(
+                  color: Theme.of(context).colorScheme.secondaryContainer,
+                  shape: const StadiumBorder(),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
+                  child: Text(l10n.toConfirmPill(n)),
+                ),
+              ),
+            ),
         ],
       ),
       trailing: Column(

@@ -3,16 +3,21 @@
 import 'package:decimal/decimal.dart';
 import 'package:financial_planner/core/dates.dart';
 import 'package:financial_planner/core/reference/units.dart';
+import 'package:financial_planner/features/investments/domain/expected_plan.dart';
 import 'package:financial_planner/features/investments/domain/history_entry.dart';
 import 'package:financial_planner/features/investments/domain/investment.dart';
 import 'package:financial_planner/features/investments/presentation/record_sheet.dart';
+import 'package:financial_planner/features/investments/presentation/widgets/fields.dart';
 import 'package:flutter/material.dart' hide Intent;
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../support/app_harness.dart';
+import '../../../support/plan_seeds.dart';
 
 HistoryEntry? editing;
 RecordPreset? preset;
+PlanRow? row;
+String itemId = 'a';
 
 class _Opener extends StatelessWidget {
   const _Opener();
@@ -23,9 +28,10 @@ class _Opener extends StatelessWidget {
       child: ElevatedButton(
         onPressed: () => showRecordSheet(
           context,
-          investmentId: 'a',
+          investmentId: itemId,
           editing: editing,
           preset: preset,
+          row: row,
         ),
         child: const Text('open'),
       ),
@@ -101,6 +107,8 @@ void main() {
       setUp(() {
         editing = null;
         preset = null;
+        row = null;
+        itemId = 'a';
       });
 
       testScreen(
@@ -557,6 +565,108 @@ void main() {
         all = await history(tester, h);
         expect(all.any((e) => e.id == entry.id), isTrue);
       });
+      PlanRow aprilRow() => PlanRow(
+        kind: PlanKind.payout,
+        k: 1,
+        from: day(2026, 1, 16),
+        date: day(2026, 4, 15),
+        expected: Decimal.parse('5000.00'),
+        state: RowState.pending,
+        noPayoutLine: true,
+      );
+
+      testScreen(
+        'AC-69: from a pending row the date stays within ± 7 days; the sheet is preset as income at the expected amount',
+        (tester) async {
+          itemId = 'fp';
+          row = aprilRow();
+          final h = await pumpScreen(
+            tester,
+            const _Opener(),
+            locale: locale,
+            now: day(2026, 10, 17),
+            seed: seedFriend,
+          );
+          await open(tester);
+          final date = tester.widget<DateField>(
+            find.byKey(const ValueKey('record-date')),
+          );
+          expect(date.value, day(2026, 4, 15));
+          expect(date.firstDate, day(2026, 4, 8));
+          expect(date.lastDate, day(2026, 4, 22));
+          expect(
+            plain(
+              tester
+                  .widget<Text>(find.byKey(const ValueKey('expected-header')))
+                  .data!,
+            ),
+            contains('5,000.00 EGP'),
+          );
+          await saveSheet(tester);
+          final out = (await history(tester, h)).whereType<MoneyOut>().single;
+          expect(
+            (out.kind, out.date, out.amount.amount),
+            (MoneyOutKind.income, day(2026, 4, 15), Decimal.parse('5000')),
+          );
+        },
+      );
+
+      testScreen('AC-69: a date outside the window is refused', (tester) async {
+        itemId = 'fp';
+        row = aprilRow();
+        final h = await pumpScreen(
+          tester,
+          const _Opener(),
+          locale: locale,
+          now: day(2026, 10, 17),
+          seed: seedFriend,
+        );
+        final l10n = l10nOf(tester);
+        await open(tester);
+        final date = tester.widget<DateField>(
+          find.byKey(const ValueKey('record-date')),
+        );
+        date.onChanged(day(2026, 4, 23));
+        await tester.pumpAndSettle();
+        await saveSheet(tester);
+        expect(find.byKey(const ValueKey('record-error')), findsOneWidget);
+        expect(
+          plain(
+            tester
+                .widget<Text>(find.byKey(const ValueKey('record-error')))
+                .data!,
+          ),
+          startsWith(plain(l10n.errOutsideWindow('§', '§')).split('§').first),
+        );
+        expect((await history(tester, h)).whereType<MoneyOut>(), isEmpty);
+      });
+
+      testScreen(
+        'AC-54: income typed by hand near a pending row says it also records that payout; interest does not',
+        (tester) async {
+          itemId = 'fp';
+          await pumpScreen(
+            tester,
+            const _Opener(),
+            locale: locale,
+            now: day(2026, 7, 20),
+            seed: seedFriend,
+          );
+          final l10n = l10nOf(tester);
+          await open(tester);
+          await tester.tap(find.text(l10n.tabOut));
+          await tester.pumpAndSettle();
+          await tester.tap(find.text(l10n.kindIncome));
+          await tester.pumpAndSettle();
+          expect(find.byKey(const ValueKey('also-records')), findsOneWidget);
+          await tester.tap(find.text(l10n.kindSale));
+          await tester.pumpAndSettle();
+          expect(find.byKey(const ValueKey('also-records')), findsNothing);
+          await tester.tap(find.text(l10n.tabInterest));
+          await tester.pumpAndSettle();
+          expect(find.byKey(const ValueKey('also-records')), findsNothing);
+        },
+      );
     });
   }
 }
