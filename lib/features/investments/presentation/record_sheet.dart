@@ -339,7 +339,7 @@ class _RecordSheetState extends ConsumerState<RecordSheet> {
     final repo = ref.read(investmentsRepositoryProvider);
     final messenger = ScaffoldMessenger.of(context);
     final l10n = context.l10n;
-    await repo.deleteEntry(e.id);
+    await repo.deleteEntries([e.id]);
     if (!mounted) return;
     Navigator.of(context).pop();
     messenger.showSnackBar(
