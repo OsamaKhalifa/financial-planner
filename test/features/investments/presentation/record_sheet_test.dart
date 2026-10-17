@@ -366,6 +366,31 @@ void main() {
       });
 
       testScreen(
+        'AC-68: income above the value does not ask for the value left',
+        (tester) async {
+          final h = await pumpScreen(
+            tester,
+            const _Opener(),
+            locale: locale,
+            seed: seedFund,
+          );
+          final l10n = l10nOf(tester);
+          await open(tester);
+          await tester.tap(find.text(l10n.tabOut));
+          await tester.pumpAndSettle();
+          await amount(tester, '1500');
+          await tester.tap(find.text(l10n.kindIncome));
+          await tester.pumpAndSettle();
+          await saveSheet(tester);
+          expect(find.text(l10n.valueLeftRequired), findsNothing);
+          final out = (await history(tester, h)).whereType<MoneyOut>().single;
+          expect(out.kind, MoneyOutKind.income);
+          expect(out.amount.amount, Decimal.parse('1500'));
+          expect((await history(tester, h)).whereType<ValueUpdate>().length, 1);
+        },
+      );
+
+      testScreen(
         'AC-19: interest received is recorded as kept inside or paid out',
         (tester) async {
           final h = await pumpScreen(

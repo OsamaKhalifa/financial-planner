@@ -119,6 +119,32 @@ void main() {
     expect(tl.flowsIn(day(2025, 12, 31), day(2026, 12, 31)).length, 3);
   });
 
+  test('income keeps the recorded value; a sale lowers it (Q12)', () {
+    final tl = ItemTimeline(
+      InvestmentWithHistory(
+        investment: inv(egp),
+        history: [
+          mIn(day(2026, 1, 1), '1000', egp),
+          MoneyOut(
+            investmentId: 'a',
+            date: day(2026, 3, 1),
+            amount: Money(d('1500'), egp),
+            kind: MoneyOutKind.income,
+          ),
+          MoneyOut(
+            investmentId: 'a',
+            date: day(2026, 4, 1),
+            amount: Money(d('300'), egp),
+          ),
+        ],
+      ),
+      RateBook(const []),
+    );
+    expect(tl.recordedValueAt(day(2026, 3, 1)), d('1000'));
+    expect(tl.closedAt(day(2026, 3, 1)), isFalse);
+    expect(tl.recordedValueAt(day(2026, 4, 1)), d('700'));
+  });
+
   test('a missing rate is collected, never converted 1:1', () {
     final tl = ItemTimeline(
       InvestmentWithHistory(
