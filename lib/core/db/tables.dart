@@ -22,6 +22,17 @@ class Investments extends Table {
       text().map(const DecimalConverter()).nullable()();
   TextColumn get inflationOverride => text().nullable()();
   TextColumn get notes => text().nullable()();
+
+  /// v2 (story §5.5, §5.6): the plan and the P-2/P-3 answers, all optional.
+  TextColumn get payoutSchedule => text().nullable()();
+  TextColumn get expectedProfit =>
+      text().map(const DecimalConverter()).nullable()();
+  TextColumn get valueCheckSchedule => text().nullable()();
+  TextColumn get expectedGrowth =>
+      text().map(const DecimalConverter()).nullable()();
+  TextColumn get profitBasis => text().nullable()();
+  TextColumn get capitalBack => text().nullable()();
+  TextColumn get accountKind => text().nullable()();
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();
 
@@ -31,12 +42,24 @@ class Investments extends Table {
 
 @DataClassName('HistoryEntryRow')
 @TableIndex(name: 'history_by_investment_date', columns: {#investmentId, #date})
+// One value update per item and day; flows and interest may repeat.
+@TableIndex.sql(
+  'CREATE UNIQUE INDEX history_one_value_update_per_day '
+  'ON history_entries (investment_id, date) '
+  "WHERE kind = 'value_update'",
+)
+// One decision per pending row: a second Skip on it throws Conflict.
+@TableIndex.sql(
+  'CREATE UNIQUE INDEX history_one_skip_per_plan_date '
+  'ON history_entries (investment_id, kind, date) '
+  "WHERE kind IN ('payout_skipped', 'value_skipped')",
+)
 class HistoryEntries extends Table {
   TextColumn get id => text()();
   TextColumn get investmentId =>
       text().references(Investments, #id, onDelete: KeyAction.cascade)();
 
-  /// money_in, sale, income, interest_*, value_update
+  /// money_in, sale, income, interest_*, value_update, *_skipped
   TextColumn get kind => text()();
   TextColumn get date => text().map(const CalendarDateConverter())();
 

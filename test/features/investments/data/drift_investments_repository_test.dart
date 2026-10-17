@@ -16,8 +16,10 @@ import 'package:financial_planner/core/reference/markets.dart';
 import 'package:financial_planner/core/reference/units.dart';
 import 'package:financial_planner/core/storage_exceptions.dart';
 import 'package:financial_planner/features/investments/data/drift_investments_repository.dart';
+import 'package:financial_planner/features/investments/domain/expected_plan.dart';
 import 'package:financial_planner/features/investments/domain/history_entry.dart';
 import 'package:financial_planner/features/investments/domain/investment.dart';
+import 'package:financial_planner/features/investments/domain/item_timeline.dart';
 import 'package:financial_planner/features/investments/domain/period.dart';
 import 'package:financial_planner/features/investments/domain/portfolio_calculator.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -289,13 +291,142 @@ void main() {
   );
 
   test(
-    'update, delete and deleteEntry of an unknown id are NotFound',
+    'update, delete and deleteEntries of an unknown id are NotFound',
     () async {
       await expectLater(repo.update(fund('nope')), throwsA(isA<NotFound>()));
       await expectLater(repo.delete('nope'), throwsA(isA<NotFound>()));
-      await expectLater(repo.deleteEntry('nope'), throwsA(isA<NotFound>()));
+      await expectLater(repo.deleteEntries(['nope']), throwsA(isA<NotFound>()));
     },
   );
+
+  test('every plan field and both skip kinds round-trip', () async {
+    final item = Investment(
+      id: 'pe',
+      name: "Friend's project",
+      type: AssetType.privateEquity,
+      intent: Intent.longTerm,
+      unit: egp,
+      startDate: day(2026, 1, 15),
+      zakatRule: ZakatRule.longTermDividendsOnly,
+      payoutSchedule: Schedule.quarterly,
+      expectedProfit: d('0.20'),
+      valueCheckSchedule: Schedule.halfYearly,
+      expectedGrowth: d('-0.05'),
+      profitBasis: ProfitBasis.fixedPctOfMoney,
+      capitalBack: CapitalBack.notSure,
+    );
+    await repo.create(item, [
+      PlanSkip(
+        id: 's1',
+        investmentId: 'pe',
+        date: day(2026, 4, 15),
+        plan: PlanKind.payout,
+      ),
+      PlanSkip(
+        id: 's2',
+        investmentId: 'pe',
+        date: day(2026, 7, 15),
+        plan: PlanKind.value,
+      ),
+    ]);
+    final back = (await all()).single;
+    final i = back.investment;
+    expect(i.type, AssetType.privateEquity);
+    expect(i.payoutSchedule, Schedule.quarterly);
+    expect(i.expectedProfit, d('0.20'));
+    expect(i.valueCheckSchedule, Schedule.halfYearly);
+    expect(i.expectedGrowth, d('-0.05'));
+    expect(i.profitBasis, ProfitBasis.fixedPctOfMoney);
+    expect(i.capitalBack, CapitalBack.notSure);
+    expect(i.accountKind, isNull);
+    final skips = back.history.whereType<PlanSkip>().toList();
+    expect(
+      [for (final x in skips) (x.id, x.date, x.plan)],
+      [
+        ('s1', day(2026, 4, 15), PlanKind.payout),
+        ('s2', day(2026, 7, 15), PlanKind.value),
+      ],
+    );
+    final dep = Investment(
+      id: 'dep',
+      name: 'dep',
+      type: AssetType.cashDeposit,
+      unit: egp,
+      startDate: day(2026, 1, 1),
+      zakatRule: ZakatRule.cash100,
+      payoutSchedule: Schedule.monthly,
+      accountKind: AccountKind.conventional,
+    );
+    await repo.create(dep, const []);
+    final stored = (await all()).firstWhere((h) => h.investment.id == 'dep');
+    expect(stored.investment.accountKind, AccountKind.conventional);
+  });
+
+  test('a second skip of the same row is a Conflict', () async {
+    await repo.create(fund('a'), const []);
+    PlanSkip skip(String id) => PlanSkip(
+      id: id,
+      investmentId: 'a',
+      date: day(2026, 4, 1),
+      plan: PlanKind.payout,
+    );
+    await repo.saveEntries([skip('s1')]);
+    await expectLater(repo.saveEntries([skip('s2')]), throwsA(isA<Conflict>()));
+    await repo.saveEntries([
+      PlanSkip(
+        id: 's3',
+        investmentId: 'a',
+        date: day(2026, 4, 1),
+        plan: PlanKind.value,
+      ),
+    ]);
+  });
+
+  test('deleteEntries is all or nothing', () async {
+    await repo.create(fund('a'), [
+      val('1', 'a', day(2026, 1, 31), '1000'),
+      val('2', 'a', day(2026, 2, 28), '1100'),
+    ]);
+    await expectLater(
+      repo.deleteEntries(['1', 'nope']),
+      throwsA(isA<NotFound>()),
+    );
+    expect((await all()).single.history.length, 2);
+    await repo.deleteEntries(['1', '2']);
+    expect((await all()).single.history, isEmpty);
+  });
+
+  test('AC-51: reading the plan writes no row', () async {
+    final item = Investment(
+      id: 'pe',
+      name: 'pe',
+      type: AssetType.privateEquity,
+      intent: Intent.longTerm,
+      unit: egp,
+      startDate: day(2026, 1, 15),
+      zakatRule: ZakatRule.longTermFullValue,
+      payoutSchedule: Schedule.quarterly,
+      expectedProfit: d('0.20'),
+      profitBasis: ProfitBasis.shareOfProfit,
+      capitalBack: CapitalBack.no,
+    );
+    await repo.create(item, [
+      MoneyIn(
+        investmentId: 'pe',
+        date: day(2026, 1, 15),
+        amount: Money(d('100000'), egp),
+      ),
+    ]);
+    final before = await db.select(db.historyEntries).get();
+    final plan = expectedVsActual(
+      ItemTimeline((await all()).single, RateBook(const [])),
+      day(2026, 10, 17),
+    )!;
+    expect(plan.pendingRows.length, 3);
+    final after = await db.select(db.historyEntries).get();
+    expect(after.length, before.length);
+    expect(after.length, 1);
+  });
 
   test('update changes the item and keeps its history', () async {
     await repo.create(fund('a'), [val('1', 'a', day(2026, 1, 31), '1000')]);

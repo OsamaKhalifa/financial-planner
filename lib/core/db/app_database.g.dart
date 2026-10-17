@@ -157,6 +157,79 @@ class $InvestmentsTable extends Investments
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _payoutScheduleMeta = const VerificationMeta(
+    'payoutSchedule',
+  );
+  @override
+  late final GeneratedColumn<String> payoutSchedule = GeneratedColumn<String>(
+    'payout_schedule',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<Decimal?, String> expectedProfit =
+      GeneratedColumn<String>(
+        'expected_profit',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      ).withConverter<Decimal?>($InvestmentsTable.$converterexpectedProfitn);
+  static const VerificationMeta _valueCheckScheduleMeta =
+      const VerificationMeta('valueCheckSchedule');
+  @override
+  late final GeneratedColumn<String> valueCheckSchedule =
+      GeneratedColumn<String>(
+        'value_check_schedule',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  @override
+  late final GeneratedColumnWithTypeConverter<Decimal?, String> expectedGrowth =
+      GeneratedColumn<String>(
+        'expected_growth',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      ).withConverter<Decimal?>($InvestmentsTable.$converterexpectedGrowthn);
+  static const VerificationMeta _profitBasisMeta = const VerificationMeta(
+    'profitBasis',
+  );
+  @override
+  late final GeneratedColumn<String> profitBasis = GeneratedColumn<String>(
+    'profit_basis',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _capitalBackMeta = const VerificationMeta(
+    'capitalBack',
+  );
+  @override
+  late final GeneratedColumn<String> capitalBack = GeneratedColumn<String>(
+    'capital_back',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _accountKindMeta = const VerificationMeta(
+    'accountKind',
+  );
+  @override
+  late final GeneratedColumn<String> accountKind = GeneratedColumn<String>(
+    'account_kind',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -196,6 +269,13 @@ class $InvestmentsTable extends Investments
     customZakatShare,
     inflationOverride,
     notes,
+    payoutSchedule,
+    expectedProfit,
+    valueCheckSchedule,
+    expectedGrowth,
+    profitBasis,
+    capitalBack,
+    accountKind,
     createdAt,
     updatedAt,
   ];
@@ -302,6 +382,51 @@ class $InvestmentsTable extends Investments
         notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
       );
     }
+    if (data.containsKey('payout_schedule')) {
+      context.handle(
+        _payoutScheduleMeta,
+        payoutSchedule.isAcceptableOrUnknown(
+          data['payout_schedule']!,
+          _payoutScheduleMeta,
+        ),
+      );
+    }
+    if (data.containsKey('value_check_schedule')) {
+      context.handle(
+        _valueCheckScheduleMeta,
+        valueCheckSchedule.isAcceptableOrUnknown(
+          data['value_check_schedule']!,
+          _valueCheckScheduleMeta,
+        ),
+      );
+    }
+    if (data.containsKey('profit_basis')) {
+      context.handle(
+        _profitBasisMeta,
+        profitBasis.isAcceptableOrUnknown(
+          data['profit_basis']!,
+          _profitBasisMeta,
+        ),
+      );
+    }
+    if (data.containsKey('capital_back')) {
+      context.handle(
+        _capitalBackMeta,
+        capitalBack.isAcceptableOrUnknown(
+          data['capital_back']!,
+          _capitalBackMeta,
+        ),
+      );
+    }
+    if (data.containsKey('account_kind')) {
+      context.handle(
+        _accountKindMeta,
+        accountKind.isAcceptableOrUnknown(
+          data['account_kind']!,
+          _accountKindMeta,
+        ),
+      );
+    }
     if (data.containsKey('created_at')) {
       context.handle(
         _createdAtMeta,
@@ -393,6 +518,38 @@ class $InvestmentsTable extends Investments
         DriftSqlType.string,
         data['${effectivePrefix}notes'],
       ),
+      payoutSchedule: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}payout_schedule'],
+      ),
+      expectedProfit: $InvestmentsTable.$converterexpectedProfitn.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}expected_profit'],
+        ),
+      ),
+      valueCheckSchedule: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}value_check_schedule'],
+      ),
+      expectedGrowth: $InvestmentsTable.$converterexpectedGrowthn.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}expected_growth'],
+        ),
+      ),
+      profitBasis: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}profit_basis'],
+      ),
+      capitalBack: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}capital_back'],
+      ),
+      accountKind: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}account_kind'],
+      ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -419,6 +576,14 @@ class $InvestmentsTable extends Investments
       const DecimalConverter();
   static TypeConverter<Decimal?, String?> $convertercustomZakatSharen =
       NullAwareTypeConverter.wrap($convertercustomZakatShare);
+  static TypeConverter<Decimal, String> $converterexpectedProfit =
+      const DecimalConverter();
+  static TypeConverter<Decimal?, String?> $converterexpectedProfitn =
+      NullAwareTypeConverter.wrap($converterexpectedProfit);
+  static TypeConverter<Decimal, String> $converterexpectedGrowth =
+      const DecimalConverter();
+  static TypeConverter<Decimal?, String?> $converterexpectedGrowthn =
+      NullAwareTypeConverter.wrap($converterexpectedGrowth);
 }
 
 class InvestmentRow extends DataClass implements Insertable<InvestmentRow> {
@@ -437,6 +602,15 @@ class InvestmentRow extends DataClass implements Insertable<InvestmentRow> {
   final Decimal? customZakatShare;
   final String? inflationOverride;
   final String? notes;
+
+  /// v2 (story §5.5, §5.6): the plan and the P-2/P-3 answers, all optional.
+  final String? payoutSchedule;
+  final Decimal? expectedProfit;
+  final String? valueCheckSchedule;
+  final Decimal? expectedGrowth;
+  final String? profitBasis;
+  final String? capitalBack;
+  final String? accountKind;
   final DateTime createdAt;
   final DateTime updatedAt;
   const InvestmentRow({
@@ -455,6 +629,13 @@ class InvestmentRow extends DataClass implements Insertable<InvestmentRow> {
     this.customZakatShare,
     this.inflationOverride,
     this.notes,
+    this.payoutSchedule,
+    this.expectedProfit,
+    this.valueCheckSchedule,
+    this.expectedGrowth,
+    this.profitBasis,
+    this.capitalBack,
+    this.accountKind,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -502,6 +683,31 @@ class InvestmentRow extends DataClass implements Insertable<InvestmentRow> {
     if (!nullToAbsent || notes != null) {
       map['notes'] = Variable<String>(notes);
     }
+    if (!nullToAbsent || payoutSchedule != null) {
+      map['payout_schedule'] = Variable<String>(payoutSchedule);
+    }
+    if (!nullToAbsent || expectedProfit != null) {
+      map['expected_profit'] = Variable<String>(
+        $InvestmentsTable.$converterexpectedProfitn.toSql(expectedProfit),
+      );
+    }
+    if (!nullToAbsent || valueCheckSchedule != null) {
+      map['value_check_schedule'] = Variable<String>(valueCheckSchedule);
+    }
+    if (!nullToAbsent || expectedGrowth != null) {
+      map['expected_growth'] = Variable<String>(
+        $InvestmentsTable.$converterexpectedGrowthn.toSql(expectedGrowth),
+      );
+    }
+    if (!nullToAbsent || profitBasis != null) {
+      map['profit_basis'] = Variable<String>(profitBasis);
+    }
+    if (!nullToAbsent || capitalBack != null) {
+      map['capital_back'] = Variable<String>(capitalBack);
+    }
+    if (!nullToAbsent || accountKind != null) {
+      map['account_kind'] = Variable<String>(accountKind);
+    }
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
@@ -542,6 +748,27 @@ class InvestmentRow extends DataClass implements Insertable<InvestmentRow> {
       notes: notes == null && nullToAbsent
           ? const Value.absent()
           : Value(notes),
+      payoutSchedule: payoutSchedule == null && nullToAbsent
+          ? const Value.absent()
+          : Value(payoutSchedule),
+      expectedProfit: expectedProfit == null && nullToAbsent
+          ? const Value.absent()
+          : Value(expectedProfit),
+      valueCheckSchedule: valueCheckSchedule == null && nullToAbsent
+          ? const Value.absent()
+          : Value(valueCheckSchedule),
+      expectedGrowth: expectedGrowth == null && nullToAbsent
+          ? const Value.absent()
+          : Value(expectedGrowth),
+      profitBasis: profitBasis == null && nullToAbsent
+          ? const Value.absent()
+          : Value(profitBasis),
+      capitalBack: capitalBack == null && nullToAbsent
+          ? const Value.absent()
+          : Value(capitalBack),
+      accountKind: accountKind == null && nullToAbsent
+          ? const Value.absent()
+          : Value(accountKind),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
     );
@@ -570,6 +797,15 @@ class InvestmentRow extends DataClass implements Insertable<InvestmentRow> {
         json['inflationOverride'],
       ),
       notes: serializer.fromJson<String?>(json['notes']),
+      payoutSchedule: serializer.fromJson<String?>(json['payoutSchedule']),
+      expectedProfit: serializer.fromJson<Decimal?>(json['expectedProfit']),
+      valueCheckSchedule: serializer.fromJson<String?>(
+        json['valueCheckSchedule'],
+      ),
+      expectedGrowth: serializer.fromJson<Decimal?>(json['expectedGrowth']),
+      profitBasis: serializer.fromJson<String?>(json['profitBasis']),
+      capitalBack: serializer.fromJson<String?>(json['capitalBack']),
+      accountKind: serializer.fromJson<String?>(json['accountKind']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
@@ -593,6 +829,13 @@ class InvestmentRow extends DataClass implements Insertable<InvestmentRow> {
       'customZakatShare': serializer.toJson<Decimal?>(customZakatShare),
       'inflationOverride': serializer.toJson<String?>(inflationOverride),
       'notes': serializer.toJson<String?>(notes),
+      'payoutSchedule': serializer.toJson<String?>(payoutSchedule),
+      'expectedProfit': serializer.toJson<Decimal?>(expectedProfit),
+      'valueCheckSchedule': serializer.toJson<String?>(valueCheckSchedule),
+      'expectedGrowth': serializer.toJson<Decimal?>(expectedGrowth),
+      'profitBasis': serializer.toJson<String?>(profitBasis),
+      'capitalBack': serializer.toJson<String?>(capitalBack),
+      'accountKind': serializer.toJson<String?>(accountKind),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
@@ -614,6 +857,13 @@ class InvestmentRow extends DataClass implements Insertable<InvestmentRow> {
     Value<Decimal?> customZakatShare = const Value.absent(),
     Value<String?> inflationOverride = const Value.absent(),
     Value<String?> notes = const Value.absent(),
+    Value<String?> payoutSchedule = const Value.absent(),
+    Value<Decimal?> expectedProfit = const Value.absent(),
+    Value<String?> valueCheckSchedule = const Value.absent(),
+    Value<Decimal?> expectedGrowth = const Value.absent(),
+    Value<String?> profitBasis = const Value.absent(),
+    Value<String?> capitalBack = const Value.absent(),
+    Value<String?> accountKind = const Value.absent(),
     DateTime? createdAt,
     DateTime? updatedAt,
   }) => InvestmentRow(
@@ -640,6 +890,21 @@ class InvestmentRow extends DataClass implements Insertable<InvestmentRow> {
         ? inflationOverride.value
         : this.inflationOverride,
     notes: notes.present ? notes.value : this.notes,
+    payoutSchedule: payoutSchedule.present
+        ? payoutSchedule.value
+        : this.payoutSchedule,
+    expectedProfit: expectedProfit.present
+        ? expectedProfit.value
+        : this.expectedProfit,
+    valueCheckSchedule: valueCheckSchedule.present
+        ? valueCheckSchedule.value
+        : this.valueCheckSchedule,
+    expectedGrowth: expectedGrowth.present
+        ? expectedGrowth.value
+        : this.expectedGrowth,
+    profitBasis: profitBasis.present ? profitBasis.value : this.profitBasis,
+    capitalBack: capitalBack.present ? capitalBack.value : this.capitalBack,
+    accountKind: accountKind.present ? accountKind.value : this.accountKind,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
   );
@@ -670,6 +935,27 @@ class InvestmentRow extends DataClass implements Insertable<InvestmentRow> {
           ? data.inflationOverride.value
           : this.inflationOverride,
       notes: data.notes.present ? data.notes.value : this.notes,
+      payoutSchedule: data.payoutSchedule.present
+          ? data.payoutSchedule.value
+          : this.payoutSchedule,
+      expectedProfit: data.expectedProfit.present
+          ? data.expectedProfit.value
+          : this.expectedProfit,
+      valueCheckSchedule: data.valueCheckSchedule.present
+          ? data.valueCheckSchedule.value
+          : this.valueCheckSchedule,
+      expectedGrowth: data.expectedGrowth.present
+          ? data.expectedGrowth.value
+          : this.expectedGrowth,
+      profitBasis: data.profitBasis.present
+          ? data.profitBasis.value
+          : this.profitBasis,
+      capitalBack: data.capitalBack.present
+          ? data.capitalBack.value
+          : this.capitalBack,
+      accountKind: data.accountKind.present
+          ? data.accountKind.value
+          : this.accountKind,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
@@ -693,6 +979,13 @@ class InvestmentRow extends DataClass implements Insertable<InvestmentRow> {
           ..write('customZakatShare: $customZakatShare, ')
           ..write('inflationOverride: $inflationOverride, ')
           ..write('notes: $notes, ')
+          ..write('payoutSchedule: $payoutSchedule, ')
+          ..write('expectedProfit: $expectedProfit, ')
+          ..write('valueCheckSchedule: $valueCheckSchedule, ')
+          ..write('expectedGrowth: $expectedGrowth, ')
+          ..write('profitBasis: $profitBasis, ')
+          ..write('capitalBack: $capitalBack, ')
+          ..write('accountKind: $accountKind, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -700,7 +993,7 @@ class InvestmentRow extends DataClass implements Insertable<InvestmentRow> {
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     id,
     name,
     assetType,
@@ -716,9 +1009,16 @@ class InvestmentRow extends DataClass implements Insertable<InvestmentRow> {
     customZakatShare,
     inflationOverride,
     notes,
+    payoutSchedule,
+    expectedProfit,
+    valueCheckSchedule,
+    expectedGrowth,
+    profitBasis,
+    capitalBack,
+    accountKind,
     createdAt,
     updatedAt,
-  );
+  ]);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -738,6 +1038,13 @@ class InvestmentRow extends DataClass implements Insertable<InvestmentRow> {
           other.customZakatShare == this.customZakatShare &&
           other.inflationOverride == this.inflationOverride &&
           other.notes == this.notes &&
+          other.payoutSchedule == this.payoutSchedule &&
+          other.expectedProfit == this.expectedProfit &&
+          other.valueCheckSchedule == this.valueCheckSchedule &&
+          other.expectedGrowth == this.expectedGrowth &&
+          other.profitBasis == this.profitBasis &&
+          other.capitalBack == this.capitalBack &&
+          other.accountKind == this.accountKind &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
 }
@@ -758,6 +1065,13 @@ class InvestmentsCompanion extends UpdateCompanion<InvestmentRow> {
   final Value<Decimal?> customZakatShare;
   final Value<String?> inflationOverride;
   final Value<String?> notes;
+  final Value<String?> payoutSchedule;
+  final Value<Decimal?> expectedProfit;
+  final Value<String?> valueCheckSchedule;
+  final Value<Decimal?> expectedGrowth;
+  final Value<String?> profitBasis;
+  final Value<String?> capitalBack;
+  final Value<String?> accountKind;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   final Value<int> rowid;
@@ -777,6 +1091,13 @@ class InvestmentsCompanion extends UpdateCompanion<InvestmentRow> {
     this.customZakatShare = const Value.absent(),
     this.inflationOverride = const Value.absent(),
     this.notes = const Value.absent(),
+    this.payoutSchedule = const Value.absent(),
+    this.expectedProfit = const Value.absent(),
+    this.valueCheckSchedule = const Value.absent(),
+    this.expectedGrowth = const Value.absent(),
+    this.profitBasis = const Value.absent(),
+    this.capitalBack = const Value.absent(),
+    this.accountKind = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -797,6 +1118,13 @@ class InvestmentsCompanion extends UpdateCompanion<InvestmentRow> {
     this.customZakatShare = const Value.absent(),
     this.inflationOverride = const Value.absent(),
     this.notes = const Value.absent(),
+    this.payoutSchedule = const Value.absent(),
+    this.expectedProfit = const Value.absent(),
+    this.valueCheckSchedule = const Value.absent(),
+    this.expectedGrowth = const Value.absent(),
+    this.profitBasis = const Value.absent(),
+    this.capitalBack = const Value.absent(),
+    this.accountKind = const Value.absent(),
     required DateTime createdAt,
     required DateTime updatedAt,
     this.rowid = const Value.absent(),
@@ -824,6 +1152,13 @@ class InvestmentsCompanion extends UpdateCompanion<InvestmentRow> {
     Expression<String>? customZakatShare,
     Expression<String>? inflationOverride,
     Expression<String>? notes,
+    Expression<String>? payoutSchedule,
+    Expression<String>? expectedProfit,
+    Expression<String>? valueCheckSchedule,
+    Expression<String>? expectedGrowth,
+    Expression<String>? profitBasis,
+    Expression<String>? capitalBack,
+    Expression<String>? accountKind,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<int>? rowid,
@@ -844,6 +1179,14 @@ class InvestmentsCompanion extends UpdateCompanion<InvestmentRow> {
       if (customZakatShare != null) 'custom_zakat_share': customZakatShare,
       if (inflationOverride != null) 'inflation_override': inflationOverride,
       if (notes != null) 'notes': notes,
+      if (payoutSchedule != null) 'payout_schedule': payoutSchedule,
+      if (expectedProfit != null) 'expected_profit': expectedProfit,
+      if (valueCheckSchedule != null)
+        'value_check_schedule': valueCheckSchedule,
+      if (expectedGrowth != null) 'expected_growth': expectedGrowth,
+      if (profitBasis != null) 'profit_basis': profitBasis,
+      if (capitalBack != null) 'capital_back': capitalBack,
+      if (accountKind != null) 'account_kind': accountKind,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
@@ -866,6 +1209,13 @@ class InvestmentsCompanion extends UpdateCompanion<InvestmentRow> {
     Value<Decimal?>? customZakatShare,
     Value<String?>? inflationOverride,
     Value<String?>? notes,
+    Value<String?>? payoutSchedule,
+    Value<Decimal?>? expectedProfit,
+    Value<String?>? valueCheckSchedule,
+    Value<Decimal?>? expectedGrowth,
+    Value<String?>? profitBasis,
+    Value<String?>? capitalBack,
+    Value<String?>? accountKind,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
     Value<int>? rowid,
@@ -886,6 +1236,13 @@ class InvestmentsCompanion extends UpdateCompanion<InvestmentRow> {
       customZakatShare: customZakatShare ?? this.customZakatShare,
       inflationOverride: inflationOverride ?? this.inflationOverride,
       notes: notes ?? this.notes,
+      payoutSchedule: payoutSchedule ?? this.payoutSchedule,
+      expectedProfit: expectedProfit ?? this.expectedProfit,
+      valueCheckSchedule: valueCheckSchedule ?? this.valueCheckSchedule,
+      expectedGrowth: expectedGrowth ?? this.expectedGrowth,
+      profitBasis: profitBasis ?? this.profitBasis,
+      capitalBack: capitalBack ?? this.capitalBack,
+      accountKind: accountKind ?? this.accountKind,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
@@ -948,6 +1305,31 @@ class InvestmentsCompanion extends UpdateCompanion<InvestmentRow> {
     if (notes.present) {
       map['notes'] = Variable<String>(notes.value);
     }
+    if (payoutSchedule.present) {
+      map['payout_schedule'] = Variable<String>(payoutSchedule.value);
+    }
+    if (expectedProfit.present) {
+      map['expected_profit'] = Variable<String>(
+        $InvestmentsTable.$converterexpectedProfitn.toSql(expectedProfit.value),
+      );
+    }
+    if (valueCheckSchedule.present) {
+      map['value_check_schedule'] = Variable<String>(valueCheckSchedule.value);
+    }
+    if (expectedGrowth.present) {
+      map['expected_growth'] = Variable<String>(
+        $InvestmentsTable.$converterexpectedGrowthn.toSql(expectedGrowth.value),
+      );
+    }
+    if (profitBasis.present) {
+      map['profit_basis'] = Variable<String>(profitBasis.value);
+    }
+    if (capitalBack.present) {
+      map['capital_back'] = Variable<String>(capitalBack.value);
+    }
+    if (accountKind.present) {
+      map['account_kind'] = Variable<String>(accountKind.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -978,6 +1360,13 @@ class InvestmentsCompanion extends UpdateCompanion<InvestmentRow> {
           ..write('customZakatShare: $customZakatShare, ')
           ..write('inflationOverride: $inflationOverride, ')
           ..write('notes: $notes, ')
+          ..write('payoutSchedule: $payoutSchedule, ')
+          ..write('expectedProfit: $expectedProfit, ')
+          ..write('valueCheckSchedule: $valueCheckSchedule, ')
+          ..write('expectedGrowth: $expectedGrowth, ')
+          ..write('profitBasis: $profitBasis, ')
+          ..write('capitalBack: $capitalBack, ')
+          ..write('accountKind: $accountKind, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
@@ -1205,7 +1594,7 @@ class HistoryEntryRow extends DataClass implements Insertable<HistoryEntryRow> {
   final String id;
   final String investmentId;
 
-  /// money_in, sale, income, interest_*, value_update
+  /// money_in, sale, income, interest_*, value_update, *_skipped
   final String kind;
   final DateTime date;
 
@@ -3306,6 +3695,14 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     'history_by_investment_date',
     'CREATE INDEX history_by_investment_date ON history_entries (investment_id, date)',
   );
+  late final Index historyOneValueUpdatePerDay = Index(
+    'history_one_value_update_per_day',
+    'CREATE UNIQUE INDEX history_one_value_update_per_day ON history_entries (investment_id, date) WHERE kind = \'value_update\'',
+  );
+  late final Index historyOneSkipPerPlanDate = Index(
+    'history_one_skip_per_plan_date',
+    'CREATE UNIQUE INDEX history_one_skip_per_plan_date ON history_entries (investment_id, kind, date) WHERE kind IN (\'payout_skipped\', \'value_skipped\')',
+  );
   late final Index ratesByPair = Index(
     'rates_by_pair',
     'CREATE INDEX rates_by_pair ON rates (from_unit, to_unit, as_of)',
@@ -3322,6 +3719,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     appSettings,
     noZakatYears,
     historyByInvestmentDate,
+    historyOneValueUpdatePerDay,
+    historyOneSkipPerPlanDate,
     ratesByPair,
   ];
   @override
@@ -3353,6 +3752,13 @@ typedef $$InvestmentsTableCreateCompanionBuilder =
       Value<Decimal?> customZakatShare,
       Value<String?> inflationOverride,
       Value<String?> notes,
+      Value<String?> payoutSchedule,
+      Value<Decimal?> expectedProfit,
+      Value<String?> valueCheckSchedule,
+      Value<Decimal?> expectedGrowth,
+      Value<String?> profitBasis,
+      Value<String?> capitalBack,
+      Value<String?> accountKind,
       required DateTime createdAt,
       required DateTime updatedAt,
       Value<int> rowid,
@@ -3374,6 +3780,13 @@ typedef $$InvestmentsTableUpdateCompanionBuilder =
       Value<Decimal?> customZakatShare,
       Value<String?> inflationOverride,
       Value<String?> notes,
+      Value<String?> payoutSchedule,
+      Value<Decimal?> expectedProfit,
+      Value<String?> valueCheckSchedule,
+      Value<Decimal?> expectedGrowth,
+      Value<String?> profitBasis,
+      Value<String?> capitalBack,
+      Value<String?> accountKind,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
       Value<int> rowid,
@@ -3486,6 +3899,43 @@ class $$InvestmentsTableFilterComposer
 
   ColumnFilters<String> get notes => $composableBuilder(
     column: $table.notes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get payoutSchedule => $composableBuilder(
+    column: $table.payoutSchedule,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<Decimal?, Decimal, String>
+  get expectedProfit => $composableBuilder(
+    column: $table.expectedProfit,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<String> get valueCheckSchedule => $composableBuilder(
+    column: $table.valueCheckSchedule,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<Decimal?, Decimal, String>
+  get expectedGrowth => $composableBuilder(
+    column: $table.expectedGrowth,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<String> get profitBasis => $composableBuilder(
+    column: $table.profitBasis,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get capitalBack => $composableBuilder(
+    column: $table.capitalBack,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get accountKind => $composableBuilder(
+    column: $table.accountKind,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3609,6 +4059,41 @@ class $$InvestmentsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get payoutSchedule => $composableBuilder(
+    column: $table.payoutSchedule,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get expectedProfit => $composableBuilder(
+    column: $table.expectedProfit,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get valueCheckSchedule => $composableBuilder(
+    column: $table.valueCheckSchedule,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get expectedGrowth => $composableBuilder(
+    column: $table.expectedGrowth,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get profitBasis => $composableBuilder(
+    column: $table.profitBasis,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get capitalBack => $composableBuilder(
+    column: $table.capitalBack,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get accountKind => $composableBuilder(
+    column: $table.accountKind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -3685,6 +4170,43 @@ class $$InvestmentsTableAnnotationComposer
   GeneratedColumn<String> get notes =>
       $composableBuilder(column: $table.notes, builder: (column) => column);
 
+  GeneratedColumn<String> get payoutSchedule => $composableBuilder(
+    column: $table.payoutSchedule,
+    builder: (column) => column,
+  );
+
+  GeneratedColumnWithTypeConverter<Decimal?, String> get expectedProfit =>
+      $composableBuilder(
+        column: $table.expectedProfit,
+        builder: (column) => column,
+      );
+
+  GeneratedColumn<String> get valueCheckSchedule => $composableBuilder(
+    column: $table.valueCheckSchedule,
+    builder: (column) => column,
+  );
+
+  GeneratedColumnWithTypeConverter<Decimal?, String> get expectedGrowth =>
+      $composableBuilder(
+        column: $table.expectedGrowth,
+        builder: (column) => column,
+      );
+
+  GeneratedColumn<String> get profitBasis => $composableBuilder(
+    column: $table.profitBasis,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get capitalBack => $composableBuilder(
+    column: $table.capitalBack,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get accountKind => $composableBuilder(
+    column: $table.accountKind,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
@@ -3760,6 +4282,13 @@ class $$InvestmentsTableTableManager
                 Value<Decimal?> customZakatShare = const Value.absent(),
                 Value<String?> inflationOverride = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
+                Value<String?> payoutSchedule = const Value.absent(),
+                Value<Decimal?> expectedProfit = const Value.absent(),
+                Value<String?> valueCheckSchedule = const Value.absent(),
+                Value<Decimal?> expectedGrowth = const Value.absent(),
+                Value<String?> profitBasis = const Value.absent(),
+                Value<String?> capitalBack = const Value.absent(),
+                Value<String?> accountKind = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
@@ -3779,6 +4308,13 @@ class $$InvestmentsTableTableManager
                 customZakatShare: customZakatShare,
                 inflationOverride: inflationOverride,
                 notes: notes,
+                payoutSchedule: payoutSchedule,
+                expectedProfit: expectedProfit,
+                valueCheckSchedule: valueCheckSchedule,
+                expectedGrowth: expectedGrowth,
+                profitBasis: profitBasis,
+                capitalBack: capitalBack,
+                accountKind: accountKind,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 rowid: rowid,
@@ -3800,6 +4336,13 @@ class $$InvestmentsTableTableManager
                 Value<Decimal?> customZakatShare = const Value.absent(),
                 Value<String?> inflationOverride = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
+                Value<String?> payoutSchedule = const Value.absent(),
+                Value<Decimal?> expectedProfit = const Value.absent(),
+                Value<String?> valueCheckSchedule = const Value.absent(),
+                Value<Decimal?> expectedGrowth = const Value.absent(),
+                Value<String?> profitBasis = const Value.absent(),
+                Value<String?> capitalBack = const Value.absent(),
+                Value<String?> accountKind = const Value.absent(),
                 required DateTime createdAt,
                 required DateTime updatedAt,
                 Value<int> rowid = const Value.absent(),
@@ -3819,6 +4362,13 @@ class $$InvestmentsTableTableManager
                 customZakatShare: customZakatShare,
                 inflationOverride: inflationOverride,
                 notes: notes,
+                payoutSchedule: payoutSchedule,
+                expectedProfit: expectedProfit,
+                valueCheckSchedule: valueCheckSchedule,
+                expectedGrowth: expectedGrowth,
+                profitBasis: profitBasis,
+                capitalBack: capitalBack,
+                accountKind: accountKind,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 rowid: rowid,
