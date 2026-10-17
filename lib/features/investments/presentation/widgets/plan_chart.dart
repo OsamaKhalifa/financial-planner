@@ -98,6 +98,29 @@ PlanSeries payoutSeries(ExpectedVsActual p) {
   );
 }
 
+/// The value chart's lowest and highest amounts (its two Y labels); null for
+/// the payouts chart, which always starts at 0 (UX review U2).
+({Decimal low, Decimal high})? valueRange(PlanSeries s) {
+  final all = [...s.expected, ...s.actual, ...s.pending];
+  if (s.steps || all.isEmpty) return null;
+  var low = all.first.amount;
+  var high = low;
+  for (final p in all) {
+    if (p.amount < low) low = p.amount;
+    if (p.amount > high) high = p.amount;
+  }
+  return (low: low, high: high);
+}
+
+/// A short axis label ("10.2k", "1.5M"); exact amounts stay in the rows and
+/// the tooltip.
+String shortAmount(Decimal v) {
+  final x = v.toDouble();
+  if (x.abs() >= 1e6) return '${(x / 1e6).toStringAsFixed(1)}M';
+  if (x.abs() >= 1e3) return '${(x / 1e3).toStringAsFixed(1)}k';
+  return x.toStringAsFixed(0);
+}
+
 /// One chart, two callers (spec E10). Drawn with CustomPaint: no package.
 class PlanChart extends StatefulWidget {
   const PlanChart({
@@ -148,6 +171,8 @@ class _PlanChartState extends State<PlanChart> {
                     actual: scheme.primary,
                     expected: scheme.outline,
                     grid: scheme.outlineVariant,
+                    label: Theme.of(context).textTheme.labelSmall!
+                        .copyWith(color: scheme.onSurfaceVariant),
                   ),
                 ),
               );
@@ -175,7 +200,17 @@ final class _Geometry {
     if (all.isEmpty) return;
     _t0 = all.map((p) => p.date).reduce((a, b) => a.isBefore(b) ? a : b);
     _t1 = all.map((p) => p.date).reduce((a, b) => a.isAfter(b) ? a : b);
-    _max = all.map((p) => p.amount.toDouble()).reduce(math.max);
+    final range = valueRange(series);
+    if (range == null) {
+      final max = all.map((p) => p.amount.toDouble()).reduce(math.max);
+      _hi = max <= 0 ? 1.0 : max * 1.1;
+    } else {
+      final low = range.low.toDouble();
+      final high = range.high.toDouble();
+      final pad = high == low ? (high.abs() * 0.05 + 1) : (high - low) * 0.1;
+      _lo = low - pad;
+      _hi = high + pad;
+    }
   }
 
   final PlanSeries series;
@@ -183,18 +218,18 @@ final class _Geometry {
   final bool rtl;
   DateTime? _t0;
   DateTime? _t1;
-  var _max = 0.0;
+  var _lo = 0.0;
+  var _hi = 1.0;
   static const _pad = 8.0;
 
   Offset at(ChartPoint p) {
     final span = _t1!.difference(_t0!).inDays;
     final fx = span == 0 ? 0.5 : p.date.difference(_t0!).inDays / span;
     final x = _pad + (rtl ? 1 - fx : fx) * (size.width - 2 * _pad);
-    final top = _max <= 0 ? 1.0 : _max * 1.1;
     final y =
         size.height -
         _pad -
-        (p.amount.toDouble() / top) * (size.height - 2 * _pad);
+        (p.amount.toDouble() - _lo) / (_hi - _lo) * (size.height - 2 * _pad);
     return Offset(x, y);
   }
 
@@ -230,12 +265,14 @@ class _PlanPainter extends CustomPainter {
     required this.actual,
     required this.expected,
     required this.grid,
+    required this.label,
   });
 
   final _Geometry g;
   final Color actual;
   final Color expected;
   final Color grid;
+  final TextStyle label;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -258,12 +295,28 @@ class _PlanPainter extends CustomPainter {
     for (final p in s.actual) {
       canvas.drawCircle(g.at(p), 3.5, dot);
     }
+    _yLabels(canvas, size);
     final ring = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2
       ..color = expected;
     for (final p in s.pending) {
       canvas.drawCircle(g.at(p), 5, ring);
+    }
+  }
+
+  /// Min and max on the start edge (the right edge in RTL).
+  void _yLabels(Canvas canvas, Size size) {
+    final range = valueRange(g.series);
+    if (range == null) return;
+    for (final v in [range.low, range.high]) {
+      final tp = TextPainter(
+        text: TextSpan(text: shortAmount(v), style: label),
+        textDirection: TextDirection.ltr,
+      )..layout();
+      final y = g.at(ChartPoint(g._t0!, v)).dy - tp.height / 2;
+      final x = g.rtl ? size.width - tp.width : 0.0;
+      tp.paint(canvas, Offset(x, y.clamp(0, size.height - tp.height)));
     }
   }
 

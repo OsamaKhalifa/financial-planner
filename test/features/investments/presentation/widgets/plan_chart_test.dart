@@ -90,6 +90,22 @@ void main() {
     expect(s.steps, isTrue);
   });
 
+  test('U2 the value chart spans min to max with two short labels; the payouts chart starts at 0', () {
+    final v = valueSeries(plan(planFund(), [fundStart], day(2026, 3, 5)));
+    final r = valueRange(v)!;
+    expect(r.low, dd('10000'));
+    expect(r.high, v.expected.last.amount);
+    expect(shortAmount(r.low), '10.0k');
+    expect(shortAmount(dd('1500000')), '1.5M');
+    expect(shortAmount(dd('950')), '950');
+    final p = payoutSeries(
+      plan(friendsProject(), [
+        moneyIn('fp', day(2026, 1, 15), '100000'),
+      ], day(2026, 10, 17)),
+    );
+    expect(valueRange(p), isNull);
+  });
+
   for (final locale in [en, ar]) {
     testWidgets(
       'the chart is one accessible element with its summary (${locale.languageCode}); a tap shows the exact amount',
@@ -137,10 +153,14 @@ void main() {
         );
         final box = tester.getRect(find.byType(CustomPaint).last);
         // The March pending point (day 59 of 63); the axis mirrors in RTL.
-        final max = s.expected.last.amount.toDouble() * 1.1;
+        final r = valueRange(s)!;
+        final pad = (r.high - r.low).toDouble() * 0.1;
+        final lo = r.low.toDouble() - pad;
+        final hi = r.high.toDouble() + pad;
         final f = 59 / 63;
         final x = box.left + 8 + (locale == ar ? 1 - f : f) * (box.width - 16);
-        final top = box.top + 8 + (box.height - 16) * (1 - 10184.88 / max);
+        final top =
+            box.top + 8 + (box.height - 16) * (1 - (10184.88 - lo) / (hi - lo));
         await tester.tapAt(Offset(x, top));
         await tester.pump();
         expect(find.text('tip 10184.88'), findsOneWidget);

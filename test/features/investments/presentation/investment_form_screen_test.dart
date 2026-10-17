@@ -18,6 +18,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 
 import '../../../support/app_harness.dart';
+import '../../../support/plan_seeds.dart';
 
 TextField shareField(WidgetTester tester) => tester.widget<TextField>(
   find.descendant(
@@ -1082,6 +1083,50 @@ void main() {
             findsNothing,
           );
           expect(find.byKey(const ValueKey('pe-notice')), findsNothing);
+        },
+      );
+      testScreen(
+        'U4: on edit, changing Q2 shows "This recalculates every past month" right under Q2',
+        (tester) async {
+          tester0 = tester;
+          await pumpScreen(
+            tester,
+            const InvestmentFormScreen(editId: 'fp'),
+            locale: locale,
+            now: day(2026, 10, 17),
+            seed: seedFriend,
+          );
+          final l10n = l10nOf(tester);
+          expect(find.byKey(const ValueKey('q2-recalculates')), findsNothing);
+          await tapKey(tester, 'q2-CapitalBack.yes');
+          expect(find.byKey(const ValueKey('q2-recalculates')), findsOneWidget);
+          expect(find.text(l10n.editRecalculates), findsWidgets);
+        },
+      );
+
+      testScreen(
+        'AC-66: changing Q1 to share of profit on the edit form removes the Shariah risk tag',
+        (tester) async {
+          tester0 = tester;
+          final h = await pumpScreen(
+            tester,
+            const InvestmentFormScreen(editId: 'fp'),
+            locale: locale,
+            now: day(2026, 10, 17),
+            seed: (h) => seedFriend(
+              h,
+              investment: friendsProject(q1: ProfitBasis.fixedPctOfMoney),
+            ),
+          );
+          final l10n = l10nOf(tester);
+          expect(find.text(l10n.caseBTagPreview), findsOneWidget);
+          await tapKey(tester, 'q1-ProfitBasis.shareOfProfit');
+          expect(find.text(l10n.caseBTagPreview), findsNothing);
+          await save(tester);
+          expect(
+            (await saved(tester, h)).single.investment.shariahRisk,
+            isFalse,
+          );
         },
       );
     });

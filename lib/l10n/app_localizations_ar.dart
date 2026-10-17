@@ -1771,7 +1771,7 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get givenAwayFromPayouts => 'ما تُصدّق به من الدفعات (للتطهير)';
+  String get givenAwayFromPayouts => 'ما تصدّقتَ به من الدفعات (للتطهير)';
 
   @override
   String get givenAwayFromPayoutsHelp =>

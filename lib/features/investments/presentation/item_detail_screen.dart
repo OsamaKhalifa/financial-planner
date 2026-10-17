@@ -680,6 +680,31 @@ class _ToConfirmCardState extends ConsumerState<_ToConfirmCard> {
     final theme = Theme.of(context);
     final key = '${r.kind.name}-${r.date.toIso8601String().substring(0, 10)}';
     void edit() => showRecordSheet(context, investmentId: _item.id, row: r);
+    // Small phones and large text: the date moves into the label column so
+    // the check mark keeps its 48 dp (UX 2.12.7).
+    final narrow =
+        MediaQuery.sizeOf(context).width < 400 ||
+        MediaQuery.textScalerOf(context).scale(1) > 1;
+    final date = Text(context.date(r.date), key: ValueKey('date-$key'));
+    final text = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (narrow) date,
+        Text(_rowLabel(context, r, _item)),
+        if (r.expected != null)
+          Text(
+            context.money(r.expected!, _item.unit),
+            style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
+          ),
+        if (r.noPayoutLine)
+          Text(
+            noPayoutText(context, r, _item),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+      ],
+    );
     return InkWell(
       key: ValueKey('row-$key'),
       onTap: edit,
@@ -692,27 +717,17 @@ class _ToConfirmCardState extends ConsumerState<_ToConfirmCard> {
               padding: EdgeInsetsDirectional.only(end: 8, top: 2),
               child: Icon(Icons.radio_button_unchecked, size: 18),
             ),
-            SizedBox(width: 88, child: Text(context.date(r.date))),
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(_rowLabel(context, r, _item)),
-                  if (r.expected != null)
-                    Text(
-                      context.money(r.expected!, _item.unit),
-                      style: TextStyle(
-                        color: theme.colorScheme.onSurfaceVariant,
+              child: MergeSemantics(
+                child: narrow
+                    ? text
+                    : Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(width: 88, child: date),
+                          Expanded(child: text),
+                        ],
                       ),
-                    ),
-                  if (r.noPayoutLine)
-                    Text(
-                      noPayoutText(context, r, _item),
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                ],
               ),
             ),
             if (r.expected != null)

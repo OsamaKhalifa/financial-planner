@@ -457,7 +457,7 @@
   "caseCReturnsLine": "لا تُحسب الدفعات عائدًا: يعود إليك مالك حتى لو خسر المشروع.",
   "kindPayoutPurify": "دفعة · للتطهير",
   "toPurifyIncludesPayouts": "منها {amount} من الدفعات",
-  "givenAwayFromPayouts": "ما تُصدّق به من الدفعات (للتطهير)",
+  "givenAwayFromPayouts": "ما تصدّقتَ به من الدفعات (للتطهير)",
   "givenAwayFromPayoutsHelp": "مال من هذه الدفعات تصدّقت به. إخراجه لا يُحسب زكاة.",
   "toConfirmPill": "{count} للتأكيد",
   "expectedHeader": "المتوقع {amount} في {date}",

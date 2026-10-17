@@ -1372,6 +1372,8 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
       ]),
       if (_errors.contains(DraftError.answerCapitalBack))
         _errorText(context, l10n.errPickOne),
+      if (_editing != null && _editing!.capitalBack != _q2)
+        Text(l10n.editRecalculates, key: const ValueKey('q2-recalculates')),
       if (_expectedProfit == null) ?_peNotice(context),
     ];
   }

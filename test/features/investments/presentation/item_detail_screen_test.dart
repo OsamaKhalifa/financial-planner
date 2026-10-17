@@ -1173,6 +1173,43 @@ void main() {
           expect(v.value, Decimal.parse('10196.72'));
         },
       );
+      testScreen(
+        'U3: at 320 pt the date moves into the label column and ✓ keeps 48 dp; U5: date, label and amount read as one',
+        (tester) async {
+          await pumpScreen(
+            tester,
+            const ItemDetailScreen(investmentId: 'fp'),
+            locale: locale,
+            now: oct17,
+            seed: seedFriend,
+          );
+          final l10n = l10nOf(tester);
+          tester.view.physicalSize = const Size(320, 2400);
+          await tester.pumpAndSettle();
+          expect(tester.takeException(), isNull);
+          final date = find.byKey(const ValueKey('date-payout-2026-04-15'));
+          final label = find.descendant(
+            of: find.byKey(const ValueKey('row-payout-2026-04-15')),
+            matching: find.text(l10n.rowPayout),
+          );
+          expect(tester.getTopLeft(date).dx, tester.getTopLeft(label).dx);
+          expect(
+            tester.getTopLeft(date).dy,
+            lessThan(tester.getTopLeft(label).dy),
+          );
+          final check = tester.getSize(
+            find.byKey(const ValueKey('check-payout-2026-04-15')),
+          );
+          expect(check.width, greaterThanOrEqualTo(48));
+          final node = tester.getSemantics(label);
+          expect(node.label, contains(l10n.rowPayout));
+          expect(plain(node.label), contains('5,000.00 EGP'));
+          expect(
+            plain(node.label),
+            contains(plain(tester.widget<Text>(date).data!)),
+          );
+        },
+      );
     });
   }
 }
