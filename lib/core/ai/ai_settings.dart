@@ -13,8 +13,8 @@ class AiSettings {
   /// The user's opt-in. Off by default: data stays on the device.
   final bool cloudEnabled;
 
-  /// Null means the app's shared AI service. Otherwise the [AiVendor.id] the
-  /// user brings their own key for.
+  /// The [AiVendor.id] the user brings their own key for. Null until the
+  /// user picks one.
   final String? vendorId;
 
   /// One key per vendor, so switching vendor keeps the other keys.
@@ -34,8 +34,7 @@ class AiSettingsStore {
   static const _vendorKey = 'ai.vendor';
   static String _apiKeyKey(String vendorId) => 'ai.apiKey.$vendorId';
 
-  /// A stored vendor that is no longer offered falls back to the shared
-  /// service.
+  /// A stored vendor that is no longer offered reads as none picked.
   Future<AiSettings> read(List<String> vendorIds) async {
     final apiKeys = <String, String>{};
     for (final id in vendorIds) {
@@ -91,7 +90,7 @@ class AiSettingsNotifier extends AsyncNotifier<AiSettings> {
     );
   }
 
-  /// Null selects the app's shared service.
+  /// Null clears the choice.
   Future<void> selectVendor(String? vendorId) async {
     final current = await future;
     await _store.writeVendor(vendorId);
