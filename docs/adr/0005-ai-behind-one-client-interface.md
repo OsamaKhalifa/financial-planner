@@ -2,6 +2,8 @@
 
 **Status:** accepted · 2026-10-16 · decided by @OsamaKhalifa
 
+> **2026-10-17:** the shared route (`CloudAiClient`, the `ai-proxy/` Worker, the app token) is removed by [ADR-0006](0006-no-shared-ai-key.md). Users bring their own key. The interface and the vendor registry below still apply.
+
 ## Decision
 
 Features use AI only through `AiClient` (`lib/core/ai/ai_client.dart`): one method, `complete(AiPrompt) → AiReply`, and three errors (`AiUnavailable`, `AiQuotaExceeded`, `AiFailure`). The implementation is chosen in exactly one place, `aiClientProvider` (`lib/core/ai/ai_providers.dart`).
@@ -60,11 +62,9 @@ No streaming, chat history, tool calls, images, prompt registry, response cache,
 
 ## Setup (manual, by the owner)
 
-1. Create a Gemini API key in Google AI Studio. The model is the alias `gemini-flash-lite-latest` in both `ai-proxy/wrangler.toml` and `GeminiAiClient` — an alias, because pinned models get retired for new users (`gemini-2.5-flash` returned 404 in 2026-10).
-2. In `ai-proxy/`: `npm ci`, `npx wrangler login`, `npx wrangler secret put GEMINI_API_KEY`, `npx wrangler secret put APP_TOKEN` (a long random string), `npx wrangler deploy`.
-3. Run the app with `--dart-define=AI_PROXY_URL=<worker url> --dart-define=AI_APP_TOKEN=<same token>`.
+None for the app. Users create their own key (Google AI Studio for Gemini) and paste it in Settings. The Gemini model is the alias `gemini-flash-lite-latest` in `GeminiAiClient` — an alias, because pinned models get retired for new users (`gemini-2.5-flash` returned 404 in 2026-10).
 
-**Live test** (real Gemini, real device storage, local Worker): put your key in `~/.config/financial-planner/ai.env` (outside the repo), boot an iOS simulator, run `tool/ai_live_test.sh`. Not part of CI — it needs a key and spends quota.
+**Live test** (real Gemini, real device storage): put your key in `~/.config/financial-planner/ai.env` (outside the repo), boot an iOS simulator, run `tool/ai_live_test.sh`. Not part of CI — it needs a key and spends quota.
 
 ## Trigger to revisit
 

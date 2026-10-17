@@ -12,9 +12,6 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
-  // Radio value for the app's shared service; vendors use their own ids.
-  static const _shared = '';
-
   final _keyController = TextEditingController();
 
   @override
@@ -55,21 +52,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         if (settings.cloudEnabled) ...[
           ListTile(title: Text('AI provider', style: heading)),
           RadioGroup<String>(
-            groupValue: vendor?.id ?? _shared,
+            groupValue: vendor?.id,
             onChanged: (id) {
               _keyController.clear();
-              notifier.selectVendor(id == null || id == _shared ? null : id);
+              notifier.selectVendor(id);
             },
             child: Column(
               children: [
-                const RadioListTile<String>(
-                  value: _shared,
-                  title: Text("App's shared AI"),
-                  subtitle: Text(
-                    "No key needed. Free use is limited and shared by all "
-                    "users. Text goes through the app's server.",
-                  ),
-                ),
                 for (final v in vendors)
                   RadioListTile<String>(
                     value: v.id,
@@ -138,7 +127,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   String _status(AiSettings settings, AiVendor? vendor) {
     if (!settings.cloudEnabled) return 'Cloud AI is off.';
-    if (vendor == null) return "Using the app's shared AI service.";
+    if (vendor == null) return 'Pick an AI provider to use it.';
     return settings.apiKey == null
         ? 'Add your ${vendor.name} key to use it.'
         : 'Using your own ${vendor.name} key.';

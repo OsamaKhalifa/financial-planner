@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   setUp(() => FlutterSecureStorage.setMockInitialValues({}));
 
-  test('defaults to off, shared service, no keys', () async {
+  test('defaults to off, no provider, no keys', () async {
     final settings = await ProviderContainer.test().read(
       aiSettingsProvider.future,
     );
@@ -47,7 +47,7 @@ void main() {
     );
   });
 
-  test('a vendor no longer offered falls back to the shared service', () async {
+  test('a vendor no longer offered reads as no provider', () async {
     FlutterSecureStorage.setMockInitialValues({
       'ai.vendor': 'gone',
       'ai.apiKey.gone': 'k',

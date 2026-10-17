@@ -38,9 +38,14 @@ void main() {
     await tester.tap(find.byType(Switch));
     await tester.pumpAndSettle();
 
-    expect(find.text("App's shared AI"), findsOneWidget);
     expect(find.text('Google Gemini'), findsOneWidget);
-    expect(find.text("Using the app's shared AI service."), findsOneWidget);
+    expect(
+      tester
+          .widget<RadioGroup<String>>(find.byType(RadioGroup<String>))
+          .groupValue,
+      isNull,
+    );
+    expect(find.text('Pick an AI provider to use it.'), findsOneWidget);
     expect(find.byType(TextField), findsNothing);
     expect(await storage.read(key: 'ai.cloudEnabled'), 'true');
   });
