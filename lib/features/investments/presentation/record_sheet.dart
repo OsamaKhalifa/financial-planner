@@ -254,7 +254,10 @@ class _RecordSheetState extends ConsumerState<RecordSheet> {
         final current =
             calc?.timeline(item.id).recordedValueAt(_date) ?? Decimal.zero;
         final inItemUnit = unit == item.unit ? amount : null;
-        if (left == null && inItemUnit != null && inItemUnit > current) {
+        if (_sale &&
+            left == null &&
+            inItemUnit != null &&
+            inItemUnit > current) {
           fail(l10n.valueLeftRequired);
           return;
         }

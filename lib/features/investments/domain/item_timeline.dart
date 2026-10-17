@@ -74,7 +74,8 @@ final class ItemTimeline {
             update = value;
           case MoneyIn() when amount != null:
             delta += amount;
-          case MoneyOut() when amount != null:
+          // Income is paid from profit; only a sale takes value out (Q12).
+          case MoneyOut(kind: MoneyOutKind.sale) when amount != null:
             delta -= amount;
           case InterestRecord(:final kind) when amount != null:
             if (kind == InterestKind.keptInside) {

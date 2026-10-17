@@ -1343,4 +1343,43 @@ void main() {
       expectDec(noGold.silverNisab!.amount, '35700.00');
     });
   });
+  group('expected vs actual and private equity', () {
+    Investment friend() => inv(
+      'fp',
+      type: AssetType.other,
+      intent: Intent.longTerm,
+      unit: egp,
+      start: day(2026, 1, 15),
+      rule: ZakatRule.longTermDividendsOnly,
+    );
+
+    test('AC-68 income keeps the value at 100,000 (gain 5,000, ROI 5 %); income 150,000 asks nothing; a sale of 30,000 leaves 70,000', () {
+      final history = <HistoryEntry>[
+        mIn('fp', day(2026, 1, 15), '100000', egp),
+        mOut('fp', day(2026, 4, 15), '5000', egp, MoneyOutKind.income),
+      ];
+      final tl = ItemTimeline(item(friend(), history), RateBook(const []));
+      expectDec(tl.recordedValueAt(day(2026, 4, 15)), '100000.00');
+      final s = calc([
+        item(friend(), history),
+      ], today: day(2026, 4, 20)).sinceStart('fp');
+      expectDec(s.gain, '5000.00');
+      expectPct(s.simpleRoi, '5.00');
+
+      final more = [
+        ...history,
+        mOut('fp', day(2026, 5, 1), '150000', egp, MoneyOutKind.income),
+      ];
+      final tl2 = ItemTimeline(item(friend(), more), RateBook(const []));
+      expectDec(tl2.recordedValueAt(day(2026, 5, 1)), '100000.00');
+      expect(tl2.closedAt(day(2026, 5, 1)), isFalse);
+
+      final sold = [
+        ...more,
+        mOut('fp', day(2026, 6, 1), '30000', egp, MoneyOutKind.sale),
+      ];
+      final tl3 = ItemTimeline(item(friend(), sold), RateBook(const []));
+      expectDec(tl3.recordedValueAt(day(2026, 6, 1)), '70000.00');
+    });
+  });
 }
