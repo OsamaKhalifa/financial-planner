@@ -4,7 +4,6 @@ import 'package:financial_planner/core/ai/ai_settings.dart';
 import 'package:financial_planner/core/ai/cloud_ai_client.dart';
 import 'package:financial_planner/core/ai/gemini_ai_client.dart';
 import 'package:financial_planner/features/settings/settings_screen.dart';
-import 'package:financial_planner/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -37,10 +36,10 @@ void main() {
   testWidgets('own key: Settings UI, device storage, real Gemini', (
     tester,
   ) async {
-    await tester.pumpWidget(const ProviderScope(child: MyApp()));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('Settings'));
-    // Finish the page transition first: taps during it are dropped.
+    // The app root opens Setup on a fresh install, so open Settings directly.
+    await tester.pumpWidget(
+      const ProviderScope(child: MaterialApp(home: SettingsScreen())),
+    );
     await tester.pumpAndSettle();
     await _pumpUntilFound(tester, find.text('Cloud AI is off.'));
 
