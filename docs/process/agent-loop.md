@@ -1,6 +1,6 @@
 # Agent loop
 
-Seven roles. One hat at a time. Loop cap: 2.
+Eight roles. One hat at a time. Loop cap: 2.
 
 ## Roles
 
