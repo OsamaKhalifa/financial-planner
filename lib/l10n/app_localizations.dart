@@ -1007,7 +1007,7 @@ abstract class AppLocalizations {
   /// No description provided for @zakatNeedsChoice.
   ///
   /// In en, this message translates to:
-  /// **'Zakat: not set yet — answer the question below'**
+  /// **'Zakat: not set yet — answer the zakat question in this form'**
   String get zakatNeedsChoice;
 
   /// No description provided for @zakatReasonTrading.

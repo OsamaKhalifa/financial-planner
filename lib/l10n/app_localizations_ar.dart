@@ -620,7 +620,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get zakatLineCompany => 'الزكاة: 0 % — الشركة تخرج زكاتها';
 
   @override
-  String get zakatNeedsChoice => 'الزكاة: لم تُحدد بعد — أجب عن السؤال أدناه';
+  String get zakatNeedsChoice =>
+      'الزكاة: لم تُحدد بعد — أجب عن سؤال الزكاة في هذا النموذج';
 
   @override
   String get zakatReasonTrading =>

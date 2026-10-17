@@ -373,7 +373,7 @@
   },
   "zakatLineDividends": "Zakat: on dividends only, when received",
   "zakatLineCompany": "Zakat: 0 % — the company pays zakat",
-  "zakatNeedsChoice": "Zakat: not set yet — answer the question below",
+  "zakatNeedsChoice": "Zakat: not set yet — answer the zakat question in this form",
   "zakatReasonTrading": "You hold this to sell. Trade goods pay 2.5 % of market value.",
   "zakatReasonSavings": "Held as savings: zakat on market value.",
   "zakatReasonCash": "Cash is zakatable in full.",

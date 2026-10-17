@@ -620,7 +620,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get zakatNeedsChoice =>
-      'Zakat: not set yet — answer the question below';
+      'Zakat: not set yet — answer the zakat question in this form';
 
   @override
   String get zakatReasonTrading =>
