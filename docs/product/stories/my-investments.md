@@ -185,7 +185,7 @@ Why two schedules, not one: dividends quarterly but a value check monthly is com
 - **Row labels** (P-4b): a pending payout row reads "Expected payout (not received yet)" (private equity case C: "Expected payout (to purify when received)"; conventional deposit: "Expected interest (to purify)"). Never "profit due" or "owed".
 - **No duplicates:** an actual record entered by hand (income for a payout row, value update for a value row) dated within **7 days** before or after the schedule date resolves that row with its own amount (oldest row first; one record resolves one row). Interest records never resolve a payout row, except on a conventional deposit, where only they do.
 - A payout row still pending from d_k + 8 days also shows the "No payout recorded…" line. Why 7 days: a friend pays a few days off; no setting (no evidence one is needed).
-- Home shows **"N to confirm"**, N = the number of pending rows on open items.
+- Home shows a **"N to confirm"** pill on each open item that has pending rows, N = that item's pending rows. No total across items.
 
 **Shown per item** (expected vs actual):
 - each row: date, expected amount, actual amount, state (pending · received · skipped; value rows: pending · recorded · skipped);
@@ -440,7 +440,7 @@ Unless stated: item unit = base currency = EGP; zakat year = **lunar (r = 2.5 %,
 **Private equity (§5.5)**
 
 - **AC-46** Given a new private equity item, Then no market is asked, intent offers only trading and long-term, quantity is optional, and the item unit defaults to the base currency; When saved without intent, Then it is rejected and intent is named. Given an existing "other" item, Then after the update it is still "other" with the same zakat share.
-- **AC-47** Given a new private equity item with intent "trading", Then the zakat share is 100 % with no method question. Given intent "long-term", Then the user must pick one of: known zakatable %, zakat on profit received only, full value — nothing pre-selected, no 25 % option, saving without a pick is rejected (P-1). Given "Friend's project" (below) on "profit received only" with income 5,000 on 2026-04-20, 2026-07-14 and 2026-10-20, When viewing year 2026, Then the set-aside on its value is 0 and its set-aside = 0.025 × 15,000 = **375.00** (no T/Y factor), and the item shows "Zakat: 2.5 % of each profit payout you record, not of the project's value. Each payout is counted once." (lunar setting).
+- **AC-47** Given a new private equity item with intent "trading", Then the zakat share is 100 % with no method question. Given intent "long-term", Then the user must pick one of: known zakatable %, zakat on profit received only, full value — nothing pre-selected, no 25 % option, saving without a pick is rejected (P-1). Given "Friend's project" (below) on "profit received only" with income 5,000 on 2026-04-20, 2026-07-14 and 2026-10-15, When viewing year 2026 (so far) on 2026-10-17, Then the set-aside on its value is 0 and its set-aside = 0.025 × 15,000 = **375.00** (no T/Y factor), and the item shows "Zakat: 2.5 % of each profit payout you record, not of the project's value. Each payout is counted once." (lunar setting).
 
 **Expected vs actual (§5.6)** — "Friend's project" below = private equity, long-term, EGP, start **2026-01-15**, first money in **100,000**, expected profit **20 %**, payout schedule **quarterly**.
 
@@ -475,7 +475,7 @@ Unless stated: item unit = base currency = EGP; zakat year = **lunar (r = 2.5 %,
 - **AC-72** Given AC-51 on 2026-10-17, When the user taps "Received this amount" on April and then Undo, Then no income record exists, the April row is pending at 5,000.00, received = **0.00**, Home shows "3 to confirm"; When the user picks "Confirm all as expected" and then Undo, Then no income record exists and three rows are pending; When the user skips October and then Undo, Then October is pending again.
 - **AC-73** Given AC-57 on 2026-05-10, Then the 2026-04-30 row offers "Add amount" and no "Received this amount"; When the user adds 950, Then income 950.00 dated 2026-04-30 is stored, received since start = **3,050.00**, and the row is received.
 - **AC-74** Given an item with both a payout plan and a value plan, Then its screen shows one chart at a time and the user switches between Payouts and Value; Given an item with only a payout plan, Then only the payouts chart shows and there is no switch.
-- **AC-75** Given AC-51 (3 pending rows) and AC-61's fund (2 pending rows), When Home is viewed, Then it shows "**5** to confirm"; after "Confirm all as expected" on "Friend's project", Then "**2** to confirm".
+- **AC-75** Given on 2026-10-17 "Friend's project" as in AC-51 (3 pending rows) and a fund, start **2026-08-17**, 10,000, growth 12 %, value check monthly, no value update (pending rows 2026-09-17 and 2026-10-17), When Home is viewed, Then "Friend's project" shows "**3** to confirm", the fund shows "**2** to confirm", and no total is shown; after "Confirm all as expected" on "Friend's project", Then it shows no pill and the fund still shows "**2** to confirm".
 
 ---
 
@@ -585,5 +585,38 @@ Owner: QA. Every AC has a test. **D** = `test/features/investments/domain/accept
 | 41 | D `AC-41`; S `period_screen_test` `AC-41` |
 | 42, 43, 44 | D `AC-42`, `AC-43`, `AC-44`; S `unit_picker_test` `AC-42`, `AC-43`, `AC-44` |
 | 45 | D `AC-45`; S `period_screen_test` `AC-45` (×2: with and without a gold rate) |
+| 46 | D `AC-46`; S `investment_form_screen_test` `AC-46`; R `migration_test` `AC-46 after the update, v1 data reads back the same…; "other" stays "other"` |
+| 47 | D `AC-47` (375.00); `zakat_rules_test` `AC-47 private equity…`, `AC-47 every private-equity rule cites B6`; S `investment_form_screen_test` `AC-47`, `item_detail_screen_test` `AC-47` (notice text) |
+| 48 | D `AC-48` (9,000.00); `investment_draft_test` `plan fields: hidden types, schedule needed, % limits (AC-48)`; `formulas_test` `AC-48/60 expectedValue…`; S `investment_form_screen_test` `AC-48` |
+| 49 | D `AC-49`; `formulas_test` `AC-49 expectedPayout…`; S `investment_form_screen_test` `AC-49` (payout preview) |
+| 50 | D `AC-50`; `core/dates_test` `AC-50 addMonths…` |
+| 51 | D `AC-51`; R `drift_investments_repository_test` `AC-51: reading the plan writes no row`; S `item_detail_screen_test` `AC-51`, `home_screen_test` `AC-51, AC-75` |
+| 52 | D `AC-52`; S `item_detail_screen_test` `AC-52, AC-72`, `period_screen_test` `AC-52` (July 5,000 / 4,000) |
+| 53 | D `AC-53`; S `item_detail_screen_test` `AC-53, AC-72` |
+| 54 | D `AC-54`; S `record_sheet_test` `AC-54` (hand income says it also records the payout) |
+| 55 | D `AC-55` |
+| 56 | D `AC-56`; S `item_detail_screen_test` `AC-56`, `home_screen_test` `AC-56: a closed item is not counted` |
+| 57 | D `AC-57`; S `item_detail_screen_test` `AC-57, AC-73` |
+| 58 | D `AC-58`; S `item_detail_screen_test` `AC-58` |
+| 58b | D `AC-58b` (to purify 83.33, value 10,000.00, February 0.00 %); S `item_detail_screen_test` `AC-58b` |
+| 59 | D `AC-59` |
+| 60 | D `AC-60`; `formulas_test` `AC-48/60 expectedValue…`; S `item_detail_screen_test` `AC-61, AC-60` ("below your estimate") |
+| 61 | D `AC-61`; S `item_detail_screen_test` `AC-61, AC-60` |
+| 62 | D `AC-62`; `widgets/plan_chart_test` `AC-62` (×3); S `item_detail_screen_test` `AC-62, AC-74`, `period_screen_test` `AC-62: no expected figure in portfolio scope` |
+| 63 | D `AC-63`; `architecture_test` `AC-63 actual figures never import the plan`, `AC-63 no background work in features…`; S `item_detail_screen_test` `AC-63`; the harness fails any undeclared request |
+| 64 | D `AC-64`; `investment_test` `AC-64 private equity case table…`; `investment_draft_test` `Q1 is required only with a %… (AC-64, AC-70)`; S `investment_form_screen_test` `AC-64` |
+| 65 | D `AC-65`; `zakat_rules_test` `AC-65 case C is 100 % as a debt…`; S `item_detail_screen_test` `AC-65, AC-71` |
+| 66 | D `AC-66`; `investment_test` `AC-66 the Shariah risk tag…`; R `drift_investments_repository_test` (Q1/Q2 round trip); S `item_detail_screen_test` `AC-66` (×2) |
+| 67 | `l10n/expected_words_test` `AC-67` (×2); S `investment_form_screen_test` `AC-67, AC-70`, `AC-67: a stock…` |
+| 68 | D `AC-68`; S `record_sheet_test` `AC-68: income above the value does not ask for the value left` |
+| 69 | D `AC-69` (hand records d ± 7 / ± 8); S `record_sheet_test` `AC-69` (×2: window bounds, date outside refused) |
+| 70 | D `AC-70`; `investment_draft_test` `… (AC-64, AC-70)`; S `investment_form_screen_test` `AC-67, AC-70` |
+| 71 | D `AC-71`; S `item_detail_screen_test` `AC-71`, `AC-65, AC-71` |
+| 72 | D `AC-72` (skip only); S `item_detail_screen_test` `AC-52, AC-72`, `AC-53, AC-72` (Undo of ✓, Confirm all and skip) |
+| 73 | D `AC-73`; S `item_detail_screen_test` `AC-57, AC-73` |
+| 74 | S `item_detail_screen_test` `AC-62, AC-74`, `AC-74: with both plans…` |
+| 75 | D `AC-75`; S `home_screen_test` `AC-51, AC-75` — both use a fund started 2026-08-17, not AC-61's 2026-01-01 (see thin spots) |
 
 **Known thin spots (not blockers):** AC-9 is proven on the enum only (no test that the setup screen stores the matched pair). AC-12/13/14/16/20/36/38 are proven in the engine, not on screen. AC-25's unit test waits 100 ms of real time; the screen and golden-path tests carry the real guarantee. The D1 budget test (`drift_investments_repository_test`, 12k entries under 200 ms) uses a wall-clock `Stopwatch` and can flake on a slow CI host.
+
+**Thin spots for AC-46…75 (QA, 2026-10-17):** AC-75 as written cannot hold: AC-61's fund (start 2026-01-01, monthly) has 9 pending rows on 2026-10-17, so Home would show 12, not 5; the tests use a fund started 2026-08-17 (PM to fix the AC). AC-75's Home test writes the three incomes directly instead of using "Confirm all". AC-72's Undo leaves "3 to confirm" checked on the item screen, not on Home. AC-51/52 screens check the difference amount but not its minus sign; AC-52's skip line period text is checked in the engine only. AC-69's "04-07 rejected" is covered only by the date field's bounds. AC-63 compares the real figure after set-aside, not before it, and no portfolio real or purchasing-power total. AC-47 checks the total set-aside 375.00, not that the value part is 0.
