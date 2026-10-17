@@ -1,8 +1,8 @@
-# ADR-0002 — AI behind one client interface and our own proxy
+# ADR-0005 — AI behind one client interface and our own proxy
 
 **Status:** accepted · 2026-10-16 · decided by @OsamaKhalifa
 
-> **2026-10-17:** the shared route (`CloudAiClient`, the `ai-proxy/` Worker, the app token) is removed by [ADR-0003](0003-no-shared-ai-key.md). Users bring their own key. The interface and the vendor registry below still apply.
+> **2026-10-17:** the shared route (`CloudAiClient`, the `ai-proxy/` Worker, the app token) is removed by [ADR-0006](0006-no-shared-ai-key.md). Users bring their own key. The interface and the vendor registry below still apply.
 
 ## Decision
 

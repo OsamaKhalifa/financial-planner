@@ -1,6 +1,6 @@
 # Agent loop
 
-Seven roles. One hat at a time. Loop cap: 2.
+Eight roles. One hat at a time. Loop cap: 2.
 
 ## Roles
 
@@ -13,11 +13,12 @@ Seven roles. One hat at a time. Loop cap: 2.
 | architect | `docs/adr/*`, implementation specs | new abstractions, speculative generality |
 | developer | code + tests | nothing — writes to spec |
 | qa | `test/`, `integration_test/` | missing tests, manual steps, flaky tests |
+| retro | `docs/process/lessons.md`, edits to agent files (human-approved) | harness growing past its line budget |
 
 ## Pipeline
 
 ```
-PM ──► Islamic (if money) ──► UX ──► Architect ──► Developer ──► QA ──► Reviewer(s) ──► merge
+PM ──► Islamic (if money) ──► UX ──► Architect ──► Developer ──► QA ──► Reviewer(s) ──► merge ──► Retro
                                                         │
                                                         └── may send back to any upstream role once
 ```

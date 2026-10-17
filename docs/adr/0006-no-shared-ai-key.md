@@ -1,6 +1,6 @@
-# ADR-0003 — No shared AI key: users bring their own
+# ADR-0006 — No shared AI key: users bring their own
 
-**Status:** accepted · 2026-10-17 · decided by @OsamaKhalifa · supersedes the shared route of ADR-0002
+**Status:** accepted · 2026-10-17 · decided by @OsamaKhalifa · supersedes the shared route of ADR-0005
 
 ## Decision
 
@@ -8,7 +8,7 @@ The app has no shared AI service. To use cloud AI, the user turns it on in Setti
 
 Removed: the "App's shared AI" option, `CloudAiClient`, `aiProxyConfigProvider`, the Cloudflare Worker (`ai-proxy/`) and its CI job.
 
-`AiClient` and `aiClientProvider` stay as in ADR-0002. Features do not change.
+`AiClient` and `aiClientProvider` stay as in ADR-0005. Features do not change.
 
 ## Why
 

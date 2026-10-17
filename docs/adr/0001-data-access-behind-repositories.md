@@ -19,6 +19,7 @@ This is the one approved exception to the "no interface with a single implementa
 - IDs are **UUID strings**, generated on the client. No auto-increment integers — they do not survive a move to a server.
 - Each record carries `createdAt` / `updatedAt` (UTC). Enough for a future sync; no sync logic now.
 - The implementation is chosen in exactly one place: the Riverpod provider for that repository.
+- The SQLite file lives only in the app sandbox (`path_provider` application-support dir), never in the project folder. Tests use an in-memory database.
 - Domain errors (`NotFound`, `Conflict`, `StorageUnavailable`) are defined next to the interface. Implementations map their own exceptions to these.
 
 ## What we do NOT build now

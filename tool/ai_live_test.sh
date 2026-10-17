@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # Live AI test on the booted iOS simulator: real Gemini, real device storage.
-# The key stays in $AI_ENV_FILE, outside the repo. See ADR-0002.
+# The key stays in $AI_ENV_FILE, outside the repo. See ADR-0005.
 set -euo pipefail
 
 ENV_FILE="${AI_ENV_FILE:-$HOME/.config/financial-planner/ai.env}"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
-[[ -f "$ENV_FILE" ]] || { echo "Missing $ENV_FILE (see ADR-0002)."; exit 1; }
+[[ -f "$ENV_FILE" ]] || { echo "Missing $ENV_FILE (see ADR-0005)."; exit 1; }
 if grep -q 'PASTE_YOUR_KEY_HERE' "$ENV_FILE" || ! grep -qE '^GEMINI_API_KEY=.{20,}$' "$ENV_FILE"; then
   echo "Put your Gemini key in $ENV_FILE first."; exit 1
 fi

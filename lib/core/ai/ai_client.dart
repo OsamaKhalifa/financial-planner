@@ -1,4 +1,4 @@
-/// The only AI type features may depend on. See ADR-0002.
+/// The only AI type features may depend on. See ADR-0005.
 abstract interface class AiClient {
   /// Throws [AiUnavailable], [AiQuotaExceeded] or [AiFailure].
   Future<AiReply> complete(AiPrompt prompt);

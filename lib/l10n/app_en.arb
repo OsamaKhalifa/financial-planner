@@ -1,0 +1,1087 @@
+{
+  "@@locale": "en",
+  "appTitle": "Financial Planner",
+  "@appTitle": {
+    "description": "App name shown in the app bar and task switcher."
+  },
+  "unitName": "{code, select, AED{UAE dirham}AUD{Australian dollar}BDT{Bangladeshi taka}BHD{Bahraini dinar}CAD{Canadian dollar}CHF{Swiss franc}CNY{Chinese yuan}DKK{Danish krone}DZD{Algerian dinar}EGP{Egyptian pound}EUR{Euro}GBP{Pound sterling}HKD{Hong Kong dollar}IDR{Indonesian rupiah}INR{Indian rupee}JOD{Jordanian dinar}JPY{Japanese yen}KWD{Kuwaiti dinar}MAD{Moroccan dirham}MYR{Malaysian ringgit}NGN{Nigerian naira}NOK{Norwegian krone}OMR{Omani rial}PKR{Pakistani rupee}QAR{Qatari riyal}SAR{Saudi riyal}SEK{Swedish krona}SGD{Singapore dollar}TND{Tunisian dinar}TRY{Turkish lira}USD{US dollar}XAG_g{Silver, grams (999)}XAU_g{Gold, grams (24k)}ZAR{South African rand}other{{code}}}",
+  "@unitName": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "countryName": "{code, select, ARE{UAE}AUS{Australia}BGD{Bangladesh}BHR{Bahrain}CAN{Canada}CHE{Switzerland}CHN{China}DNK{Denmark}DZA{Algeria}EGY{Egypt}EMU{Euro area}GBR{United Kingdom}HKG{Hong Kong}IDN{Indonesia}IND{India}JOR{Jordan}JPN{Japan}KWT{Kuwait}MAR{Morocco}MYS{Malaysia}NGA{Nigeria}NOR{Norway}OMN{Oman}PAK{Pakistan}QAT{Qatar}SAU{Saudi Arabia}SGP{Singapore}SWE{Sweden}TUN{Tunisia}TUR{Turkey}USA{United States}ZAF{South Africa}other{{code}}}",
+  "@countryName": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "marketName": "{code, select, tadawul{Tadawul}egx{EGX}nasdaq{NASDAQ}nyse{NYSE}lse{LSE}dfm{DFM}adx{ADX}boursaKuwait{Boursa Kuwait}qse{QSE}bursaMalaysia{Bursa Malaysia}bist{BIST}psx{PSX}otherMarket{Other market}other{{code}}}",
+  "@marketName": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "next": "Next",
+  "back": "Back",
+  "done": "Done",
+  "cancel": "Cancel",
+  "save": "Save",
+  "change": "Change",
+  "source": "Source",
+  "close": "Close",
+  "add": "Add",
+  "loading": "Loading…",
+  "setupBaseTitle": "What currency do you count your wealth in?",
+  "setupBaseHelp": "Totals, monthly and yearly figures, and zakat set-aside use this currency. You can change it later.",
+  "homeInflationLine": "Home inflation: {country} (from {currency})",
+  "@homeInflationLine": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      },
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "setupZakatTitle": "How do you calculate zakat?",
+  "zakatYearTitle": "Zakat year",
+  "zakatYearLunar": "Lunar — 2.5 % over 354 days",
+  "zakatYearSolar": "Solar — 2.577 % over 365 days (AAOIFI)",
+  "zakatYearWhy": "Some scholars allow a solar year with an adjusted rate; others keep the lunar year.",
+  "longTermTitle": "Long-held shares and funds",
+  "longTermDividendsOnly": "Dividends only (IIFA)",
+  "longTermProxy25": "25 % of value (NZF proxy)",
+  "longTermFullValue": "Full value (precaution)",
+  "longTermPerItem": "I'll decide per item",
+  "longTermNotNow": "Not now",
+  "longTermWhy": "When company data is unknown, scholars use different methods.",
+  "addInvestment": "Add investment",
+  "assumptions": "Assumptions",
+  "totalValue": "Total value",
+  "asOfDate": "as of {date}",
+  "@asOfDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "showIn": "Show in",
+  "viewGold": "Gold g",
+  "viewSilver": "Silver g",
+  "excludesItems": "Excludes {count} — rate missing: {pairs}",
+  "@excludesItems": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "pairs": {
+        "type": "String"
+      }
+    }
+  },
+  "toPurifyLine": "Interest to purify: {amount}",
+  "@toPurifyLine": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "verdictKept": "{year} so far: purchasing power kept {amount}",
+  "@verdictKept": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "verdictLost": "{year} so far: purchasing power lost {amount}",
+  "@verdictLost": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "verdictNotAvailable": "{year} so far: purchasing power not available",
+  "@verdictNotAvailable": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "inflationShipped": "{country} inflation: shipped ({source}, as of {year})",
+  "@inflationShipped": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      },
+      "source": {
+        "type": "String"
+      },
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "inflationYours": "{country} inflation: your values",
+  "@inflationYours": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      }
+    }
+  },
+  "inflationAssumed": "inflation assumed from {year}",
+  "@inflationAssumed": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "inflationEmpty": "No inflation data for {country}",
+  "@inflationEmpty": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      }
+    }
+  },
+  "staleBanner": "Not updated this month: {values} values, {rates} rates",
+  "@staleBanner": {
+    "placeholders": {
+      "values": {
+        "type": "String"
+      },
+      "rates": {
+        "type": "String"
+      }
+    }
+  },
+  "updateAll": "Update all",
+  "sortLabel": "Sort",
+  "sortValue": "Value",
+  "sortReturn": "Return since start",
+  "sortName": "Name",
+  "sortOldest": "Oldest update first",
+  "closedSection": "Closed ({count})",
+  "@closedSection": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "notUpdatedThisMonth": "Not updated this month",
+  "metalRateNotUpdated": "Metal rate not updated this month",
+  "rateMissingAdd": "{from}→{to} rate missing · Add",
+  "@rateMissingAdd": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "emptyTitle": "No investments yet.",
+  "dataStaysOnPhone": "Your data stays on this phone.",
+  "presetMonthlyFund": "Monthly fund",
+  "presetGold": "Gold",
+  "presetStock": "Stock",
+  "pureGrams": "{grams} pure",
+  "@pureGrams": {
+    "placeholders": {
+      "grams": {
+        "type": "String"
+      }
+    }
+  },
+  "typeAndMarket": "{type} · {market}",
+  "@typeAndMarket": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "market": {
+        "type": "String"
+      }
+    }
+  },
+  "amountWithUnit": "{amount} {unit}",
+  "@amountWithUnit": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "pickUnit": "Choose a unit",
+  "searchUnits": "Search by code or name",
+  "mostUsed": "Most used",
+  "allUnits": "All units",
+  "chooseCountry": "Choose a country",
+  "typeStock": "Stock",
+  "typeFund": "Fund / ETF",
+  "typeSukuk": "Sukuk",
+  "typeGold": "Gold",
+  "typeSilver": "Silver",
+  "typeCash": "Cash deposit",
+  "typeCrypto": "Crypto",
+  "typeOther": "Other",
+  "intentTrading": "Trading",
+  "intentLongTerm": "Long-term",
+  "intentPersonalUse": "Personal use",
+  "intentRental": "Rental",
+  "openSection": "Open",
+  "somethingWrong": "Something went wrong.",
+  "whyWhat": "What it is",
+  "whyNumbers": "Your numbers",
+  "whyAssumptions": "Assumptions used",
+  "whySource": "Source",
+  "sourceUnverified": "source not yet verified",
+  "src_A1A2": "2.5 % of the zakatable base once per lunar year: Abu Dawud 1573 (A1). A solar year at 2.577 %: AAOIFI Shari'ah Standard 35, reported by the National Zakat Foundation UK (A2) — section number not yet verified. Other scholars (Hanafi, Mufti Online) keep exactly 2.5 % and the lunar date.",
+  "src_B1": "Cash and bank balances are zakatable in full: Quran 9:34–35; Abu Dawud 1573; IIFA Res 21 (9/3) (B1).",
+  "src_B2": "Gold and silver held as savings: zakat on market value (Quran 9:34; Abu Dawud 1573). Worn jewellery: Hanafis say zakat is due (Abu Dawud 1563); Malikis, Shafi'is and Hanbalis say it is not (B2).",
+  "src_B3": "Trading shares: 100 % of market value (IIFA Res 28 (3/4) §3, Res 121 (3/13)). Held long term with no company data: dividends only (IIFA Res 28 §3); or 25 % of value as a proxy (National Zakat Foundation UK); or full value as a precaution. A company that pays zakat itself: shareholder does not pay again (IIFA Res 28 §1) (B3).",
+  "src_B4": "Funds and ETFs follow the share rules at fund level. Sukuk: 100 % of face or market value by default, with override (B4); AAOIFI SS 35 and SS 17 section numbers not yet verified.",
+  "src_B5": "Personal-use property is not zakatable. Rental property: zakat is not on the property; rent still held counts with cash (IIFA Res 2 (2/2)). Bought to resell: 100 % of market value (B5).",
+  "src_B8": "Scholars differ on whether holding crypto is permitted (IIFA Res 237 (8/24) gave no final ruling). Those who permit it say zakat is due on its full market value (B8).",
+  "src_Z6": "Interest is not the owner's wealth: it is not return and not in the zakat base, and it is given away (Quran 2:278–279). Giving it away does not count as zakat (B1). AAOIFI SS 21 section not yet verified.",
+  "src_A6": "Zakat is always on the actual value on the zakat date, never on an inflation-adjusted value (IIFA Res 28 (3/4) §3). The real return is shown for planning only (A6).",
+  "src_A3": "Nisab: gold 85 g (20 dinars) and silver 595 g (200 dirhams): Abu Dawud 1573; Bukhari 1447; Muslim 979. Which metal to use for cash is a point of difference (A3).",
+  "sourceName": "World Bank",
+  "verdictCaption": "After set-aside, after home inflation",
+  "rateMissingTitle": "Rate missing",
+  "openSource": "Source",
+  "returnLine": "Return (since {date})",
+  "@returnLine": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "valueFromDate": "Value from {date}",
+  "@valueFromDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "whyToPurifyTitle": "Interest to purify",
+  "whyToPurifyWhat": "All interest recorded minus all interest given away. It is not return and not in the zakat base. Giving it away does not count as zakat. It is never netted against the set-aside.",
+  "formTitleAdd": "Add investment",
+  "formTitleEdit": "Edit investment",
+  "fieldName": "Name",
+  "fieldType": "Type",
+  "fieldMarket": "Market",
+  "fieldMarketCountry": "Market country",
+  "fieldUnit": "Item unit",
+  "fieldStartDate": "Start date",
+  "fieldPaid": "Paid (first money in)",
+  "fieldPaidUnit": "Paid in",
+  "fieldCurrentValue": "Current value (optional)",
+  "fieldValueDate": "Value date",
+  "fieldQuantity": "Quantity (optional)",
+  "fieldGrams": "Grams (gross)",
+  "fieldPurity": "Purity",
+  "fieldIntent": "Intent",
+  "fieldShare": "Zakat share (% of value)",
+  "fieldNotes": "Notes (optional)",
+  "karat": "{k}k",
+  "@karat": {
+    "placeholders": {
+      "k": {
+        "type": "String"
+      }
+    }
+  },
+  "fineness": "{k}",
+  "@fineness": {
+    "placeholders": {
+      "k": {
+        "type": "String"
+      }
+    }
+  },
+  "pureGramsPreview": "= {grams} pure",
+  "@pureGramsPreview": {
+    "placeholders": {
+      "grams": {
+        "type": "String"
+      }
+    }
+  },
+  "errName": "Enter a name",
+  "errType": "Choose a type",
+  "errIntent": "Choose an intent",
+  "errMarket": "Choose a market",
+  "errMarketCountry": "Choose the market's country",
+  "errUnit": "Choose a unit",
+  "errStartDate": "Choose the start date",
+  "errFirstPaid": "Enter what you paid",
+  "errGrams": "Enter the grams",
+  "errPurity": "Choose the purity",
+  "errZero": "Must be more than 0",
+  "errFuture": "The date cannot be in the future",
+  "errShare": "Enter the zakat share, 0 to 100 %",
+  "errLongTerm": "Choose how long-held shares are handled",
+  "errJewellery": "Choose the jewellery ruling",
+  "errSummary": "{count} fields need attention",
+  "@errSummary": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "errSave": "Could not save. Nothing was changed. Try again.",
+  "savedToast": "Saved",
+  "discardTitle": "Discard this investment?",
+  "discard": "Discard",
+  "keepEditing": "Keep editing",
+  "zakatLinePercent": "Zakat: on {share} of value",
+  "@zakatLinePercent": {
+    "placeholders": {
+      "share": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatLineDividends": "Zakat: on dividends only, when received",
+  "zakatLineCompany": "Zakat: 0 % — the company pays zakat",
+  "zakatNeedsChoice": "Zakat: not set yet — answer the zakat question in this form",
+  "zakatReasonTrading": "You hold this to sell. Trade goods pay 2.5 % of market value.",
+  "zakatReasonSavings": "Held as savings: zakat on market value.",
+  "zakatReasonCash": "Cash is zakatable in full.",
+  "zakatReasonSukuk": "Sukuk: 100 % of value by default.",
+  "zakatReasonJewellery": "Worn jewellery: follows your ruling.",
+  "zakatReasonCustom": "You set this share yourself.",
+  "noticeDividends": "Zakat is set aside on dividends received from this item (IIFA Res 28 (3/4)). Don't record them again in a cash item.",
+  "noticeCrypto": "Scholars differ on whether holding crypto is permitted. Those who permit it say zakat is on its full market value.",
+  "companyPays": "Company pays zakat for me (0 %)",
+  "jewelleryAsk": "Is worn jewellery zakatable?",
+  "jewelleryYes": "Zakatable",
+  "jewelleryNo": "Not zakatable",
+  "jewelleryWhy": "The schools differ on jewellery that is worn.",
+  "hintLongTerm": "Enter the zakatable part of the business: cash, receivables and stock for sale, less short-term debts. Machines and buildings are not counted.",
+  "hintRental": "Zakat is not on the property; rent you still hold is counted with your cash. Usually 0 %.",
+  "hintPersonalUse": "Personal-use items: usually 0 %.",
+  "hintTrading": "Bought to resell: usually 100 % of market value.",
+  "useShare": "Use {share} %",
+  "@useShare": {
+    "placeholders": {
+      "share": {
+        "type": "String"
+      }
+    }
+  },
+  "inlineRateLabel": "1 {from} = ____ {to} on {date}",
+  "@inlineRateLabel": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "inlineRateField": "Rate",
+  "rateSaved": "Rate saved",
+  "fetchRate": "Fetch",
+  "errRate": "Enter a rate above 0",
+  "deleteInvestment": "Delete investment",
+  "deleteConfirm": "Delete investment and its whole history?",
+  "delete": "Delete",
+  "undo": "Undo",
+  "deleted": "Deleted",
+  "edit": "Edit",
+  "valueNow": "Value now",
+  "approxInBase": "≈ {amount}",
+  "@approxInBase": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "sinceStart": "Since start",
+  "colItem": "In {unit}",
+  "@colItem": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "rowGain": "Gain",
+  "rowReturn": "Return",
+  "rowPerYear": "Per year",
+  "rowSetAside": "Estimated zakat set-aside (planning)",
+  "setAsideNote": "Actual zakat is due once a year on your zakat date.",
+  "rowReturnAfter": "Return after set-aside",
+  "rowRealOwn": "Real · own market ({country})",
+  "@rowRealOwn": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      }
+    }
+  },
+  "rowRealBase": "Real · in your money ({country})",
+  "@rowRealBase": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      }
+    }
+  },
+  "realLabel": "Purchasing power (for planning only — zakat is always on today's actual value)",
+  "byMonthYear": "By month and year",
+  "needsRate": "Needs {from}→{to} rate",
+  "@needsRate": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "toPurifyItem": "Interest to purify: {amount} · not counted as return",
+  "@toPurifyItem": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "recordGivenAway": "Record given away",
+  "history": "History",
+  "record": "Record",
+  "closedOn": "Closed on {date}",
+  "@closedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "kindMoneyIn": "Money in",
+  "kindSale": "Sale",
+  "kindIncome": "Income received",
+  "kindValue": "Value update",
+  "kindInterestKept": "Interest kept inside",
+  "kindInterestPaid": "Interest paid out",
+  "kindGivenInside": "Interest given away (from inside)",
+  "kindGivenPaid": "Interest given away (from paid out)",
+  "tabValue": "Value",
+  "tabIn": "In",
+  "tabOut": "Out",
+  "tabInterest": "Interest",
+  "interestReceived": "Received",
+  "interestGivenAway": "Given away",
+  "interestWhere": "Where is it?",
+  "interestPaidOut": "Paid out to me",
+  "interestKeptInside": "Kept inside this item",
+  "interestNote": "Interest is not counted as return and not in the zakat base. It is shown as \"to purify\" so you can give it away.",
+  "givenFrom": "Given from",
+  "givenAwayNote": "Giving it away does not count as zakat.",
+  "effectKept": "Lowers the item's value and the to-purify total by the same amount. Return is not affected.",
+  "effectPaid": "Lowers the to-purify total. The item's value does not change.",
+  "fieldAmount": "Amount",
+  "fieldDate": "Date",
+  "fieldValue": "Value",
+  "fieldValueAfter": "Value after (optional)",
+  "fieldValueLeft": "Value left",
+  "fieldKind": "Kind",
+  "lastValue": "Last: {value} on {date}",
+  "@lastValue": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "typoCheck": "This is {times}× the last value. Check the number.",
+  "@typoCheck": {
+    "placeholders": {
+      "times": {
+        "type": "String"
+      }
+    }
+  },
+  "valueLeftRequired": "This is more than the item's value. Enter what is left (0 or more).",
+  "closesInvestment": "This closes the investment. It stays in past months.",
+  "errBeforeStart": "Can't be before the start date ({date})",
+  "@errBeforeStart": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "errGivenTooMuch": "You have {amount} interest still to purify there. Enter that or less.",
+  "@errGivenTooMuch": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "replaceValueTitle": "Replace the value of {date}?",
+  "@replaceValueTitle": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "replace": "Replace",
+  "nothingToPurify": "No interest left to give away.",
+  "perUnit": "Per unit",
+  "total": "Total",
+  "zakatSectionTitle": "Zakat",
+  "whyReturnTitle": "Return",
+  "whyReturnWhat": "Money-weighted return (Modified Dietz): deposits are not profit. Over long periods with large flows it can differ from the exact money-weighted return.",
+  "whyReturnNumbers": "{r} = ({ev} − {bv} − {cf}) ÷ {d}  (end value − start value − money in/out, ÷ average money invested)",
+  "@whyReturnNumbers": {
+    "placeholders": {
+      "r": {
+        "type": "String"
+      },
+      "ev": {
+        "type": "String"
+      },
+      "bv": {
+        "type": "String"
+      },
+      "cf": {
+        "type": "String"
+      },
+      "d": {
+        "type": "String"
+      }
+    }
+  },
+  "whySetAsideTitle": "Estimated zakat set-aside (planning)",
+  "whySetAsideWhat": "Rate × zakat share × end value × days ÷ year length, plus rate × dividends received (dividends-only method), in the matched pair you chose. Actual zakat is due once a year on your zakat date.",
+  "whySetAsideNumbers": "{z} = {rate} × {share} × {ev} × {days} ÷ {year} + {rate} × {dividends}",
+  "@whySetAsideNumbers": {
+    "placeholders": {
+      "z": {
+        "type": "String"
+      },
+      "rate": {
+        "type": "String"
+      },
+      "share": {
+        "type": "String"
+      },
+      "ev": {
+        "type": "String"
+      },
+      "days": {
+        "type": "String"
+      },
+      "year": {
+        "type": "String"
+      },
+      "dividends": {
+        "type": "String"
+      }
+    }
+  },
+  "whyRealTitle": "Real return",
+  "whyRealWhat": "(1 + return) ÷ (1 + inflation) − 1. For planning only; it never changes the zakat base.",
+  "whyRealNumbers": "return {r}, inflation {i} → {real}",
+  "@whyRealNumbers": {
+    "placeholders": {
+      "r": {
+        "type": "String"
+      },
+      "i": {
+        "type": "String"
+      },
+      "real": {
+        "type": "String"
+      }
+    }
+  },
+  "whyGapTitle": "Purchasing-power gap",
+  "whyGapWhat": "(End value − set-aside) compared with (start value + money in/out + inflation on the average money invested). Zero or more means purchasing power was kept.",
+  "whyGapNumbers": "gap {gap}; needed end value {needed}",
+  "@whyGapNumbers": {
+    "placeholders": {
+      "gap": {
+        "type": "String"
+      },
+      "needed": {
+        "type": "String"
+      }
+    }
+  },
+  "whyShareTitle": "Zakat share",
+  "whyInflationTitle": "Inflation",
+  "whyInflationWhat": "Yearly rates of the series, pro-rated by days for this period.",
+  "monthsYears": "By month and year",
+  "updateAllTitle": "Update all",
+  "refreshRates": "Refresh rates online",
+  "refreshHelp": "Downloads the same public price list for everyone. Nothing about you is sent.",
+  "lastRefresh": "Last refresh: rates as of {date} · {source}",
+  "@lastRefresh": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "refreshRunning": "Refreshing…",
+  "refreshDone": "Rates as of {date} · {source} · {count} of your rates updated",
+  "@refreshDone": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "source": {
+        "type": "String"
+      },
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "refreshFailed": "Couldn't refresh. Nothing changed. Your saved rates are still used — type a rate below if you have a newer one.",
+  "refreshSource": "currency-api (fawazahmed0)",
+  "asOfLabel": "As of",
+  "showAll": "Show all",
+  "ratesStillOld": "Rates still old",
+  "valuesHeading": "Values",
+  "same": "Same",
+  "filledCount": "{filled} of {total} filled",
+  "@filledCount": {
+    "placeholders": {
+      "filled": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "updatedToast": "Updated {count} values. {left} still old.",
+  "@updatedToast": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "left": {
+        "type": "String"
+      }
+    }
+  },
+  "ratesSavedValuesNot": "Rates saved, values not saved — try again",
+  "allUpToDate": "Everything is up to date for {month}",
+  "@allUpToDate": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "saveUpdatesTitle": "Save {count} updates?",
+  "@saveUpdatesTitle": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "lastHint": "last {value} · {date}",
+  "@lastHint": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "rateRowLabel": "1 {from} = ____ {to}",
+  "@rateRowLabel": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "periodTitle": "Period view",
+  "allInvestments": "All investments",
+  "monthLabel": "Month",
+  "yearLabel": "Year",
+  "rowInflation": "Inflation ({country})",
+  "@rowInflation": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      }
+    }
+  },
+  "rowRealAfter": "Real return after set-aside",
+  "rowRealBefore": "Real return before set-aside: {value}",
+  "@rowRealBefore": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "inflationForPeriod": "{value} for this period",
+  "@inflationForPeriod": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "verdictKeptTitle": "KEPT purchasing power, after set-aside",
+  "verdictLostTitle": "LOST purchasing power, after set-aside",
+  "neededEnd": "Needed: end value {value} (return {pct})",
+  "@neededEnd": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      },
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
+  "lostGrams": "Lost {value} after set-aside",
+  "@lostGrams": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "keptGrams": "Kept {value} after set-aside",
+  "@keptGrams": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "yardstick": "Gold is a yardstick, not a price index. In gold, the gram is the measure: there is no inflation step.",
+  "notAvailable": "Not available",
+  "notAvailableWhy": "The average money invested in this period is zero or less.",
+  "markersStale": "{count} items not updated this period",
+  "@markersStale": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "markerStaleRate": "rate not updated in this period",
+  "markerNotUpdated": "value not updated",
+  "itemsHeading": "Items",
+  "excludedHeading": "Excluded",
+  "excludedLine": "{name} — {from}→{to} rate missing",
+  "@excludedLine": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "basedOn": "Based on {count} of {total} items",
+  "@basedOn": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "toPurifyPeriod": "Interest to purify: {amount} — not in return, not netted against the set-aside",
+  "@toPurifyPeriod": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "noZakatSwitch": "No zakat due for {year}",
+  "@noZakatSwitch": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "noZakatHelp": "Decide using all your zakatable wealth, not only this list.",
+  "noZakatEffect": "0 — no zakat due this year",
+  "nisabGold": "Nisab: 85 g gold = {amount}",
+  "@nisabGold": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "nisabSilver": "Nisab: 595 g silver = {amount}",
+  "@nisabSilver": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "nisabNoGold": "Add a gold rate to see the nisab",
+  "nisabNoSilver": "Add a silver rate to see the nisab",
+  "zakatableTotal": "Zakatable total in this list: {amount}",
+  "@zakatableTotal": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "otherPeriods": "Other periods",
+  "measureReturn": "Return",
+  "measureAfter": "After set-aside",
+  "measureReal": "Real after set-aside",
+  "assumptionsTitle": "Assumptions",
+  "baseAndHome": "Base and home",
+  "baseLine": "Base currency: {currency}",
+  "@baseLine": {
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "baseChangeWarning": "All totals and months recalculate.",
+  "ratesHeading": "Rates",
+  "rateLine": "1 {from} = {rate} {to} · as of {date}",
+  "@rateLine": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "rate": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "rateTagTyped": "Typed by you",
+  "rateTagFetched": "{source}",
+  "@rateTagFetched": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "rateTypedUsed": "Your rate is used (source gave {rate})",
+  "@rateTypedUsed": {
+    "placeholders": {
+      "rate": {
+        "type": "String"
+      }
+    }
+  },
+  "rateStaleMarker": "not updated this month",
+  "rateMissingMarker": "missing",
+  "noRatesYet": "Rates appear here when an investment needs one.",
+  "rateHistoryTitle": "Rates {from}→{to}",
+  "@rateHistoryTitle": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "addRate": "Add rate",
+  "editRate": "Edit rate",
+  "swapDirection": "Swap direction",
+  "inverseLine": "1 {to} = {rate} {from}",
+  "@inverseLine": {
+    "placeholders": {
+      "to": {
+        "type": "String"
+      },
+      "rate": {
+        "type": "String"
+      },
+      "from": {
+        "type": "String"
+      }
+    }
+  },
+  "rateFetchedNote": "Fetched rates are overridden by typing a rate for the same date.",
+  "inflationHeading": "Inflation",
+  "inflationRow": "{country}",
+  "@inflationRow": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      }
+    }
+  },
+  "inflationYearLine": "{year}: {rate} · {tag}",
+  "@inflationYearLine": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      },
+      "rate": {
+        "type": "String"
+      },
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "tagShipped": "Shipped",
+  "tagYours": "Yours",
+  "tagAssumed": "Assumed from {year}",
+  "@tagAssumed": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "resetToShipped": "Reset to shipped",
+  "overrideTitle": "{country} {year}",
+  "@overrideTitle": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      },
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "inflationPercentField": "Inflation (%)",
+  "errInflation": "Enter a rate from -50 to 1000 %",
+  "emptySeries": "No data for {country}. Add a year to see real figures for items using it.",
+  "@emptySeries": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatHeading": "Zakat",
+  "jewelleryNotAsked": "Not asked yet",
+  "noZakatByYear": "No zakat due by year",
+  "perItemRewritten": "Items that followed the old method keep it now.",
+  "rateAddedToast": "Rate saved",
+  "errRateFuture": "The rate date cannot be in the future",
+  "customShareSwitch": "Set my own zakat share",
+  "zakatChangedFrom": "You changed this from {share}",
+  "@zakatChangedFrom": {
+    "placeholders": {
+      "share": {
+        "type": "String"
+      }
+    }
+  },
+  "moreSection": "More",
+  "inflationSeriesField": "Inflation series",
+  "inflationSeriesDefault": "Default for this item",
+  "fetchFailed": "Couldn't fetch. Type the rate.",
+  "fetchNotCovered": "Source has no {from}→{to}. Type it.",
+  "@fetchNotCovered": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "fetchedRateLine": "1 {from} = {rate} {to} · as of {date} · {source}",
+  "@fetchedRateLine": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "rate": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      },
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "src_B6": "Business ownership: the owner pays on their share of the zakatable assets (cash, receivables, stock for sale) less short-term debts; fixed assets are not zakatable (IIFA Res 28 (3/4) §2). AAOIFI SS 35 net-assets method — section not yet verified (B6).",
+  "src_B7": "Pension with withdrawal limits: no zakat until it can be accessed (Dr. Main Al-Qudah, AMJA fatwa 21964); or zakat on the accessible amount after penalty and tax (Fiqh Council of North America — source not yet verified); or the full balance as a precaution (B7)."
+}

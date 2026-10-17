@@ -127,7 +127,7 @@ Each gets one file in `docs/product/shariah/`.
 
 - A new user can onboard, add 5 holdings, see their net worth, compute zakat, screen 1 stock, add 1 debt, set a budget, and track 1 goal — **in under 10 minutes, with no account**.
 - Every money rule in the app has a visible "why" with a reference.
-- Zero data leaves the device without an explicit user action.
+- Zero user data leaves the device without an explicit user action. (The optional rate refresh sends only a request for public FX and gold/silver rates — the same request for every user.)
 
 ---
 

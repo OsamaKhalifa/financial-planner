@@ -50,6 +50,20 @@ android/key.properties
 # macOS
 .DS_Store
 
+# Runtime data — never committed (user's real numbers may be in these)
+local/
+*.db
+*.db-wal
+*.db-shm
+*.db-journal
+*.sqlite
+*.sqlite3
+*.sqlite-wal
+*.sqlite-shm
+*.backup.json
+.env
+.env.*
+
 # Agents' scratch
 docs/_wip/
 scratchpad/
