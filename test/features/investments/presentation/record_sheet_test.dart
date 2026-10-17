@@ -623,13 +623,14 @@ void main() {
         );
         final l10n = l10nOf(tester);
         await open(tester);
-        final date = tester.widget<DateField>(
-          find.byKey(const ValueKey('record-date')),
-        );
-        date.onChanged(day(2026, 4, 23));
-        await tester.pumpAndSettle();
-        await saveSheet(tester);
-        expect(find.byKey(const ValueKey('record-error')), findsOneWidget);
+        for (final bad in [day(2026, 4, 23), day(2026, 4, 7)]) {
+          tester
+              .widget<DateField>(find.byKey(const ValueKey('record-date')))
+              .onChanged(bad);
+          await tester.pumpAndSettle();
+          await saveSheet(tester);
+          expect(find.byKey(const ValueKey('record-error')), findsOneWidget);
+        }
         expect(
           plain(
             tester
@@ -639,6 +640,15 @@ void main() {
           startsWith(plain(l10n.errOutsideWindow('§', '§')).split('§').first),
         );
         expect((await history(tester, h)).whereType<MoneyOut>(), isEmpty);
+        tester
+            .widget<DateField>(find.byKey(const ValueKey('record-date')))
+            .onChanged(day(2026, 4, 8));
+        await tester.pumpAndSettle();
+        await saveSheet(tester);
+        expect(
+          (await history(tester, h)).whereType<MoneyOut>().single.date,
+          day(2026, 4, 8),
+        );
       });
 
       testScreen(

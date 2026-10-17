@@ -1550,13 +1550,17 @@ void main() {
         fpIn(),
         fpIncome(day(2026, 4, 20), '5000'),
         fpIncome(day(2026, 7, 14), '5000'),
-        fpIncome(day(2026, 10, 20), '5000'),
+        fpIncome(day(2026, 10, 15), '5000'),
       ]);
-      final y = calc([
-        agg,
-      ], today: afterYear).item('fp', Period.year(2026, afterYear));
+      final on = day(2026, 10, 17);
+      final y = calc([agg], today: on).item('fp', Period.year(2026, on));
       expectDec(y.setAside, '375.00');
       expectDec(y.base!.dividends, '15000.00');
+      expectDec(
+        y.setAside - ZakatYear.lunar.r * y.base!.dividends,
+        '0',
+        what: 'set-aside on the value',
+      );
     });
 
     test('AC-48 no plan on metals/crypto, rule checks, V_exp at −10 % = 9,000.00, no plan → no expected figure', () {
@@ -2043,40 +2047,77 @@ void main() {
       ]);
     });
 
-    test('AC-63 a plan changes no actual figure: gain, returns, set-aside, real, purchasing power, totals, stale marker', () {
+    test('AC-63 a plan changes no actual figure: every return, gain, set-aside, real, purchasing power, totals, stale marker', () {
       final on = day(2026, 10, 17);
       final cpi = {
-        egy: {2026: '0.10'},
+        egy: {2025: '0.30', 2026: '0.10'},
       };
-      PortfolioCalculator c(Investment i) => calc(
-        [
-          item(i, [fpIn()]),
-        ],
-        today: on,
-        cpi: cpi,
-      );
-      final withPlan = c(friend());
-      final without = c(friend(profit: null, payout: null));
-      final a = withPlan.sinceStart('fp');
-      final b = without.sinceStart('fp');
-      expect(a.gain, b.gain);
-      expect(a.simpleRoi, b.simpleRoi);
-      expect(a.sinceStartReturn, b.sinceStartReturn);
-      for (final p in [Period.year(2026, on), Period.month(2026, 10, on)]) {
-        final x = withPlan.item('fp', p);
-        final y = without.item('fp', p);
-        expect(x.dietz.r, y.dietz.r);
-        expect(x.setAside, y.setAside);
-        expect(x.realAfterSetAside, y.realAfterSetAside);
-        expect(x.purchasingPower?.gap, y.purchasingPower?.gap);
-        expect(x.staleValue, y.staleValue);
-        expect(x.toPurify.amount, y.toPurify.amount);
-        final px = withPlan.portfolio(p, ViewUnit.base);
-        final py = without.portfolio(p, ViewUnit.base);
-        expect(px.dietz.r, py.dietz.r);
-        expect(px.setAside, py.setAside);
-        expect(px.staleValues, py.staleValues);
+      List<Object?> returns(Returns? r) => [
+        r?.dietz.bv,
+        r?.dietz.ev,
+        r?.dietz.cf,
+        r?.dietz.d,
+        r?.dietz.r,
+        r?.z,
+        r?.dividends,
+        r?.rz,
+        r?.i,
+        r?.real,
+        r?.realAfterZakat,
+        r?.pp?.gap,
+        r?.pp?.neededEnd,
+        r?.pp?.neededReturn,
+        r?.pp?.kept,
+      ];
+      List<Object?> all(Investment i) {
+        final c = calc(
+          [
+            item(i, [
+              fpIn(),
+              fpIncome(day(2026, 4, 20), '5000'),
+              val('fp', day(2026, 6, 30), '101000'),
+            ]),
+          ],
+          today: on,
+          cpi: cpi,
+        );
+        final s = c.sinceStart('fp');
+        return [
+          s.days,
+          s.gain,
+          s.gainBase,
+          s.simpleRoi,
+          s.simpleRoiBase,
+          s.sinceStartReturn,
+          s.annualised,
+          s.annualisedBase,
+          c.staleNow().itemIds,
+          ...returns(s.figures.base),
+          ...returns(s.figures.itemUnit),
+          for (final p in [
+            Period.year(2026, on),
+            Period.month(2026, 4, on),
+            Period.month(2026, 10, on),
+          ]) ...[
+            ...returns(c.item('fp', p).base),
+            ...returns(c.item('fp', p).itemUnit),
+            c.item('fp', p).staleValue,
+            c.item('fp', p).toPurify.amount,
+            c.item('fp', p).closed,
+            ...returns(c.portfolio(p, ViewUnit.base).totals),
+            c.portfolio(p, ViewUnit.base).staleValues,
+            c.portfolio(p, ViewUnit.base).toPurify.amount,
+          ],
+        ];
       }
+
+      final withPlan = all(friend());
+      final noPlan = all(friend(profit: null, payout: null));
+      expect(withPlan.length, noPlan.length);
+      for (var i = 0; i < withPlan.length; i++) {
+        expect(withPlan[i], noPlan[i], reason: 'figure $i');
+      }
+      expect(withPlan.whereType<Decimal>().length, greaterThan(40));
     });
 
     test('AC-64 cases follow Q2 first, Q1 only with a %', () {

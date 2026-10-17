@@ -310,19 +310,19 @@ void main() {
           final l10n = l10nOf(tester);
           expect(find.text(l10n.toConfirmPill(3)), findsOneWidget);
           expect(find.text(l10n.toConfirmPill(2)), findsOneWidget);
-          await tester.runAsync(
-            () => h.investments.saveEntries([
-              for (final m in [4, 7, 10])
-                moneyOut(
-                  'fp',
-                  day(2026, m, 15),
-                  '5000',
-                  kind: MoneyOutKind.income,
-                ),
-            ]),
-          );
+          expect(find.byKey(const ValueKey('to-confirm-fp')), findsOneWidget);
+          expect(find.byKey(const ValueKey('to-confirm-fund')), findsOneWidget);
+          expect(find.text(l10n.toConfirmPill(5)), findsNothing);
+          await tester.tap(find.text("Friend's project"));
           await settle(tester);
-          expect(find.text(l10n.toConfirmPill(3)), findsNothing);
+          await tester.tap(find.byKey(const ValueKey('confirm-all')));
+          await settle(tester);
+          final fp = (await tester.runAsync(() => h.items()))!
+              .firstWhere((x) => x.investment.id == 'fp');
+          expect(fp.history.whereType<MoneyOut>().length, 3);
+          Navigator.of(tester.element(find.byType(ItemDetailScreen))).pop();
+          await settle(tester);
+          expect(find.byKey(const ValueKey('to-confirm-fp')), findsNothing);
           expect(find.text(l10n.toConfirmPill(2)), findsOneWidget);
         },
       );
@@ -376,6 +376,45 @@ void main() {
             tester.getTopLeft(find.text('Fund B')).dy,
             lessThan(tester.getTopLeft(find.text('Fund A')).dy),
           );
+        },
+      );
+      testScreen(
+        'AC-72: ✓ April then Undo: no income, April pending at 5,000.00, Home still "3 to confirm"',
+        (tester) async {
+          final h = await pumpScreen(
+            tester,
+            const HomeScreen(),
+            locale: locale,
+            now: day(2026, 10, 17),
+            seed: seedFriend,
+          );
+          final l10n = l10nOf(tester);
+          await tester.tap(find.text("Friend's project"));
+          await settle(tester);
+          await tester.tap(
+            find.byKey(const ValueKey('check-payout-2026-04-15')),
+          );
+          await settle(tester);
+          await tester.tap(find.text(l10n.undo));
+          await settle(tester);
+          final history = (await tester.runAsync(() => h.items()))!
+              .single
+              .history;
+          expect(history.whereType<MoneyOut>(), isEmpty);
+          expect(
+            find.byKey(const ValueKey('check-payout-2026-04-15')),
+            findsOneWidget,
+          );
+          expect(
+            find.descendant(
+              of: find.byKey(const ValueKey('row-payout-2026-04-15')),
+              matching: textPlain(RegExp(r'^5,000\.00 EGP$')),
+            ),
+            findsOneWidget,
+          );
+          Navigator.of(tester.element(find.byType(ItemDetailScreen))).pop();
+          await settle(tester);
+          expect(find.text(l10n.toConfirmPill(3)), findsOneWidget);
         },
       );
     });

@@ -494,8 +494,7 @@ void main() {
           expect(textPlain(plain(l10n.noPayoutPartnership)), findsNWidgets(2));
           expect(keyText(tester, 'expected-so-far'), '15,000.00 EGP');
           expect(keyText(tester, 'received'), '0.00 EGP');
-          expect(keyText(tester, 'difference'), contains('15,000.00 EGP'));
-          expect(keyText(tester, 'difference'), isNot(startsWith('+')));
+          expect(keyText(tester, 'difference'), '−15,000.00 EGP');
         },
       );
 
@@ -573,7 +572,20 @@ void main() {
           expect(textPlain(plain(l10n.noPayoutPartnership)), findsOneWidget);
           expect(keyText(tester, 'expected-so-far'), '15,000.00 EGP');
           expect(keyText(tester, 'received'), '9,000.00 EGP');
-          expect(keyText(tester, 'difference'), contains('6,000.00 EGP'));
+          expect(keyText(tester, 'difference'), '−6,000.00 EGP');
+          final ml = MaterialLocalizations.of(
+            tester.element(find.byType(Scaffold).first),
+          );
+          String dt(DateTime d) => ml.formatMediumDate(d);
+          expect(
+            textPlain(
+              plain(
+                '${l10n.noPayoutLine(dt(day(2026, 7, 16)), dt(day(2026, 10, 15)), dt(day(2026, 10, 15)))} '
+                '${l10n.noPayoutPartnership}',
+              ),
+            ),
+            findsOneWidget,
+          );
           await tester.tap(find.text(l10n.undo));
           await settle(tester);
           expect(
@@ -1210,6 +1222,87 @@ void main() {
           );
         },
       );
+      testScreen(
+        'AC-61: a value typed by hand on 02-05 resolves February; no second value update is offered or written',
+        (tester) async {
+          final h = await pumpScreen(
+            tester,
+            const ItemDetailScreen(investmentId: 'fund'),
+            locale: locale,
+            now: day(2026, 3, 5),
+            seed: (h) async {
+              await h.setup();
+              await h.addItem(planFund(), [
+                moneyIn('fund', day(2026, 1, 1), '10000'),
+                value('fund', day(2026, 2, 5), '10050'),
+              ]);
+            },
+          );
+          final l10n = l10nOf(tester);
+          expect(
+            find.byKey(const ValueKey('row-value-2026-02-01')),
+            findsNothing,
+          );
+          expect(
+            find.byKey(const ValueKey('row-value-2026-03-01')),
+            findsOneWidget,
+          );
+          expect(find.text(l10n.toConfirmTitle(1)), findsOneWidget);
+          await tapKey(tester, 'confirm-all');
+          final values = (await historyOf(
+            tester,
+            h,
+            'fund',
+          )).whereType<ValueUpdate>().toList();
+          expect(values.map((v) => v.date).toSet(), {
+            day(2026, 2, 5),
+            day(2026, 3, 1),
+          });
+        },
+      );
+
+      testScreen('AC-65: case C on screen: gain 0.00 EGP and return 0.00 %', (
+        tester,
+      ) async {
+        await pumpScreen(
+          tester,
+          const ItemDetailScreen(investmentId: 'fp'),
+          locale: locale,
+          now: oct17,
+          seed: (h) => seedFriend(
+            h,
+            investment: friendsProject(q2: CapitalBack.yes),
+            more: [
+              moneyOut(
+                'fp',
+                day(2026, 4, 15),
+                '5000',
+                kind: MoneyOutKind.income,
+              ),
+              moneyOut(
+                'fp',
+                day(2026, 7, 15),
+                '5000',
+                kind: MoneyOutKind.income,
+              ),
+            ],
+          ),
+        );
+        final l10n = l10nOf(tester);
+        List<String> rowTexts(String label) => [
+          for (final t in tester.widgetList<Text>(
+            find.descendant(
+              of: find
+                  .ancestor(of: find.text(label), matching: find.byType(Row))
+                  .first,
+              matching: find.byType(Text),
+            ),
+          ))
+            plain(t.data ?? ''),
+        ];
+        expect(rowTexts(l10n.rowGain), contains('0.00 EGP'));
+        expect(rowTexts(l10n.rowReturn), contains('0.00 %'));
+      });
     });
   }
 }
