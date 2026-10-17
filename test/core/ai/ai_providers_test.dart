@@ -2,7 +2,6 @@ import 'package:financial_planner/core/ai/ai_client.dart';
 import 'package:financial_planner/core/ai/ai_providers.dart';
 import 'package:financial_planner/core/ai/ai_settings.dart';
 import 'package:financial_planner/core/ai/ai_vendors.dart';
-import 'package:financial_planner/core/ai/cloud_ai_client.dart';
 import 'package:financial_planner/core/ai/gemini_ai_client.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart' show Override;
@@ -14,43 +13,27 @@ import '../../support/fake_ai_vendor.dart';
 
 void main() {
   const prompt = AiPrompt(instruction: 'i', input: 'x');
-  final proxy = AiProxyConfig(
-    url: Uri.parse('https://proxy.example.dev'),
-    appToken: 't',
-  );
 
   Future<AiClient> clientFor(
     Map<String, String> stored, {
-    AiProxyConfig? config,
     List<Override> overrides = const [],
   }) async {
     FlutterSecureStorage.setMockInitialValues(stored);
-    final container = ProviderContainer.test(
-      overrides: [
-        aiProxyConfigProvider.overrideWithValue(config),
-        ...overrides,
-      ],
-    );
+    final container = ProviderContainer.test(overrides: overrides);
     await container.read(aiSettingsProvider.future);
     return container.read(aiClientProvider);
   }
 
-  test('off by default, even with a vendor key and a proxy', () async {
+  test('off by default, even with a vendor and its key', () async {
     final client = await clientFor({
       'ai.vendor': 'gemini',
       'ai.apiKey.gemini': 'k',
-    }, config: proxy);
+    });
 
     await expectLater(client.complete(prompt), throwsA(isA<AiUnavailable>()));
   });
 
-  test('on with the shared service uses the proxy', () async {
-    final client = await clientFor({'ai.cloudEnabled': 'true'}, config: proxy);
-
-    expect(client, isA<CloudAiClient>());
-  });
-
-  test('on with the shared service but no proxy is unavailable', () async {
+  test('on with no provider picked is unavailable', () async {
     final client = await clientFor({'ai.cloudEnabled': 'true'});
 
     await expectLater(client.complete(prompt), throwsA(isA<AiUnavailable>()));
@@ -61,7 +44,7 @@ void main() {
       'ai.cloudEnabled': 'true',
       'ai.vendor': 'gemini',
       'ai.apiKey.gemini': 'k',
-    }, config: proxy);
+    });
 
     expect(client, isA<GeminiAiClient>());
   });
@@ -70,7 +53,7 @@ void main() {
     final client = await clientFor({
       'ai.cloudEnabled': 'true',
       'ai.vendor': 'gemini',
-    }, config: proxy);
+    });
 
     await expectLater(client.complete(prompt), throwsA(isA<AiUnavailable>()));
   });

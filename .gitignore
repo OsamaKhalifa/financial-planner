@@ -67,8 +67,3 @@ local/
 # Agents' scratch
 docs/_wip/
 scratchpad/
-
-# AI proxy (Cloudflare Worker)
-ai-proxy/node_modules/
-ai-proxy/.wrangler/
-.dev.vars
