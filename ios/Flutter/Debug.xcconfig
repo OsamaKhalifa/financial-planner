@@ -1,1 +1,3 @@
 #include "Generated.xcconfig"
+// Optional, gitignored: holds DEVELOPMENT_TEAM for signing on a device.
+#include? "LocalTeam.xcconfig"
