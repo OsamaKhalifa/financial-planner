@@ -91,11 +91,24 @@ Q5 (real totals), Q6 (no third-unit conversion) and Q7 (Gregorian year) are deci
 4. **List** — "Sort: Value ▾" (Value in base · Return since start · Name · Oldest update first). Default Value, highest first; persists. Sections **Open**, then **Closed (3)** collapsed.
 5. **Primary action:** floating **+ Add** (S3).
 
-**List row** (end-aligned numbers, mirrors in RTL):
-- Start: name; under it type · market ("Stock · NASDAQ") or grams ("17.5 g pure").
-- End: value in base (large); under it return since start in base, signed. If item unit ≠ base: third line "1,050 USD".
-- **Stale marker:** dot + text "Not updated this month", or for metal items "Gold rate not updated this month". Never colour only.
-- **Missing rate:** base value "—", "USD→EGP rate missing · Add" → inline rate entry (2.8).
+**List row** (owner feedback 2026-10-23; end-aligned numbers, mirrors in RTL). Two columns: **start** (flex, at least 40 %) and **end** (at most 60 %). Each line in a column is optional; blank lines collapse, never leave a gap.
+
+| # | Start column | End column |
+|---|---|---|
+| 1 | **Name** — titleMedium, max 2 lines, ellipsis | **Value in the item's own unit** — titleMedium, w600, onSurface: "4,913,500.00 EGP"; gold/silver "621.00 g" |
+| 2 | **Asset type**, every row: `{type}` or `{type} · {market}` ("Stock · NASDAQ", "Gold", "Private equity"). Grams never here | **Value in base** — bodySmall, onSurfaceVariant: "94,490.38 USD". Hidden when item unit = base (shown once, on line 1). Missing rate → hidden (line 3 says why) |
+| 3 | **Status**, one at most: rate missing "USD→EGP rate missing · Add" (→ 2.8) wins over stale "● Not updated this month" / "● Metal rate not updated this month". Never colour only | **Return since start, in the item's own unit** (owner 2026-10-23) — bodyMedium, signed, onSurface: "+15.50 %". Same unit as end line 1 and the plan %. The currency effect (return in base) stays on S4 and in the totals. **Gold/silver:** the item unit is grams, so a gram return is ~0 % after every buy; use the base return for metals (see concern in the hand-off) |
+| 4 | **Pill** "3 to confirm" (2.12.4) | **Plan** — bodySmall, onSurfaceVariant: payouts only → "est. payouts 32 %/yr"; growth only → "est. growth +3 %/yr"; both → "est. payouts 32 %/yr · growth +3 %/yr" (AC-79). Growth is signed (0 and negative allowed); the payout % is always > 0, no sign. Wording by the Shariah consultant (2026-10-23, wins over UX): no "profit" and no "plan", because on a conventional deposit or a case C item that % is interest or riba, not profit. No plan, or no % typed → hidden |
+| 5 | — | **Plan, second line** — only in the 320 pt fallback below |
+
+- **Strings (new, consultant wording):** `rowPlanProfit` en "est. payouts {pct}/yr" · ar "تقدير الدفعات {pct} سنويًا"; `rowPlanGrowth` en "est. growth {pct}/yr" · ar "تقدير النمو {pct} سنويًا"; `rowPlanBoth` en "est. payouts {p}/yr · growth {g}/yr" · ar "تقدير: دفعات {p} · نمو {g} سنويًا"; `rowPlanGrowthOnly` (fallback line 5) en "growth {pct}/yr" · ar "نمو {pct} سنويًا". `{pct}`, `{p}`, `{g}` = `context.percent` ("32 %", "+3 %"), one LTR unit.
+- **Both-plans fallback (320 pt, or large text):** if `rowPlanBoth` is wider than the end column, do not ellipsize. Show two lines: line 4 `rowPlanProfit` ("est. payouts 32 %/yr"), line 5 `rowPlanGrowthOnly` ("growth +3 %/yr"). The "·" is dropped. P-3: never "interest", "guaranteed", "promised", "fixed return", "yield" — also not for a conventional cash deposit (the % is still the user's estimate; the account kind lives on S3/S4).
+- **Strings (reused):** `typeAndMarket`, `assetTypeName`, `rateMissingAdd`, `notUpdatedThisMonth`, `metalRateNotUpdated`, `toConfirmPill`. `pureGrams` is no longer used on this row (grams moved to end line 1).
+- **Why it is reachable:** tap the row → S4, where "Plan vs actual" and the Returns card define both numbers. No ⓘ on the row (one primary action: open the item).
+- **VoiceOver:** one merged element, order = start 1, start 2, end 1, end 2, end 3, end 4, start 3, start 4. Example: "Madinaty flat. Other. 4,913,500 Egyptian pounds, about 94,490 US dollars. Return since start in Egyptian pounds plus 15.5 percent. Your estimate, growth plus 3 percent per year. Not updated this month. 3 to confirm." Gold end 1 reads "621 grams pure gold".
+- **iPhone SE 320 pt** (288 pt inside 16 pt padding): end column ≤ 172 pt; "4,913,500.00 EGP" at titleMedium ≈ 140 pt fits. Build as `Row(Expanded(start), Flexible(end))`, not `ListTile.trailing` (it clips at large text). If the end line 1 does not fit, or text scale ≥ 1.3, the end column moves **under** the start column, full width, still end-aligned. Money is never shortened ("4.9M" is banned, §6).
+- **RTL:** start = right, end = left. Each number + unit is one LTR isolate ("4,913,500.00 EGP", "+15.50 %", "32 %"); the Arabic words around `{pct}` flow RTL. Digit style follows the device locale.
+- **Sort "Value"** still uses the base value (items in different units must compare). **Sort "Return"** uses the return shown on the row (item unit; base for metals), so the order matches what the user sees.
 
 ### 2.3 Add / edit investment (S3)
 
@@ -143,7 +156,14 @@ One scrolling form. Asset type is first; it decides which fields show. Hidden fi
 - Validation → stays; each missing field named inline + top summary "3 fields need attention" (AC-1). Paid = 0 → "Must be more than 0"; date pickers offer no future dates (AC-2).
 - Write fails → "Could not save. Nothing was changed. Try again."
 
-**Edit:** same form, filled. Changing type, unit, purity, intent or share on an item with history → "This recalculates every past month for this item." (confirm). Delete at the bottom: "Delete investment and its whole history?" + **Undo** toast 10 s.
+**Edit:** same form, filled. Changing type, unit, purity, intent or share on an item with history → "This recalculates every past month for this item." (confirm).
+
+**Edit — Start date (AC-77, owner feedback 2026-10-23).** Same field, same place as in Add (after Item unit, before Paid). Editable, not greyed.
+- **Picker:** last selectable day = the earlier of today and the date of the item's earliest record other than the first money in (and, for gold/silver, the start value update). Dates after it are disabled, so the user rarely meets the error.
+- **Helper line** under the field, only when that cap is before today — `editStartMaxDate` en "Latest allowed: {date} (your earliest other record)." · ar "آخر تاريخ مسموح: {date} (أقدم سجل آخر لديك)."
+- **Error** (typed date, keyboard input mode) — `editStartAfterRecord` en "Can't be after {date}: this item has a record on that date. Move or delete that record first." · ar "لا يمكن أن يكون بعد {date}: لهذا الاستثمار سجل في ذلك التاريخ. انقل ذلك السجل أو احذفه أولًا." Future date → the existing "no future dates" rule (AC-2). On the cap date itself it saves.
+- **Info line**, live under the field as soon as the date differs from the saved one (no extra dialog; editing it back is the undo) — `editStartMoves` en "Your first money in moves to this date. Every past month for this item is recalculated." · ar "تنتقل أول دفعة إلى هذا التاريخ، ويُعاد حساب كل الأشهر الماضية لهذا الاستثمار." Gold/silver — `editStartMovesMetal` en "Your first money in and starting grams move to this date. Every past month for this item is recalculated." · ar "تنتقل أول دفعة وجرامات البداية إلى هذا التاريخ، ويُعاد حساب كل الأشهر الماضية لهذا الاستثمار." If the item has a plan, the existing `editRowsRebuilt` line follows under it.
+- If the user also changed a field that already asks the recalculate confirm, that confirm shows **once** on Save; the start date does not add a second one. Delete at the bottom: "Delete investment and its whole history?" + **Undo** toast 10 s.
 
 ### 2.4 Item detail (S4)
 
@@ -174,7 +194,9 @@ One scrolling form. Asset type is first; it decides which fields show. Hidden fi
 2. Per kind:
    - **Value update:** value in item unit; reference "Last: 1,050.00 USD on 31 Dec 2026". If quantity is set: toggle **Total · Per unit**; per unit shows "× 120 units = 14,800.00 USD" before saving (D9). Gold: new grams (only when grams changed outside a buy/sell).
    - **Money in:** amount, unit, optional "value after" (else value rises by the amount). Gold: amount paid + grams bought (pure grams live).
-   - **Money out:** amount, unit, kind **Sale · Income received**. Optional "Value left". If amount > current value → "Value left" required: "This is more than the item's value. Enter what is left (0 or more)." Value left = 0 → "This closes the investment. It stays in past months." (AC-4)
+   - **Money out:** amount, unit, kind **Sale · Income received**.
+     - **Sale:** optional "Value left". If amount > current value → "Value left" required: "This is more than the item's value. Enter what is left (0 or more)." Value left = 0 → "This closes the investment. It stays in past months." (AC-4)
+     - **Income received** (AC-78): "Value left" is **removed** (not greyed), no "more than the value" check (income can be any size, Q12). One line in its place — `incomeNoValueChange` en "Income does not change the item's value." · ar "الدخل لا يغيّر قيمة الاستثمار." A value typed under Sale is kept in the sheet while it is open, so switching back to Sale shows it again, but it is **never saved** with Income.
    - **Interest:** sub-switch **Received · Given away**.
      - *Received:* amount, unit, and **Where is it? Paid out to me · Kept inside this item**. Line: "Interest is not counted as return and not in the zakat base. It is shown as 'to purify' so you can give it away. · Source" (Z-6).
      - *Given away:* amount (up to this item's to-purify total) and **Given from: Interest kept inside this item · Interest paid out to me**. Default = the case that still has interest to purify; if only one case has any, the other option is hidden. Line: "**Giving it away does not count as zakat.**" (B1, Z-6). Effect line changes with the choice:
@@ -349,7 +371,7 @@ Two sub-blocks. Each is hidden per type (story §5.6, AC-48):
 **New order of S4:** header (+ tag) → **To confirm** → Returns card → **Plan vs actual** → To purify → Zakat line (+ P-2 notice) → History.
 
 **"To confirm" card** — only when the item has pending rows.
-- Card title: "**To confirm · 3**". At the end of the title row: text button **Confirm all as expected**, and under the title the line (P-4b, exact): "Confirm only money that really came in."
+- Card title: "**To confirm · 3**". At the end of the title row: text button **Confirm all as expected**, and under the title the line(s) (AC-76): "Confirm only money that really came in." (P-4b, exact) **only while a payout row is pending**; "Confirm only if the value is still about this." (`confirmValueLine`, ar "أكّد فقط إذا كانت القيمة ما زالت قريبة من هذا.") **only while a value row is pending**. Both pending → both lines, payout line first.
 - Rows oldest first (the same order the matching rule uses). One row:
 
   ```
@@ -360,9 +382,10 @@ Two sub-blocks. Each is hidden per type (story §5.6, AC-48):
                    no profit means no payout.                    ⋮
   ```
   - **Leading:** hollow circle ○ (pending). Actual history rows use a filled icon. Never colour only: the word "Expected" is always there.
-  - **Label** (P-4b, exact): "Expected payout (not received yet)"; case C: "Expected payout (to purify when received)"; conventional cash deposit: "Expected interest (to purify)"; value rows: "Value check".
-  - **Amount:** end-aligned, normal weight, onSurfaceVariant colour (actual amounts use onSurface). VoiceOver: "Expected payout, not received yet, 15 April 2026, 5,000 Egyptian pounds. Button: Received this amount."
-  - **Trailing: the check mark** — a filled-tonal IconButton, 48 × 48 dp (above the 44 pt minimum), icon ✓, label and tooltip (P-4b, exact) "Received this amount".
+  - **Label** (P-4b, exact): "Expected payout (not received yet)"; case C: "Expected payout (to purify when received)"; conventional cash deposit: "Expected interest (to purify)"; value rows (AC-76): "Expected value (check it)" (`rowValueExpected`, ar "القيمة المتوقعة (راجعها)"). A value row never uses money-received words. "Value check" (`rowValue`) stays only as the schedule name in S3, not on pending rows.
+  - **Amount:** end-aligned, normal weight, onSurfaceVariant colour (actual amounts use onSurface). VoiceOver: "Expected payout, not received yet, 15 April 2026, 5,000 Egyptian pounds. Button: Received this amount." Value row: "Expected value, check it, 1 February 2026, 4,925,850.71 Egyptian pounds. Button: Value is as expected."
+  - **Trailing: the check mark** — a filled-tonal IconButton, 48 × 48 dp (above the 44 pt minimum), icon ✓, label and tooltip (P-4b, exact) "Received this amount" on payout rows; "Value is as expected" (`valueAsExpected`) on value rows. Arabic for the value row: change to **"القيمة كما توقعتها"** ("the value is as you expected it") — the current "القيمة كما هو متوقع" mixes gender (القيمة is feminine) and hides that the estimate is the user's own (P-3).
+  - **Value row without an amount** (schedule, no growth %): button **"Add value"** (`addValue`, ar "أضِف القيمة"), not "Add amount" — "amount" reads as money received.
 - **One tap on ✓ = done.** No sheet, no dialog. The row leaves the card and appears in History as actual (payout → money out, income; conventional cash deposit → interest (to purify), paid out to me; value → value update), dated on the schedule date, at the shown amount (AC-52, AC-61). Snackbar: "Recorded 5,000.00 EGP on 15 Apr 2026 · **Undo**" (10 s, same as delete Undo). Undo deletes that record and the row is pending again.
 - **Row without an amount** (schedule with no %): the ✓ is replaced by a text button **Add amount**, so the ✓ always means "one tap, done". It opens S5 with only the amount focused (AC-57).
 - **Secondary actions:** tap the row body → **Edit** (S5 pre-filled, below). ⋮ → Edit · Skip. No swipe here: swipe means delete in History, and must not mean skip.
@@ -481,6 +504,7 @@ Shown only when the item has a plan. One card, two parts, a SegmentedButton **Pa
 | Expected payout (row / per payout) | S3, S4 | Expected payout · {x} every {n} months | money in − sales before the period × % × months ÷ 12; an estimate, not used for zakat or return | P-3 |
 | Expected so far / Received / Difference | S4, S7 (item) | Expected so far (your estimate) · Received · Difference | Σ expected payouts to today (skipped included) vs all income recorded | P-3 |
 | Your estimate (value) | S4 | Your estimate {x} · difference {y} ({z} %) | money in/out compounded at the growth % by days ÷ 365; never your own value updates | P-3 |
+| Estimate on the Home row | S2 | est. payouts {pct}/yr · est. growth {pct}/yr | the user's own % from S3; an estimate, not a promise; not used for zakat or return. Defined on S4 "Plan vs actual" (row tap) | P-3 |
 
 **VoiceOver:** each number reads label + value + unit + marker in one phrase, e.g. "Return since start, plus 15.50 percent, in Egyptian pounds, value not updated this month." Signs read as words.
 
@@ -508,13 +532,19 @@ Home totals are illustrative; S7 uses AC-15.
 │   month                 [Update all] │
 │ Sort: Value ▾                        │
 │ ──────────────────────────────────── │
-│ Gold bar 50 g          262,500.00 EGP│
-│ Gold · 50.0 g pure          +25.00 % │
-│ ● Gold rate not updated this month   │
+│ Gold bar 50 g                50.00 g │
+│ Gold                  262,500.00 EGP │
+│ ● Metal rate not            +25.00 % │
+│   updated this month                 │
 │ ──────────────────────────────────── │
-│ US stock                57,750.00 EGP│
-│ Stock · NASDAQ              +15.50 % │
-│                          1,050.00 USD│
+│ US stock                1,050.00 USD │
+│ Stock · NASDAQ         57,750.00 EGP │
+│                             +15.50 % │
+│ ──────────────────────────────────── │
+│ Madinaty flat       4,913,500.00 EGP │
+│ Other                  94,490.38 USD │
+│                              +2.10 % │
+│ (3 to confirm)   est. growth +3 %/yr │
 │ ──────────────────────────────────── │
 │ Closed (3) ▸                         │
 │                             [ + Add ]│
@@ -664,7 +694,7 @@ Home totals are illustrative; S7 uses AC-15.
 ```
 │ Friend's project      100,000.00 EGP│
 │ Private equity               0.00 % │
-│ (3 to confirm)                      │
+│ (3 to confirm) est. payouts 20 %/yr │
 │ Sort: Value ▾                       │
 ```
 
