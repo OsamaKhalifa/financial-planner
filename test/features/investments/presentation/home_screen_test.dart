@@ -384,13 +384,19 @@ void main() {
             rowText(tester, 'plan-mre'),
             plain(l10n.rowPlanProfit(pct('0.32', signed: false))),
           );
-          final big = tester.widget<Text>(
-            find.byKey(const ValueKey('value-own-mre')),
-          );
-          final small = tester.widget<Text>(
-            find.byKey(const ValueKey('value-base-mre')),
-          );
-          expect(big.style!.fontSize!, greaterThan(small.style!.fontSize!));
+          for (final id in ['mre', 'flat']) {
+            final big = tester.widget<Text>(
+              find.byKey(ValueKey('value-own-$id')),
+            );
+            final small = tester.widget<Text>(
+              find.byKey(ValueKey('value-base-$id')),
+            );
+            expect(
+              big.style!.fontSize!,
+              greaterThan(small.style!.fontSize!),
+              reason: id,
+            );
+          }
           expect(
             tester.getTopLeft(find.byKey(const ValueKey('value-own-mre'))).dy,
             lessThan(
@@ -414,6 +420,13 @@ void main() {
           expect(rowText(tester, 'value-own-mre'), '1,100,000.00 EGP');
           expect(rowText(tester, 'value-base-mre'), '20,000.00 USD');
           expect(rowText(tester, 'return-mre'), '+10.00 %');
+          expect(
+            find.descendant(
+              of: find.byKey(const ValueKey('item-mre')),
+              matching: textPlain(RegExp(r'^0\.00 %$')),
+            ),
+            findsNothing,
+          );
         },
       );
 
@@ -449,6 +462,13 @@ void main() {
           expect(rowText(tester, 'value-own-g'), '50.00 g');
           expect(rowText(tester, 'value-base-g'), '5,500.00 USD');
           expect(rowText(tester, 'return-g'), '+10.00 %');
+          expect(
+            find.descendant(
+              of: find.byKey(const ValueKey('item-g')),
+              matching: textPlain(RegExp(r'^0\.00 %$')),
+            ),
+            findsNothing,
+          );
           expect(
             find.descendant(
               of: find.byKey(const ValueKey('item-g')),
@@ -607,6 +627,7 @@ void main() {
             l10n.typeOther,
             '4,913,500.00 EGP',
             '94,490.38 USD',
+            '${l10n.sortReturn}: 0.00 %',
             plain(l10n.rowPlanGrowth(pct('0.03'))),
             l10n.toConfirmPill(1),
           ];

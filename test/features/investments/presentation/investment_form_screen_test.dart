@@ -14,6 +14,7 @@ import 'package:financial_planner/features/investments/domain/expected_plan.dart
 import 'package:financial_planner/features/investments/domain/history_entry.dart';
 import 'package:financial_planner/features/investments/domain/investment.dart';
 import 'package:financial_planner/features/investments/domain/item_timeline.dart';
+import 'package:financial_planner/features/investments/presentation/home_screen.dart';
 import 'package:financial_planner/features/investments/presentation/investment_form_screen.dart';
 import 'package:financial_planner/features/investments/presentation/item_detail_screen.dart';
 import 'package:flutter/material.dart' hide Intent;
@@ -832,6 +833,36 @@ void main() {
             ],
           );
           expect(plan.expectedSoFar, Decimal.parse('10000'));
+        },
+      );
+
+      testScreen(
+        'AC-77: after moving Friend\'s project to 2026-02-10, Home shows "2 to confirm"',
+        (tester) async {
+          await pumpScreen(
+            tester,
+            const HomeScreen(),
+            locale: locale,
+            now: day(2026, 10, 17),
+            seed: seedFriend,
+          );
+          final l10n = l10nOf(tester);
+          expect(find.text(l10n.toConfirmPill(3)), findsOneWidget);
+          unawaited(
+            tester
+                .state<NavigatorState>(find.byType(Navigator).first)
+                .push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => const InvestmentFormScreen(editId: 'fp'),
+                  ),
+                ),
+          );
+          await tester.pumpAndSettle();
+          await openStartPicker(tester);
+          await pickInOpenPicker(tester, 1, '10');
+          await save(tester);
+          expect(find.byType(InvestmentFormScreen), findsNothing);
+          expect(find.text(l10n.toConfirmPill(2)), findsOneWidget);
         },
       );
 

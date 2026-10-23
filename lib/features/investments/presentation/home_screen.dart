@@ -385,6 +385,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       own: own == null ? '—' : context.money(own, item.unit),
       inBase: inBase == null ? null : context.money(inBase, base),
       ret: ret == null ? null : context.percent(ret),
+      retLabel: l10n.sortReturn,
       plan: _planTexts(context, item),
       status: status,
       pill: pending > 0 ? l10n.toConfirmPill(pending) : null,
@@ -445,6 +446,7 @@ final class _RowTexts {
     required this.own,
     required this.inBase,
     required this.ret,
+    required this.retLabel,
     required this.plan,
     required this.status,
     required this.pill,
@@ -455,13 +457,22 @@ final class _RowTexts {
   final String own;
   final String? inBase;
   final String? ret;
+  final String retLabel;
   final _PlanTexts plan;
   final String? status;
   final String? pill;
 
   /// VoiceOver order (UX 2.2): start 1–2, end 1–4, start 3–4.
-  String get spoken =>
-      [name, type, own, ?inBase, ?ret, ?plan.one, ?status, ?pill].join('\n');
+  String get spoken => [
+    name,
+    type,
+    own,
+    ?inBase,
+    if (ret != null) '$retLabel: $ret',
+    ?plan.one,
+    ?status,
+    ?pill,
+  ].join('\n');
 }
 
 class _RowLayout extends StatelessWidget {
