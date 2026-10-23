@@ -836,6 +836,26 @@ void main() {
       );
 
       testScreen(
+        'AC-77: moving the start and changing the plan says "Rows to confirm are rebuilt" once',
+        (tester) async {
+          await pumpScreen(
+            tester,
+            const InvestmentFormScreen(editId: 'fp'),
+            locale: locale,
+            now: day(2026, 10, 17),
+            seed: seedFriend,
+          );
+          final l10n = l10nOf(tester);
+          await type(tester, field(l10n.fieldExpectedProfit), '25');
+          expect(find.text(l10n.editRowsRebuilt), findsOneWidget);
+          await openStartPicker(tester);
+          await pickInOpenPicker(tester, 1, '10');
+          expect(find.text(l10n.editStartMoves), findsOneWidget);
+          expect(find.text(l10n.editRowsRebuilt), findsOneWidget);
+        },
+      );
+
+      testScreen(
         'AC-77: with income on 2026-04-20 the picker stops at 2026-04-20, names it, and that date saves',
         (tester) async {
           final h = await pumpScreen(

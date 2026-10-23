@@ -1665,7 +1665,9 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
             ),
           ),
         if (answersChanged) Text(l10n.editRecalculates),
-        if (planChanged) Text(l10n.editRowsRebuilt),
+        // Under the start date instead when the start moved (UX 2.3).
+        if (planChanged && _start == edited.startDate)
+          Text(l10n.editRowsRebuilt),
       ],
     );
   }
