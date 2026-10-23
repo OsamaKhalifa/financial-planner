@@ -879,6 +879,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fieldValueLeft => 'Value left';
 
   @override
+  String get incomeNoValueChange => 'Income does not change the item\'s value.';
+
+  @override
   String get fieldKind => 'Kind';
 
   @override

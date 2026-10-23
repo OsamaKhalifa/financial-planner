@@ -1466,6 +1466,12 @@ abstract class AppLocalizations {
   /// **'Value left'**
   String get fieldValueLeft;
 
+  /// No description provided for @incomeNoValueChange.
+  ///
+  /// In en, this message translates to:
+  /// **'Income does not change the item\'s value.'**
+  String get incomeNoValueChange;
+
   /// No description provided for @fieldKind.
   ///
   /// In en, this message translates to:

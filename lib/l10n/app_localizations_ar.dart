@@ -879,6 +879,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get fieldValueLeft => 'القيمة المتبقية';
 
   @override
+  String get incomeNoValueChange => 'الدخل لا يغيّر قيمة الاستثمار.';
+
+  @override
   String get fieldKind => 'النوع';
 
   @override

@@ -228,6 +228,7 @@
   "fieldValue": "القيمة",
   "fieldValueAfter": "القيمة بعد العملية (اختياري)",
   "fieldValueLeft": "القيمة المتبقية",
+  "incomeNoValueChange": "الدخل لا يغيّر قيمة الاستثمار.",
   "fieldKind": "النوع",
   "lastValue": "آخر قيمة: {value} بتاريخ {date}",
   "typoCheck": "هذا {times} أضعاف آخر قيمة. تحقق من الرقم.",

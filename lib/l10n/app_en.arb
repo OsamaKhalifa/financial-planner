@@ -522,6 +522,7 @@
   "fieldValue": "Value",
   "fieldValueAfter": "Value after (optional)",
   "fieldValueLeft": "Value left",
+  "incomeNoValueChange": "Income does not change the item's value.",
   "fieldKind": "Kind",
   "lastValue": "Last: {value} on {date}",
   "@lastValue": {
