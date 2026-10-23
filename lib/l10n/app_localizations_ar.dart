@@ -1614,6 +1614,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get confirmAllLine => 'أكّد فقط المال الذي وصل فعلًا.';
 
   @override
+  String get confirmValueLine =>
+      'أكّد فقط إذا كانت القيمة ما زالت قريبة من هذا.';
+
+  @override
   String get rowPayout => 'دفعة متوقعة (لم تُستلم بعد)';
 
   @override
@@ -1626,10 +1630,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String get rowValue => 'مراجعة القيمة';
 
   @override
+  String get rowValueExpected => 'القيمة المتوقعة (راجعها)';
+
+  @override
   String get receivedThisAmount => 'استلمت هذا المبلغ';
 
   @override
+  String get valueAsExpected => 'القيمة كما توقعتها';
+
+  @override
   String get addAmount => 'أضف المبلغ';
+
+  @override
+  String get addValue => 'أضِف القيمة';
 
   @override
   String get skipRow => 'تخطٍّ';
@@ -1806,4 +1819,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String periodPayouts(String expected, String received) {
     return 'الدفعات: تقديرك $expected · المستلم $received';
   }
+
+  @override
+  String get tabOverview => 'نظرة عامة';
+
+  @override
+  String get tabInvestments => 'الاستثمارات';
+
+  @override
+  String get tabZakat => 'الزكاة';
+
+  @override
+  String get tabPlan => 'الخطة';
+
+  @override
+  String get comingSoon => 'هذه الصفحة قادمة قريبًا.';
 }

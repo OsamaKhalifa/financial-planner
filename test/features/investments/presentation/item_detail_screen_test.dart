@@ -789,7 +789,7 @@ void main() {
             },
           );
           final l10n = l10nOf(tester);
-          expect(find.text(l10n.rowValue), findsNWidgets(2));
+          expect(find.text(l10n.rowValueExpected), findsNWidgets(2));
           expect(textPlain('10,096.72 EGP'), findsWidgets);
           expect(textPlain('10,184.88 EGP'), findsWidgets);
           await tapKey(tester, 'check-value-2026-02-01');
@@ -819,6 +819,142 @@ void main() {
           expect(text, contains('384.88 EGP'));
           expect(text, contains('3.78 %'));
           expect(textPlain(plain(l10n.valueBelowEstimate)), findsNWidgets(2));
+        },
+      );
+
+      Investment flat({Decimal? growth}) => Investment(
+        id: 'flat',
+        name: 'شقة مدينتي',
+        type: AssetType.other,
+        intent: Intent.personalUse,
+        unit: egp,
+        startDate: day(2026, 1, 1),
+        zakatRule: ZakatRule.custom,
+        customZakatShare: Decimal.zero,
+        valueCheckSchedule: Schedule.monthly,
+        expectedGrowth: growth,
+      );
+
+      Future<void> seedFlat(Harness h, {Decimal? growth}) async {
+        await h.setup();
+        await h.addItem(flat(growth: growth), [
+          moneyIn('flat', day(2026, 1, 1), '4913500'),
+        ]);
+      }
+
+      testScreen(
+        'AC-76: a value-check row reads "Expected value (check it)" with no money-received words; ✓ records a value update only',
+        (tester) async {
+          final h = await pumpScreen(
+            tester,
+            const ItemDetailScreen(investmentId: 'flat'),
+            locale: locale,
+            now: day(2026, 2, 5),
+            seed: (h) => seedFlat(h, growth: Decimal.parse('0.03')),
+          );
+          final l10n = l10nOf(tester);
+          expect(find.text(l10n.toConfirmTitle(1)), findsOneWidget);
+          expect(find.text(l10n.rowValueExpected), findsOneWidget);
+          expect(inCard(RegExp(r'^4,925,850\.71 EGP$')), findsOneWidget);
+          expect(find.text(l10n.confirmValueLine), findsOneWidget);
+          for (final gone in [
+            l10n.receivedThisAmount,
+            l10n.rowPayout,
+            l10n.confirmAllLine,
+            l10n.rowValue,
+          ]) {
+            expect(textPlain(gone), findsNothing, reason: gone);
+          }
+          if (locale == en) {
+            expect(
+              textPlain(RegExp('received', caseSensitive: false)),
+              findsNothing,
+            );
+          }
+          final check = find.byKey(const ValueKey('check-value-2026-02-01'));
+          expect(
+            tester.widget<IconButton>(check).tooltip,
+            l10n.valueAsExpected,
+          );
+          await tapKey(tester, 'check-value-2026-02-01');
+          final history = await historyOf(tester, h, 'flat');
+          expect(history.whereType<MoneyOut>(), isEmpty);
+          final v = history.whereType<ValueUpdate>().single;
+          expect(
+            (v.date, v.value),
+            (day(2026, 2, 1), Decimal.parse('4925850.71')),
+          );
+        },
+      );
+
+      testScreen(
+        'AC-76: a value row with no amount offers "Add value", not "Add amount"',
+        (tester) async {
+          await pumpScreen(
+            tester,
+            const ItemDetailScreen(investmentId: 'flat'),
+            locale: locale,
+            now: day(2026, 2, 5),
+            seed: seedFlat,
+          );
+          final l10n = l10nOf(tester);
+          expect(
+            find.descendant(
+              of: find.byKey(const ValueKey('add-value-2026-02-01')),
+              matching: find.text(l10n.addValue),
+            ),
+            findsOneWidget,
+          );
+          expect(find.text(l10n.addAmount), findsNothing);
+        },
+      );
+
+      testScreen(
+        'AC-76: with both plans each line shows only while its kind is pending, payout line first',
+        (tester) async {
+          await pumpScreen(
+            tester,
+            const ItemDetailScreen(investmentId: 'both'),
+            locale: locale,
+            now: day(2026, 2, 5),
+            seed: (h) async {
+              await h.setup();
+              await h.addItem(
+                Investment(
+                  id: 'both',
+                  name: 'Both',
+                  type: AssetType.fund,
+                  intent: Intent.trading,
+                  unit: egp,
+                  startDate: day(2026, 1, 1),
+                  zakatRule: ZakatRule.trading100,
+                  payoutSchedule: Schedule.monthly,
+                  expectedProfit: Decimal.parse('0.10'),
+                  valueCheckSchedule: Schedule.monthly,
+                  expectedGrowth: Decimal.parse('0.03'),
+                ),
+                [moneyIn('both', day(2026, 1, 1), '10000')],
+              );
+            },
+          );
+          final l10n = l10nOf(tester);
+          final payoutLine = find.text(l10n.confirmAllLine);
+          final valueLine = find.text(l10n.confirmValueLine);
+          expect(
+            tester.getTopLeft(payoutLine).dy,
+            lessThan(tester.getTopLeft(valueLine).dy),
+          );
+          expect(
+            tester
+                .widget<IconButton>(
+                  find.byKey(const ValueKey('check-payout-2026-02-01')),
+                )
+                .tooltip,
+            l10n.receivedThisAmount,
+          );
+          await tapKey(tester, 'check-payout-2026-02-01');
+          expect(find.text(l10n.confirmAllLine), findsNothing);
+          expect(find.text(l10n.confirmValueLine), findsOneWidget);
         },
       );
 

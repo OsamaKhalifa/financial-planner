@@ -41,6 +41,34 @@ void main() {
           rtl ? TextDirection.rtl : TextDirection.ltr,
         );
       });
+
+      testScreen('tabs switch pages and keep Investments state', (
+        tester,
+      ) async {
+        await pumpScreen(
+          tester,
+          const RootGate(),
+          locale: locale,
+          seed: (h) => h.setup(),
+        );
+        final l10n = l10nOf(tester);
+        expect(find.byType(NavigationDestination), findsNWidgets(4));
+        for (final title in [l10n.tabOverview, l10n.tabZakat, l10n.tabPlan]) {
+          await tester.tap(
+            find.descendant(
+              of: find.byType(NavigationBar),
+              matching: find.text(title),
+            ),
+          );
+          await tester.pumpAndSettle();
+          expect(find.text(l10n.comingSoon), findsOneWidget);
+          expect(find.text(l10n.emptyTitle), findsNothing);
+        }
+        await tester.tap(find.text(l10n.tabInvestments));
+        await tester.pumpAndSettle();
+        expect(find.text(l10n.emptyTitle), findsOneWidget);
+        expect(find.text(l10n.comingSoon), findsNothing);
+      });
     });
   }
 }
