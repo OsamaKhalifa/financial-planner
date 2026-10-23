@@ -202,9 +202,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get assumptions => 'Assumptions';
 
   @override
-  String get totalValue => 'Total value';
-
-  @override
   String asOfDate(String date) {
     return 'as of $date';
   }
@@ -221,11 +218,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String excludesItems(String count, String pairs) {
     return 'Excludes $count — rate missing: $pairs';
-  }
-
-  @override
-  String toPurifyLine(String amount) {
-    return 'Interest to purify: $amount';
   }
 
   @override

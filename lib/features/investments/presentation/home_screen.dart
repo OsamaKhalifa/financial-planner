@@ -15,16 +15,12 @@ import 'assumptions_screen.dart';
 import 'investment_form_screen.dart';
 import 'investments_providers.dart';
 import 'item_detail_screen.dart';
-import 'period_screen.dart';
 import 'update_all_screen.dart';
-import 'why_builders.dart';
-import 'why_sheet.dart';
-import 'widgets/inflation_tag.dart';
 import 'widgets/labels.dart';
 
 enum _Sort { value, ret, name, oldest }
 
-/// S2: totals, this year's verdict, stale summary and the list.
+/// S2: stale summary and the list. Totals live on Overview.
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
@@ -33,7 +29,6 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  var _view = ViewUnit.base;
   var _sort = _Sort.value;
 
   void _push(Widget screen) =>
@@ -77,16 +72,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (items.isEmpty) return scaffold(_empty(context));
 
     final year = Period.year(today.year, today);
-    final shown = ref.watch(portfolioFiguresProvider((year, _view)));
-    final inBase = ref.watch(portfolioFiguresProvider((year, ViewUnit.base)));
     final stale = calc.staleNow();
     final rows = _rows(items, year);
     return scaffold(
       ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
         children: [
-          if (shown != null && inBase != null)
-            _totalsCard(context, shown, inBase, today, base),
           if (stale.itemIds.isNotEmpty || stale.ratePairs.isNotEmpty)
             _staleBanner(context, stale),
           const SizedBox(height: 8),
@@ -133,128 +124,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
             const SizedBox(height: 16),
             Text(l10n.dataStaysOnPhone),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _totalsCard(
-    BuildContext context,
-    PortfolioFigures shown,
-    PortfolioFigures inBase,
-    DateTime today,
-    Unit base,
-  ) {
-    final l10n = context.l10n;
-    final theme = Theme.of(context).textTheme;
-    final totals = shown.totals;
-    final ev = totals?.dietz.ev;
-    final value = ev == null
-        ? '—'
-        : shown.view == ViewUnit.base
-        ? context.money(ev, base)
-        : context.grams(ev);
-    final pp = inBase.totals?.pp;
-    final excluded = inBase.excluded;
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(l10n.totalValue, style: theme.labelLarge),
-            Text(
-              value,
-              key: const ValueKey('total-value'),
-              style: theme.headlineSmall,
-            ),
-            Text(l10n.asOfDate(context.date(today))),
-            const SizedBox(height: 8),
-            SegmentedButton<ViewUnit>(
-              segments: [
-                ButtonSegment(value: ViewUnit.base, label: Text(base.code)),
-                ButtonSegment(
-                  value: ViewUnit.goldGrams,
-                  label: Text(l10n.viewGold),
-                ),
-                ButtonSegment(
-                  value: ViewUnit.silverGrams,
-                  label: Text(l10n.viewSilver),
-                ),
-              ],
-              selected: {_view},
-              onSelectionChanged: (s) => setState(() => _view = s.first),
-            ),
-            if (excluded.isNotEmpty)
-              InkWell(
-                onTap: () => _push(const UpdateAllScreen()),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Text(
-                    l10n.excludesItems(
-                      '${excluded.length}',
-                      excluded
-                          .map((e) => context.pair(e.from, e.to))
-                          .toSet()
-                          .join(', '),
-                    ),
-                  ),
-                ),
-              ),
-            if (inBase.toPurify.amount > Decimal.zero)
-              InkWell(
-                onTap: () => showWhy(context, whyToPurify(context)),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Text(
-                    l10n.toPurifyLine(
-                      context.money(inBase.toPurify.amount, base),
-                    ),
-                  ),
-                ),
-              ),
-            const Divider(),
-            InkWell(
-              onTap: () => _push(PeriodScreen(initialYear: today.year)),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      key: const ValueKey('verdict'),
-                      pp == null
-                          ? l10n.verdictNotAvailable('${today.year}')
-                          : pp.kept
-                          ? l10n.verdictKept(
-                              '${today.year}',
-                              context.money(pp.gap, base, signed: true),
-                            )
-                          : l10n.verdictLost(
-                              '${today.year}',
-                              context.money(pp.gap, base, signed: true),
-                            ),
-                      style: theme.titleSmall,
-                    ),
-                    Text(l10n.verdictCaption, style: theme.bodySmall),
-                    Consumer(
-                      builder: (context, ref, _) {
-                        final tag = inflationTag(
-                          context,
-                          ref,
-                          inBase.homeCountry,
-                          inBase.totals?.inflation,
-                        );
-                        return tag == null
-                            ? const SizedBox.shrink()
-                            : Text(tag, style: theme.bodySmall);
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ),
           ],
         ),
       ),

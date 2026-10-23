@@ -284,12 +284,6 @@ abstract class AppLocalizations {
   /// **'Assumptions'**
   String get assumptions;
 
-  /// No description provided for @totalValue.
-  ///
-  /// In en, this message translates to:
-  /// **'Total value'**
-  String get totalValue;
-
   /// No description provided for @asOfDate.
   ///
   /// In en, this message translates to:
@@ -319,12 +313,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Excludes {count} — rate missing: {pairs}'**
   String excludesItems(String count, String pairs);
-
-  /// No description provided for @toPurifyLine.
-  ///
-  /// In en, this message translates to:
-  /// **'Interest to purify: {amount}'**
-  String toPurifyLine(String amount);
 
   /// No description provided for @verdictKept.
   ///

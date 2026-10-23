@@ -15,7 +15,7 @@
 |---|---|---|
 | D1 | **Optional online refresh** of FX and gold/silver rates. Only on tap; no background fetch (AC-25). The request is **identical for every user** — no currency list, amounts or identifiers (AC-26). Each fetched rate is stored with the **source's "as of" date** and source name (AC-27). A typed rate on the same date and pair wins; both kept (AC-28). Latest rates only — no past-date fetch. Item values are always typed. | S6 starts with it; S8 has it; inline Fetch only when the date needed is today. |
 | D2 | **Shipped default inflation** per country and year, with source and "as of" year; user overrides any year; removing the override brings back the shipped value (AC-32). | Real figures visible from day one; each says Shipped / Yours / Assumed (2.9). |
-| D3 | **Grams view (gold/silver): yes.** Zakat computed in money, then shown in grams; no inflation step; "yardstick, not a price index" (AC-39). | "Show in: EGP \| Gold g" toggle on S2 and S7. |
+| D3 | **Grams view (gold/silver): yes.** Zakat computed in money, then shown in grams; no inflation step; "yardstick, not a price index" (AC-39). | "Show in: EGP \| Gold g" toggle on S7 (S2 dropped it with its totals card, 2026-10-23). |
 | D4 | **Zakat year** asked at setup, lunar 2.5 % / 354.367 days pre-selected and shown; solar 2.577 % / 365 the option; always a matched pair (AC-9). **Long-term shares method** asked at setup or when the first long-term stock/fund is added (AC-8). **Jewellery** asked when jewellery is first added. **Nisab metal** is not asked here (UC-3). **Pension** is not a type and not a setup question. | S1, S3. |
 | D5 | **Intent** (trading / long-term / personal use / rental) drives the default zakat share (story §5.1). | S3. |
 | D6 | **Interest (to purify)** is its own history record, not a money-out kind: *paid out to me* or *kept inside this item*, plus an **Interest given away** record, available for both cases (kept inside: lowers value and to-purify; paid out: lowers to-purify only). Never in return, gain or the zakat base; "to purify" total shown on its own, never netted against zakat (story §5.3–5.4, AC-19). | S4, S5, S2, S7. |
@@ -27,7 +27,7 @@
 
 | Tag | Working assumption | If it flips |
 |---|---|---|
-| **[F-GOLDBASE]** | Grams view decided yes; tag kept so the toggle stays easy to drop. | Remove the toggle on S2/S7. Nothing else depends on it. |
+| **[F-GOLDBASE]** | Grams view decided yes; tag kept so the toggle stays easy to drop. | Remove the toggle on S7. Nothing else depends on it. |
 | **[F-DIV]** | Dividends-only = zakat share 0 % + the notice (story AC-5). The consultant proposes a set-aside on dividends received (see PM-Q1). | S7 ladder gains a "set-aside on dividends" amount; the notice text changes. |
 
 Q5 (real totals), Q6 (no third-unit conversion) and Q7 (Gregorian year) are decided; no flip tags.
@@ -79,17 +79,13 @@ Q5 (real totals), Q6 (no third-unit conversion) and Q7 (Gregorian year) are deci
 
 ### 2.2 Home — investments list (S2)
 
-**Entry point:** launch, back from any screen.
+**Entry point:** Investments tab, back from any screen.
 
-1. **Totals card**
-   - "Total value" — big, base currency, "as of {latest date used}". Values are net of interest kept inside items (story §5.4).
-   - If items excluded: "Excludes 1 item — USD→EGP rate missing" → S6 at that rate.
-   - **Show in: EGP | Gold g** (D3) [F-GOLDBASE].
-   - **To purify** line, only if > 0: "Interest to purify: 500.00 EGP ⓘ" → S9 (D6).
-2. **This-year verdict row** — "2026 so far: purchasing power **kept +407.75 EGP**" / "**lost −566.50 EGP**" (after set-aside, after home inflation). Tag under it when inflation is shipped or assumed (2.9). Tap → S7, Year.
-3. **Stale banner** (only if anything is stale, D8) — "4 values and 2 rates not updated this month · **Update all**" → S6.
-4. **List** — "Sort: Value ▾" (Value in base · Return since start · Name · Oldest update first). Default Value, highest first; persists. Sections **Open**, then **Closed (3)** collapsed.
-5. **Primary action:** floating **+ Add** (S3).
+**No totals card (owner 2026-10-23).** The total, excluded items, to purify and this year's verdict live on the Overview tab only. Overview's total opens this tab.
+
+1. **Stale banner** (only if anything is stale, D8) — "4 values and 2 rates not updated this month · **Update all**" → S6.
+2. **List** — "Sort: Value ▾" (Value in base · Return since start · Name · Oldest update first). Default Value, highest first; persists. Sections **Open**, then **Closed (3)** collapsed.
+3. **Primary action:** floating **+ Add** (S3).
 
 **List row** (owner feedback 2026-10-23; end-aligned numbers, mirrors in RTL). Two columns: **start** (flex, at least 40 %) and **end** (at most 60 %). Each line in a column is optional; blank lines collapse, never leave a gap.
 
@@ -248,7 +244,7 @@ One scrolling form. Asset type is first; it decides which fields show. Hidden fi
 ### 2.8 Missing-rate states (everywhere)
 
 A missing rate never becomes 1:1 and never blocks typing.
-- **S2 row:** base value "—", "USD→EGP rate missing · Add". Totals card "Excludes 1 item".
+- **S2 row:** base value "—", "USD→EGP rate missing · Add". Overview total "Excludes 1 item".
 - **S4:** base column "Needs USD→EGP rate" + inline field.
 - **S7:** **Excluded** group: "US stock — USD→EGP rate missing" (AC-21). Verdict says "Based on 4 of 5 items".
 - **Inline rate entry** (shared): "1 USD = ____ EGP on {date needed}" + Save; **Fetch** only if that date is today.
@@ -518,16 +514,6 @@ Home totals are illustrative; S7 uses AC-15.
 ```
 ┌──────────────────────────────────────┐
 │ My Investments         [Assumptions] │
-│ ┌──────────────────────────────────┐ │
-│ │ Total value       Show in EGP | g │ │
-│ │ 1,240,500.00 EGP                  │ │
-│ │ as of 16 Oct 2026 · Excludes 1  › │ │
-│ │ Interest to purify: 500.00 EGP  ⓘ │ │
-│ ├──────────────────────────────────┤ │
-│ │ 2026 so far: kept purchasing power│ │
-│ │ ▲ +407.75 EGP                  ⓘ ›│ │
-│ │ Egypt inflation: shipped (2025)   │ │
-│ └──────────────────────────────────┘ │
 │ ● 4 values, 2 rates not updated this │
 │   month                 [Update all] │
 │ Sort: Value ▾                        │
