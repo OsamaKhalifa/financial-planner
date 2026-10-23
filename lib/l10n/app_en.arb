@@ -65,7 +65,6 @@
   "longTermWhy": "When company data is unknown, scholars use different methods.",
   "addInvestment": "Add investment",
   "assumptions": "Assumptions",
-  "totalValue": "Total value",
   "asOfDate": "as of {date}",
   "@asOfDate": {
     "placeholders": {
@@ -84,14 +83,6 @@
         "type": "String"
       },
       "pairs": {
-        "type": "String"
-      }
-    }
-  },
-  "toPurifyLine": "Interest to purify: {amount}",
-  "@toPurifyLine": {
-    "placeholders": {
-      "amount": {
         "type": "String"
       }
     }

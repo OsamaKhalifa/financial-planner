@@ -202,9 +202,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get assumptions => 'الافتراضات';
 
   @override
-  String get totalValue => 'القيمة الإجمالية';
-
-  @override
   String asOfDate(String date) {
     return 'بتاريخ $date';
   }
@@ -221,11 +218,6 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String excludesItems(String count, String pairs) {
     return 'يستثني $count — سعر الصرف غير متوفر: $pairs';
-  }
-
-  @override
-  String toPurifyLine(String amount) {
-    return 'فوائد ربوية للتطهير: $amount';
   }
 
   @override

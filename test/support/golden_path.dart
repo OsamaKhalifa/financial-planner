@@ -135,7 +135,8 @@ Future<void> runGoldenPath(WidgetTester tester) async {
   // Saving closed Update all; leave Assumptions too.
   tester.state<NavigatorState>(find.byType(Navigator)).pop();
   await tester.pumpAndSettle();
-  await tester.tap(find.byKey(const ValueKey('verdict')));
+  await tapText(l10n().tabOverview);
+  await tester.tap(find.byKey(const ValueKey('overview-verdict')));
   await tester.pumpAndSettle();
   await tapText(l10n().monthLabel);
   String plain(String s) => s.replaceAll('\u2066', '').replaceAll('\u2069', '');

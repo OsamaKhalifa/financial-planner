@@ -10,7 +10,6 @@ import 'package:financial_planner/features/investments/domain/investment.dart';
 import 'package:financial_planner/features/investments/presentation/home_screen.dart';
 import 'package:financial_planner/features/investments/presentation/investment_form_screen.dart';
 import 'package:financial_planner/features/investments/presentation/item_detail_screen.dart';
-import 'package:financial_planner/features/investments/presentation/period_screen.dart';
 import 'package:financial_planner/features/investments/presentation/update_all_screen.dart';
 import 'package:flutter/material.dart' hide Intent;
 import 'package:flutter_test/flutter_test.dart';
@@ -58,43 +57,6 @@ void main() {
         },
       );
 
-      testScreen('totals, the verdict and its inflation tag', (tester) async {
-        await pumpScreen(
-          tester,
-          const HomeScreen(),
-          locale: locale,
-          seed: seedBasic,
-        );
-        final l10n = l10nOf(tester);
-        final total = tester.widget<Text>(
-          find.byKey(const ValueKey('total-value')),
-        );
-        expect(plain(total.data!), contains('2,600.00'));
-        final asOf = isolateLtr(
-          MaterialLocalizations.of(tester.element(find.byType(Scaffold)))
-              .formatMediumDate(day(2026, 10, 16)),
-        );
-        expect(find.text(l10n.asOfDate(asOf)), findsOneWidget);
-        final verdict = tester.widget<Text>(
-          find.byKey(const ValueKey('verdict')),
-        );
-        expect(verdict.data, contains('2026'));
-        expect(
-          verdict.data,
-          startsWith(l10n.verdictKept('2026', '').split(' ').first),
-        );
-        expect(
-          find.text(
-            l10n.inflationShipped(
-              l10n.countryName('EGY'),
-              l10n.sourceName,
-              '2026',
-            ),
-          ),
-          findsOneWidget,
-        );
-      });
-
       testScreen(
         'both items are listed with value and return; sort by name reorders',
         (tester) async {
@@ -139,48 +101,7 @@ void main() {
         expect(find.byType(UpdateAllScreen), findsOneWidget);
       });
 
-      testScreen(
-        'AC-21: an item with no rate is left out of the total and named',
-        (tester) async {
-          await pumpScreen(
-            tester,
-            const HomeScreen(),
-            locale: locale,
-            seed: (h) async {
-              await seedBasic(h);
-              await h.addItem(
-                item(
-                  'us',
-                  name: 'US stock',
-                  type: AssetType.stock,
-                  unit: usd,
-                  market: Market.nasdaq,
-                ),
-                [
-                  moneyIn('us', day(2026, 2, 1), '100', usd),
-                  value('us', day(2026, 10, 2), '120'),
-                ],
-              );
-            },
-          );
-          final l10n = l10nOf(tester);
-          expect(
-            textPlain(l10n.excludesItems('1', '').split(' — ').first),
-            findsOneWidget,
-          );
-          expect(textPlain('USD→EGP'), findsWidgets);
-          expect(find.text(l10n.rateMissingAdd('USD', 'EGP')), findsOneWidget);
-          final total = tester.widget<Text>(
-            find.byKey(const ValueKey('total-value')),
-          );
-          expect(plain(total.data!), contains('2,600.00'));
-          await tester.tap(find.text(l10n.rateMissingAdd('USD', 'EGP')));
-          await tester.pumpAndSettle();
-          expect(find.byType(ItemDetailScreen), findsOneWidget);
-        },
-      );
-
-      testScreen('AC-19: interest to purify is shown on its own', (
+      testScreen('AC-21: an item with no rate is named on its row', (
         tester,
       ) async {
         await pumpScreen(
@@ -188,66 +109,27 @@ void main() {
           const HomeScreen(),
           locale: locale,
           seed: (h) async {
-            await h.setup();
+            await seedBasic(h);
             await h.addItem(
               item(
-                'dep',
-                type: AssetType.cashDeposit,
-                intent: null,
-                rule: ZakatRule.cash100,
+                'us',
+                name: 'US stock',
+                type: AssetType.stock,
+                unit: usd,
+                market: Market.nasdaq,
               ),
               [
-                moneyIn('dep', day(2026, 1, 1), '10000'),
-                interest(
-                  'dep',
-                  day(2026, 6, 30),
-                  '500',
-                  InterestKind.keptInside,
-                ),
-                value('dep', day(2026, 10, 5), '10500'),
+                moneyIn('us', day(2026, 2, 1), '100', usd),
+                value('us', day(2026, 10, 2), '120'),
               ],
             );
           },
         );
         final l10n = l10nOf(tester);
-        expect(
-          textPlain(plain(l10n.toPurifyLine('500.00 EGP'))),
-          findsOneWidget,
-        );
-        final total = tester.widget<Text>(
-          find.byKey(const ValueKey('total-value')),
-        );
-        expect(plain(total.data!), contains('10,000.00'));
-        await tester.tap(textPlain(plain(l10n.toPurifyLine('500.00 EGP'))));
+        expect(find.text(l10n.rateMissingAdd('USD', 'EGP')), findsOneWidget);
+        await tester.tap(find.text(l10n.rateMissingAdd('USD', 'EGP')));
         await tester.pumpAndSettle();
-        expect(find.text(l10n.whyToPurifyTitle), findsOneWidget);
-        expect(find.text(l10n.src_Z6), findsOneWidget);
-      });
-
-      testScreen('the grams view shows the total in grams of gold', (
-        tester,
-      ) async {
-        await pumpScreen(
-          tester,
-          const HomeScreen(),
-          locale: locale,
-          seed: (h) async {
-            await h.setup();
-            await h.rate(xauG, egp, '4000', day(2025, 12, 31));
-            await h.rate(xauG, egp, '4000', day(2026, 10, 2));
-            await h.addItem(item('fund', name: 'Fund'), [
-              moneyIn('fund', day(2026, 1, 1), '40000'),
-              value('fund', day(2026, 10, 3), '40000'),
-            ]);
-          },
-        );
-        final l10n = l10nOf(tester);
-        await tester.tap(find.text(l10n.viewGold));
-        await tester.pumpAndSettle();
-        final total = tester.widget<Text>(
-          find.byKey(const ValueKey('total-value')),
-        );
-        expect(plain(total.data!), '10.00 g');
+        expect(find.byType(ItemDetailScreen), findsOneWidget);
       });
 
       testScreen('closed investments are collapsed under their own heading', (
@@ -274,25 +156,19 @@ void main() {
         expect(find.text('Old fund'), findsOneWidget);
       });
 
-      testScreen(
-        'tapping the verdict opens the year view; a row opens its detail',
-        (tester) async {
-          await pumpScreen(
-            tester,
-            const HomeScreen(),
-            locale: locale,
-            seed: seedBasic,
-          );
-          await tester.tap(find.byKey(const ValueKey('verdict')));
-          await tester.pumpAndSettle();
-          expect(find.byType(PeriodScreen), findsOneWidget);
-          tester.state<NavigatorState>(find.byType(Navigator)).pop();
-          await tester.pumpAndSettle();
-          await tester.tap(find.text('Fund A'));
-          await tester.pumpAndSettle();
-          expect(find.byType(ItemDetailScreen), findsOneWidget);
-        },
-      );
+      testScreen('no totals card; a row opens its detail', (tester) async {
+        await pumpScreen(
+          tester,
+          const HomeScreen(),
+          locale: locale,
+          seed: seedBasic,
+        );
+        expect(find.byKey(const ValueKey('total-value')), findsNothing);
+        expect(find.text(l10nOf(tester).viewGold), findsNothing);
+        await tester.tap(find.text('Fund A'));
+        await tester.pumpAndSettle();
+        expect(find.byType(ItemDetailScreen), findsOneWidget);
+      });
       String rowText(WidgetTester tester, String key) =>
           plain(tester.widget<Text>(find.byKey(ValueKey(key))).data!);
 

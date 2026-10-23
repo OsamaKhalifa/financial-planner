@@ -1,6 +1,9 @@
 /* Copyright (c) 2026-Present Osama Khalifa. All rights reserved. */
 
 import 'package:financial_planner/core/dates.dart';
+import 'package:financial_planner/core/money/format.dart';
+import 'package:financial_planner/core/reference/markets.dart';
+import 'package:financial_planner/features/investments/domain/history_entry.dart';
 import 'package:financial_planner/features/investments/domain/investment.dart';
 import 'package:financial_planner/features/investments/presentation/home_screen.dart';
 import 'package:financial_planner/features/investments/presentation/investment_form_screen.dart';
@@ -72,7 +75,26 @@ void main() {
         final l10n = l10nOf(tester);
         expect(find.text(l10n.overviewTotal), findsOneWidget);
         expect(textOf(tester, 'overview-total'), contains('2,600.00'));
+        final asOf = isolateLtr(
+          MaterialLocalizations.of(tester.element(find.byType(Scaffold)))
+              .formatMediumDate(day(2026, 10, 16)),
+        );
+        expect(find.text(l10n.asOfDate(asOf)), findsOneWidget);
         expect(textOf(tester, 'overview-verdict'), contains('2026'));
+        expect(
+          textOf(tester, 'overview-verdict'),
+          startsWith(plain(l10n.verdictKept('2026', '').split(' ').first)),
+        );
+        expect(
+          find.text(
+            l10n.inflationShipped(
+              l10n.countryName('EGY'),
+              l10n.sourceName,
+              '2026',
+            ),
+          ),
+          findsOneWidget,
+        );
         expect(find.text(l10n.rowSetAside), findsOneWidget);
         expect(find.text(l10n.setAsideNote), findsOneWidget);
         expect(find.text(l10n.realLabel), findsOneWidget);
@@ -85,6 +107,82 @@ void main() {
         expect(find.text(l10n.exposureRisk), findsNothing);
         expect(find.text(l10n.exposureCrypto), findsNothing);
         expect(find.byKey(const ValueKey('overview-purify')), findsNothing);
+      });
+
+      testScreen(
+        'AC-21: an item with no rate is left out of the total and named',
+        (tester) async {
+          await pumpScreen(
+            tester,
+            const OverviewScreen(),
+            locale: locale,
+            seed: (h) async {
+              await seedBasic(h);
+              await h.addItem(
+                item(
+                  'us',
+                  name: 'US stock',
+                  type: AssetType.stock,
+                  unit: usd,
+                  market: Market.nasdaq,
+                ),
+                [
+                  moneyIn('us', day(2026, 2, 1), '100', usd),
+                  value('us', day(2026, 10, 2), '120'),
+                ],
+              );
+            },
+          );
+          final l10n = l10nOf(tester);
+          expect(
+            textPlain(l10n.excludesItems('1', '').split(' — ').first),
+            findsWidgets,
+          );
+          expect(find.text(l10n.sinceStartExcludes('1')), findsOneWidget);
+          expect(textPlain('USD→EGP'), findsWidgets);
+          expect(textOf(tester, 'overview-total'), contains('2,600.00'));
+        },
+      );
+
+      testScreen('AC-19: interest to purify is shown on its own', (
+        tester,
+      ) async {
+        await pumpScreen(
+          tester,
+          const OverviewScreen(),
+          locale: locale,
+          seed: (h) async {
+            await h.setup();
+            await h.addItem(
+              item(
+                'dep',
+                type: AssetType.cashDeposit,
+                intent: null,
+                rule: ZakatRule.cash100,
+              ),
+              [
+                moneyIn('dep', day(2026, 1, 1), '10000'),
+                interest(
+                  'dep',
+                  day(2026, 6, 30),
+                  '500',
+                  InterestKind.keptInside,
+                ),
+                value('dep', day(2026, 10, 5), '10500'),
+              ],
+            );
+          },
+        );
+        final l10n = l10nOf(tester);
+        expect(textOf(tester, 'overview-purify'), contains('500.00'));
+        expect(textOf(tester, 'overview-total'), contains('10,000.00'));
+        await tester.ensureVisible(
+          find.byKey(const ValueKey('overview-purify')),
+        );
+        await tester.tap(find.byKey(const ValueKey('overview-purify')));
+        await tester.pumpAndSettle();
+        expect(find.text(l10n.whyToPurifyTitle), findsOneWidget);
+        expect(find.text(l10n.src_Z6), findsOneWidget);
       });
 
       testScreen('the stale line leads to Update all', (tester) async {
