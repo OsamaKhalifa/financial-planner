@@ -1604,6 +1604,24 @@ class AppLocalizationsEn extends AppLocalizations {
       'Rows to confirm are rebuilt for the new dates. Your recorded payouts and values stay.';
 
   @override
+  String editStartAfterRecord(String date) {
+    return 'Can\'t be after $date: this item has a record on that date. Move or delete that record first.';
+  }
+
+  @override
+  String editStartMaxDate(String date) {
+    return 'Latest allowed: $date (your earliest other record).';
+  }
+
+  @override
+  String get editStartMoves =>
+      'Your first money in moves to this date. Every past month for this item is recalculated.';
+
+  @override
+  String get editStartMovesMetal =>
+      'Your first money in and starting grams move to this date. Every past month for this item is recalculated.';
+
+  @override
   String toConfirmTitle(int count) {
     return 'To confirm · $count';
   }

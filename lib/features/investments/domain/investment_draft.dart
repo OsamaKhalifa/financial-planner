@@ -7,6 +7,7 @@ import '../../../core/money/money.dart';
 import '../../../core/reference/countries.dart';
 import '../../../core/reference/markets.dart';
 import '../../../core/reference/units.dart';
+import 'history_entry.dart';
 import 'investment.dart';
 import 'zakat_rules.dart';
 
@@ -23,6 +24,7 @@ enum DraftError {
   missingPurity,
   zeroAmount,
   futureDate,
+  startAfterRecord,
   shareRequired,
   answerLongTermMethod,
   answerJewellery,
@@ -102,13 +104,14 @@ List<DraftError> validate(
   InvestmentDraft d, {
   required DateTime today,
   required Settings settings,
+  DateTime? latestStart,
 }) {
   final errors = <DraftError>[];
   if (d.name == null || d.name!.trim().isEmpty) {
     errors.add(DraftError.missingName);
   }
   if (d.unit == null) errors.add(DraftError.missingUnit);
-  _checkDates(d, today, errors);
+  _checkDates(d, today, latestStart, errors);
   _checkFirstPaid(d, errors);
   final type = d.type;
   if (type == null) {
@@ -121,13 +124,70 @@ List<DraftError> validate(
   return errors;
 }
 
-void _checkDates(InvestmentDraft d, DateTime today, List<DraftError> errors) {
+void _checkDates(
+  InvestmentDraft d,
+  DateTime today,
+  DateTime? latestStart,
+  List<DraftError> errors,
+) {
   final start = d.startDate;
   if (start == null) {
     errors.add(DraftError.missingStartDate);
   } else if (start.isAfter(today)) {
     errors.add(DraftError.futureDate);
+  } else if (latestStart != null && start.isAfter(latestStart)) {
+    errors.add(DraftError.startAfterRecord);
   }
+}
+
+/// AC-77: the records the add form wrote on the start date, which move with
+/// it — the first money in and, for metals, the value bought.
+(MoneyIn?, ValueUpdate?) _onStart(Investment item, List<HistoryEntry> history) {
+  final onStart = history.where((e) => e.date == item.startDate);
+  return (
+    onStart.whereType<MoneyIn>().firstOrNull,
+    item.unit.isMetal ? onStart.whereType<ValueUpdate>().firstOrNull : null,
+  );
+}
+
+List<HistoryEntry> startRecords(Investment item, List<HistoryEntry> history) {
+  final (paid, bought) = _onStart(item, history);
+  return [?paid, ?bought];
+}
+
+List<HistoryEntry> startRecordsMovedTo(
+  Investment item,
+  List<HistoryEntry> history,
+  DateTime to,
+) {
+  final (paid, bought) = _onStart(item, history);
+  return [
+    if (paid != null)
+      MoneyIn(
+        id: paid.id,
+        investmentId: paid.investmentId,
+        date: to,
+        amount: paid.amount,
+        createdAt: paid.createdAt,
+      ),
+    if (bought != null)
+      ValueUpdate(
+        id: bought.id,
+        investmentId: bought.investmentId,
+        date: to,
+        value: bought.value,
+        createdAt: bought.createdAt,
+      ),
+  ];
+}
+
+/// AC-77: the start may not pass a record that stays where it is.
+DateTime? latestStart(Investment item, List<HistoryEntry> history) {
+  final moving = startRecords(item, history).toSet();
+  return history
+      .where((e) => !moving.contains(e))
+      .map((e) => e.date)
+      .fold<DateTime?>(null, (a, b) => a == null || b.isBefore(a) ? b : a);
 }
 
 void _checkFirstPaid(InvestmentDraft d, List<DraftError> errors) {

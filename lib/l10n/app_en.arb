@@ -1183,6 +1183,24 @@
   },
   "editRecalculates": "This recalculates every past month for this item.",
   "editRowsRebuilt": "Rows to confirm are rebuilt for the new dates. Your recorded payouts and values stay.",
+  "editStartAfterRecord": "Can't be after {date}: this item has a record on that date. Move or delete that record first.",
+  "@editStartAfterRecord": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "editStartMaxDate": "Latest allowed: {date} (your earliest other record).",
+  "@editStartMaxDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "editStartMoves": "Your first money in moves to this date. Every past month for this item is recalculated.",
+  "editStartMovesMetal": "Your first money in and starting grams move to this date. Every past month for this item is recalculated.",
   "toConfirmTitle": "To confirm · {count}",
   "@toConfirmTitle": {
     "placeholders": {

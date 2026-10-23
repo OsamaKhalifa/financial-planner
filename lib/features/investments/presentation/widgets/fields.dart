@@ -57,6 +57,7 @@ class DateField extends StatelessWidget {
     required this.onChanged,
     this.firstDate,
     this.error,
+    this.helper,
   });
 
   final String label;
@@ -64,6 +65,7 @@ class DateField extends StatelessWidget {
   final DateTime lastDate;
   final DateTime? firstDate;
   final String? error;
+  final String? helper;
   final ValueChanged<DateTime> onChanged;
 
   @override
@@ -81,6 +83,8 @@ class DateField extends StatelessWidget {
       decoration: InputDecoration(
         labelText: label,
         errorText: error,
+        helperText: helper,
+        helperMaxLines: 2,
         suffixIcon: const Icon(Icons.calendar_today),
       ),
       child: Text(context.date(value)),
