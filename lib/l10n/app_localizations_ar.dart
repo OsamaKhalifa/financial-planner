@@ -1817,6 +1817,26 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String rowPlanProfit(String pct) {
+    return 'تقدير الدفعات $pct سنويًا';
+  }
+
+  @override
+  String rowPlanGrowth(String pct) {
+    return 'تقدير النمو $pct سنويًا';
+  }
+
+  @override
+  String rowPlanBoth(String p, String g) {
+    return 'تقدير: دفعات $p · نمو $g سنويًا';
+  }
+
+  @override
+  String rowPlanGrowthOnly(String pct) {
+    return 'نمو $pct سنويًا';
+  }
+
+  @override
   String expectedHeader(String amount, String date) {
     return 'المتوقع $amount في $date';
   }

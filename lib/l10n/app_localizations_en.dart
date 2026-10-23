@@ -1819,6 +1819,26 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String rowPlanProfit(String pct) {
+    return 'est. payouts $pct/yr';
+  }
+
+  @override
+  String rowPlanGrowth(String pct) {
+    return 'est. growth $pct/yr';
+  }
+
+  @override
+  String rowPlanBoth(String p, String g) {
+    return 'est. payouts $p/yr · growth $g/yr';
+  }
+
+  @override
+  String rowPlanGrowthOnly(String pct) {
+    return 'growth $pct/yr';
+  }
+
+  @override
   String expectedHeader(String amount, String date) {
     return 'Expected $amount on $date';
   }

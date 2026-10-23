@@ -1363,6 +1363,41 @@
       }
     }
   },
+  "rowPlanProfit": "est. payouts {pct}/yr",
+  "@rowPlanProfit": {
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
+  "rowPlanGrowth": "est. growth {pct}/yr",
+  "@rowPlanGrowth": {
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
+  "rowPlanBoth": "est. payouts {p}/yr · growth {g}/yr",
+  "@rowPlanBoth": {
+    "placeholders": {
+      "p": {
+        "type": "String"
+      },
+      "g": {
+        "type": "String"
+      }
+    }
+  },
+  "rowPlanGrowthOnly": "growth {pct}/yr",
+  "@rowPlanGrowthOnly": {
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
   "expectedHeader": "Expected {amount} on {date}",
   "@expectedHeader": {
     "placeholders": {

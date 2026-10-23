@@ -2931,6 +2931,30 @@ abstract class AppLocalizations {
   /// **'{count} to confirm'**
   String toConfirmPill(int count);
 
+  /// No description provided for @rowPlanProfit.
+  ///
+  /// In en, this message translates to:
+  /// **'est. payouts {pct}/yr'**
+  String rowPlanProfit(String pct);
+
+  /// No description provided for @rowPlanGrowth.
+  ///
+  /// In en, this message translates to:
+  /// **'est. growth {pct}/yr'**
+  String rowPlanGrowth(String pct);
+
+  /// No description provided for @rowPlanBoth.
+  ///
+  /// In en, this message translates to:
+  /// **'est. payouts {p}/yr · growth {g}/yr'**
+  String rowPlanBoth(String p, String g);
+
+  /// No description provided for @rowPlanGrowthOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'growth {pct}/yr'**
+  String rowPlanGrowthOnly(String pct);
+
   /// No description provided for @expectedHeader.
   ///
   /// In en, this message translates to:
