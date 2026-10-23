@@ -3014,6 +3014,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This page is coming soon.'**
   String get comingSoon;
+
+  /// No description provided for @overviewTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Investments total'**
+  String get overviewTotal;
+
+  /// No description provided for @thisYearTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{year} so far'**
+  String thisYearTitle(String year);
+
+  /// No description provided for @byTypeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'By asset type'**
+  String get byTypeTitle;
+
+  /// No description provided for @typeShare.
+  ///
+  /// In en, this message translates to:
+  /// **'{value} · {share}'**
+  String typeShare(String value, String share);
+
+  /// No description provided for @sinceStartGain.
+  ///
+  /// In en, this message translates to:
+  /// **'Gain'**
+  String get sinceStartGain;
+
+  /// No description provided for @sinceStartRoi.
+  ///
+  /// In en, this message translates to:
+  /// **'Return on money paid in'**
+  String get sinceStartRoi;
+
+  /// No description provided for @sinceStartExcludes.
+  ///
+  /// In en, this message translates to:
+  /// **'Excludes {count} — rate missing'**
+  String sinceStartExcludes(String count);
+
+  /// No description provided for @shariahCheckTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Shariah notes'**
+  String get shariahCheckTitle;
+
+  /// No description provided for @exposureRisk.
+  ///
+  /// In en, this message translates to:
+  /// **'Value in items tagged Shariah risk'**
+  String get exposureRisk;
+
+  /// No description provided for @exposureCrypto.
+  ///
+  /// In en, this message translates to:
+  /// **'Value in crypto'**
+  String get exposureCrypto;
+
+  /// No description provided for @shariahNoScreening.
+  ///
+  /// In en, this message translates to:
+  /// **'The app does not screen companies for halal yet.'**
+  String get shariahNoScreening;
 }
 
 class _AppLocalizationsDelegate

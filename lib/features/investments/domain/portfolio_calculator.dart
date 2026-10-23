@@ -159,6 +159,7 @@ final class SinceStartFigures {
     required this.sinceStartReturn,
     required this.annualised,
     required this.annualisedBase,
+    required this.totalInBase,
   });
 
   /// Story §9.2: the period formulas with S = start date, E = latest value date.
@@ -173,6 +174,45 @@ final class SinceStartFigures {
   /// Null when the item was held for less than 365 days.
   final Decimal? annualised;
   final Decimal? annualisedBase;
+
+  /// Money paid in, each flow at its own date's rate; null when a rate is
+  /// missing.
+  final Decimal? totalInBase;
+}
+
+/// One asset type's share of the base total (Overview, UC-2).
+final class TypeSlice {
+  const TypeSlice(this.type, this.value, this.share);
+
+  final AssetType type;
+  final Decimal value;
+  final Decimal share;
+}
+
+/// Simple ROI over every started item, in the base currency. Not Dietz: it
+/// drifts over long periods with big flows (story §9.1).
+final class SinceStartTotal {
+  const SinceStartTotal({
+    required this.gain,
+    required this.roi,
+    required this.excluded,
+  });
+
+  final Decimal gain;
+
+  /// Null when nothing was paid in.
+  final Decimal? roi;
+
+  /// Items left out because a rate is missing.
+  final int excluded;
+}
+
+/// Base value held in items that need a Shariah check.
+final class Exposure {
+  const Exposure({required this.shariahRisk, required this.crypto});
+
+  final Decimal shariahRisk;
+  final Decimal crypto;
 }
 
 final class NisabHint {
@@ -482,7 +522,62 @@ final class PortfolioCalculator {
       sinceStartReturn: f.itemUnit?.dietz.r,
       annualised: _annualisedOf(f.itemUnit, days),
       annualisedBase: _annualisedOf(f.base, days),
+      totalInBase: inBase?.totalIn,
     );
+  }
+
+  /// Largest first; types worth nothing are left out.
+  List<TypeSlice> byType(Period p) {
+    final byType = <AssetType, Decimal>{};
+    for (final (inv, ev) in _heldInBase(p)) {
+      byType.update(inv.type, (v) => v + ev, ifAbsent: () => ev);
+    }
+    final total = sumOf(byType.values);
+    if (total == Decimal.zero) return const [];
+    return [
+      for (final e in byType.entries)
+        if (e.value != Decimal.zero)
+          TypeSlice(e.key, e.value, divide(e.value, total)),
+    ]..sort((a, b) => b.value.compareTo(a.value));
+  }
+
+  SinceStartTotal sinceStartTotal() {
+    var gain = Decimal.zero;
+    var paidIn = Decimal.zero;
+    var excluded = 0;
+    for (final h in _items) {
+      if (h.investment.startDate.isAfter(today)) continue;
+      final s = sinceStart(h.investment.id);
+      if (s.gainBase == null || s.totalInBase == null) {
+        excluded++;
+        continue;
+      }
+      gain += s.gainBase!;
+      paidIn += s.totalInBase!;
+    }
+    return SinceStartTotal(
+      gain: gain,
+      roi: paidIn == Decimal.zero ? null : divide(gain, paidIn),
+      excluded: excluded,
+    );
+  }
+
+  Exposure exposure(Period p) {
+    var risk = Decimal.zero;
+    var crypto = Decimal.zero;
+    for (final (inv, ev) in _heldInBase(p)) {
+      if (inv.shariahRisk) risk += ev;
+      if (inv.type == AssetType.crypto) crypto += ev;
+    }
+    return Exposure(shariahRisk: risk, crypto: crypto);
+  }
+
+  Iterable<(Investment, Decimal)> _heldInBase(Period p) sync* {
+    for (final h in _items) {
+      final f = item(h.investment.id, p);
+      final ev = f.base?.dietz.ev;
+      if (f.held && ev != null) yield (h.investment, ev);
+    }
   }
 
   /// Latest value date; for metals also the latest rate, because the item's

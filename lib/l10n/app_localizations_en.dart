@@ -1877,4 +1877,44 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get comingSoon => 'This page is coming soon.';
+
+  @override
+  String get overviewTotal => 'Investments total';
+
+  @override
+  String thisYearTitle(String year) {
+    return '$year so far';
+  }
+
+  @override
+  String get byTypeTitle => 'By asset type';
+
+  @override
+  String typeShare(String value, String share) {
+    return '$value · $share';
+  }
+
+  @override
+  String get sinceStartGain => 'Gain';
+
+  @override
+  String get sinceStartRoi => 'Return on money paid in';
+
+  @override
+  String sinceStartExcludes(String count) {
+    return 'Excludes $count — rate missing';
+  }
+
+  @override
+  String get shariahCheckTitle => 'Shariah notes';
+
+  @override
+  String get exposureRisk => 'Value in items tagged Shariah risk';
+
+  @override
+  String get exposureCrypto => 'Value in crypto';
+
+  @override
+  String get shariahNoScreening =>
+      'The app does not screen companies for halal yet.';
 }

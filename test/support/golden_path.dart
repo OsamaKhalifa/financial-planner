@@ -105,6 +105,7 @@ Future<void> runGoldenPath(WidgetTester tester) async {
   // 16 April: 4,000 more money in.
   now = DateTime(2026, 4, 16, 9);
   await startApp();
+  await tapText(l10n().tabInvestments);
   await tapText('Fund A');
   await tapText(l10n().record);
   await tapText(l10n().tabIn);
@@ -115,6 +116,7 @@ Future<void> runGoldenPath(WidgetTester tester) async {
   // 30 April: Update all.
   now = DateTime(2026, 4, 30, 9);
   await startApp();
+  await tapText(l10n().tabInvestments);
   await tester.tap(find.byTooltip(l10n().assumptions));
   await tester.pumpAndSettle();
   await tapText(l10n().updateAll);

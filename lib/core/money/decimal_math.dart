@@ -26,3 +26,6 @@ Decimal powRatio(Decimal base, Decimal exponent) {
   final result = math.pow(base.toDouble(), exponent.toDouble()).toDouble();
   return Decimal.parse(result.toStringAsPrecision(15));
 }
+
+/// A 0..1 fraction for drawing a bar; never used for money.
+double progressOf(Decimal fraction) => fraction.toDouble().clamp(0, 1);

@@ -482,5 +482,16 @@
   "tabInvestments": "الاستثمارات",
   "tabZakat": "الزكاة",
   "tabPlan": "الخطة",
-  "comingSoon": "هذه الصفحة قادمة قريبًا."
+  "comingSoon": "هذه الصفحة قادمة قريبًا.",
+  "overviewTotal": "إجمالي الاستثمارات",
+  "thisYearTitle": "{year} حتى الآن",
+  "byTypeTitle": "حسب نوع الأصل",
+  "typeShare": "{value} · {share}",
+  "sinceStartGain": "الربح",
+  "sinceStartRoi": "العائد على المبلغ المدفوع",
+  "sinceStartExcludes": "يستثني {count} — سعر الصرف غير متوفر",
+  "shariahCheckTitle": "ملاحظات شرعية",
+  "exposureRisk": "القيمة في عناصر عليها علامة «مخاطرة شرعية»",
+  "exposureCrypto": "القيمة في العملات الرقمية",
+  "shariahNoScreening": "التطبيق لا يفحص الشركات شرعيًا بعد."
 }
