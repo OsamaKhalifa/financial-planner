@@ -1615,6 +1615,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get confirmAllLine => 'Confirm only money that really came in.';
 
   @override
+  String get confirmValueLine =>
+      'Confirm only if the value is still about this.';
+
+  @override
   String get rowPayout => 'Expected payout (not received yet)';
 
   @override
@@ -1627,10 +1631,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get rowValue => 'Value check';
 
   @override
+  String get rowValueExpected => 'Expected value (check it)';
+
+  @override
   String get receivedThisAmount => 'Received this amount';
 
   @override
+  String get valueAsExpected => 'Value is as expected';
+
+  @override
   String get addAmount => 'Add amount';
+
+  @override
+  String get addValue => 'Add value';
 
   @override
   String get skipRow => 'Skip';

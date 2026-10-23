@@ -2632,6 +2632,12 @@ abstract class AppLocalizations {
   /// **'Confirm only money that really came in.'**
   String get confirmAllLine;
 
+  /// No description provided for @confirmValueLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm only if the value is still about this.'**
+  String get confirmValueLine;
+
   /// No description provided for @rowPayout.
   ///
   /// In en, this message translates to:
@@ -2656,17 +2662,35 @@ abstract class AppLocalizations {
   /// **'Value check'**
   String get rowValue;
 
+  /// No description provided for @rowValueExpected.
+  ///
+  /// In en, this message translates to:
+  /// **'Expected value (check it)'**
+  String get rowValueExpected;
+
   /// No description provided for @receivedThisAmount.
   ///
   /// In en, this message translates to:
   /// **'Received this amount'**
   String get receivedThisAmount;
 
+  /// No description provided for @valueAsExpected.
+  ///
+  /// In en, this message translates to:
+  /// **'Value is as expected'**
+  String get valueAsExpected;
+
   /// No description provided for @addAmount.
   ///
   /// In en, this message translates to:
   /// **'Add amount'**
   String get addAmount;
+
+  /// No description provided for @addValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Add value'**
+  String get addValue;
 
   /// No description provided for @skipRow.
   ///

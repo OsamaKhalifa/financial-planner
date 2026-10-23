@@ -539,7 +539,7 @@ String noPayoutText(BuildContext context, PlanRow r, Investment item) {
 
 String _rowLabel(BuildContext context, PlanRow r, Investment item) {
   final l10n = context.l10n;
-  if (r.kind == PlanKind.value) return l10n.rowValue;
+  if (r.kind == PlanKind.value) return l10n.rowValueExpected;
   if (item.conventionalDeposit) return l10n.rowInterest;
   if (item.peCase == PeCase.c) return l10n.rowPayoutPurify;
   return l10n.rowPayout;
@@ -656,8 +656,10 @@ class _ToConfirmCardState extends ConsumerState<_ToConfirmCard> {
                   ),
               ],
             ),
-            if (withAmount.isNotEmpty)
+            if (rows.any((r) => r.kind == PlanKind.payout))
               Text(l10n.confirmAllLine, style: theme.textTheme.bodySmall),
+            if (rows.any((r) => r.kind == PlanKind.value))
+              Text(l10n.confirmValueLine, style: theme.textTheme.bodySmall),
             if (noAmount > 0)
               Text(
                 l10n.rowsNeedAmount(noAmount),
@@ -734,7 +736,9 @@ class _ToConfirmCardState extends ConsumerState<_ToConfirmCard> {
               IconButton.filledTonal(
                 key: ValueKey('check-$key'),
                 constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
-                tooltip: l10n.receivedThisAmount,
+                tooltip: r.kind == PlanKind.value
+                    ? l10n.valueAsExpected
+                    : l10n.receivedThisAmount,
                 icon: const Icon(Icons.check),
                 onPressed: _busy
                     ? null
@@ -750,7 +754,9 @@ class _ToConfirmCardState extends ConsumerState<_ToConfirmCard> {
               TextButton(
                 key: ValueKey('add-$key'),
                 onPressed: _busy ? null : edit,
-                child: Text(l10n.addAmount),
+                child: Text(
+                  r.kind == PlanKind.value ? l10n.addValue : l10n.addAmount,
+                ),
               ),
             PopupMenuButton<bool>(
               key: ValueKey('menu-$key'),
