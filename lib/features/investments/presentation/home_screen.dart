@@ -292,14 +292,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Row(
       children: [
         Text('${l10n.sortLabel}: '),
-        DropdownButton<_Sort>(
-          key: const ValueKey('sort'),
-          value: _sort,
-          items: [
-            for (final e in labels.entries)
-              DropdownMenuItem(value: e.key, child: Text(e.value)),
-          ],
-          onChanged: (v) => setState(() => _sort = v!),
+        Flexible(
+          child: DropdownButton<_Sort>(
+            key: const ValueKey('sort'),
+            isExpanded: true,
+            value: _sort,
+            items: [
+              for (final e in labels.entries)
+                DropdownMenuItem(
+                  value: e.key,
+                  child: Text(e.value, overflow: TextOverflow.ellipsis),
+                ),
+            ],
+            onChanged: (v) => setState(() => _sort = v!),
+          ),
         ),
       ],
     );
@@ -343,79 +349,248 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     _Sort.value => (b.figures.base?.dietz.ev ?? Decimal.zero).compareTo(
       a.figures.base?.dietz.ev ?? Decimal.zero,
     ),
-    _Sort.ret => (b.since.figures.base?.dietz.r ?? Decimal.zero).compareTo(
-      a.since.figures.base?.dietz.r ?? Decimal.zero,
+    _Sort.ret => (b.shownReturn ?? Decimal.zero).compareTo(
+      a.shownReturn ?? Decimal.zero,
     ),
     _Sort.name => a.item.name.compareTo(b.item.name),
     _Sort.oldest => a.lastDate.compareTo(b.lastDate),
   };
 
+  /// UX 2.2 list row: start = name, type, status, pill; end = own value,
+  /// base value, return, estimate.
   Widget _rowTile(BuildContext context, _Row r, StaleNow stale, Unit base) {
     final l10n = context.l10n;
     final item = r.item;
     final f = r.figures;
-    final baseEv = f.base?.dietz.ev;
-    final ret = r.since.figures.base?.dietz.r;
-    final isStale = stale.itemIds.contains(item.id);
-    final subtitle = item.unit.isMetal
-        ? l10n.pureGrams(context.grams(f.itemUnit?.dietz.ev ?? Decimal.zero))
-        : item.market == null
+    final own = f.itemUnit?.dietz.ev;
+    final inBase = item.unit == base ? null : f.base?.dietz.ev;
+    final ret = r.shownReturn;
+    final type = item.market == null
         ? context.assetTypeName(item.type)
         : l10n.typeAndMarket(
             context.assetTypeName(item.type),
             context.marketName(item.market!),
           );
-    return ListTile(
+    final status = f.excluded != null
+        ? l10n.rateMissingAdd(f.excluded!.from.code, f.excluded!.to.code)
+        : stale.itemIds.contains(item.id)
+        ? (item.unit.isMetal
+              ? l10n.metalRateNotUpdated
+              : l10n.notUpdatedThisMonth)
+        : null;
+    final pending = ref.watch(pendingCountProvider(item.id));
+    final row = _RowTexts(
+      name: item.name,
+      type: type,
+      own: own == null ? '—' : context.money(own, item.unit),
+      inBase: inBase == null ? null : context.money(inBase, base),
+      ret: ret == null ? null : context.percent(ret),
+      plan: _planTexts(context, item),
+      status: status,
+      pill: pending > 0 ? l10n.toConfirmPill(pending) : null,
+    );
+    return Semantics(
       key: ValueKey('item-${item.id}'),
-      title: Text(item.name),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(subtitle),
-          if (f.excluded != null)
+      container: true,
+      button: true,
+      excludeSemantics: true,
+      label: row.spoken,
+      child: InkWell(
+        onTap: () => _push(ItemDetailScreen(investmentId: item.id)),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: _RowLayout(id: item.id, texts: row),
+        ),
+      ),
+    );
+  }
+
+  /// Consultant wording (UX 2.2): never "profit" or "plan" on the row.
+  _PlanTexts _planTexts(BuildContext context, Investment item) {
+    final l10n = context.l10n;
+    String pct(Decimal v) => context.percent(
+      v,
+      digits: (v * Decimal.fromInt(100)).scale.clamp(0, 2),
+    );
+    final p = item.expectedProfit == null
+        ? null
+        : pct(item.expectedProfit!).replaceAll('+', '');
+    final g = item.expectedGrowth == null ? null : pct(item.expectedGrowth!);
+    return _PlanTexts(
+      one: p != null && g != null
+          ? l10n.rowPlanBoth(p, g)
+          : p != null
+          ? l10n.rowPlanProfit(p)
+          : g != null
+          ? l10n.rowPlanGrowth(g)
+          : null,
+      profit: p == null ? null : l10n.rowPlanProfit(p),
+      growthOnly: p != null && g != null ? l10n.rowPlanGrowthOnly(g) : null,
+    );
+  }
+}
+
+final class _PlanTexts {
+  const _PlanTexts({this.one, this.profit, this.growthOnly});
+
+  final String? one;
+  final String? profit;
+  final String? growthOnly;
+}
+
+final class _RowTexts {
+  const _RowTexts({
+    required this.name,
+    required this.type,
+    required this.own,
+    required this.inBase,
+    required this.ret,
+    required this.plan,
+    required this.status,
+    required this.pill,
+  });
+
+  final String name;
+  final String type;
+  final String own;
+  final String? inBase;
+  final String? ret;
+  final _PlanTexts plan;
+  final String? status;
+  final String? pill;
+
+  /// VoiceOver order (UX 2.2): start 1–2, end 1–4, start 3–4.
+  String get spoken =>
+      [name, type, own, ?inBase, ?ret, ?plan.one, ?status, ?pill].join('\n');
+}
+
+class _RowLayout extends StatelessWidget {
+  const _RowLayout({required this.id, required this.texts});
+
+  final String id;
+  final _RowTexts texts;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final ownStyle = theme.textTheme.titleMedium?.copyWith(
+      fontWeight: FontWeight.w600,
+      color: theme.colorScheme.onSurface,
+    );
+    final small = theme.textTheme.bodySmall?.copyWith(
+      color: theme.colorScheme.onSurfaceVariant,
+    );
+    final scaler = MediaQuery.textScalerOf(context);
+    return LayoutBuilder(
+      builder: (context, c) {
+        bool fits(String text, TextStyle? style, num width) =>
+            (TextPainter(
+              text: TextSpan(text: text, style: style),
+              textDirection: Directionality.of(context),
+              textScaler: scaler,
+              maxLines: 1,
+            )..layout()).width <=
+            width;
+        final endMax = c.maxWidth * 0.6;
+        final stacked =
+            scaler.scale(1) >= 1.3 || !fits(texts.own, ownStyle, endMax);
+        final endWidth = stacked ? c.maxWidth : endMax;
+        final both = texts.plan.one;
+        final split =
+            texts.plan.growthOnly != null &&
+            both != null &&
+            !fits(both, small, endWidth);
+        final end = Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
             Text(
-              l10n.rateMissingAdd(f.excluded!.from.code, f.excluded!.to.code),
-            )
-          else if (isStale)
-            Text(
-              item.unit.isMetal
-                  ? l10n.metalRateNotUpdated
-                  : l10n.notUpdatedThisMonth,
+              texts.own,
+              key: ValueKey('value-own-$id'),
+              style: ownStyle,
+              textAlign: TextAlign.end,
             ),
-          if (ref.watch(pendingCountProvider(item.id)) case final n when n > 0)
-            Padding(
-              padding: const EdgeInsets.only(top: 4),
-              child: DecoratedBox(
-                key: ValueKey('to-confirm-${item.id}'),
-                decoration: ShapeDecoration(
-                  color: Theme.of(context).colorScheme.secondaryContainer,
-                  shape: const StadiumBorder(),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 2,
-                  ),
-                  child: Text(l10n.toConfirmPill(n)),
-                ),
+            if (texts.inBase != null)
+              Text(
+                texts.inBase!,
+                key: ValueKey('value-base-$id'),
+                style: small,
+              ),
+            if (texts.ret != null)
+              Text(
+                texts.ret!,
+                key: ValueKey('return-$id'),
+                style: theme.textTheme.bodyMedium,
+              ),
+            if (both != null)
+              Text(
+                split ? texts.plan.profit! : both,
+                key: ValueKey('plan-$id'),
+                style: small,
+                textAlign: TextAlign.end,
+              ),
+            if (split)
+              Text(
+                texts.plan.growthOnly!,
+                key: ValueKey('plan2-$id'),
+                style: small,
+                textAlign: TextAlign.end,
+              ),
+          ],
+        );
+        final start = _start(context);
+        if (stacked) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              start,
+              Align(alignment: AlignmentDirectional.centerEnd, child: end),
+            ],
+          );
+        }
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(child: start),
+            const SizedBox(width: 12),
+            ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: endMax),
+              child: end,
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _start(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          texts.name,
+          style: theme.textTheme.titleMedium,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+        Text(texts.type),
+        if (texts.status != null) Text(texts.status!),
+        if (texts.pill != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: DecoratedBox(
+              key: ValueKey('to-confirm-$id'),
+              decoration: ShapeDecoration(
+                color: theme.colorScheme.secondaryContainer,
+                shape: const StadiumBorder(),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                child: Text(texts.pill!),
               ),
             ),
-        ],
-      ),
-      trailing: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Text(
-            baseEv == null ? '—' : context.money(baseEv, base),
-            style: Theme.of(context).textTheme.titleSmall,
           ),
-          if (ret != null) Text(context.percent(ret)),
-          if (item.unit != base && f.itemUnit != null)
-            Text(context.money(f.itemUnit!.dietz.ev, item.unit)),
-        ],
-      ),
-      onTap: () => _push(ItemDetailScreen(investmentId: item.id)),
+      ],
     );
   }
 }
@@ -427,4 +602,10 @@ class _Row {
   final ItemFigures figures;
   final SinceStartFigures since;
   final DateTime lastDate;
+
+  /// The item-unit return (owner, 2026-10-23); metals use the base return,
+  /// because a buy adds grams and value alike, so grams read ~0 %.
+  Decimal? get shownReturn => item.unit.isMetal
+      ? since.figures.base?.dietz.r
+      : since.figures.itemUnit?.dietz.r;
 }

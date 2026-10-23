@@ -20,7 +20,8 @@ extension LabelContext on BuildContext {
   String amount(Decimal v, {bool signed = false, int digits = 2}) =>
       formatAmount(v, lang, signed: signed, digits: digits);
 
-  String percent(Decimal fraction) => formatPercent(fraction, lang);
+  String percent(Decimal fraction, {int digits = 2}) =>
+      formatPercent(fraction, lang, digits: digits);
 
   String grams(Decimal v, {bool signed = false}) =>
       formatGrams(v, lang, signed: signed);
