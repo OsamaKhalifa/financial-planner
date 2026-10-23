@@ -67,3 +67,6 @@ local/
 # Agents' scratch
 docs/_wip/
 scratchpad/
+
+# Agent session worktrees
+.claude/worktrees/
