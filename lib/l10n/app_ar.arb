@@ -468,5 +468,10 @@
   "alsoRecordsPayout": "هذا يسجّل أيضًا الدفعة المتوقعة في {date}.",
   "alsoRecordsValue": "هذا يسجّل أيضًا مراجعة القيمة في {date}.",
   "errOutsideWindow": "اختر تاريخًا من {from} إلى {to}.",
-  "periodPayouts": "الدفعات: تقديرك {expected} · المستلم {received}"
+  "periodPayouts": "الدفعات: تقديرك {expected} · المستلم {received}",
+  "tabOverview": "نظرة عامة",
+  "tabInvestments": "الاستثمارات",
+  "tabZakat": "الزكاة",
+  "tabPlan": "الخطة",
+  "comingSoon": "هذه الصفحة قادمة قريبًا."
 }

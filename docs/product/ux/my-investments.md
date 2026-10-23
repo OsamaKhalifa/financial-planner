@@ -52,7 +52,7 @@ Q5 (real totals), Q6 (no third-unit conversion) and Q7 (Gregorian year) are deci
 
 **Why merge this way:** three jobs — *record* (S3 + S5), *keep current* (S6, S8 for corrections), *judge* (S2, S4, S7). Rates, inflation and zakat choices are all "assumptions behind the numbers", so they live together in S8, and every why sheet deep-links to the exact S8 row.
 
-**Navigation:** S2 is the root. No tab bar in v1. Home top bar: title, **Assumptions** icon (S8). Everything else is reached by tapping content.
+**Navigation:** a bottom tab bar — Overview · **Investments** · Zakat · Plan (2026-10-23). S2 is the root of the Investments tab, which opens at launch until Overview has content. Pushed screens cover the tab bar. Home top bar: title, **Assumptions** icon (S8). Everything else is reached by tapping content.
 
 ---
 

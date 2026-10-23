@@ -2930,6 +2930,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Payouts: your estimate {expected} · received {received}'**
   String periodPayouts(String expected, String received);
+
+  /// No description provided for @tabOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'Overview'**
+  String get tabOverview;
+
+  /// No description provided for @tabInvestments.
+  ///
+  /// In en, this message translates to:
+  /// **'Investments'**
+  String get tabInvestments;
+
+  /// No description provided for @tabZakat.
+  ///
+  /// In en, this message translates to:
+  /// **'Zakat'**
+  String get tabZakat;
+
+  /// No description provided for @tabPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan'**
+  String get tabPlan;
+
+  /// No description provided for @comingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'This page is coming soon.'**
+  String get comingSoon;
 }
 
 class _AppLocalizationsDelegate

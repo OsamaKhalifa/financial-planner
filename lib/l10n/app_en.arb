@@ -1392,5 +1392,10 @@
         "type": "String"
       }
     }
-  }
+  },
+  "tabOverview": "Overview",
+  "tabInvestments": "Investments",
+  "tabZakat": "Zakat",
+  "tabPlan": "Plan",
+  "comingSoon": "This page is coming soon."
 }

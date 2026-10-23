@@ -1821,4 +1821,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String periodPayouts(String expected, String received) {
     return 'Payouts: your estimate $expected · received $received';
   }
+
+  @override
+  String get tabOverview => 'Overview';
+
+  @override
+  String get tabInvestments => 'Investments';
+
+  @override
+  String get tabZakat => 'Zakat';
+
+  @override
+  String get tabPlan => 'Plan';
+
+  @override
+  String get comingSoon => 'This page is coming soon.';
 }

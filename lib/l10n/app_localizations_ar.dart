@@ -1819,4 +1819,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String periodPayouts(String expected, String received) {
     return 'الدفعات: تقديرك $expected · المستلم $received';
   }
+
+  @override
+  String get tabOverview => 'نظرة عامة';
+
+  @override
+  String get tabInvestments => 'الاستثمارات';
+
+  @override
+  String get tabZakat => 'الزكاة';
+
+  @override
+  String get tabPlan => 'الخطة';
+
+  @override
+  String get comingSoon => 'هذه الصفحة قادمة قريبًا.';
 }
