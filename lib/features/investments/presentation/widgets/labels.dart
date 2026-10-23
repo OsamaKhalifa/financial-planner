@@ -42,23 +42,30 @@ extension LabelContext on BuildContext {
 
   String pair(Unit from, Unit to) => isolateLtr('${from.code}→${to.code}');
 
+  String assetTypeName(AssetType t) => l10n.assetTypeName(t);
+
+  String intentName(Intent i) => l10n.intentName(i);
+}
+
+/// Without a [BuildContext], e.g. the English names of a sheet export.
+extension LabelNames on AppLocalizations {
   String assetTypeName(AssetType t) => switch (t) {
-    AssetType.stock => l10n.typeStock,
-    AssetType.fund => l10n.typeFund,
-    AssetType.sukuk => l10n.typeSukuk,
-    AssetType.gold => l10n.typeGold,
-    AssetType.silver => l10n.typeSilver,
-    AssetType.cashDeposit => l10n.typeCash,
-    AssetType.crypto => l10n.typeCrypto,
-    AssetType.privateEquity => l10n.typePrivateEquity,
-    AssetType.other => l10n.typeOther,
+    AssetType.stock => typeStock,
+    AssetType.fund => typeFund,
+    AssetType.sukuk => typeSukuk,
+    AssetType.gold => typeGold,
+    AssetType.silver => typeSilver,
+    AssetType.cashDeposit => typeCash,
+    AssetType.crypto => typeCrypto,
+    AssetType.privateEquity => typePrivateEquity,
+    AssetType.other => typeOther,
   };
 
   String intentName(Intent i) => switch (i) {
-    Intent.trading => l10n.intentTrading,
-    Intent.longTerm => l10n.intentLongTerm,
-    Intent.personalUse => l10n.intentPersonalUse,
-    Intent.rental => l10n.intentRental,
+    Intent.trading => intentTrading,
+    Intent.longTerm => intentLongTerm,
+    Intent.personalUse => intentPersonalUse,
+    Intent.rental => intentRental,
   };
 }
 
