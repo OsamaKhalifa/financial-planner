@@ -1875,4 +1875,43 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get comingSoon => 'هذه الصفحة قادمة قريبًا.';
+
+  @override
+  String get overviewTotal => 'إجمالي الاستثمارات';
+
+  @override
+  String thisYearTitle(String year) {
+    return '$year حتى الآن';
+  }
+
+  @override
+  String get byTypeTitle => 'حسب نوع الأصل';
+
+  @override
+  String typeShare(String value, String share) {
+    return '$value · $share';
+  }
+
+  @override
+  String get sinceStartGain => 'الربح';
+
+  @override
+  String get sinceStartRoi => 'العائد على المبلغ المدفوع';
+
+  @override
+  String sinceStartExcludes(String count) {
+    return 'يستثني $count — سعر الصرف غير متوفر';
+  }
+
+  @override
+  String get shariahCheckTitle => 'ملاحظات شرعية';
+
+  @override
+  String get exposureRisk => 'القيمة في عناصر عليها علامة «مخاطرة شرعية»';
+
+  @override
+  String get exposureCrypto => 'القيمة في العملات الرقمية';
+
+  @override
+  String get shariahNoScreening => 'التطبيق لا يفحص الشركات شرعيًا بعد.';
 }

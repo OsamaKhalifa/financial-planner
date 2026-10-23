@@ -1451,5 +1451,40 @@
   "tabInvestments": "Investments",
   "tabZakat": "Zakat",
   "tabPlan": "Plan",
-  "comingSoon": "This page is coming soon."
+  "comingSoon": "This page is coming soon.",
+  "overviewTotal": "Investments total",
+  "thisYearTitle": "{year} so far",
+  "@thisYearTitle": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "byTypeTitle": "By asset type",
+  "typeShare": "{value} · {share}",
+  "@typeShare": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      },
+      "share": {
+        "type": "String"
+      }
+    }
+  },
+  "sinceStartGain": "Gain",
+  "sinceStartRoi": "Return on money paid in",
+  "sinceStartExcludes": "Excludes {count} — rate missing",
+  "@sinceStartExcludes": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "shariahCheckTitle": "Shariah notes",
+  "exposureRisk": "Value in items tagged Shariah risk",
+  "exposureCrypto": "Value in crypto",
+  "shariahNoScreening": "The app does not screen companies for halal yet."
 }

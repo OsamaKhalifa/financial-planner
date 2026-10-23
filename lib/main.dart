@@ -61,13 +61,19 @@ class RootGate extends ConsumerWidget {
 class AppShell extends StatefulWidget {
   const AppShell({super.key});
 
+  static const investmentsTab = 1;
+
+  static void select(BuildContext context, int tab) =>
+      context.findAncestorStateOfType<_AppShellState>()?._select(tab);
+
   @override
   State<AppShell> createState() => _AppShellState();
 }
 
 class _AppShellState extends State<AppShell> {
-  // Investments until Overview has content; then Overview.
-  var _tab = 1;
+  var _tab = 0;
+
+  void _select(int tab) => setState(() => _tab = tab);
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +90,7 @@ class _AppShellState extends State<AppShell> {
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _tab,
-        onDestinationSelected: (i) => setState(() => _tab = i),
+        onDestinationSelected: _select,
         destinations: [
           NavigationDestination(
             icon: const Icon(Icons.dashboard_outlined),

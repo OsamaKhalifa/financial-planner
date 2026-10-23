@@ -443,4 +443,107 @@ void main() {
       );
     });
   });
+
+  group('Overview figures (UC-2)', () {
+    InvestmentWithHistory held(
+      String id,
+      AssetType type,
+      String paid,
+      String value, {
+      Unit unit = egp,
+      ZakatRule rule = ZakatRule.trading100,
+      ProfitBasis? basis,
+      String? profit,
+      CapitalBack? back,
+    }) => InvestmentWithHistory(
+      investment: Investment(
+        id: id,
+        name: id,
+        type: type,
+        unit: unit,
+        startDate: day(2026, 1, 1),
+        zakatRule: rule,
+        profitBasis: basis,
+        expectedProfit: profit == null ? null : d(profit),
+        capitalBack: back,
+      ),
+      history: [
+        MoneyIn(
+          investmentId: id,
+          date: day(2026, 1, 1),
+          amount: Money(d(paid), unit),
+        ),
+        ValueUpdate(investmentId: id, date: day(2026, 10, 1), value: d(value)),
+      ],
+    );
+    final year = Period.year(2026, today);
+
+    test('by type: value and share per type, largest first, adding up to the total', () {
+      final c = calc([
+        held('s', AssetType.stock, '50000', '60000'),
+        held(
+          'c',
+          AssetType.cashDeposit,
+          '40000',
+          '40000',
+          rule: ZakatRule.cash100,
+        ),
+      ]);
+      final slices = c.byType(year);
+      expect(
+        [for (final s in slices) (s.type, s.value, s.share)],
+        [
+          (AssetType.stock, d('60000'), d('0.6')),
+          (AssetType.cashDeposit, d('40000'), d('0.4')),
+        ],
+      );
+      expect(
+        slices.fold(Decimal.zero, (a, s) => a + s.value),
+        c.portfolio(year, ViewUnit.base).totals!.dietz.ev,
+      );
+    });
+
+    test('by type leaves out an item with no rate, as the total does', () {
+      final c = calc([
+        held('s', AssetType.stock, '1000', '1000'),
+        held('us', AssetType.fund, '10', '12', unit: usd),
+      ]);
+      expect([for (final s in c.byType(year)) s.type], [AssetType.stock]);
+    });
+
+    test('since start: gain over money paid in; an item with no rate is counted out', () {
+      final c = calc([
+        held('a', AssetType.fund, '1000', '1100'),
+        held('b', AssetType.fund, '1000', '1300'),
+        held('us', AssetType.fund, '10', '12', unit: usd),
+      ]);
+      final s = c.sinceStartTotal();
+      expect((s.gain, s.roi, s.excluded), (d('400'), d('0.2'), 1));
+    });
+
+    test('exposure: Shariah-risk items and crypto, nothing else', () {
+      final c = calc([
+        held(
+          'pe',
+          AssetType.privateEquity,
+          '5000',
+          '5000',
+          rule: ZakatRule.longTermFullValue,
+          basis: ProfitBasis.fixedPctOfMoney,
+          profit: '0.2',
+          back: CapitalBack.no,
+        ),
+        held(
+          'btc',
+          AssetType.crypto,
+          '3000',
+          '2500',
+          rule: ZakatRule.crypto100,
+        ),
+        held('s', AssetType.stock, '1000', '1000'),
+      ]);
+      final e = c.exposure(year);
+      expect((e.shariahRisk, e.crypto), (d('5000'), d('2500')));
+    });
+  });
 }

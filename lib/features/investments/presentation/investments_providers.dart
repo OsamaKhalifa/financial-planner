@@ -70,6 +70,18 @@ final sinceStartProvider = Provider.family<SinceStartFigures?, String>((
   return calc != null && calc.hasItem(id) ? calc.sinceStart(id) : null;
 });
 
+final byTypeProvider = Provider.family<List<TypeSlice>?, Period>(
+  (ref, p) => ref.watch(calculatorProvider).value?.byType(p),
+);
+
+final sinceStartTotalProvider = Provider<SinceStartTotal?>(
+  (ref) => ref.watch(calculatorProvider).value?.sinceStartTotal(),
+);
+
+final exposureProvider = Provider.family<Exposure?, Period>(
+  (ref, p) => ref.watch(calculatorProvider).value?.exposure(p),
+);
+
 /// Rebuilt from the item on every read; nothing is cached or written (E1).
 final expectedProvider = Provider.family<ExpectedVsActual?, String>((ref, id) {
   final calc = ref.watch(calculatorProvider).value;
