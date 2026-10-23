@@ -64,19 +64,22 @@ class DriftInvestmentsRepository implements InvestmentsRepository {
       );
 
   @override
-  Future<void> update(Investment item) => guardStorage(() async {
-    final n =
-        await (_db.update(
-          _db.investments,
-        )..where((t) => t.id.equals(item.id))).write(
-          _investmentRow(
-            item,
-            created: const Value.absent(),
-            updated: _now().toUtc(),
-          ),
-        );
-    if (n == 0) throw NotFound('investment ${item.id}');
-  });
+  Future<void> update(
+    Investment item, {
+    List<HistoryEntry> entries = const [],
+  }) => guardStorage(
+    () => _db.transaction(() async {
+      final now = _now().toUtc();
+      final n =
+          await (_db.update(
+            _db.investments,
+          )..where((t) => t.id.equals(item.id))).write(
+            _investmentRow(item, created: const Value.absent(), updated: now),
+          );
+      if (n == 0) throw NotFound('investment ${item.id}');
+      await _upsertEntries(entries, now);
+    }),
+  );
 
   @override
   Future<void> delete(String id) => guardStorage(() async {
@@ -109,20 +112,21 @@ class DriftInvestmentsRepository implements InvestmentsRepository {
 
   @override
   Future<void> saveEntries(List<HistoryEntry> entries) => guardStorage(
-    () => _db.transaction(() async {
-      final now = _now().toUtc();
-      for (final e in entries) {
-        final existing = await (_db.select(
-          _db.historyEntries,
-        )..where((t) => t.id.equals(e.id))).getSingleOrNull();
-        await _db
-            .into(_db.historyEntries)
-            .insertOnConflictUpdate(
-              _entryRow(e, created: existing?.createdAt ?? now, updated: now),
-            );
-      }
-    }),
+    () => _db.transaction(() => _upsertEntries(entries, _now().toUtc())),
   );
+
+  Future<void> _upsertEntries(List<HistoryEntry> entries, DateTime now) async {
+    for (final e in entries) {
+      final existing = await (_db.select(
+        _db.historyEntries,
+      )..where((t) => t.id.equals(e.id))).getSingleOrNull();
+      await _db
+          .into(_db.historyEntries)
+          .insertOnConflictUpdate(
+            _entryRow(e, created: existing?.createdAt ?? now, updated: now),
+          );
+    }
+  }
 
   @override
   Future<void> deleteEntries(List<String> ids) => guardStorage(

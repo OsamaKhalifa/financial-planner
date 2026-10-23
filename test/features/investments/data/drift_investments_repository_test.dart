@@ -446,6 +446,31 @@ void main() {
     expect(back.history.length, 1);
   });
 
+  test('AC-77 update with entries is one transaction: a failing entry rolls the start date back', () async {
+    await repo.create(fund('a'), [
+      val('1', 'a', day(2026, 1, 1), '1000'),
+      val('2', 'a', day(2026, 3, 1), '1100'),
+    ]);
+    await expectLater(
+      repo.update(
+        fund('a', start: day(2026, 3, 1)),
+        entries: [val('1', 'a', day(2026, 3, 1), '1000')],
+      ),
+      throwsA(isA<Conflict>()),
+    );
+    final back = (await all()).single;
+    expect(back.investment.startDate, day(2026, 1, 1));
+    expect(back.history.map((e) => e.date), [day(2026, 1, 1), day(2026, 3, 1)]);
+
+    await repo.update(
+      fund('a', start: day(2025, 12, 1)),
+      entries: [val('1', 'a', day(2025, 12, 1), '1000')],
+    );
+    final moved = (await all()).single;
+    expect(moved.investment.startDate, day(2025, 12, 1));
+    expect(moved.history.first.date, day(2025, 12, 1));
+  });
+
   test(
     'create is one transaction: a failing entry leaves no item behind',
     () async {

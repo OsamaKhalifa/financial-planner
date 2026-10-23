@@ -467,13 +467,13 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
     );
     final repo = ref.read(investmentsRepositoryProvider);
     if (_isEdit) {
-      // Not one transaction: the repository has no call that writes an item
-      // and its entries together on update.
-      await repo.update(item);
       final edited = _editing!;
-      if (edited.startDate != _start) {
-        await repo.saveEntries(startRecordsMovedTo(edited, _history, _start!));
-      }
+      await repo.update(
+        item,
+        entries: edited.startDate == _start
+            ? const []
+            : startRecordsMovedTo(edited, _history, _start!),
+      );
       return id;
     }
     if (rate != null) {
