@@ -1,0 +1,4 @@
+// Google Sheets export (ADR-0007): the iOS client id reversed, for the sign-in
+// return URL. The ids themselves are in lib/features/export/export_providers.dart.
+// GOOGLE_REVERSED_CLIENT_ID = com.googleusercontent.apps.1234-abc
+GOOGLE_REVERSED_CLIENT_ID =

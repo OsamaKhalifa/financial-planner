@@ -101,6 +101,7 @@ Set monthly income and spending categories. Record spending by hand. See spent v
 - All user data stored locally on device.
 - Encrypted at rest (platform secure storage for keys, local DB encrypted).
 - Export: user can export their data as JSON for their own backup.
+- Export to Google Sheets: after linking a Google account in Settings, everything (with history) or a snapshot of now, into a new spreadsheet in the user's Drive. Nothing leaves the phone before the user taps Export ([ADR-0007](../adr/0007-export-to-google-sheets.md)).
 - Import: from an exported JSON only. No CSV broker import in v1.
 - No telemetry in v1. No crash reports sent off-device unless the user opts in on first launch (decision deferred to UX).
 

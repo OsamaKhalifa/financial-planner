@@ -34,10 +34,11 @@ void main() {
     expect(bad, isEmpty);
   });
 
-  test('package:http only in the rate refresher and the AI clients', () {
+  test('package:http only in the rate refresher, AI and Sheets clients', () {
     final bad = violations(
       (p) =>
           p != 'lib/core/assumptions/data/rate_refresher.dart' &&
+          p != 'lib/features/export/data/google_sheets_client.dart' &&
           !p.startsWith('lib/core/ai/'),
       RegExp(r'''(import|export)\s+['"]package:http/'''),
     );
