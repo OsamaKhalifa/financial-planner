@@ -300,7 +300,9 @@ class _RecordSheetState extends ConsumerState<RecordSheet> {
           entries.add(_valueOn(item.id, _asValue(item, after), h));
         }
       case _Tab.moneyOut:
-        final left = parseAmount(_valueLeft.text);
+        // Income never changes the value (Q12), even if a value left was
+        // typed under Sale before switching.
+        final left = _sale ? parseAmount(_valueLeft.text) : null;
         final current =
             calc?.timeline(item.id).recordedValueAt(_date) ?? Decimal.zero;
         final inItemUnit = unit == item.unit ? amount : null;
@@ -626,13 +628,17 @@ class _RecordSheetState extends ConsumerState<RecordSheet> {
             selected: {_sale},
             onSelectionChanged: (s) => setState(() => _sale = s.first),
           ),
-          AmountField(
-            key: const ValueKey('value-left'),
-            controller: _valueLeft,
-            label: l10n.fieldValueLeft,
-            onChanged: (_) => setState(() {}),
-          ),
-          if (left != null && left == Decimal.zero) Text(l10n.closesInvestment),
+          if (_sale) ...[
+            AmountField(
+              key: const ValueKey('value-left'),
+              controller: _valueLeft,
+              label: l10n.fieldValueLeft,
+              onChanged: (_) => setState(() {}),
+            ),
+            if (left != null && left == Decimal.zero)
+              Text(l10n.closesInvestment),
+          ] else
+            Text(l10n.incomeNoValueChange),
         ];
       case _Tab.interest:
         final caseC = item.peCase == PeCase.c;

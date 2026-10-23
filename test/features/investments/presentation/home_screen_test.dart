@@ -1,5 +1,6 @@
 /* Copyright (c) 2026-Present Osama Khalifa. All rights reserved. */
 
+import 'package:decimal/decimal.dart';
 import 'package:financial_planner/core/dates.dart';
 import 'package:financial_planner/core/money/format.dart';
 import 'package:financial_planner/core/reference/markets.dart';
@@ -292,6 +293,386 @@ void main() {
           expect(find.byType(ItemDetailScreen), findsOneWidget);
         },
       );
+      String rowText(WidgetTester tester, String key) =>
+          plain(tester.widget<Text>(find.byKey(ValueKey(key))).data!);
+
+      String pct(String fraction, {bool signed = true}) {
+        final s = formatPercent(
+          Decimal.parse(fraction),
+          locale.languageCode,
+          digits: 0,
+        );
+        return plain(signed ? s : s.replaceAll('+', ''));
+      }
+
+      Investment flat() => Investment(
+        id: 'flat',
+        name: 'شقة مدينتي',
+        type: AssetType.other,
+        intent: Intent.personalUse,
+        unit: egp,
+        startDate: day(2026, 1, 1),
+        zakatRule: ZakatRule.custom,
+        customZakatShare: Decimal.zero,
+        valueCheckSchedule: Schedule.monthly,
+        expectedGrowth: Decimal.parse('0.03'),
+      );
+
+      Investment madinty() => Investment(
+        id: 'mre',
+        name: 'Madinty real estate',
+        type: AssetType.other,
+        intent: Intent.rental,
+        unit: egp,
+        startDate: day(2026, 1, 15),
+        zakatRule: ZakatRule.custom,
+        customZakatShare: Decimal.zero,
+        payoutSchedule: Schedule.quarterly,
+        expectedProfit: Decimal.parse('0.32'),
+      );
+
+      Future<void> seedAc79(Harness h, {bool moved = false}) async {
+        await h.setup(base: usd);
+        if (moved) {
+          await h.rate(usd, egp, '50', day(2026, 1, 15));
+          await h.rate(usd, egp, '55', day(2026, 10, 15));
+        } else {
+          await h.rate(usd, egp, '52', day(2026, 1, 1));
+        }
+        await h.addItem(flat(), [moneyIn('flat', day(2026, 1, 1), '4913500')]);
+        await h.addItem(madinty(), [
+          moneyIn('mre', day(2026, 1, 15), '1000000'),
+          value('mre', day(2026, 10, 15), '1100000'),
+        ]);
+      }
+
+      testScreen(
+        'AC-79: rows show type, own-unit value big, base value small, own-unit return and the estimate line',
+        (tester) async {
+          await pumpScreen(
+            tester,
+            const HomeScreen(),
+            locale: locale,
+            seed: seedAc79,
+          );
+          final l10n = l10nOf(tester);
+          expect(
+            find.descendant(
+              of: find.byKey(const ValueKey('item-flat')),
+              matching: find.text(l10n.typeOther),
+            ),
+            findsOneWidget,
+          );
+          expect(
+            find.descendant(
+              of: find.byKey(const ValueKey('item-mre')),
+              matching: find.text(l10n.typeOther),
+            ),
+            findsOneWidget,
+          );
+          expect(rowText(tester, 'value-own-flat'), '4,913,500.00 EGP');
+          expect(rowText(tester, 'value-base-flat'), '94,490.38 USD');
+          expect(rowText(tester, 'return-flat'), '0.00 %');
+          expect(
+            rowText(tester, 'plan-flat'),
+            plain(l10n.rowPlanGrowth(pct('0.03'))),
+          );
+          expect(rowText(tester, 'value-own-mre'), '1,100,000.00 EGP');
+          expect(rowText(tester, 'value-base-mre'), '21,153.85 USD');
+          expect(rowText(tester, 'return-mre'), '+10.00 %');
+          expect(
+            rowText(tester, 'plan-mre'),
+            plain(l10n.rowPlanProfit(pct('0.32', signed: false))),
+          );
+          for (final id in ['mre', 'flat']) {
+            final big = tester.widget<Text>(
+              find.byKey(ValueKey('value-own-$id')),
+            );
+            final small = tester.widget<Text>(
+              find.byKey(ValueKey('value-base-$id')),
+            );
+            expect(
+              big.style!.fontSize!,
+              greaterThan(small.style!.fontSize!),
+              reason: id,
+            );
+          }
+          expect(
+            tester.getTopLeft(find.byKey(const ValueKey('value-own-mre'))).dy,
+            lessThan(
+              tester
+                  .getTopLeft(find.byKey(const ValueKey('value-base-mre')))
+                  .dy,
+            ),
+          );
+        },
+      );
+
+      testScreen(
+        'AC-79: with 50 then 55 EGP per USD the row shows 20,000.00 USD and the EGP return +10.00 %, not 0.00 %',
+        (tester) async {
+          await pumpScreen(
+            tester,
+            const HomeScreen(),
+            locale: locale,
+            seed: (h) => seedAc79(h, moved: true),
+          );
+          expect(rowText(tester, 'value-own-mre'), '1,100,000.00 EGP');
+          expect(rowText(tester, 'value-base-mre'), '20,000.00 USD');
+          expect(rowText(tester, 'return-mre'), '+10.00 %');
+          expect(
+            find.descendant(
+              of: find.byKey(const ValueKey('item-mre')),
+              matching: textPlain(RegExp(r'^0\.00 %$')),
+            ),
+            findsNothing,
+          );
+        },
+      );
+
+      testScreen(
+        'AC-79: gold at 100 then 110 USD per gram shows grams, 5,500.00 USD and the USD return +10.00 %; type, not grams, on the start side',
+        (tester) async {
+          await pumpScreen(
+            tester,
+            const HomeScreen(),
+            locale: locale,
+            seed: (h) async {
+              await h.setup(base: usd);
+              await h.rate(xauG, usd, '100', day(2026, 1, 1));
+              await h.rate(xauG, usd, '110', day(2026, 10, 16));
+              await h.addItem(
+                item(
+                  'g',
+                  name: 'My gold',
+                  type: AssetType.gold,
+                  unit: xauG,
+                  intent: Intent.longTerm,
+                  rule: ZakatRule.bullion100,
+                  karat: 24,
+                ),
+                [
+                  moneyIn('g', day(2026, 1, 1), '5000', usd),
+                  value('g', day(2026, 1, 1), '50'),
+                ],
+              );
+            },
+          );
+          final l10n = l10nOf(tester);
+          expect(rowText(tester, 'value-own-g'), '50.00 g');
+          expect(rowText(tester, 'value-base-g'), '5,500.00 USD');
+          expect(rowText(tester, 'return-g'), '+10.00 %');
+          expect(
+            find.descendant(
+              of: find.byKey(const ValueKey('item-g')),
+              matching: textPlain(RegExp(r'^0\.00 %$')),
+            ),
+            findsNothing,
+          );
+          expect(
+            find.descendant(
+              of: find.byKey(const ValueKey('item-g')),
+              matching: find.text(l10n.typeGold),
+            ),
+            findsOneWidget,
+          );
+          expect(
+            find.descendant(
+              of: find.byKey(const ValueKey('item-g')),
+              matching: textPlain(RegExp(r'[0-9٠-٩] g$')),
+            ),
+            findsOneWidget,
+          );
+        },
+      );
+
+      testScreen(
+        'AC-79: both estimates on one line; neither → no line; a base-currency item shows its value once',
+        (tester) async {
+          await pumpScreen(
+            tester,
+            const HomeScreen(),
+            locale: locale,
+            seed: (h) async {
+              await h.setup(base: usd);
+              await h.addItem(
+                Investment(
+                  id: 'both',
+                  name: 'Both',
+                  type: AssetType.fund,
+                  intent: Intent.trading,
+                  unit: usd,
+                  startDate: day(2026, 1, 1),
+                  zakatRule: ZakatRule.trading100,
+                  payoutSchedule: Schedule.monthly,
+                  expectedProfit: Decimal.parse('0.32'),
+                  valueCheckSchedule: Schedule.monthly,
+                  expectedGrowth: Decimal.parse('0.03'),
+                ),
+                [moneyIn('both', day(2026, 1, 1), '1000', usd)],
+              );
+              await h.addItem(item('none', unit: usd), [
+                moneyIn('none', day(2026, 1, 1), '1000', usd),
+              ]);
+            },
+          );
+          final l10n = l10nOf(tester);
+          expect(
+            rowText(tester, 'plan-both'),
+            plain(l10n.rowPlanBoth(pct('0.32', signed: false), pct('0.03'))),
+          );
+          expect(find.byKey(const ValueKey('plan-none')), findsNothing);
+          expect(find.byKey(const ValueKey('value-base-both')), findsNothing);
+          expect(
+            find.descendant(
+              of: find.byKey(const ValueKey('item-both')),
+              matching: textPlain('1,000.00 USD'),
+            ),
+            findsOneWidget,
+          );
+        },
+      );
+
+      testScreen(
+        'AC-79: on a 320 pt screen both estimates split into two lines and nothing overflows',
+        (tester) async {
+          await pumpScreen(
+            tester,
+            const HomeScreen(),
+            locale: locale,
+            seed: (h) async {
+              await h.setup();
+              await h.addItem(
+                Investment(
+                  id: 'both',
+                  name: 'شقة مدينتي',
+                  type: AssetType.other,
+                  intent: Intent.personalUse,
+                  unit: egp,
+                  startDate: day(2026, 1, 1),
+                  zakatRule: ZakatRule.custom,
+                  customZakatShare: Decimal.zero,
+                  payoutSchedule: Schedule.monthly,
+                  expectedProfit: Decimal.parse('0.32'),
+                  valueCheckSchedule: Schedule.monthly,
+                  expectedGrowth: Decimal.parse('0.03'),
+                ),
+                [moneyIn('both', day(2026, 1, 1), '4913500')],
+              );
+            },
+          );
+          tester.view.physicalSize = const Size(320, 2400);
+          await tester.pumpAndSettle();
+          final l10n = l10nOf(tester);
+          expect(tester.takeException(), isNull);
+          expect(
+            rowText(tester, 'plan-both'),
+            plain(l10n.rowPlanProfit(pct('0.32', signed: false))),
+          );
+          expect(
+            rowText(tester, 'plan2-both'),
+            plain(l10n.rowPlanGrowthOnly(pct('0.03'))),
+          );
+          expect(rowText(tester, 'value-own-both'), '4,913,500.00 EGP');
+        },
+      );
+
+      testScreen(
+        'AC-79: at text scale 1.3 the end column moves under the start column',
+        (tester) async {
+          await pumpScreen(
+            tester,
+            MediaQuery(
+              data: const MediaQueryData(textScaler: TextScaler.linear(1.3)),
+              child: const HomeScreen(),
+            ),
+            locale: locale,
+            seed: seedAc79,
+          );
+          expect(tester.takeException(), isNull);
+          final type = find.descendant(
+            of: find.byKey(const ValueKey('item-mre')),
+            matching: find.text(l10nOf(tester).typeOther),
+          );
+          expect(
+            tester.getTopLeft(find.byKey(const ValueKey('value-own-mre'))).dy,
+            greaterThan(tester.getBottomLeft(type).dy),
+          );
+        },
+      );
+
+      testScreen(
+        'AC-79: VoiceOver reads name, type, values, return, estimate, then status and pill',
+        (tester) async {
+          final handle = tester.ensureSemantics();
+          await pumpScreen(
+            tester,
+            const HomeScreen(),
+            locale: locale,
+            now: day(2026, 2, 5),
+            seed: (h) async {
+              await h.setup(base: usd);
+              await h.rate(usd, egp, '52', day(2026, 1, 1));
+              await h.addItem(flat(), [
+                moneyIn('flat', day(2026, 1, 1), '4913500'),
+              ]);
+            },
+          );
+          final l10n = l10nOf(tester);
+          final label = plain(
+            tester.getSemantics(find.byKey(const ValueKey('item-flat'))).label,
+          );
+          final order = [
+            'شقة مدينتي',
+            l10n.typeOther,
+            '4,913,500.00 EGP',
+            '94,490.38 USD',
+            '${l10n.sortReturn}: 0.00 %',
+            plain(l10n.rowPlanGrowth(pct('0.03'))),
+            l10n.toConfirmPill(1),
+          ];
+          var at = -1;
+          for (final part in order) {
+            final i = label.indexOf(part);
+            expect(i, greaterThan(at), reason: '$part in $label');
+            at = i;
+          }
+          handle.dispose();
+        },
+      );
+
+      testScreen('AC-79: sort by Return uses the return shown on the row', (
+        tester,
+      ) async {
+        await pumpScreen(
+          tester,
+          const HomeScreen(),
+          locale: locale,
+          seed: (h) async {
+            await h.setup(base: usd);
+            await h.rate(usd, egp, '50', day(2026, 1, 15));
+            await h.rate(usd, egp, '55', day(2026, 10, 15));
+            await h.addItem(madinty(), [
+              moneyIn('mre', day(2026, 1, 15), '1000000'),
+              value('mre', day(2026, 10, 15), '1100000'),
+            ]);
+            await h.addItem(item('u', name: 'USD fund', unit: usd), [
+              moneyIn('u', day(2026, 1, 15), '1000', usd),
+              value('u', day(2026, 10, 15), '1050'),
+            ]);
+          },
+        );
+        final l10n = l10nOf(tester);
+        await tester.tap(find.byKey(const ValueKey('sort')));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text(l10n.sortReturn).last);
+        await tester.pumpAndSettle();
+        expect(
+          tester.getTopLeft(find.text('Madinty real estate')).dy,
+          lessThan(tester.getTopLeft(find.text('USD fund')).dy),
+        );
+      });
+
       testScreen(
         'AC-51, AC-75: rows show "3 to confirm" and "2 to confirm" (5 in all); after Confirm all on the project only "2"',
         (tester) async {

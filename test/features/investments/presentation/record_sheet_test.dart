@@ -1,11 +1,13 @@
 /* Copyright (c) 2026-Present Osama Khalifa. All rights reserved. */
 
 import 'package:decimal/decimal.dart';
+import 'package:financial_planner/core/assumptions/domain/rate_book.dart';
 import 'package:financial_planner/core/dates.dart';
 import 'package:financial_planner/core/reference/units.dart';
 import 'package:financial_planner/features/investments/domain/expected_plan.dart';
 import 'package:financial_planner/features/investments/domain/history_entry.dart';
 import 'package:financial_planner/features/investments/domain/investment.dart';
+import 'package:financial_planner/features/investments/domain/item_timeline.dart';
 import 'package:financial_planner/features/investments/presentation/record_sheet.dart';
 import 'package:financial_planner/features/investments/presentation/widgets/fields.dart';
 import 'package:flutter/material.dart' hide Intent;
@@ -372,6 +374,67 @@ void main() {
           MoneyOutKind.income,
         );
       });
+
+      testScreen(
+        'AC-78: "Value left" is offered only for a sale; income saves one record and no value update',
+        (tester) async {
+          itemId = 'fp';
+          final h = await pumpScreen(
+            tester,
+            const _Opener(),
+            locale: locale,
+            now: day(2026, 4, 15),
+            seed: seedFriend,
+          );
+          final l10n = l10nOf(tester);
+          final valueLeft = find.byKey(const ValueKey('value-left'));
+          await open(tester);
+          await tester.tap(find.text(l10n.tabOut));
+          await tester.pumpAndSettle();
+          expect(valueLeft, findsOneWidget);
+          await tester.enterText(valueLeft, '60000');
+          await tester.pumpAndSettle();
+          await tester.tap(find.text(l10n.kindIncome));
+          await tester.pumpAndSettle();
+          expect(valueLeft, findsNothing);
+          expect(find.text(l10n.incomeNoValueChange), findsOneWidget);
+          await tester.tap(find.text(l10n.kindSale));
+          await tester.pumpAndSettle();
+          expect(
+            tester
+                .widget<TextField>(
+                  find.descendant(
+                    of: valueLeft,
+                    matching: find.byType(TextField),
+                  ),
+                )
+                .controller!
+                .text,
+            '60000',
+          );
+          await tester.tap(find.text(l10n.kindIncome));
+          await tester.pumpAndSettle();
+          await amount(tester, '5000');
+          await saveSheet(tester);
+          final all = await history(tester, h);
+          final added = all.where((e) => e is! MoneyIn).toList();
+          expect(added, hasLength(1));
+          final income = added.single as MoneyOut;
+          expect(
+            (income.kind, income.date, income.amount.amount),
+            (MoneyOutKind.income, day(2026, 4, 15), Decimal.parse('5000')),
+          );
+          late InvestmentWithHistory agg;
+          await tester.runAsync(() async => agg = (await h.items()).single);
+          expect(
+            ItemTimeline(
+              agg,
+              RateBook(const []),
+            ).recordedValueAt(day(2026, 4, 15)),
+            Decimal.parse('100000'),
+          );
+        },
+      );
 
       testScreen(
         'AC-68: income above the value does not ask for the value left',

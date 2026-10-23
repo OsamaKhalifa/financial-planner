@@ -879,6 +879,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get fieldValueLeft => 'القيمة المتبقية';
 
   @override
+  String get incomeNoValueChange => 'الدخل لا يغيّر قيمة الاستثمار.';
+
+  @override
   String get fieldKind => 'النوع';
 
   @override
@@ -1603,6 +1606,24 @@ class AppLocalizationsAr extends AppLocalizations {
       'يُعاد بناء صفوف التأكيد للتواريخ الجديدة. تبقى دفعاتك وقيمك المسجلة كما هي.';
 
   @override
+  String editStartAfterRecord(String date) {
+    return 'لا يمكن أن يكون بعد $date: لهذا الاستثمار سجل في ذلك التاريخ. انقل ذلك السجل أو احذفه أولًا.';
+  }
+
+  @override
+  String editStartMaxDate(String date) {
+    return 'آخر تاريخ مسموح: $date (أقدم سجل آخر لديك).';
+  }
+
+  @override
+  String get editStartMoves =>
+      'تنتقل أول دفعة إلى هذا التاريخ، ويُعاد حساب كل الأشهر الماضية لهذا الاستثمار.';
+
+  @override
+  String get editStartMovesMetal =>
+      'تنتقل أول دفعة وجرامات البداية إلى هذا التاريخ، ويُعاد حساب كل الأشهر الماضية لهذا الاستثمار.';
+
+  @override
   String toConfirmTitle(int count) {
     return 'للتأكيد · $count';
   }
@@ -1793,6 +1814,26 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String toConfirmPill(int count) {
     return '$count للتأكيد';
+  }
+
+  @override
+  String rowPlanProfit(String pct) {
+    return 'تقدير الدفعات $pct سنويًا';
+  }
+
+  @override
+  String rowPlanGrowth(String pct) {
+    return 'تقدير النمو $pct سنويًا';
+  }
+
+  @override
+  String rowPlanBoth(String p, String g) {
+    return 'تقدير: دفعات $p · نمو $g سنويًا';
+  }
+
+  @override
+  String rowPlanGrowthOnly(String pct) {
+    return 'نمو $pct سنويًا';
   }
 
   @override

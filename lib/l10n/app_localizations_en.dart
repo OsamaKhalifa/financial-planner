@@ -879,6 +879,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fieldValueLeft => 'Value left';
 
   @override
+  String get incomeNoValueChange => 'Income does not change the item\'s value.';
+
+  @override
   String get fieldKind => 'Kind';
 
   @override
@@ -1604,6 +1607,24 @@ class AppLocalizationsEn extends AppLocalizations {
       'Rows to confirm are rebuilt for the new dates. Your recorded payouts and values stay.';
 
   @override
+  String editStartAfterRecord(String date) {
+    return 'Can\'t be after $date: this item has a record on that date. Move or delete that record first.';
+  }
+
+  @override
+  String editStartMaxDate(String date) {
+    return 'Latest allowed: $date (your earliest other record).';
+  }
+
+  @override
+  String get editStartMoves =>
+      'Your first money in moves to this date. Every past month for this item is recalculated.';
+
+  @override
+  String get editStartMovesMetal =>
+      'Your first money in and starting grams move to this date. Every past month for this item is recalculated.';
+
+  @override
   String toConfirmTitle(int count) {
     return 'To confirm · $count';
   }
@@ -1795,6 +1816,26 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String toConfirmPill(int count) {
     return '$count to confirm';
+  }
+
+  @override
+  String rowPlanProfit(String pct) {
+    return 'est. payouts $pct/yr';
+  }
+
+  @override
+  String rowPlanGrowth(String pct) {
+    return 'est. growth $pct/yr';
+  }
+
+  @override
+  String rowPlanBoth(String p, String g) {
+    return 'est. payouts $p/yr · growth $g/yr';
+  }
+
+  @override
+  String rowPlanGrowthOnly(String pct) {
+    return 'growth $pct/yr';
   }
 
   @override

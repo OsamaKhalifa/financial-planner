@@ -9,8 +9,12 @@ import 'package:financial_planner/core/dates.dart';
 import 'package:financial_planner/core/money/format.dart';
 import 'package:financial_planner/core/reference/markets.dart';
 import 'package:financial_planner/core/reference/units.dart';
+import 'package:financial_planner/core/assumptions/domain/rate_book.dart';
+import 'package:financial_planner/features/investments/domain/expected_plan.dart';
 import 'package:financial_planner/features/investments/domain/history_entry.dart';
 import 'package:financial_planner/features/investments/domain/investment.dart';
+import 'package:financial_planner/features/investments/domain/item_timeline.dart';
+import 'package:financial_planner/features/investments/presentation/home_screen.dart';
 import 'package:financial_planner/features/investments/presentation/investment_form_screen.dart';
 import 'package:financial_planner/features/investments/presentation/item_detail_screen.dart';
 import 'package:flutter/material.dart' hide Intent;
@@ -753,6 +757,257 @@ void main() {
           final items = await saved(tester, h);
           expect(items.single.investment.name, 'New name');
           expect(items.single.history.length, 2);
+        },
+      );
+
+      Future<(int, int, int)> openStartPicker(WidgetTester tester) async {
+        final f = find.byIcon(Icons.calendar_today).first;
+        await tester.ensureVisible(f);
+        await tester.tap(f);
+        await tester.pumpAndSettle();
+        final last = tester
+            .widget<CalendarDatePicker>(find.byType(CalendarDatePicker))
+            .lastDate;
+        return (last.year, last.month, last.day);
+      }
+
+      Future<void> pickInOpenPicker(
+        WidgetTester tester,
+        int months,
+        String dayOfMonth,
+      ) async {
+        final ml = MaterialLocalizations.of(
+          tester.element(find.byType(Dialog)),
+        );
+        for (var i = 0; i < months; i++) {
+          await tester.tap(find.byTooltip(ml.nextMonthTooltip));
+          await tester.pumpAndSettle();
+        }
+        await tester.tap(find.text(dayOfMonth).hitTestable().first);
+        await tester.tap(find.text(ml.okButtonLabel));
+        await tester.pumpAndSettle();
+      }
+
+      String shown(WidgetTester tester, DateTime d) =>
+          MaterialLocalizations.of(tester.element(find.byType(Scaffold).first))
+              .formatMediumDate(d);
+
+      testScreen(
+        'AC-77: Friend\'s project start 2026-01-15 → 2026-02-10 moves the first money in; rows are 2026-05-10 and 2026-08-10',
+        (tester) async {
+          final h = await pumpScreen(
+            tester,
+            const InvestmentFormScreen(editId: 'fp'),
+            locale: locale,
+            now: day(2026, 10, 17),
+            seed: seedFriend,
+          );
+          final l10n = l10nOf(tester);
+          final before = (await saved(tester, h)).single.history.single.id;
+          expect(find.text(l10n.editStartMoves), findsNothing);
+          expect(await openStartPicker(tester), (2026, 10, 17));
+          await pickInOpenPicker(tester, 1, '10');
+          expect(find.text(l10n.editStartMoves), findsOneWidget);
+          expect(find.text(l10n.editRowsRebuilt), findsOneWidget);
+          expect(
+            textPlain(plain(l10n.editStartMaxDate('§').split('§').first)),
+            findsNothing,
+          );
+          await save(tester);
+          expect(find.byType(AlertDialog), findsNothing);
+          final after = (await saved(tester, h)).single;
+          expect(after.investment.startDate, day(2026, 2, 10));
+          final paid = after.history.single as MoneyIn;
+          expect((paid.id, paid.date), (before, day(2026, 2, 10)));
+          final plan = expectedVsActual(
+            ItemTimeline(after, RateBook(const [])),
+            day(2026, 10, 17),
+          )!;
+          final rows = plan.pendingRows.toList()
+            ..sort((a, b) => a.date.compareTo(b.date));
+          expect(
+            [for (final r in rows) (r.date, r.expected)],
+            [
+              (day(2026, 5, 10), Decimal.parse('5000')),
+              (day(2026, 8, 10), Decimal.parse('5000')),
+            ],
+          );
+          expect(plan.expectedSoFar, Decimal.parse('10000'));
+        },
+      );
+
+      testScreen(
+        'AC-77: after moving Friend\'s project to 2026-02-10, Home shows "2 to confirm"',
+        (tester) async {
+          await pumpScreen(
+            tester,
+            const HomeScreen(),
+            locale: locale,
+            now: day(2026, 10, 17),
+            seed: seedFriend,
+          );
+          final l10n = l10nOf(tester);
+          expect(find.text(l10n.toConfirmPill(3)), findsOneWidget);
+          unawaited(
+            tester
+                .state<NavigatorState>(find.byType(Navigator).first)
+                .push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => const InvestmentFormScreen(editId: 'fp'),
+                  ),
+                ),
+          );
+          await tester.pumpAndSettle();
+          await openStartPicker(tester);
+          await pickInOpenPicker(tester, 1, '10');
+          await save(tester);
+          expect(find.byType(InvestmentFormScreen), findsNothing);
+          expect(find.text(l10n.toConfirmPill(2)), findsOneWidget);
+        },
+      );
+
+      testScreen(
+        'AC-77: moving the start and changing the plan says "Rows to confirm are rebuilt" once',
+        (tester) async {
+          await pumpScreen(
+            tester,
+            const InvestmentFormScreen(editId: 'fp'),
+            locale: locale,
+            now: day(2026, 10, 17),
+            seed: seedFriend,
+          );
+          final l10n = l10nOf(tester);
+          await type(tester, field(l10n.fieldExpectedProfit), '25');
+          expect(find.text(l10n.editRowsRebuilt), findsOneWidget);
+          await openStartPicker(tester);
+          await pickInOpenPicker(tester, 1, '10');
+          expect(find.text(l10n.editStartMoves), findsOneWidget);
+          expect(find.text(l10n.editRowsRebuilt), findsOneWidget);
+        },
+      );
+
+      testScreen(
+        'AC-77: with income on 2026-04-20 the picker stops at 2026-04-20, names it, and that date saves',
+        (tester) async {
+          final h = await pumpScreen(
+            tester,
+            const InvestmentFormScreen(editId: 'fp'),
+            locale: locale,
+            now: day(2026, 10, 17),
+            seed: (h) => seedFriend(
+              h,
+              more: [
+                moneyOut(
+                  'fp',
+                  day(2026, 4, 20),
+                  '5000',
+                  kind: MoneyOutKind.income,
+                ),
+                moneyOut(
+                  'fp',
+                  day(2026, 7, 14),
+                  '10000',
+                  kind: MoneyOutKind.income,
+                ),
+              ],
+            ),
+          );
+          final l10n = l10nOf(tester);
+          expect(
+            textPlain(
+              plain(l10n.editStartMaxDate(shown(tester, day(2026, 4, 20)))),
+            ),
+            findsOneWidget,
+          );
+          expect(await openStartPicker(tester), (2026, 4, 20));
+          await pickInOpenPicker(tester, 3, '20');
+          await save(tester);
+          final after = (await saved(tester, h)).single;
+          expect(after.investment.startDate, day(2026, 4, 20));
+          expect(
+            after.history.whereType<MoneyIn>().single.date,
+            day(2026, 4, 20),
+          );
+          expect(
+            after.history.whereType<MoneyOut>().map((e) => e.date).toSet(),
+            {day(2026, 4, 20), day(2026, 7, 14)},
+          );
+        },
+      );
+
+      testScreen(
+        'AC-77: a gold item with a value update on 2026-08-01 stops the picker on 2026-07-31',
+        (tester) async {
+          await pumpScreen(
+            tester,
+            const InvestmentFormScreen(editId: 'g'),
+            locale: locale,
+            now: day(2026, 10, 17),
+            seed: (h) async {
+              await h.setup();
+              await h.addItem(
+                item(
+                  'g',
+                  type: AssetType.gold,
+                  unit: xauG,
+                  start: day(2026, 3, 1),
+                  intent: Intent.longTerm,
+                  rule: ZakatRule.bullion100,
+                  karat: 24,
+                ),
+                [
+                  moneyIn('g', day(2026, 3, 1), '50000'),
+                  value('g', day(2026, 3, 1), '10'),
+                  value('g', day(2026, 8, 1), '10'),
+                ],
+              );
+            },
+          );
+          expect(await openStartPicker(tester), (2026, 7, 31));
+        },
+      );
+
+      testScreen(
+        'AC-77: a gold item\'s first money in and start grams both move to 2026-02-01',
+        (tester) async {
+          final h = await pumpScreen(
+            tester,
+            const InvestmentFormScreen(editId: 'g'),
+            locale: locale,
+            now: day(2026, 10, 17),
+            seed: (h) async {
+              await h.setup();
+              await h.addItem(
+                item(
+                  'g',
+                  type: AssetType.gold,
+                  unit: xauG,
+                  start: day(2026, 3, 1),
+                  intent: Intent.longTerm,
+                  rule: ZakatRule.bullion100,
+                  karat: 24,
+                ),
+                [
+                  moneyIn('g', day(2026, 3, 1), '50000'),
+                  value('g', day(2026, 3, 1), '10'),
+                ],
+              );
+            },
+          );
+          final l10n = l10nOf(tester);
+          await openStartPicker(tester);
+          final ml = MaterialLocalizations.of(
+            tester.element(find.byType(Dialog)),
+          );
+          await tester.tap(find.byTooltip(ml.previousMonthTooltip));
+          await tester.pumpAndSettle();
+          await pickInOpenPicker(tester, 0, '1');
+          expect(find.text(l10n.editStartMovesMetal), findsOneWidget);
+          await save(tester);
+          final after = (await saved(tester, h)).single;
+          expect(after.investment.startDate, day(2026, 2, 1));
+          expect(after.history.map((e) => e.date).toSet(), {day(2026, 2, 1)});
+          expect(after.history.length, 2);
         },
       );
       Future<void> peBasics(WidgetTester tester, String name) async {

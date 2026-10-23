@@ -6,6 +6,7 @@ import 'package:financial_planner/core/dates.dart';
 import 'package:financial_planner/core/money/money.dart';
 import 'package:financial_planner/core/reference/markets.dart';
 import 'package:financial_planner/core/reference/units.dart';
+import 'package:financial_planner/features/investments/domain/history_entry.dart';
 import 'package:financial_planner/features/investments/domain/investment.dart';
 import 'package:financial_planner/features/investments/domain/investment_draft.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -249,5 +250,84 @@ void main() {
       isEmpty,
     );
     expect(check(draft(AssetType.cashDeposit)), isEmpty);
+  });
+
+  group('AC-77 moving the start date', () {
+    Investment held(AssetType type, Unit unit) => Investment(
+      id: 'a',
+      name: 'A',
+      type: type,
+      intent: Intent.longTerm,
+      unit: unit,
+      startDate: day(2026, 7, 1),
+      zakatRule: ZakatRule.bullion100,
+    );
+    MoneyIn paid(DateTime on) => MoneyIn(
+      investmentId: 'a',
+      date: on,
+      amount: Money(Decimal.parse('100'), egp),
+    );
+    ValueUpdate worth(DateTime on) =>
+        ValueUpdate(investmentId: 'a', date: on, value: Decimal.parse('5'));
+
+    test('AC-77 the first money in moves; for metals its value update too', () {
+      final first = paid(day(2026, 7, 1));
+      final second = paid(day(2026, 7, 1));
+      final v = worth(day(2026, 7, 1));
+      final history = [first, second, v, paid(day(2026, 8, 1))];
+      final fund = held(AssetType.fund, egp);
+      expect(startRecords(fund, history).length, 1);
+      expect(startRecords(fund, history).single, first);
+      final gold = held(AssetType.gold, Unit.xauG);
+      expect(startRecords(gold, history).whereType<MoneyIn>().length, 1);
+      expect(startRecords(gold, history).whereType<ValueUpdate>().single, v);
+      final moved = startRecordsMovedTo(gold, history, day(2026, 1, 1));
+      expect(moved.map((e) => e.date).toSet(), {day(2026, 1, 1)});
+      expect(
+        moved.map((e) => e.id).toSet(),
+        startRecords(gold, history).map((e) => e.id).toSet(),
+      );
+    });
+
+    test('AC-77 the start may not pass the earliest record that stays', () {
+      final fund = held(AssetType.fund, egp);
+      final history = [
+        paid(day(2026, 7, 1)),
+        worth(day(2026, 8, 1)),
+        paid(day(2026, 9, 1)),
+      ];
+      final limit = startLimit(fund, history)!;
+      expect((limit.latest, limit.record), (day(2026, 8, 1), day(2026, 8, 1)));
+      expect(startLimit(fund, [paid(day(2026, 7, 1))]), isNull);
+      InvestmentDraft at(DateTime on) => InvestmentDraft(
+        name: 'A',
+        type: AssetType.sukuk,
+        unit: egp,
+        startDate: on,
+        firstPaid: Money(Decimal.parse('100'), egp),
+      );
+      List<DraftError> check(DateTime on) => validate(
+        at(on),
+        today: today,
+        settings: setup,
+        latestStart: day(2026, 8, 1),
+      );
+      expect(check(day(2026, 8, 1)), isEmpty);
+      expect(check(day(2026, 1, 1)), isEmpty);
+      expect(check(day(2026, 8, 2)), [DraftError.startAfterRecord]);
+      expect(check(day(2026, 10, 17)), [DraftError.futureDate]);
+    });
+
+    test('AC-77 metals: the start value update may not land on a kept value update day', () {
+      final gold = held(AssetType.gold, Unit.xauG);
+      final history = [
+        paid(day(2026, 7, 1)),
+        worth(day(2026, 7, 1)),
+        worth(day(2026, 8, 1)),
+        paid(day(2026, 9, 1)),
+      ];
+      final limit = startLimit(gold, history)!;
+      expect((limit.latest, limit.record), (day(2026, 7, 31), day(2026, 8, 1)));
+    });
   });
 }

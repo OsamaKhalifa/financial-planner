@@ -1466,6 +1466,12 @@ abstract class AppLocalizations {
   /// **'Value left'**
   String get fieldValueLeft;
 
+  /// No description provided for @incomeNoValueChange.
+  ///
+  /// In en, this message translates to:
+  /// **'Income does not change the item\'s value.'**
+  String get incomeNoValueChange;
+
   /// No description provided for @fieldKind.
   ///
   /// In en, this message translates to:
@@ -2614,6 +2620,30 @@ abstract class AppLocalizations {
   /// **'Rows to confirm are rebuilt for the new dates. Your recorded payouts and values stay.'**
   String get editRowsRebuilt;
 
+  /// No description provided for @editStartAfterRecord.
+  ///
+  /// In en, this message translates to:
+  /// **'Can\'t be after {date}: this item has a record on that date. Move or delete that record first.'**
+  String editStartAfterRecord(String date);
+
+  /// No description provided for @editStartMaxDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest allowed: {date} (your earliest other record).'**
+  String editStartMaxDate(String date);
+
+  /// No description provided for @editStartMoves.
+  ///
+  /// In en, this message translates to:
+  /// **'Your first money in moves to this date. Every past month for this item is recalculated.'**
+  String get editStartMoves;
+
+  /// No description provided for @editStartMovesMetal.
+  ///
+  /// In en, this message translates to:
+  /// **'Your first money in and starting grams move to this date. Every past month for this item is recalculated.'**
+  String get editStartMovesMetal;
+
   /// No description provided for @toConfirmTitle.
   ///
   /// In en, this message translates to:
@@ -2900,6 +2930,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count} to confirm'**
   String toConfirmPill(int count);
+
+  /// No description provided for @rowPlanProfit.
+  ///
+  /// In en, this message translates to:
+  /// **'est. payouts {pct}/yr'**
+  String rowPlanProfit(String pct);
+
+  /// No description provided for @rowPlanGrowth.
+  ///
+  /// In en, this message translates to:
+  /// **'est. growth {pct}/yr'**
+  String rowPlanGrowth(String pct);
+
+  /// No description provided for @rowPlanBoth.
+  ///
+  /// In en, this message translates to:
+  /// **'est. payouts {p}/yr · growth {g}/yr'**
+  String rowPlanBoth(String p, String g);
+
+  /// No description provided for @rowPlanGrowthOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'growth {pct}/yr'**
+  String rowPlanGrowthOnly(String pct);
 
   /// No description provided for @expectedHeader.
   ///

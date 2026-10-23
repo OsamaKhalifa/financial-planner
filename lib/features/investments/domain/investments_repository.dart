@@ -12,8 +12,9 @@ abstract interface class InvestmentsRepository {
   /// One transaction: the item and its first entries.
   Future<void> create(Investment item, List<HistoryEntry> initial);
 
-  /// Throws [NotFound] for an unknown id.
-  Future<void> update(Investment item);
+  /// One transaction: the item and [entries] (insert or replace by id, as
+  /// [saveEntries]). Throws [NotFound] for an unknown id.
+  Future<void> update(Investment item, {List<HistoryEntry> entries = const []});
 
   /// Deletes the item and its whole history. Throws [NotFound].
   Future<void> delete(String id);

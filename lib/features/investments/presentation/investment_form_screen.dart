@@ -75,6 +75,7 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
   Country? _inflation;
   String? _rateError;
   Investment? _editing;
+  List<HistoryEntry> _history = const [];
   var _dirty = false;
   Schedule? _payoutSchedule;
   Schedule? _valueCheckSchedule;
@@ -341,13 +342,12 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
       _draft(),
       today: today,
       settings: _effectiveSettings,
+      latestStart: _startLimit?.latest,
     ).toSet();
     if (_isEdit) {
       errors.removeAll({
         DraftError.missingFirstPaid,
         DraftError.zeroAmount,
-        DraftError.missingStartDate,
-        DraftError.futureDate,
         DraftError.missingGrams,
       });
     }
@@ -409,6 +409,25 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
     }
   }
 
+  StartLimit? get _startLimit =>
+      _isEdit ? startLimit(_editing!, _history) : null;
+
+  DateTime _startCap(DateTime today) {
+    final latest = _startLimit?.latest;
+    return latest != null && latest.isBefore(today) ? latest : today;
+  }
+
+  List<Widget> _startMoves(BuildContext context, Investment edited) {
+    final l10n = context.l10n;
+    return [
+      Text(
+        edited.unit.isMetal ? l10n.editStartMovesMetal : l10n.editStartMoves,
+      ),
+      if (edited.payoutSchedule != null || edited.valueCheckSchedule != null)
+        Text(l10n.editRowsRebuilt),
+    ];
+  }
+
   Future<String> _persist({Decimal? rate}) async {
     final type = _type!;
     final rule = _rule!;
@@ -427,7 +446,7 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
       market: _market,
       marketCountry: _market == Market.other ? _marketCountry : null,
       unit: _unit!,
-      startDate: _editing?.startDate ?? _start!,
+      startDate: _start!,
       quantity: type == AssetType.gold || type == AssetType.silver
           ? null
           : draft.quantity,
@@ -448,7 +467,13 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
     );
     final repo = ref.read(investmentsRepositoryProvider);
     if (_isEdit) {
-      await repo.update(item);
+      final edited = _editing!;
+      await repo.update(
+        item,
+        entries: edited.startDate == _start
+            ? const []
+            : startRecordsMovedTo(edited, _history, _start!),
+      );
       return id;
     }
     if (rate != null) {
@@ -510,9 +535,11 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
       if (items == null) {
         return const Scaffold(body: Center(child: CircularProgressIndicator()));
       }
-      _loadEdit(
-        items.firstWhere((h) => h.investment.id == widget.editId).investment,
+      final aggregate = items.firstWhere(
+        (h) => h.investment.id == widget.editId,
       );
+      _history = aggregate.history;
+      _loadEdit(aggregate.investment);
     }
     _start ??= today;
     _paidUnit ??= _unit?.isMetal == true ? settings.baseCurrency : _unit;
@@ -608,17 +635,28 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
                 type == AssetType.sukuk)
               ..._marketFields(context, type!),
             if (type != null && !isMetal) _unitField(context),
-            if (!_isEdit)
-              DateField(
-                label: l10n.fieldStartDate,
-                value: _start!,
-                lastDate: today,
-                error: err({
-                  DraftError.missingStartDate,
-                  DraftError.futureDate,
-                }, l10n.errFuture),
-                onChanged: (d) => _touch(() => _start = d),
-              ),
+            DateField(
+              label: l10n.fieldStartDate,
+              value: _start!,
+              lastDate: _startCap(today),
+              helper: _startCap(today).isBefore(today)
+                  ? l10n.editStartMaxDate(context.date(_startCap(today)))
+                  : null,
+              error:
+                  err(
+                    {DraftError.startAfterRecord},
+                    l10n.editStartAfterRecord(
+                      context.date(_startLimit?.record ?? today),
+                    ),
+                  ) ??
+                  err({
+                    DraftError.missingStartDate,
+                    DraftError.futureDate,
+                  }, l10n.errFuture),
+              onChanged: (d) => _touch(() => _start = d),
+            ),
+            if (_isEdit && _start != _editing!.startDate)
+              ..._startMoves(context, _editing!),
             if (!_isEdit && type != null)
               ..._moneyFields(context, type, isMetal),
             if (type != null && !isMetal)
@@ -1627,7 +1665,9 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
             ),
           ),
         if (answersChanged) Text(l10n.editRecalculates),
-        if (planChanged) Text(l10n.editRowsRebuilt),
+        // Under the start date instead when the start moved (UX 2.3).
+        if (planChanged && _start == edited.startDate)
+          Text(l10n.editRowsRebuilt),
       ],
     );
   }
