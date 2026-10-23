@@ -296,8 +296,9 @@ void main() {
         worth(day(2026, 8, 1)),
         paid(day(2026, 9, 1)),
       ];
-      expect(latestStart(fund, history), day(2026, 8, 1));
-      expect(latestStart(fund, [paid(day(2026, 7, 1))]), isNull);
+      final limit = startLimit(fund, history)!;
+      expect((limit.latest, limit.record), (day(2026, 8, 1), day(2026, 8, 1)));
+      expect(startLimit(fund, [paid(day(2026, 7, 1))]), isNull);
       InvestmentDraft at(DateTime on) => InvestmentDraft(
         name: 'A',
         type: AssetType.sukuk,
@@ -315,6 +316,18 @@ void main() {
       expect(check(day(2026, 1, 1)), isEmpty);
       expect(check(day(2026, 8, 2)), [DraftError.startAfterRecord]);
       expect(check(day(2026, 10, 17)), [DraftError.futureDate]);
+    });
+
+    test('AC-77 metals: the start value update may not land on a kept value update day', () {
+      final gold = held(AssetType.gold, Unit.xauG);
+      final history = [
+        paid(day(2026, 7, 1)),
+        worth(day(2026, 7, 1)),
+        worth(day(2026, 8, 1)),
+        paid(day(2026, 9, 1)),
+      ];
+      final limit = startLimit(gold, history)!;
+      expect((limit.latest, limit.record), (day(2026, 7, 31), day(2026, 8, 1)));
     });
   });
 }

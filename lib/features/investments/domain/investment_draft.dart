@@ -181,13 +181,30 @@ List<HistoryEntry> startRecordsMovedTo(
   ];
 }
 
-/// AC-77: the start may not pass a record that stays where it is.
-DateTime? latestStart(Investment item, List<HistoryEntry> history) {
+/// AC-77: how late the start may move. [record] is the kept record that
+/// sets the limit; [latest] is the last allowed start date.
+final class StartLimit {
+  const StartLimit({required this.latest, required this.record});
+
+  final DateTime latest;
+  final DateTime record;
+}
+
+/// The start may not pass a record that stays where it is. For metals the
+/// start value update moves too, and one item has one value update a day, so
+/// a kept value update ends the range the day before it.
+StartLimit? startLimit(Investment item, List<HistoryEntry> history) {
   final moving = startRecords(item, history).toSet();
-  return history
-      .where((e) => !moving.contains(e))
-      .map((e) => e.date)
-      .fold<DateTime?>(null, (a, b) => a == null || b.isBefore(a) ? b : a);
+  StartLimit? best;
+  for (final e in history.where((e) => !moving.contains(e))) {
+    final latest = item.unit.isMetal && e is ValueUpdate
+        ? e.date.subtract(const Duration(days: 1))
+        : e.date;
+    if (best == null || latest.isBefore(best.latest)) {
+      best = StartLimit(latest: latest, record: e.date);
+    }
+  }
+  return best;
 }
 
 void _checkFirstPaid(InvestmentDraft d, List<DraftError> errors) {

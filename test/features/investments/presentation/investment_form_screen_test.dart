@@ -905,6 +905,38 @@ void main() {
       );
 
       testScreen(
+        'AC-77: a gold item with a value update on 2026-08-01 stops the picker on 2026-07-31',
+        (tester) async {
+          await pumpScreen(
+            tester,
+            const InvestmentFormScreen(editId: 'g'),
+            locale: locale,
+            now: day(2026, 10, 17),
+            seed: (h) async {
+              await h.setup();
+              await h.addItem(
+                item(
+                  'g',
+                  type: AssetType.gold,
+                  unit: xauG,
+                  start: day(2026, 3, 1),
+                  intent: Intent.longTerm,
+                  rule: ZakatRule.bullion100,
+                  karat: 24,
+                ),
+                [
+                  moneyIn('g', day(2026, 3, 1), '50000'),
+                  value('g', day(2026, 3, 1), '10'),
+                  value('g', day(2026, 8, 1), '10'),
+                ],
+              );
+            },
+          );
+          expect(await openStartPicker(tester), (2026, 7, 31));
+        },
+      );
+
+      testScreen(
         'AC-77: a gold item\'s first money in and start grams both move to 2026-02-01',
         (tester) async {
           final h = await pumpScreen(

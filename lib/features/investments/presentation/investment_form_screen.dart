@@ -342,7 +342,7 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
       _draft(),
       today: today,
       settings: _effectiveSettings,
-      latestStart: _latestStart,
+      latestStart: _startLimit?.latest,
     ).toSet();
     if (_isEdit) {
       errors.removeAll({
@@ -409,11 +409,11 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
     }
   }
 
-  DateTime? get _latestStart =>
-      _isEdit ? latestStart(_editing!, _history) : null;
+  StartLimit? get _startLimit =>
+      _isEdit ? startLimit(_editing!, _history) : null;
 
   DateTime _startCap(DateTime today) {
-    final latest = _latestStart;
+    final latest = _startLimit?.latest;
     return latest != null && latest.isBefore(today) ? latest : today;
   }
 
@@ -646,7 +646,7 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
                   err(
                     {DraftError.startAfterRecord},
                     l10n.editStartAfterRecord(
-                      context.date(_latestStart ?? today),
+                      context.date(_startLimit?.record ?? today),
                     ),
                   ) ??
                   err({
