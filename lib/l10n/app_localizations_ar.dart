@@ -1388,4 +1388,422 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get src_B7 =>
       'معاش تقاعدي بقيود على السحب: لا زكاة حتى يمكن الوصول إليه (د. مين القضاة، فتوى أمجا 21964)؛ أو الزكاة على المبلغ المتاح بعد الغرامة والضريبة (مجلس الفقه لأمريكا الشمالية — المصدر لم يُتحقق منه بعد)؛ أو الرصيد كاملًا احتياطًا (B7).';
+
+  @override
+  String get typePrivateEquity => 'ملكية خاصة';
+
+  @override
+  String get typePrivateEquityHint =>
+      'حصة في نشاط تجاري غير مدرج في سوق — مثل مشروع صديق.';
+
+  @override
+  String get fieldSharesInProject => 'حصص في المشروع (اختياري)';
+
+  @override
+  String get peIntentTrading => 'للبيع';
+
+  @override
+  String get peIntentLongTerm => 'طويل الأجل (لأجل ربحه)';
+
+  @override
+  String get zakatPeTrading =>
+      'الزكاة: على 100 ٪ من القيمة. تحتفظ بها للبيع. — قرار المجمع 28 (3/4) §3.';
+
+  @override
+  String get peMethodKnown => 'نسبة زكوية معروفة';
+
+  @override
+  String get peMethodKnownSource => 'قرار المجمع 121 (3/13) §1';
+
+  @override
+  String get peMethodProfit => 'الزكاة على الربح المستلم فقط';
+
+  @override
+  String get peMethodFull => 'القيمة كاملة';
+
+  @override
+  String get peMethodFullNote => 'احتياطًا.';
+
+  @override
+  String get peMethodPick => 'اختر طريقة حساب الزكاة';
+
+  @override
+  String get peMethodsHelp =>
+      'إذا كان المشروع يشتري البضائع ويبيعها في الغالب، فمعظم قيمته زكوية عادةً.';
+
+  @override
+  String noticeProfitPayoutsOnly(String rate) {
+    return 'الزكاة: $rate من كل دفعة ربح تسجلها، لا من قيمة المشروع. تُحسب كل دفعة مرة واحدة.';
+  }
+
+  @override
+  String get noticeCapitalBackIsDebt =>
+      'هذا مثل مال أقرضته. الزكاة على المبلغ كاملًا، كدين لك. — قرار المجمع 1 (1/2).';
+
+  @override
+  String get zakatCaseC => 'الزكاة على 100 ٪.';
+
+  @override
+  String get q2CapitalBack => 'إذا خسر المشروع، هل يعود إليك مالك كله رغم ذلك؟';
+
+  @override
+  String get answerNo => 'لا';
+
+  @override
+  String get answerYes => 'نعم';
+
+  @override
+  String get answerNotSure => 'لست متأكدًا';
+
+  @override
+  String get q1ProfitBasis =>
+      'هل هذه النسبة حصة من الربح الفعلي للمشروع، أم نسبة ثابتة من المال الذي وضعته؟';
+
+  @override
+  String get q1Share => 'حصة من الربح الفعلي';
+
+  @override
+  String get q1Fixed => 'نسبة ثابتة من مالي';
+
+  @override
+  String get errPickOne => 'اختر إجابة. «لست متأكدًا» مقبولة.';
+
+  @override
+  String get noticeCaseB =>
+      'النسبة الثابتة من المال الذي وضعته ليست حصة ربح صحيحة. في الشراكة يجب أن يكون ربحك جزءًا من الربح الفعلي للمشروع. قد ترغب في تغيير الشروط مع شريكك.';
+
+  @override
+  String get noticeCaseC =>
+      'يعود إليك مالك حتى لو خسر المشروع. هذا مثل القرض. والزيادة على القرض ربا. يعرض التطبيق هذه الدفعات «للتطهير»، لا ربحًا.';
+
+  @override
+  String get noticeCaseNotSure =>
+      'اسأل شريكك سؤالين: هل ربحك جزء من الربح الفعلي؟ هل يمكن أن تخسر مالك؟ الإجابتان تحددان هل هذه شراكة أم قرض.';
+
+  @override
+  String get srcCaseB =>
+      'قرار المجمع 30 (5/4) البند 4: لا ضمان لرأس المال ولا لربح مقطوع، وهذا الشرط باطل. المعيار الشرعي 13 لأيوفي §8/1 — لم يُتحقق منه بعد (B6.1).';
+
+  @override
+  String get srcCaseC =>
+      'قرار المجمع 10 (10/2): الزيادة على القرض المشروطة في بدايته ربا. سورة البقرة 2:279 (B6.1).';
+
+  @override
+  String get srcCaseNotSure =>
+      'قرار المجمع 30 (5/4): الربح في الشراكة حصة من الربح الفعلي (B6.1).';
+
+  @override
+  String get caseBTagPreview =>
+      'سيُوسم هذا الاستثمار بـ«مخاطرة شرعية». تبقى الدفعات محسوبة عائدًا. · المصدر لم يُتحقق منه بعد';
+
+  @override
+  String get accountKindQuestion =>
+      'هل هذا حساب إسلامي (حصة من الربح) أم حساب تقليدي (فائدة)؟';
+
+  @override
+  String get accountIslamic => 'حساب إسلامي (حصة من الربح)';
+
+  @override
+  String get accountConventional => 'حساب تقليدي (فائدة)';
+
+  @override
+  String get errPickAccountKind => 'اختر نوع الحساب';
+
+  @override
+  String get noticeConventional =>
+      'هذه فائدة. سجّلها مالًا خارجًا «فائدة (للتطهير)»، لا دخلًا.';
+
+  @override
+  String get expectedTitle => 'المتوقع (اختياري)';
+
+  @override
+  String get expectedSubtitle =>
+      'خطّط للدفعات أو لمراجعات القيمة. تقدير، لا وعد.';
+
+  @override
+  String get blockPayouts => 'الدفعات';
+
+  @override
+  String get blockValueChecks => 'مراجعات القيمة';
+
+  @override
+  String get fieldPayoutSchedule => 'جدول الدفعات';
+
+  @override
+  String get fieldValueCheckSchedule => 'جدول مراجعة القيمة';
+
+  @override
+  String get scheduleNone => 'بدون';
+
+  @override
+  String get scheduleMonthly => 'شهريًا';
+
+  @override
+  String get scheduleQuarterly => 'كل 3 أشهر';
+
+  @override
+  String get scheduleHalfYearly => 'كل 6 أشهر';
+
+  @override
+  String get scheduleYearly => 'سنويًا';
+
+  @override
+  String get fieldExpectedProfit => 'الربح المتوقع (تقديرك، ٪ سنويًا)';
+
+  @override
+  String get fieldExpectedGrowth => 'نمو القيمة المتوقع (تقديرك، ٪ سنويًا)';
+
+  @override
+  String get estimateHelp =>
+      'تقدير، لا وعد. لا يُستخدم في الزكاة ولا في العائد.';
+
+  @override
+  String payoutPreview(String amount, int months, String date) {
+    String _temp0 = intl.Intl.pluralLogic(
+      months,
+      locale: localeName,
+      other: '$months شهرًا',
+      few: '$months أشهر',
+      two: 'شهرين',
+      one: 'شهر',
+    );
+    return '= $amount كل $_temp0 · أول دفعة في $date';
+  }
+
+  @override
+  String growthPreview(String date, String amount) {
+    return 'تقديرك في $date: $amount (إن لم يُضف شيء أو يُسحب).';
+  }
+
+  @override
+  String get errPickPayoutSchedule => 'اختر جدول دفعات، أو امسح هذه النسبة.';
+
+  @override
+  String get errPickValueSchedule =>
+      'اختر جدول مراجعة القيمة، أو امسح هذه النسبة.';
+
+  @override
+  String get errProfitPositive =>
+      'يجب أن تكون أكبر من 0. اتركها فارغة إن لم توجد نسبة.';
+
+  @override
+  String get errGrowthTooLow => 'يجب أن تكون أكبر من −100 ٪.';
+
+  @override
+  String needsRateForEstimates(String pair, String date) {
+    return 'يلزم سعر $pair في $date لعرض تقديراتك';
+  }
+
+  @override
+  String get editRecalculates =>
+      'سيُعاد حساب كل الأشهر الماضية لهذا الاستثمار.';
+
+  @override
+  String get editRowsRebuilt =>
+      'يُعاد بناء صفوف التأكيد للتواريخ الجديدة. تبقى دفعاتك وقيمك المسجلة كما هي.';
+
+  @override
+  String toConfirmTitle(int count) {
+    return 'للتأكيد · $count';
+  }
+
+  @override
+  String get confirmAll => 'تأكيد الكل كما هو متوقع';
+
+  @override
+  String get confirmAllLine => 'أكّد فقط المال الذي وصل فعلًا.';
+
+  @override
+  String get rowPayout => 'دفعة متوقعة (لم تُستلم بعد)';
+
+  @override
+  String get rowPayoutPurify => 'دفعة متوقعة (للتطهير عند استلامها)';
+
+  @override
+  String get rowInterest => 'فائدة متوقعة (للتطهير)';
+
+  @override
+  String get rowValue => 'مراجعة القيمة';
+
+  @override
+  String get receivedThisAmount => 'استلمت هذا المبلغ';
+
+  @override
+  String get addAmount => 'أضف المبلغ';
+
+  @override
+  String get skipRow => 'تخطٍّ';
+
+  @override
+  String noPayoutLine(String from, String to, String date) {
+    return 'لم تُسجَّل دفعة عن الفترة $from – $to. المتوقع نحو $date.';
+  }
+
+  @override
+  String get noPayoutPartnership => 'في الشراكة، لا ربح يعني لا دفعة.';
+
+  @override
+  String recordedSnack(String amount, String date) {
+    return 'سُجّل $amount في $date';
+  }
+
+  @override
+  String recordedAllSnack(int count) {
+    return 'سُجّل $count كما هو متوقع';
+  }
+
+  @override
+  String get skippedSnack => 'تم التخطي';
+
+  @override
+  String rowsNeedAmount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count صفوف تحتاج إلى مبلغ',
+      one: 'صف واحد يحتاج إلى مبلغ',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String showMoreRows(int count) {
+    return 'عرض $count أخرى';
+  }
+
+  @override
+  String get kindSkipped => 'تم تخطيه';
+
+  @override
+  String get valueBelowEstimate => 'القيمة أقل من تقديرك.';
+
+  @override
+  String get planCardTitle => 'الخطة مقابل الفعلي';
+
+  @override
+  String get expectedSoFar => 'المتوقع حتى الآن (تقديرك)';
+
+  @override
+  String get receivedLabel => 'المستلم';
+
+  @override
+  String get differenceLabel => 'الفرق';
+
+  @override
+  String receivedSinceStart(String amount) {
+    return 'المستلم منذ البداية: $amount';
+  }
+
+  @override
+  String get caseCReceived => 'يُحسب مستلمًا. ويُعرض للتطهير، لا ربحًا.';
+
+  @override
+  String valueVsEstimate(
+    String actual,
+    String estimate,
+    String diff,
+    String pct,
+  ) {
+    return 'الفعلي $actual · تقديرك $estimate · $diff ($pct)';
+  }
+
+  @override
+  String get estimatesFooter =>
+      'تقديرات فقط. لا تُستخدم في الزكاة ولا في العائد.';
+
+  @override
+  String get chartLegend => '— الفعلي · - - تقديرك · ○ للتأكيد';
+
+  @override
+  String chartPayoutsSummary(String expected, String received, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count صفوف',
+      one: 'صف واحد',
+    );
+    return 'رسم الدفعات. تقديرك حتى الآن $expected. المستلم $received. $_temp0 للتأكيد.';
+  }
+
+  @override
+  String chartValueSummary(String expected, String actual, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count صفوف',
+      one: 'صف واحد',
+    );
+    return 'رسم القيمة. تقديرك اليوم $expected. آخر قيمة $actual. $_temp0 للتأكيد.';
+  }
+
+  @override
+  String get stateReceived => 'مستلم';
+
+  @override
+  String get stateRecorded => 'مسجل';
+
+  @override
+  String get stateToConfirm => 'للتأكيد';
+
+  @override
+  String get stateSkipped => 'تم تخطيه';
+
+  @override
+  String get shariahRiskTag => 'مخاطرة شرعية';
+
+  @override
+  String get caseBReturnLine =>
+      'تُحسب الدفعات عائدًا. · المصدر لم يُتحقق منه بعد';
+
+  @override
+  String get changeAnswers => 'تغيير الإجابات';
+
+  @override
+  String get caseCReturnsLine =>
+      'لا تُحسب الدفعات عائدًا: يعود إليك مالك حتى لو خسر المشروع.';
+
+  @override
+  String get kindPayoutPurify => 'دفعة · للتطهير';
+
+  @override
+  String toPurifyIncludesPayouts(String amount) {
+    return 'منها $amount من الدفعات';
+  }
+
+  @override
+  String get givenAwayFromPayouts => 'ما تصدّقتَ به من الدفعات (للتطهير)';
+
+  @override
+  String get givenAwayFromPayoutsHelp =>
+      'مال من هذه الدفعات تصدّقت به. إخراجه لا يُحسب زكاة.';
+
+  @override
+  String toConfirmPill(int count) {
+    return '$count للتأكيد';
+  }
+
+  @override
+  String expectedHeader(String amount, String date) {
+    return 'المتوقع $amount في $date';
+  }
+
+  @override
+  String alsoRecordsPayout(String date) {
+    return 'هذا يسجّل أيضًا الدفعة المتوقعة في $date.';
+  }
+
+  @override
+  String alsoRecordsValue(String date) {
+    return 'هذا يسجّل أيضًا مراجعة القيمة في $date.';
+  }
+
+  @override
+  String errOutsideWindow(String from, String to) {
+    return 'اختر تاريخًا من $from إلى $to.';
+  }
+
+  @override
+  String periodPayouts(String expected, String received) {
+    return 'الدفعات: تقديرك $expected · المستلم $received';
+  }
 }

@@ -7,6 +7,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/money/decimal_math.dart';
 import '../../../core/money/money.dart';
 import '../../../core/reference/units.dart';
+import '../../../core/dates.dart';
+import '../domain/expected_plan.dart';
 import '../domain/history_entry.dart';
 import '../domain/investment.dart';
 import '../../../core/assumptions/assumptions_providers.dart';
@@ -23,12 +25,17 @@ Future<void> showRecordSheet(
   required String investmentId,
   HistoryEntry? editing,
   RecordPreset? preset,
+  PlanRow? row,
 }) => showModalBottomSheet<void>(
   context: context,
   isScrollControlled: true,
   useSafeArea: true,
-  builder: (_) =>
-      RecordSheet(investmentId: investmentId, editing: editing, preset: preset),
+  builder: (_) => RecordSheet(
+    investmentId: investmentId,
+    editing: editing,
+    preset: preset,
+    row: row,
+  ),
 );
 
 enum _Tab { value, moneyIn, moneyOut, interest }
@@ -43,11 +50,16 @@ class RecordSheet extends ConsumerStatefulWidget {
     required this.investmentId,
     this.editing,
     this.preset,
+    this.row,
   });
 
   final String investmentId;
   final HistoryEntry? editing;
   final RecordPreset? preset;
+
+  /// Opened from a pending row: kind, date and amount preset; the date stays
+  /// within the row's 7-day window (architect Q-E2).
+  final PlanRow? row;
 
   @override
   ConsumerState<RecordSheet> createState() => _RecordSheetState();
@@ -85,6 +97,30 @@ class _RecordSheetState extends ConsumerState<RecordSheet> {
     if (widget.preset == RecordPreset.interestGivenAway) {
       _tab = _Tab.interest;
       _givenAway = true;
+      final left = _toPurify(h);
+      _from = left.kept > Decimal.zero || left.paid == Decimal.zero
+          ? _Where.keptInside
+          : _Where.paidOut;
+    }
+    final row = widget.row;
+    if (row != null) {
+      _date = row.date;
+      final held = row.kind == PlanKind.value
+          ? _calc()?.timeline(h.investment.id).heldInterestAt(row.date)
+          : null;
+      // A typed value is gross of interest kept inside; the estimate is net.
+      _amount.text = row.expected == null
+          ? ''
+          : (row.expected! + (held ?? Decimal.zero)).toString();
+      if (row.kind == PlanKind.value) {
+        _tab = _Tab.value;
+      } else if (h.investment.conventionalDeposit) {
+        _tab = _Tab.interest;
+        _where = _Where.paidOut;
+      } else {
+        _tab = _Tab.moneyOut;
+        _sale = false;
+      }
     }
     if (e == null) return;
     _date = e.date;
@@ -121,6 +157,7 @@ class _RecordSheetState extends ConsumerState<RecordSheet> {
         _from = kind == InterestKind.givenAwayFromInside
             ? _Where.keptInside
             : _Where.paidOut;
+      case PlanSkip():
     }
   }
 
@@ -149,6 +186,11 @@ class _RecordSheetState extends ConsumerState<RecordSheet> {
   ({Decimal kept, Decimal paid}) _toPurify(InvestmentWithHistory h) {
     var kept = Decimal.zero;
     var paid = Decimal.zero;
+    if (h.investment.peCase == PeCase.c) {
+      for (final e in h.history.whereType<MoneyOut>()) {
+        if (e.kind == MoneyOutKind.income) paid += e.amount.amount;
+      }
+    }
     for (final e in h.history.whereType<InterestRecord>()) {
       if (e.id == widget.editing?.id) continue;
       final a = e.amount.amount;
@@ -178,6 +220,14 @@ class _RecordSheetState extends ConsumerState<RecordSheet> {
 
     if (_date.isBefore(item.startDate)) {
       fail(l10n.errBeforeStart(context.date(item.startDate)));
+      return;
+    }
+    final window = _window;
+    if (window != null &&
+        (_date.isBefore(window.$1) || _date.isAfter(window.$2))) {
+      fail(
+        l10n.errOutsideWindow(context.date(window.$1), context.date(window.$2)),
+      );
       return;
     }
     if (amount == null || (amount <= Decimal.zero && _tab != _Tab.value)) {
@@ -254,7 +304,10 @@ class _RecordSheetState extends ConsumerState<RecordSheet> {
         final current =
             calc?.timeline(item.id).recordedValueAt(_date) ?? Decimal.zero;
         final inItemUnit = unit == item.unit ? amount : null;
-        if (left == null && inItemUnit != null && inItemUnit > current) {
+        if (_sale &&
+            left == null &&
+            inItemUnit != null &&
+            inItemUnit > current) {
           fail(l10n.valueLeftRequired);
           return;
         }
@@ -291,6 +344,38 @@ class _RecordSheetState extends ConsumerState<RecordSheet> {
     } on Exception {
       fail(l10n.errSave);
     }
+  }
+
+  /// The row's date ± 7 days, never after today.
+  (DateTime, DateTime)? get _window {
+    final row = widget.row;
+    if (row == null) return null;
+    return (
+      row.date.subtract(const Duration(days: 7)),
+      earlier(row.date.add(const Duration(days: 7)), ref.read(todayProvider)),
+    );
+  }
+
+  /// "This also records …" when a record typed by hand falls in a pending
+  /// row's window (UX 2.12.3); interest only on a conventional deposit.
+  String? _alsoRecords(Investment item) {
+    if (widget.row != null || widget.editing != null) return null;
+    final plan = ref.watch(expectedProvider(item.id));
+    if (plan == null) return null;
+    final kind = switch (_tab) {
+      _Tab.value => PlanKind.value,
+      _Tab.moneyOut when !_sale && !item.conventionalDeposit => PlanKind.payout,
+      _Tab.interest when !_givenAway && item.conventionalDeposit =>
+        PlanKind.payout,
+      _ => null,
+    };
+    if (kind == null) return null;
+    final row = plan.pendingRowNear(_date, kind);
+    if (row == null) return null;
+    final l10n = context.l10n;
+    return kind == PlanKind.value
+        ? l10n.alsoRecordsValue(context.date(row.date))
+        : l10n.alsoRecordsPayout(context.date(row.date));
   }
 
   /// A value update on the same day replaces the one that is there.
@@ -335,7 +420,7 @@ class _RecordSheetState extends ConsumerState<RecordSheet> {
     final repo = ref.read(investmentsRepositoryProvider);
     final messenger = ScaffoldMessenger.of(context);
     final l10n = context.l10n;
-    await repo.deleteEntry(e.id);
+    await repo.deleteEntries([e.id]);
     if (!mounted) return;
     Navigator.of(context).pop();
     messenger.showSnackBar(
@@ -396,13 +481,28 @@ class _RecordSheetState extends ConsumerState<RecordSheet> {
                 _error = null;
               }),
             ),
+            if (widget.row?.expected case final expected?)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Text(
+                  l10n.expectedHeader(
+                    context.money(expected, item.unit),
+                    context.date(widget.row!.date),
+                  ),
+                  key: const ValueKey('expected-header'),
+                ),
+              ),
             const SizedBox(height: 12),
             DateField(
+              key: const ValueKey('record-date'),
               label: l10n.fieldDate,
               value: _date,
-              lastDate: today,
+              firstDate: _window?.$1,
+              lastDate: _window?.$2 ?? today,
               onChanged: (d) => setState(() => _date = d),
             ),
+            if (_alsoRecords(item) case final line?)
+              Text(line, key: const ValueKey('also-records')),
             ..._tabFields(context, h, last, amount),
             if (_error != null)
               Padding(
@@ -535,6 +635,7 @@ class _RecordSheetState extends ConsumerState<RecordSheet> {
           if (left != null && left == Decimal.zero) Text(l10n.closesInvestment),
         ];
       case _Tab.interest:
+        final caseC = item.peCase == PeCase.c;
         final left = _toPurify(h);
         final anyLeft = left.kept > Decimal.zero || left.paid > Decimal.zero;
         return [
@@ -586,12 +687,19 @@ class _RecordSheetState extends ConsumerState<RecordSheet> {
                 if (left.paid > Decimal.zero)
                   ButtonSegment(
                     value: _Where.paidOut,
-                    label: Text(l10n.interestPaidOut),
+                    label: Text(
+                      caseC ? l10n.givenAwayFromPayouts : l10n.interestPaidOut,
+                    ),
                   ),
               ],
               selected: {_from},
               onSelectionChanged: (s) => setState(() => _from = s.first),
             ),
+            if (caseC && _from == _Where.paidOut)
+              Text(
+                l10n.givenAwayFromPayoutsHelp,
+                key: const ValueKey('payouts-given-help'),
+              ),
             Text(
               l10n.givenAwayNote,
               style: Theme.of(context).textTheme.titleSmall,

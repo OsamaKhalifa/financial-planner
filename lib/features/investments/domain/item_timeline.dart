@@ -23,13 +23,15 @@ final class MissingRate {
 /// other units are converted at the entry's date.
 final class ItemTimeline {
   ItemTimeline(this.aggregate, RateBook rates)
-    : _entries = List.of(aggregate.history)..sort(_byDate) {
+    : _entries = aggregate.history.where((e) => e is! PlanSkip).toList()
+        ..sort(_byDate),
+      _incomeIsPurify = aggregate.investment.peCase == PeCase.c {
     for (final e in _entries) {
       final m = switch (e) {
         MoneyIn(:final amount) => amount,
         MoneyOut(:final amount) => amount,
         InterestRecord(:final amount) => amount,
-        ValueUpdate() => null,
+        ValueUpdate() || PlanSkip() => null,
       };
       if (m == null) continue;
       final c = rates.convert(m, unit, e.date);
@@ -45,6 +47,9 @@ final class ItemTimeline {
   final InvestmentWithHistory aggregate;
   final List<MissingRate> missing = [];
   final List<HistoryEntry> _entries;
+
+  /// Case C: every income payout is "to purify", never return (P-4, E5).
+  final bool _incomeIsPurify;
   final Map<String, Decimal> _amount = {};
   final List<(DateTime, Decimal)> _values = [];
   final List<(DateTime, Decimal)> _held = [];
@@ -74,7 +79,8 @@ final class ItemTimeline {
             update = value;
           case MoneyIn() when amount != null:
             delta += amount;
-          case MoneyOut() when amount != null:
+          // Income is paid from profit; only a sale takes value out (Q12).
+          case MoneyOut(kind: MoneyOutKind.sale) when amount != null:
             delta -= amount;
           case InterestRecord(:final kind) when amount != null:
             if (kind == InterestKind.keptInside) {
@@ -124,10 +130,16 @@ final class ItemTimeline {
     }
   }
 
+  bool _isPurifyIncome(HistoryEntry x) =>
+      _incomeIsPurify && x is MoneyOut && x.kind == MoneyOutKind.income;
+
+  /// Amount in the item unit; null for a value update or a missing rate.
+  Decimal? inItemUnit(HistoryEntry e) => _amount[e.id];
+
   /// Money in (+) and money out (−) dated after [s] up to [e]; never interest.
   List<Flow> flowsIn(DateTime s, DateTime e) => [
     for (final x in _entriesIn(s, e))
-      if (_amount[x.id] != null)
+      if (_amount[x.id] != null && !_isPurifyIncome(x))
         switch (x) {
           MoneyIn() => Flow(date: x.date, amount: _amount[x.id]!),
           MoneyOut() => Flow(date: x.date, amount: -_amount[x.id]!),
@@ -140,6 +152,7 @@ final class ItemTimeline {
     for (final x in _entriesIn(s, e))
       if (x is MoneyOut &&
           x.kind == MoneyOutKind.income &&
+          !_incomeIsPurify &&
           _amount[x.id] != null)
         Flow(date: x.date, amount: _amount[x.id]!),
   ];
@@ -147,12 +160,15 @@ final class ItemTimeline {
   Decimal incomeIn(DateTime s, DateTime e) =>
       sumOf(incomeFlows(s, e).map((f) => f.amount));
 
-  /// All interest received less all given away, from both places (AC-19).
+  /// All interest received less all given away, from both places (AC-19);
+  /// on a case C item also every income payout (AC-65).
   Money toPurifyAt(DateTime d) {
     var total = Decimal.zero;
     for (final x in _entries) {
       final amount = _amount[x.id];
-      if (x is! InterestRecord || amount == null || x.date.isAfter(d)) continue;
+      if (amount == null || x.date.isAfter(d)) continue;
+      if (_isPurifyIncome(x)) total += amount;
+      if (x is! InterestRecord) continue;
       total += switch (x.kind) {
         InterestKind.keptInside || InterestKind.paidOut => amount,
         _ => -amount,

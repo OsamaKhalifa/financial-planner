@@ -1387,4 +1387,425 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get src_B7 =>
       'Pension with withdrawal limits: no zakat until it can be accessed (Dr. Main Al-Qudah, AMJA fatwa 21964); or zakat on the accessible amount after penalty and tax (Fiqh Council of North America — source not yet verified); or the full balance as a precaution (B7).';
+
+  @override
+  String get typePrivateEquity => 'Private equity';
+
+  @override
+  String get typePrivateEquityHint =>
+      'A stake in a business not on a market — e.g. a friend\'s project.';
+
+  @override
+  String get fieldSharesInProject => 'Shares in the project (optional)';
+
+  @override
+  String get peIntentTrading => 'To sell';
+
+  @override
+  String get peIntentLongTerm => 'Long-term (for its profit)';
+
+  @override
+  String get zakatPeTrading =>
+      'Zakat: on 100 % of value. You hold this to sell. — IIFA Res 28 (3/4) §3.';
+
+  @override
+  String get peMethodKnown => 'Known zakatable %';
+
+  @override
+  String get peMethodKnownSource => 'IIFA Res 121 (3/13) §1';
+
+  @override
+  String get peMethodProfit => 'Zakat on profit received only';
+
+  @override
+  String get peMethodFull => 'Full value';
+
+  @override
+  String get peMethodFullNote => 'Precaution.';
+
+  @override
+  String get peMethodPick => 'Pick how zakat is counted';
+
+  @override
+  String get peMethodsHelp =>
+      'If the project mostly buys and sells goods, most of its value is usually zakatable.';
+
+  @override
+  String noticeProfitPayoutsOnly(String rate) {
+    return 'Zakat: $rate of each profit payout you record, not of the project\'s value. Each payout is counted once.';
+  }
+
+  @override
+  String get noticeCapitalBackIsDebt =>
+      'This works like money you lent. Zakat is on the full amount, as a debt owed to you. — IIFA Res 1 (1/2).';
+
+  @override
+  String get zakatCaseC => 'Zakat on 100 %.';
+
+  @override
+  String get q2CapitalBack =>
+      'If the project loses money, do you still get all your money back?';
+
+  @override
+  String get answerNo => 'No';
+
+  @override
+  String get answerYes => 'Yes';
+
+  @override
+  String get answerNotSure => 'Not sure';
+
+  @override
+  String get q1ProfitBasis =>
+      'Is this % a share of the project\'s real profit, or a fixed % of the money you put in?';
+
+  @override
+  String get q1Share => 'Share of the real profit';
+
+  @override
+  String get q1Fixed => 'Fixed % of my money';
+
+  @override
+  String get errPickOne => 'Pick one. \'Not sure\' is fine.';
+
+  @override
+  String get noticeCaseB =>
+      'A fixed % of the money you put in is not a valid profit share. In a partnership, your profit must be a part of the project\'s real profit. You may want to change the terms with your partner.';
+
+  @override
+  String get noticeCaseC =>
+      'Your money comes back even if the project loses. This works like a loan. Extra money on a loan is riba. The app shows these payouts as \"to purify\", not as profit.';
+
+  @override
+  String get noticeCaseNotSure =>
+      'Ask your partner two things: Is your profit a part of the real profit? Can you lose money? The answers decide if this is a partnership or a loan.';
+
+  @override
+  String get srcCaseB =>
+      'IIFA Res 30 (5/4) item 4: no guarantee of the capital or a fixed profit; such a clause is void. AAOIFI SS 13 §8/1 — section not yet verified (B6.1).';
+
+  @override
+  String get srcCaseC =>
+      'IIFA Res 10 (10/2): an increase on a loan agreed at its start is riba. Quran 2:279 (B6.1).';
+
+  @override
+  String get srcCaseNotSure =>
+      'IIFA Res 30 (5/4): profit in a partnership is a share of the real profit (B6.1).';
+
+  @override
+  String get caseBTagPreview =>
+      'This item will be tagged Shariah risk. Payouts still count as return. · source not yet verified';
+
+  @override
+  String get accountKindQuestion =>
+      'Is this an Islamic account (profit share) or a conventional account (interest)?';
+
+  @override
+  String get accountIslamic => 'Islamic account (profit share)';
+
+  @override
+  String get accountConventional => 'Conventional account (interest)';
+
+  @override
+  String get errPickAccountKind => 'Pick the account kind';
+
+  @override
+  String get noticeConventional =>
+      'This is interest. Record it as money out \"interest (to purify)\", not as income.';
+
+  @override
+  String get expectedTitle => 'Expected (optional)';
+
+  @override
+  String get expectedSubtitle =>
+      'Plan payouts or value checks. An estimate, not a promise.';
+
+  @override
+  String get blockPayouts => 'Payouts';
+
+  @override
+  String get blockValueChecks => 'Value checks';
+
+  @override
+  String get fieldPayoutSchedule => 'Payout schedule';
+
+  @override
+  String get fieldValueCheckSchedule => 'Value-check schedule';
+
+  @override
+  String get scheduleNone => 'None';
+
+  @override
+  String get scheduleMonthly => 'Monthly';
+
+  @override
+  String get scheduleQuarterly => 'Every 3 months';
+
+  @override
+  String get scheduleHalfYearly => 'Every 6 months';
+
+  @override
+  String get scheduleYearly => 'Yearly';
+
+  @override
+  String get fieldExpectedProfit =>
+      'Expected profit (your estimate, % per year)';
+
+  @override
+  String get fieldExpectedGrowth =>
+      'Expected value growth (your estimate, % per year)';
+
+  @override
+  String get estimateHelp =>
+      'An estimate, not a promise. Not used for zakat or return.';
+
+  @override
+  String payoutPreview(String amount, int months, String date) {
+    String _temp0 = intl.Intl.pluralLogic(
+      months,
+      locale: localeName,
+      other: '$months months',
+      one: 'month',
+    );
+    return '= $amount every $_temp0 · first on $date';
+  }
+
+  @override
+  String growthPreview(String date, String amount) {
+    return 'Your estimate for $date: $amount (if nothing else is added or taken out).';
+  }
+
+  @override
+  String get errPickPayoutSchedule =>
+      'Pick a payout schedule, or clear this %.';
+
+  @override
+  String get errPickValueSchedule =>
+      'Pick a value-check schedule, or clear this %.';
+
+  @override
+  String get errProfitPositive =>
+      'Must be more than 0. Leave it empty for no %.';
+
+  @override
+  String get errGrowthTooLow => 'Must be more than −100 %.';
+
+  @override
+  String needsRateForEstimates(String pair, String date) {
+    return 'Needs $pair rate on $date for your estimates';
+  }
+
+  @override
+  String get editRecalculates =>
+      'This recalculates every past month for this item.';
+
+  @override
+  String get editRowsRebuilt =>
+      'Rows to confirm are rebuilt for the new dates. Your recorded payouts and values stay.';
+
+  @override
+  String toConfirmTitle(int count) {
+    return 'To confirm · $count';
+  }
+
+  @override
+  String get confirmAll => 'Confirm all as expected';
+
+  @override
+  String get confirmAllLine => 'Confirm only money that really came in.';
+
+  @override
+  String get rowPayout => 'Expected payout (not received yet)';
+
+  @override
+  String get rowPayoutPurify => 'Expected payout (to purify when received)';
+
+  @override
+  String get rowInterest => 'Expected interest (to purify)';
+
+  @override
+  String get rowValue => 'Value check';
+
+  @override
+  String get receivedThisAmount => 'Received this amount';
+
+  @override
+  String get addAmount => 'Add amount';
+
+  @override
+  String get skipRow => 'Skip';
+
+  @override
+  String noPayoutLine(String from, String to, String date) {
+    return 'No payout recorded for $from – $to. Expected around $date.';
+  }
+
+  @override
+  String get noPayoutPartnership =>
+      'In a partnership, no profit means no payout.';
+
+  @override
+  String recordedSnack(String amount, String date) {
+    return 'Recorded $amount on $date';
+  }
+
+  @override
+  String recordedAllSnack(int count) {
+    return 'Recorded $count as expected';
+  }
+
+  @override
+  String get skippedSnack => 'Skipped';
+
+  @override
+  String rowsNeedAmount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count rows need an amount',
+      one: '1 row needs an amount',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String showMoreRows(int count) {
+    return 'Show $count more';
+  }
+
+  @override
+  String get kindSkipped => 'Skipped';
+
+  @override
+  String get valueBelowEstimate => 'Value is below your estimate.';
+
+  @override
+  String get planCardTitle => 'Plan vs actual';
+
+  @override
+  String get expectedSoFar => 'Expected so far (your estimate)';
+
+  @override
+  String get receivedLabel => 'Received';
+
+  @override
+  String get differenceLabel => 'Difference';
+
+  @override
+  String receivedSinceStart(String amount) {
+    return 'Received since start: $amount';
+  }
+
+  @override
+  String get caseCReceived =>
+      'Counted as received. Shown as to purify, not profit.';
+
+  @override
+  String valueVsEstimate(
+    String actual,
+    String estimate,
+    String diff,
+    String pct,
+  ) {
+    return 'Actual $actual · Your estimate $estimate · $diff ($pct)';
+  }
+
+  @override
+  String get estimatesFooter => 'Estimates only. Not used for zakat or return.';
+
+  @override
+  String get chartLegend => '— Actual · - - Your estimate · ○ To confirm';
+
+  @override
+  String chartPayoutsSummary(String expected, String received, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count rows',
+      one: '1 row',
+    );
+    return 'Payouts chart. Your estimate so far $expected. Received $received. $_temp0 to confirm.';
+  }
+
+  @override
+  String chartValueSummary(String expected, String actual, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count rows',
+      one: '1 row',
+    );
+    return 'Value chart. Your estimate today $expected. Last value $actual. $_temp0 to confirm.';
+  }
+
+  @override
+  String get stateReceived => 'received';
+
+  @override
+  String get stateRecorded => 'recorded';
+
+  @override
+  String get stateToConfirm => 'to confirm';
+
+  @override
+  String get stateSkipped => 'skipped';
+
+  @override
+  String get shariahRiskTag => 'Shariah risk';
+
+  @override
+  String get caseBReturnLine =>
+      'Payouts count as return. · source not yet verified';
+
+  @override
+  String get changeAnswers => 'Change answers';
+
+  @override
+  String get caseCReturnsLine =>
+      'Payouts are not counted as return: your money comes back even if the project loses.';
+
+  @override
+  String get kindPayoutPurify => 'Payout · to purify';
+
+  @override
+  String toPurifyIncludesPayouts(String amount) {
+    return 'includes $amount of payouts';
+  }
+
+  @override
+  String get givenAwayFromPayouts => 'Given away from payouts (to purify)';
+
+  @override
+  String get givenAwayFromPayoutsHelp =>
+      'Money from these payouts that you gave to charity. Giving it away does not count as zakat.';
+
+  @override
+  String toConfirmPill(int count) {
+    return '$count to confirm';
+  }
+
+  @override
+  String expectedHeader(String amount, String date) {
+    return 'Expected $amount on $date';
+  }
+
+  @override
+  String alsoRecordsPayout(String date) {
+    return 'This also records the expected payout of $date.';
+  }
+
+  @override
+  String alsoRecordsValue(String date) {
+    return 'This also records the value check of $date.';
+  }
+
+  @override
+  String errOutsideWindow(String from, String to) {
+    return 'Pick a date from $from to $to.';
+  }
+
+  @override
+  String periodPayouts(String expected, String received) {
+    return 'Payouts: your estimate $expected · received $received';
+  }
 }

@@ -5,7 +5,16 @@ import 'package:decimal/decimal.dart';
 import '../../../core/assumptions/domain/settings.dart';
 import 'investment.dart';
 
-enum ZakatNotice { dividendsCountedWithCash, cryptoDisputed }
+enum ZakatNotice {
+  dividendsCountedWithCash,
+  cryptoDisputed,
+
+  /// Private equity on "profit received only" (P-4c).
+  profitPayoutsOnly,
+
+  /// Case C: money lent, zakat on the full amount as a debt (P-1 item 5).
+  capitalBackIsDebt,
+}
 
 final class ResolvedZakat {
   ResolvedZakat({
@@ -64,6 +73,8 @@ ZakatRule? defaultRule(AssetType type, Intent? intent, Settings settings) {
       return ZakatRule.sukuk100;
     case AssetType.crypto:
       return ZakatRule.crypto100;
+    case AssetType.privateEquity:
+      return intent == Intent.trading ? ZakatRule.trading100 : null;
     case AssetType.other:
       return null;
   }
@@ -79,6 +90,7 @@ ZakatOffer? offeredShare(AssetType type, Intent? intent) {
 }
 
 ResolvedZakat resolve(Investment item, Settings settings) {
+  if (item.type == AssetType.privateEquity) return _privateEquity(item);
   ResolvedZakat full(String section, [ZakatNotice? notice]) => ResolvedZakat(
     share: Decimal.one,
     onDividends: false,
@@ -139,4 +151,30 @@ ResolvedZakat resolve(Investment item, Settings settings) {
         sourceSection: 'A9',
       );
   }
+}
+
+/// Every private-equity item cites B6; case C is fixed at 100 % whatever
+/// rule is stored, so changing Q2 needs no rule rewrite (spec E6).
+ResolvedZakat _privateEquity(Investment item) {
+  ResolvedZakat full([ZakatNotice? notice]) => ResolvedZakat(
+    share: Decimal.one,
+    onDividends: false,
+    sourceSection: 'B6',
+    notice: notice,
+  );
+  if (item.peCase == PeCase.c) return full(ZakatNotice.capitalBackIsDebt);
+  return switch (item.zakatRule) {
+    ZakatRule.longTermDividendsOnly => ResolvedZakat(
+      share: Decimal.zero,
+      onDividends: true,
+      sourceSection: 'B6',
+      notice: ZakatNotice.profitPayoutsOnly,
+    ),
+    ZakatRule.custom => ResolvedZakat(
+      share: item.customZakatShare!,
+      onDividends: false,
+      sourceSection: 'B6',
+    ),
+    _ => full(),
+  };
 }

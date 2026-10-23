@@ -25,6 +25,7 @@ abstract interface class InvestmentsRepository {
   /// same item and day throws [Conflict]; an unknown item throws [NotFound].
   Future<void> saveEntries(List<HistoryEntry> entries);
 
-  /// Throws [NotFound].
-  Future<void> deleteEntry(String id);
+  /// One transaction; throws [NotFound] and deletes nothing if any id is
+  /// unknown. Undo of "Confirm all" removes several records at once.
+  Future<void> deleteEntries(List<String> ids);
 }

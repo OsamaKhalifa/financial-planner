@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/assumptions/assumptions_providers.dart';
 import '../../../core/reference/units.dart';
+import '../domain/history_entry.dart';
 import '../domain/investment.dart';
 import '../domain/period.dart';
 import '../domain/portfolio_calculator.dart';
@@ -310,10 +311,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         h.investment,
         ref.watch(itemFiguresProvider((h.investment.id, year)))!,
         ref.watch(sinceStartProvider(h.investment.id))!,
-        h.history.fold<DateTime>(
-          h.investment.startDate,
-          (a, e) => e.date.isAfter(a) ? e.date : a,
-        ),
+        // A skip is a decision, not an update: it never moves "oldest first".
+        h.history
+            .where((e) => e is! PlanSkip)
+            .fold<DateTime>(
+              h.investment.startDate,
+              (a, e) => e.date.isAfter(a) ? e.date : a,
+            ),
       ),
   ];
 
@@ -377,6 +381,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               item.unit.isMetal
                   ? l10n.metalRateNotUpdated
                   : l10n.notUpdatedThisMonth,
+            ),
+          if (ref.watch(pendingCountProvider(item.id)) case final n when n > 0)
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: DecoratedBox(
+                key: ValueKey('to-confirm-${item.id}'),
+                decoration: ShapeDecoration(
+                  color: Theme.of(context).colorScheme.secondaryContainer,
+                  shape: const StadiumBorder(),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
+                  child: Text(l10n.toConfirmPill(n)),
+                ),
+              ),
             ),
         ],
       ),

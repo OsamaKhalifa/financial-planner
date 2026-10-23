@@ -1083,5 +1083,310 @@
     }
   },
   "src_B6": "Business ownership: the owner pays on their share of the zakatable assets (cash, receivables, stock for sale) less short-term debts; fixed assets are not zakatable (IIFA Res 28 (3/4) §2). AAOIFI SS 35 net-assets method — section not yet verified (B6).",
-  "src_B7": "Pension with withdrawal limits: no zakat until it can be accessed (Dr. Main Al-Qudah, AMJA fatwa 21964); or zakat on the accessible amount after penalty and tax (Fiqh Council of North America — source not yet verified); or the full balance as a precaution (B7)."
+  "src_B7": "Pension with withdrawal limits: no zakat until it can be accessed (Dr. Main Al-Qudah, AMJA fatwa 21964); or zakat on the accessible amount after penalty and tax (Fiqh Council of North America — source not yet verified); or the full balance as a precaution (B7).",
+  "typePrivateEquity": "Private equity",
+  "typePrivateEquityHint": "A stake in a business not on a market — e.g. a friend's project.",
+  "fieldSharesInProject": "Shares in the project (optional)",
+  "peIntentTrading": "To sell",
+  "peIntentLongTerm": "Long-term (for its profit)",
+  "zakatPeTrading": "Zakat: on 100 % of value. You hold this to sell. — IIFA Res 28 (3/4) §3.",
+  "peMethodKnown": "Known zakatable %",
+  "peMethodKnownSource": "IIFA Res 121 (3/13) §1",
+  "peMethodProfit": "Zakat on profit received only",
+  "peMethodFull": "Full value",
+  "peMethodFullNote": "Precaution.",
+  "peMethodPick": "Pick how zakat is counted",
+  "peMethodsHelp": "If the project mostly buys and sells goods, most of its value is usually zakatable.",
+  "noticeProfitPayoutsOnly": "Zakat: {rate} of each profit payout you record, not of the project's value. Each payout is counted once.",
+  "@noticeProfitPayoutsOnly": {
+    "placeholders": {
+      "rate": {
+        "type": "String"
+      }
+    }
+  },
+  "noticeCapitalBackIsDebt": "This works like money you lent. Zakat is on the full amount, as a debt owed to you. — IIFA Res 1 (1/2).",
+  "zakatCaseC": "Zakat on 100 %.",
+  "q2CapitalBack": "If the project loses money, do you still get all your money back?",
+  "answerNo": "No",
+  "answerYes": "Yes",
+  "answerNotSure": "Not sure",
+  "q1ProfitBasis": "Is this % a share of the project's real profit, or a fixed % of the money you put in?",
+  "q1Share": "Share of the real profit",
+  "q1Fixed": "Fixed % of my money",
+  "errPickOne": "Pick one. 'Not sure' is fine.",
+  "noticeCaseB": "A fixed % of the money you put in is not a valid profit share. In a partnership, your profit must be a part of the project's real profit. You may want to change the terms with your partner.",
+  "noticeCaseC": "Your money comes back even if the project loses. This works like a loan. Extra money on a loan is riba. The app shows these payouts as \"to purify\", not as profit.",
+  "noticeCaseNotSure": "Ask your partner two things: Is your profit a part of the real profit? Can you lose money? The answers decide if this is a partnership or a loan.",
+  "srcCaseB": "IIFA Res 30 (5/4) item 4: no guarantee of the capital or a fixed profit; such a clause is void. AAOIFI SS 13 §8/1 — section not yet verified (B6.1).",
+  "srcCaseC": "IIFA Res 10 (10/2): an increase on a loan agreed at its start is riba. Quran 2:279 (B6.1).",
+  "srcCaseNotSure": "IIFA Res 30 (5/4): profit in a partnership is a share of the real profit (B6.1).",
+  "caseBTagPreview": "This item will be tagged Shariah risk. Payouts still count as return. · source not yet verified",
+  "accountKindQuestion": "Is this an Islamic account (profit share) or a conventional account (interest)?",
+  "accountIslamic": "Islamic account (profit share)",
+  "accountConventional": "Conventional account (interest)",
+  "errPickAccountKind": "Pick the account kind",
+  "noticeConventional": "This is interest. Record it as money out \"interest (to purify)\", not as income.",
+  "expectedTitle": "Expected (optional)",
+  "expectedSubtitle": "Plan payouts or value checks. An estimate, not a promise.",
+  "blockPayouts": "Payouts",
+  "blockValueChecks": "Value checks",
+  "fieldPayoutSchedule": "Payout schedule",
+  "fieldValueCheckSchedule": "Value-check schedule",
+  "scheduleNone": "None",
+  "scheduleMonthly": "Monthly",
+  "scheduleQuarterly": "Every 3 months",
+  "scheduleHalfYearly": "Every 6 months",
+  "scheduleYearly": "Yearly",
+  "fieldExpectedProfit": "Expected profit (your estimate, % per year)",
+  "fieldExpectedGrowth": "Expected value growth (your estimate, % per year)",
+  "estimateHelp": "An estimate, not a promise. Not used for zakat or return.",
+  "payoutPreview": "= {amount} every {months, plural, =1{month} other{{months} months}} · first on {date}",
+  "@payoutPreview": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "months": {
+        "type": "int"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "growthPreview": "Your estimate for {date}: {amount} (if nothing else is added or taken out).",
+  "@growthPreview": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "errPickPayoutSchedule": "Pick a payout schedule, or clear this %.",
+  "errPickValueSchedule": "Pick a value-check schedule, or clear this %.",
+  "errProfitPositive": "Must be more than 0. Leave it empty for no %.",
+  "errGrowthTooLow": "Must be more than −100 %.",
+  "needsRateForEstimates": "Needs {pair} rate on {date} for your estimates",
+  "@needsRateForEstimates": {
+    "placeholders": {
+      "pair": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "editRecalculates": "This recalculates every past month for this item.",
+  "editRowsRebuilt": "Rows to confirm are rebuilt for the new dates. Your recorded payouts and values stay.",
+  "toConfirmTitle": "To confirm · {count}",
+  "@toConfirmTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "confirmAll": "Confirm all as expected",
+  "confirmAllLine": "Confirm only money that really came in.",
+  "rowPayout": "Expected payout (not received yet)",
+  "rowPayoutPurify": "Expected payout (to purify when received)",
+  "rowInterest": "Expected interest (to purify)",
+  "rowValue": "Value check",
+  "receivedThisAmount": "Received this amount",
+  "addAmount": "Add amount",
+  "skipRow": "Skip",
+  "noPayoutLine": "No payout recorded for {from} – {to}. Expected around {date}.",
+  "@noPayoutLine": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "noPayoutPartnership": "In a partnership, no profit means no payout.",
+  "recordedSnack": "Recorded {amount} on {date}",
+  "@recordedSnack": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "recordedAllSnack": "Recorded {count} as expected",
+  "@recordedAllSnack": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "skippedSnack": "Skipped",
+  "rowsNeedAmount": "{count, plural, =1{1 row needs an amount} other{{count} rows need an amount}}",
+  "@rowsNeedAmount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "showMoreRows": "Show {count} more",
+  "@showMoreRows": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "kindSkipped": "Skipped",
+  "valueBelowEstimate": "Value is below your estimate.",
+  "planCardTitle": "Plan vs actual",
+  "expectedSoFar": "Expected so far (your estimate)",
+  "receivedLabel": "Received",
+  "differenceLabel": "Difference",
+  "receivedSinceStart": "Received since start: {amount}",
+  "@receivedSinceStart": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "caseCReceived": "Counted as received. Shown as to purify, not profit.",
+  "valueVsEstimate": "Actual {actual} · Your estimate {estimate} · {diff} ({pct})",
+  "@valueVsEstimate": {
+    "placeholders": {
+      "actual": {
+        "type": "String"
+      },
+      "estimate": {
+        "type": "String"
+      },
+      "diff": {
+        "type": "String"
+      },
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
+  "estimatesFooter": "Estimates only. Not used for zakat or return.",
+  "chartLegend": "— Actual · - - Your estimate · ○ To confirm",
+  "chartPayoutsSummary": "Payouts chart. Your estimate so far {expected}. Received {received}. {count, plural, =1{1 row} other{{count} rows}} to confirm.",
+  "@chartPayoutsSummary": {
+    "placeholders": {
+      "expected": {
+        "type": "String"
+      },
+      "received": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "chartValueSummary": "Value chart. Your estimate today {expected}. Last value {actual}. {count, plural, =1{1 row} other{{count} rows}} to confirm.",
+  "@chartValueSummary": {
+    "placeholders": {
+      "expected": {
+        "type": "String"
+      },
+      "actual": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "stateReceived": "received",
+  "stateRecorded": "recorded",
+  "stateToConfirm": "to confirm",
+  "stateSkipped": "skipped",
+  "shariahRiskTag": "Shariah risk",
+  "caseBReturnLine": "Payouts count as return. · source not yet verified",
+  "changeAnswers": "Change answers",
+  "caseCReturnsLine": "Payouts are not counted as return: your money comes back even if the project loses.",
+  "kindPayoutPurify": "Payout · to purify",
+  "toPurifyIncludesPayouts": "includes {amount} of payouts",
+  "@toPurifyIncludesPayouts": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "givenAwayFromPayouts": "Given away from payouts (to purify)",
+  "givenAwayFromPayoutsHelp": "Money from these payouts that you gave to charity. Giving it away does not count as zakat.",
+  "toConfirmPill": "{count} to confirm",
+  "@toConfirmPill": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "expectedHeader": "Expected {amount} on {date}",
+  "@expectedHeader": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "alsoRecordsPayout": "This also records the expected payout of {date}.",
+  "@alsoRecordsPayout": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "alsoRecordsValue": "This also records the value check of {date}.",
+  "@alsoRecordsValue": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "errOutsideWindow": "Pick a date from {from} to {to}.",
+  "@errOutsideWindow": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "periodPayouts": "Payouts: your estimate {expected} · received {received}",
+  "@periodPayouts": {
+    "placeholders": {
+      "expected": {
+        "type": "String"
+      },
+      "received": {
+        "type": "String"
+      }
+    }
+  }
 }

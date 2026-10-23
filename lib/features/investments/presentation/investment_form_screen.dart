@@ -1,7 +1,7 @@
 /* Copyright (c) 2026-Present Osama Khalifa. All rights reserved. */
 
 import 'package:decimal/decimal.dart';
-import 'package:flutter/material.dart' hide Intent;
+import 'package:flutter/material.dart' hide Flow, Intent;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/assumptions/assumptions_providers.dart';
@@ -9,12 +9,14 @@ import '../../../core/assumptions/data/rate_refresher.dart';
 import '../../../core/assumptions/domain/rate.dart';
 import '../../../core/assumptions/domain/rate_book.dart';
 import '../../../core/assumptions/domain/settings.dart';
+import '../../../core/dates.dart';
 import '../../../core/ids.dart';
 import '../../../core/money/decimal_math.dart';
 import '../../../core/money/money.dart';
 import '../../../core/reference/countries.dart';
 import '../../../core/reference/markets.dart';
 import '../../../core/reference/units.dart';
+import '../domain/formulas.dart';
 import '../domain/history_entry.dart';
 import '../domain/investment.dart';
 import '../domain/investment_draft.dart';
@@ -48,6 +50,8 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
   final _share = TextEditingController();
   final _notes = TextEditingController();
   final _rate = TextEditingController();
+  final _profit = TextEditingController();
+  final _growth = TextEditingController();
 
   AssetType? _type;
   Intent? _intent;
@@ -72,6 +76,14 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
   String? _rateError;
   Investment? _editing;
   var _dirty = false;
+  Schedule? _payoutSchedule;
+  Schedule? _valueCheckSchedule;
+  ProfitBasis? _profitBasis;
+  CapitalBack? _capitalBack;
+  AccountKind? _accountKind;
+
+  /// Private equity, long-term: the user's pick of the three P-1 methods.
+  ZakatRule? _peMethod;
 
   bool get _isEdit => widget.editId != null;
 
@@ -93,6 +105,8 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
       _share,
       _notes,
       _rate,
+      _profit,
+      _growth,
     ]) {
       c.dispose();
     }
@@ -124,6 +138,14 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
     _companyPays = false;
     _chosenMethod = null;
     _share.clear();
+    _payoutSchedule = null;
+    _valueCheckSchedule = null;
+    _profit.clear();
+    _growth.clear();
+    _profitBasis = null;
+    _capitalBack = null;
+    _accountKind = null;
+    _peMethod = null;
   }
 
   void _loadEdit(Investment i) {
@@ -151,7 +173,69 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
       ZakatRule.longTermFullValue => LongTermMethod.fullValue,
       _ => null,
     };
+    _payoutSchedule = i.payoutSchedule;
+    _valueCheckSchedule = i.valueCheckSchedule;
+    _profit.text = _pctText(i.expectedProfit);
+    _growth.text = _pctText(i.expectedGrowth);
+    _profitBasis = i.profitBasis;
+    _capitalBack = i.capitalBack;
+    _accountKind = i.accountKind;
+    if (i.type == AssetType.privateEquity) {
+      _customShare = false;
+      // A case C item stores a placeholder rule (resolve ignores it), so it
+      // is not shown as the user's pick.
+      _peMethod = i.peCase == PeCase.c || i.intent != Intent.longTerm
+          ? null
+          : i.zakatRule;
+    }
   }
+
+  String _pctText(Decimal? fraction) =>
+      fraction == null ? '' : (fraction * Decimal.fromInt(100)).toString();
+
+  Decimal? _pct(TextEditingController c) {
+    final p = parseAmount(c.text);
+    return p == null ? null : divide(p, Decimal.fromInt(100));
+  }
+
+  bool get _payoutAllowed => _type != null && payoutPlanAllowed(_type!);
+
+  bool get _valueAllowed => _type != null && valuePlanAllowed(_type!);
+
+  Decimal? get _expectedProfit => _payoutAllowed ? _pct(_profit) : null;
+
+  Decimal? get _expectedGrowth => _valueAllowed ? _pct(_growth) : null;
+
+  Schedule? get _payout => _payoutAllowed ? _payoutSchedule : null;
+
+  Schedule? get _valueCheck => _valueAllowed ? _valueCheckSchedule : null;
+
+  bool get _isPe => _type == AssetType.privateEquity;
+
+  /// Q1 is cleared with the %; the account kind with the payout schedule.
+  ProfitBasis? get _q1 =>
+      _isPe && _expectedProfit != null ? _profitBasis : null;
+
+  CapitalBack? get _q2 => _isPe ? _capitalBack : null;
+
+  AccountKind? get _account =>
+      _type == AssetType.cashDeposit && _payout != null ? _accountKind : null;
+
+  /// What would be stored, for the case, the notices and the zakat line.
+  Investment _probe(AssetType type, ZakatRule rule) => Investment(
+    name: '',
+    type: type,
+    intent: _intent,
+    unit: const Unit('USD'),
+    startDate: DateTime.utc(2000),
+    zakatRule: rule,
+    customZakatShare: rule == ZakatRule.custom ? _shareFraction : null,
+    payoutSchedule: _payout,
+    expectedProfit: _expectedProfit,
+    profitBasis: _q1,
+    capitalBack: _q2,
+    accountKind: _account,
+  );
 
   Settings get _settings =>
       ref.read(settingsProvider).value ?? const Settings();
@@ -171,6 +255,7 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
     if (_companyPays && type == AssetType.stock) {
       return ZakatRule.companyPaysZakat;
     }
+    if (type == AssetType.privateEquity) return _peRule;
     if (type == AssetType.other ||
         (_customShare && type != AssetType.cashDeposit)) {
       return _share.text.trim().isEmpty ? null : ZakatRule.custom;
@@ -183,6 +268,22 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
       return explicitLongTermRule(_chosenMethod!);
     }
     return defaultRule(type, _intent, _effectiveSettings);
+  }
+
+  /// Case C stores full value as a placeholder: resolve fixes it at 100 %
+  /// whatever is stored (spec E6), and the edit form asks again if Q2 changes.
+  ZakatRule? get _peRule {
+    if (_capitalBack == CapitalBack.yes) {
+      return _intent == Intent.trading
+          ? ZakatRule.trading100
+          : ZakatRule.longTermFullValue;
+    }
+    if (_intent == Intent.trading) return ZakatRule.trading100;
+    if (_intent != Intent.longTerm) return null;
+    if (_peMethod == ZakatRule.custom && _share.text.trim().isEmpty) {
+      return null;
+    }
+    return _peMethod;
   }
 
   Decimal? get _shareFraction {
@@ -224,6 +325,13 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
       quantity: parseAmount(_quantity.text),
       zakatRule: _rule,
       customZakatShare: _shareFraction,
+      payoutSchedule: _payout,
+      expectedProfit: _expectedProfit,
+      valueCheckSchedule: _valueCheck,
+      expectedGrowth: _expectedGrowth,
+      profitBasis: _q1,
+      capitalBack: _q2,
+      accountKind: _account,
     );
   }
 
@@ -329,6 +437,13 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
       customZakatShare: rule == ZakatRule.custom ? _shareFraction : null,
       inflationOverride: _inflation,
       notes: _notes.text.trim().isEmpty ? null : _notes.text.trim(),
+      payoutSchedule: _payout,
+      expectedProfit: _expectedProfit,
+      valueCheckSchedule: _valueCheck,
+      expectedGrowth: _expectedGrowth,
+      profitBasis: _q1,
+      capitalBack: _q2,
+      accountKind: _account,
       createdAt: _editing?.createdAt,
     );
     final repo = ref.read(investmentsRepositoryProvider);
@@ -469,6 +584,11 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
                   ),
               ],
             ),
+            if (type == AssetType.privateEquity)
+              Text(
+                l10n.typePrivateEquityHint,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
             if (_errors.contains(DraftError.missingType))
               Text(
                 l10n.errType,
@@ -504,11 +624,14 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
             if (type != null && !isMetal)
               AmountField(
                 controller: _quantity,
-                label: l10n.fieldQuantity,
+                label: _isPe ? l10n.fieldSharesInProject : l10n.fieldQuantity,
                 onChanged: (_) => _dirty = true,
               ),
             if (type != null) ..._intentFields(context, type),
+            if (_isPe) ..._capitalBackFields(context),
             if (type != null) ..._zakatFields(context, type),
+            if (type != null && (_payoutAllowed || _valueAllowed))
+              _expectedSection(context, type),
             _moreSection(context),
             const SizedBox(height: 16),
             FilledButton(
@@ -868,6 +991,7 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
       AssetType.gold ||
       AssetType.silver => [Intent.longTerm, Intent.personalUse],
       AssetType.other => Intent.values,
+      AssetType.privateEquity => [Intent.trading, Intent.longTerm],
       _ => const <Intent>[],
     };
     if (options.isEmpty) return const [];
@@ -879,7 +1003,13 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
         children: [
           for (final i in options)
             ChoiceChip(
-              label: Text(context.intentName(i)),
+              label: Text(
+                !_isPe
+                    ? context.intentName(i)
+                    : i == Intent.trading
+                    ? l10n.peIntentTrading
+                    : l10n.peIntentLongTerm,
+              ),
               selected: _intent == i,
               onSelected: (_) => _touch(() {
                 _intent = i;
@@ -925,6 +1055,8 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
     if (needsJewellery) widgets.add(_jewelleryChoice(context));
     if (type == AssetType.other) {
       widgets.addAll(_otherShare(context));
+    } else if (type == AssetType.privateEquity) {
+      widgets.addAll(_peMethodFields(context));
     } else if (type != AssetType.cashDeposit) {
       widgets.addAll(_customShareFields(context, type));
     }
@@ -960,7 +1092,10 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
         type != AssetType.other &&
         !needsMethod) {
       widgets.add(
-        Text(l10n.errShare, style: TextStyle(color: theme.colorScheme.error)),
+        Text(
+          type == AssetType.privateEquity ? l10n.peMethodPick : l10n.errShare,
+          style: TextStyle(color: theme.colorScheme.error),
+        ),
       );
     }
     widgets.add(
@@ -979,7 +1114,7 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
     final l10n = context.l10n;
     final rule = _rule;
     if (rule == null) return (l10n.zakatNeedsChoice, const []);
-    if (rule == ZakatRule.custom) {
+    if (rule == ZakatRule.custom && type != AssetType.privateEquity) {
       final share = _shareFraction;
       return (
         share == null
@@ -996,20 +1131,22 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
         _effectiveSettings.jewelleryZakatable == null) {
       return (l10n.zakatNeedsChoice, const []);
     }
-    final probe = Investment(
-      name: '',
-      type: type,
-      unit: const Unit('USD'),
-      startDate: DateTime.utc(2000),
-      zakatRule: rule,
-    );
-    final r = resolve(probe, _effectiveSettings);
+    final r = resolve(_probe(type, rule), _effectiveSettings);
     final notice = switch (r.notice) {
       ZakatNotice.dividendsCountedWithCash => l10n.noticeDividends,
       ZakatNotice.cryptoDisputed => l10n.noticeCrypto,
+      ZakatNotice.profitPayoutsOnly => l10n.noticeProfitPayoutsOnly(
+        context.percent(_effectiveSettings.zakatYear!.r).replaceAll('+', ''),
+      ),
+      ZakatNotice.capitalBackIsDebt => l10n.noticeCapitalBackIsDebt,
       null => null,
     };
     final reason = switch (rule) {
+      _ when r.notice == ZakatNotice.capitalBackIsDebt => null,
+      ZakatRule.trading100 when type == AssetType.privateEquity =>
+        l10n.zakatPeTrading,
+      ZakatRule.longTermFullValue when type == AssetType.privateEquity =>
+        l10n.peMethodFullNote,
       ZakatRule.trading100 => l10n.zakatReasonTrading,
       ZakatRule.cash100 => l10n.zakatReasonCash,
       ZakatRule.bullion100 => l10n.zakatReasonSavings,
@@ -1033,6 +1170,7 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
       AssetType.stock || AssetType.fund => 'B3',
       AssetType.sukuk => 'B4',
       AssetType.crypto => 'B8',
+      AssetType.privateEquity => 'B6',
       AssetType.other => 'B5',
     };
     return Why(
@@ -1193,6 +1331,348 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
             ),
           ),
         ),
+    ];
+  }
+
+  Widget _errorText(BuildContext context, String text) =>
+      Text(text, style: TextStyle(color: Theme.of(context).colorScheme.error));
+
+  Widget _radios<T>(
+    String keyPrefix,
+    T? group,
+    ValueChanged<T?> onChanged,
+    List<(T, String)> options,
+  ) => RadioGroup<T>(
+    groupValue: group,
+    onChanged: (v) => _touch(() => onChanged(v)),
+    child: Column(
+      children: [
+        for (final o in options)
+          RadioListTile<T>(
+            key: ValueKey('$keyPrefix-${o.$1}'),
+            contentPadding: EdgeInsets.zero,
+            value: o.$1,
+            title: Text(o.$2),
+          ),
+      ],
+    ),
+  );
+
+  /// Q2 on every private-equity item, right after the intent: it can change
+  /// the zakat share (case C, P-2 loop 1).
+  List<Widget> _capitalBackFields(BuildContext context) {
+    final l10n = context.l10n;
+    return [
+      const SizedBox(height: 12),
+      Text(l10n.q2CapitalBack, style: Theme.of(context).textTheme.titleSmall),
+      _radios<CapitalBack>('q2', _capitalBack, (v) => _capitalBack = v, [
+        (CapitalBack.no, l10n.answerNo),
+        (CapitalBack.yes, l10n.answerYes),
+        (CapitalBack.notSure, l10n.answerNotSure),
+      ]),
+      if (_errors.contains(DraftError.answerCapitalBack))
+        _errorText(context, l10n.errPickOne),
+      if (_editing != null && _editing!.capitalBack != _q2)
+        Text(l10n.editRecalculates, key: const ValueKey('q2-recalculates')),
+      if (_expectedProfit == null) ?_peNotice(context),
+    ];
+  }
+
+  /// One notice from the case, with a Source link (P-2 table, AC-64).
+  Widget? _peNotice(BuildContext context) {
+    final l10n = context.l10n;
+    final c = _probe(AssetType.privateEquity, ZakatRule.trading100).peCase;
+    final why = whyCase(context, c);
+    if (why == null) return null;
+    return Card(
+      key: const ValueKey('pe-notice'),
+      color: Theme.of(context).colorScheme.secondaryContainer,
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(Icons.info_outline, size: 20),
+                const SizedBox(width: 8),
+                Expanded(child: Text(why.what)),
+              ],
+            ),
+            if (c == PeCase.b)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Text(l10n.caseBTagPreview),
+              ),
+            TextButton(
+              onPressed: () => showWhy(context, why),
+              child: Text(l10n.source),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// P-1: long-term asks one of three methods, nothing pre-selected, no 25 %.
+  List<Widget> _peMethodFields(BuildContext context) {
+    final l10n = context.l10n;
+    if (_intent != Intent.longTerm || _capitalBack == CapitalBack.yes) {
+      return const [];
+    }
+    return [
+      _radios<ZakatRule>('pe-method', _peMethod, (v) => _peMethod = v, [
+        (ZakatRule.custom, l10n.peMethodKnown),
+        (ZakatRule.longTermDividendsOnly, l10n.peMethodProfit),
+        (ZakatRule.longTermFullValue, l10n.peMethodFull),
+      ]),
+      if (_peMethod == ZakatRule.custom) ...[
+        AmountField(
+          key: const ValueKey('share'),
+          controller: _share,
+          label: l10n.fieldShare,
+          onChanged: (_) => _touch(() {}),
+        ),
+        Text(
+          l10n.peMethodKnownSource,
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+      ],
+      Text(l10n.peMethodsHelp, style: Theme.of(context).textTheme.bodySmall),
+    ];
+  }
+
+  Widget _scheduleChips(
+    String keyPrefix,
+    Schedule? selected,
+    ValueChanged<Schedule?> onSelected,
+  ) {
+    final l10n = context.l10n;
+    final options = <(Schedule?, String)>[
+      (null, l10n.scheduleNone),
+      (Schedule.monthly, l10n.scheduleMonthly),
+      (Schedule.quarterly, l10n.scheduleQuarterly),
+      (Schedule.halfYearly, l10n.scheduleHalfYearly),
+      (Schedule.yearly, l10n.scheduleYearly),
+    ];
+    return Wrap(
+      spacing: 8,
+      children: [
+        for (final o in options)
+          ChoiceChip(
+            key: ValueKey('$keyPrefix-${o.$1?.name ?? 'none'}'),
+            label: Text(o.$2),
+            selected: selected == o.$1,
+            onSelected: (_) => _touch(() => onSelected(o.$1)),
+          ),
+      ],
+    );
+  }
+
+  /// The money in on the start date, in the item unit; null while a rate is
+  /// missing (the inline rate entry asks for it).
+  Decimal? _startCapital() {
+    if (_isEdit) {
+      final calc = ref.read(calculatorProvider).value;
+      if (calc == null || !calc.hasItem(widget.editId!)) return null;
+      final tl = calc.timeline(widget.editId!);
+      return sumOf([
+        for (final f in tl.flowsIn(
+          _start!.subtract(const Duration(days: 1)),
+          _start!,
+        ))
+          f.amount,
+      ]);
+    }
+    final paid = parseAmount(_paid.text);
+    if (paid == null || _paidUnit == null || _unit == null) return null;
+    if (_paidUnit == _unit) return paid;
+    final rate = parseAmount(_rate.text);
+    if (_showRateRow) return rate == null ? null : paid * rate;
+    return ref
+        .read(rateBookProvider)
+        .value
+        ?.convert(Money(paid, _paidUnit!), _unit!, _start!)
+        ?.amount;
+  }
+
+  Widget _expectedSection(BuildContext context, AssetType type) {
+    final l10n = context.l10n;
+    final theme = Theme.of(context);
+    final edited = _editing;
+    final hasPlan =
+        edited != null &&
+        (edited.payoutSchedule != null || edited.valueCheckSchedule != null);
+    final capital = _startCapital();
+    final unit = _unit;
+    final help = Text(l10n.estimateHelp, style: theme.textTheme.bodySmall);
+    final profit = _expectedProfit;
+    final growth = _expectedGrowth;
+    String? preview;
+    if (profit != null && _payout != null && unit != null) {
+      final m = _payout!.months;
+      preview = capital == null
+          ? null
+          : l10n.payoutPreview(
+              context.money(
+                expectedPayout(capital: capital, rate: profit, months: m),
+                unit,
+              ),
+              m,
+              context.date(addMonths(_start!, m)),
+            );
+    }
+    String? growthLine;
+    if (growth != null && unit != null && capital != null) {
+      final on = addMonths(_start!, 12);
+      growthLine = l10n.growthPreview(
+        context.date(on),
+        context.money(
+          expectedValue(
+            flows: [Flow(date: _start!, amount: capital)],
+            growth: growth,
+            on: on,
+          ),
+          unit,
+        ),
+      );
+    }
+    final missingRate =
+        capital == null &&
+        !_isEdit &&
+        _paidUnit != null &&
+        unit != null &&
+        (profit != null || growth != null);
+    final planChanged =
+        edited != null &&
+        (edited.payoutSchedule != _payout ||
+            edited.expectedProfit != profit ||
+            edited.valueCheckSchedule != _valueCheck ||
+            edited.expectedGrowth != growth);
+    final answersChanged =
+        edited != null &&
+        (edited.profitBasis != _q1 || edited.capitalBack != _q2);
+    return ExpansionTile(
+      key: const ValueKey('expected'),
+      title: Text(l10n.expectedTitle),
+      subtitle: Text(l10n.expectedSubtitle),
+      tilePadding: EdgeInsets.zero,
+      initiallyExpanded: type == AssetType.privateEquity || hasPlan,
+      expandedCrossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (_payoutAllowed) ...[
+          Text(l10n.blockPayouts, style: theme.textTheme.titleSmall),
+          Text(l10n.fieldPayoutSchedule, style: theme.textTheme.labelLarge),
+          _scheduleChips('payout', _payoutSchedule, (v) {
+            _payoutSchedule = v;
+          }),
+          AmountField(
+            key: const ValueKey('expected-profit'),
+            controller: _profit,
+            label: l10n.fieldExpectedProfit,
+            suffix: '%',
+            error: _errors.contains(DraftError.profitNeedsSchedule)
+                ? l10n.errPickPayoutSchedule
+                : _errors.contains(DraftError.profitNotPositive)
+                ? l10n.errProfitPositive
+                : null,
+            onChanged: (_) => _touch(() {}),
+          ),
+          help,
+          if (preview != null)
+            Text(preview, key: const ValueKey('payout-preview')),
+          if (type == AssetType.cashDeposit && _payout != null)
+            ..._accountKindFields(context),
+          if (_isPe && profit != null) ...[
+            Text(l10n.q1ProfitBasis, style: theme.textTheme.titleSmall),
+            _radios<ProfitBasis>('q1', _profitBasis, (v) => _profitBasis = v, [
+              (ProfitBasis.shareOfProfit, l10n.q1Share),
+              (ProfitBasis.fixedPctOfMoney, l10n.q1Fixed),
+              (ProfitBasis.notSure, l10n.answerNotSure),
+            ]),
+            if (_errors.contains(DraftError.answerProfitBasis))
+              _errorText(context, l10n.errPickOne),
+            ?_peNotice(context),
+          ],
+        ],
+        if (_valueAllowed) ...[
+          const SizedBox(height: 12),
+          Text(l10n.blockValueChecks, style: theme.textTheme.titleSmall),
+          Text(l10n.fieldValueCheckSchedule, style: theme.textTheme.labelLarge),
+          _scheduleChips('value', _valueCheckSchedule, (v) {
+            _valueCheckSchedule = v;
+          }),
+          AmountField(
+            key: const ValueKey('expected-growth'),
+            controller: _growth,
+            label: l10n.fieldExpectedGrowth,
+            suffix: '%',
+            error: _errors.contains(DraftError.growthNeedsSchedule)
+                ? l10n.errPickValueSchedule
+                : _errors.contains(DraftError.growthTooLow)
+                ? l10n.errGrowthTooLow
+                : null,
+            onChanged: (_) => _touch(() {}),
+          ),
+          help,
+          if (growthLine != null)
+            Text(growthLine, key: const ValueKey('growth-preview')),
+        ],
+        if (missingRate)
+          Text(
+            l10n.needsRateForEstimates(
+              context.pair(_paidUnit!, unit),
+              context.date(_start!),
+            ),
+          ),
+        if (answersChanged) Text(l10n.editRecalculates),
+        if (planChanged) Text(l10n.editRowsRebuilt),
+      ],
+    );
+  }
+
+  List<Widget> _accountKindFields(BuildContext context) {
+    final l10n = context.l10n;
+    return [
+      Text(
+        l10n.accountKindQuestion,
+        style: Theme.of(context).textTheme.titleSmall,
+      ),
+      Wrap(
+        spacing: 8,
+        children: [
+          for (final k in [
+            (AccountKind.islamic, l10n.accountIslamic),
+            (AccountKind.conventional, l10n.accountConventional),
+          ])
+            ChoiceChip(
+              key: ValueKey('account-${k.$1.name}'),
+              label: Text(k.$2),
+              selected: _accountKind == k.$1,
+              onSelected: (_) => _touch(() => _accountKind = k.$1),
+            ),
+        ],
+      ),
+      if (_errors.contains(DraftError.answerAccountKind))
+        _errorText(context, l10n.errPickAccountKind),
+      if (_accountKind == AccountKind.conventional) ...[
+        Text(
+          l10n.noticeConventional,
+          key: const ValueKey('conventional-notice'),
+        ),
+        TextButton(
+          onPressed: () => showWhy(
+            context,
+            Why(
+              title: l10n.accountConventional,
+              what: l10n.noticeConventional,
+              source: l10n.src_Z6,
+            ),
+          ),
+          child: Text(l10n.source),
+        ),
+      ],
     ];
   }
 }

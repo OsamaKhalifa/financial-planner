@@ -18,6 +18,7 @@ import 'package:financial_planner/core/money/money.dart';
 import 'package:financial_planner/core/reference/countries.dart';
 import 'package:financial_planner/core/reference/markets.dart';
 import 'package:financial_planner/core/reference/units.dart';
+import 'package:financial_planner/features/investments/domain/expected_plan.dart';
 import 'package:financial_planner/features/investments/domain/formulas.dart';
 import 'package:financial_planner/features/investments/domain/history_entry.dart';
 import 'package:financial_planner/features/investments/domain/investment.dart';
@@ -1341,6 +1342,982 @@ void main() {
       ).nisabHint();
       expect(noGold.goldNisab, isNull);
       expectDec(noGold.silverNisab!.amount, '35700.00');
+    });
+  });
+  group('expected vs actual and private equity', () {
+    /// "Friend's project" (story §10): private equity, long-term, EGP, start
+    /// 2026-01-15, 100,000 in, 20 % a year, paid every 3 months.
+    Investment friend({
+      ZakatRule rule = ZakatRule.longTermFullValue,
+      String? profit = '0.20',
+      Schedule? payout = Schedule.quarterly,
+      ProfitBasis? q1 = ProfitBasis.shareOfProfit,
+      CapitalBack q2 = CapitalBack.no,
+    }) => Investment(
+      id: 'fp',
+      name: "Friend's project",
+      type: AssetType.privateEquity,
+      intent: Intent.longTerm,
+      unit: egp,
+      startDate: day(2026, 1, 15),
+      zakatRule: rule,
+      payoutSchedule: payout,
+      expectedProfit: profit == null ? null : d(profit),
+      profitBasis: profit == null ? null : q1,
+      capitalBack: q2,
+      createdAt: _epoch,
+      updatedAt: _epoch,
+    );
+
+    MoneyIn fpIn() => mIn('fp', day(2026, 1, 15), '100000', egp);
+
+    MoneyOut fpIncome(DateTime on, String a) =>
+        mOut('fp', on, a, egp, MoneyOutKind.income);
+
+    PlanSkip skip(String id, DateTime on, PlanKind k) => PlanSkip(
+      id: _id(),
+      investmentId: id,
+      date: on,
+      plan: k,
+      createdAt: _epoch,
+      updatedAt: _epoch,
+    );
+
+    ExpectedVsActual planOf(Investment i, List<HistoryEntry> h, DateTime on) =>
+        expectedVsActual(ItemTimeline(item(i, h), RateBook(const [])), on)!;
+
+    /// The fund of AC-60/61: start 2026-01-01, 10,000 in, growth 12 %.
+    Investment fund({
+      Schedule check = Schedule.monthly,
+      String growth = '0.12',
+    }) => Investment(
+      id: 'fund',
+      name: 'fund',
+      type: AssetType.fund,
+      intent: Intent.trading,
+      unit: egp,
+      startDate: day(2026, 1, 1),
+      zakatRule: ZakatRule.trading100,
+      valueCheckSchedule: check,
+      expectedGrowth: d(growth),
+      createdAt: _epoch,
+      updatedAt: _epoch,
+    );
+
+    MoneyIn fundIn() => mIn('fund', day(2026, 1, 1), '10000', egp);
+
+    /// Cash deposit of AC-58: start 2026-01-01, 10,000, 10 %, monthly.
+    Investment deposit(AccountKind kind) => Investment(
+      id: 'dep',
+      name: 'dep',
+      type: AssetType.cashDeposit,
+      unit: egp,
+      startDate: day(2026, 1, 1),
+      zakatRule: ZakatRule.cash100,
+      payoutSchedule: Schedule.monthly,
+      expectedProfit: d('0.10'),
+      accountKind: kind,
+      createdAt: _epoch,
+      updatedAt: _epoch,
+    );
+
+    List<DateTime> dates(List<PlanRow> rows) => [for (final r in rows) r.date];
+
+    void expectRows(List<PlanRow> rows, List<String?> expected) {
+      expect(rows.length, expected.length);
+      for (var i = 0; i < rows.length; i++) {
+        if (expected[i] == null) {
+          expect(rows[i].expected, isNull, reason: 'row $i');
+        } else {
+          expectDec(rows[i].expected, expected[i]!, what: 'row $i');
+        }
+      }
+    }
+
+    test('AC-68 income keeps the value at 100,000 (gain 5,000, ROI 5 %); income 150,000 asks nothing; a sale of 30,000 leaves 70,000', () {
+      final history = <HistoryEntry>[
+        mIn('fp', day(2026, 1, 15), '100000', egp),
+        mOut('fp', day(2026, 4, 15), '5000', egp, MoneyOutKind.income),
+      ];
+      final tl = ItemTimeline(item(friend(), history), RateBook(const []));
+      expectDec(tl.recordedValueAt(day(2026, 4, 15)), '100000.00');
+      expectDec(tl.netValueAt(day(2026, 4, 15)), '100000.00');
+      final s = calc([
+        item(friend(), history),
+      ], today: day(2026, 4, 20)).sinceStart('fp');
+      expectDec(s.gain, '5000.00');
+      expectPct(s.simpleRoi, '5.00');
+
+      final more = [
+        ...history,
+        mOut('fp', day(2026, 5, 1), '150000', egp, MoneyOutKind.income),
+      ];
+      final tl2 = ItemTimeline(item(friend(), more), RateBook(const []));
+      expectDec(tl2.recordedValueAt(day(2026, 5, 1)), '100000.00');
+      expect(tl2.closedAt(day(2026, 5, 1)), isFalse);
+
+      final sold = [
+        ...more,
+        mOut('fp', day(2026, 6, 1), '30000', egp, MoneyOutKind.sale),
+      ];
+      final tl3 = ItemTimeline(item(friend(), sold), RateBook(const []));
+      expectDec(tl3.recordedValueAt(day(2026, 6, 1)), '70000.00');
+
+      final f = fund(check: Schedule.yearly);
+      final ac60 = [
+        fundIn(),
+        mIn('fund', day(2026, 4, 1), '2000', egp),
+        val('fund', day(2026, 7, 1), '12400'),
+      ];
+      final withIncome = [
+        ...ac60,
+        mOut('fund', day(2026, 5, 1), '500', egp, MoneyOutKind.income),
+      ];
+      expectDec(
+        planOf(f, ac60, day(2026, 7, 1)).expectedValueAt(day(2026, 7, 1)),
+        '12635.39',
+      );
+      expectDec(
+        planOf(f, withIncome, day(2026, 7, 1)).expectedValueAt(day(2026, 7, 1)),
+        '12635.39',
+      );
+    });
+    test('AC-46 private equity asks no market, intent only trading or long-term, quantity optional; no intent is named', () {
+      InvestmentDraft draft({Intent? intent, ZakatRule? rule}) =>
+          InvestmentDraft(
+            name: "Friend's project",
+            type: AssetType.privateEquity,
+            intent: intent,
+            unit: egp,
+            startDate: day(2026, 1, 15),
+            firstPaid: Money(d('100000'), egp),
+            zakatRule: rule,
+            capitalBack: CapitalBack.no,
+          );
+      expect(validate(draft(), today: today, settings: settings()), [
+        DraftError.missingIntent,
+      ]);
+      for (final bad in [Intent.personalUse, Intent.rental]) {
+        expect(
+          validate(
+            draft(intent: bad),
+            today: today,
+            settings: settings(),
+          ),
+          [DraftError.missingIntent],
+        );
+      }
+      expect(
+        validate(
+          draft(intent: Intent.trading),
+          today: today,
+          settings: settings(),
+        ),
+        isEmpty,
+        reason: 'no market, no quantity needed',
+      );
+      final other = inv(
+        'o',
+        type: AssetType.other,
+        intent: Intent.longTerm,
+        unit: egp,
+        start: day(2026, 1, 1),
+        share: '0.4',
+      );
+      expect(other.peCase, isNull);
+      expectDec(resolve(other, settings()).share, '0.40');
+      expect(resolve(other, settings()).sourceSection, 'A9');
+    });
+
+    test('AC-47 trading is 100 % with no method; long-term must pick (no 25 %); profit received only = 0.025 × 15,000 = 375.00', () {
+      expect(
+        defaultRule(AssetType.privateEquity, Intent.trading, settings()),
+        ZakatRule.trading100,
+      );
+      expectDec(
+        resolve(friend(rule: ZakatRule.trading100), settings()).share,
+        '1.00',
+      );
+      expect(
+        defaultRule(AssetType.privateEquity, Intent.longTerm, settings()),
+        isNull,
+      );
+      final i = friend(rule: ZakatRule.longTermDividendsOnly);
+      final r = resolve(i, settings());
+      expectDec(r.share, '0');
+      expect(r.notice, ZakatNotice.profitPayoutsOnly);
+      final agg = item(i, [
+        fpIn(),
+        fpIncome(day(2026, 4, 20), '5000'),
+        fpIncome(day(2026, 7, 14), '5000'),
+        fpIncome(day(2026, 10, 15), '5000'),
+      ]);
+      final on = day(2026, 10, 17);
+      final y = calc([agg], today: on).item('fp', Period.year(2026, on));
+      expectDec(y.setAside, '375.00');
+      expectDec(y.base!.dividends, '15000.00');
+      expectDec(
+        y.setAside - ZakatYear.lunar.r * y.base!.dividends,
+        '0',
+        what: 'set-aside on the value',
+      );
+    });
+
+    test('AC-48 no plan on metals/crypto, rule checks, V_exp at −10 % = 9,000.00, no plan → no expected figure', () {
+      InvestmentDraft d0(
+        AssetType t, {
+        Schedule? payout,
+        String? profit,
+        Schedule? check,
+        String? growth,
+      }) => InvestmentDraft(
+        name: 'x',
+        type: t,
+        intent: Intent.trading,
+        market: Market.egx,
+        unit: egp,
+        startDate: day(2026, 1, 1),
+        firstPaid: Money(d('10000'), egp),
+        zakatRule: ZakatRule.trading100,
+        payoutSchedule: payout,
+        expectedProfit: profit == null ? null : d(profit),
+        valueCheckSchedule: check,
+        expectedGrowth: growth == null ? null : d(growth),
+      );
+      List<DraftError> v(InvestmentDraft x) =>
+          validate(x, today: today, settings: settings());
+      for (final t in [AssetType.gold, AssetType.silver, AssetType.crypto]) {
+        expect(
+          v(d0(t, payout: Schedule.monthly)),
+          contains(DraftError.planNotForType),
+        );
+      }
+      for (final t in [AssetType.gold, AssetType.silver]) {
+        expect(
+          v(d0(t, check: Schedule.monthly)),
+          contains(DraftError.planNotForType),
+        );
+      }
+      expect(v(d0(AssetType.fund, profit: '0.1')), [
+        DraftError.profitNeedsSchedule,
+      ]);
+      expect(v(d0(AssetType.fund, growth: '0.1')), [
+        DraftError.growthNeedsSchedule,
+      ]);
+      expect(v(d0(AssetType.fund, payout: Schedule.monthly, profit: '0')), [
+        DraftError.profitNotPositive,
+      ]);
+      expect(v(d0(AssetType.fund, check: Schedule.yearly, growth: '-1')), [
+        DraftError.growthTooLow,
+      ]);
+      expect(
+        v(d0(AssetType.fund, check: Schedule.yearly, growth: '-0.10')),
+        isEmpty,
+      );
+      final p = planOf(fund(check: Schedule.yearly, growth: '-0.10'), [
+        fundIn(),
+      ], day(2027, 1, 1));
+      expectDec(p.expectedValueAt(day(2027, 1, 1)), '9000.00');
+      expectDec(p.valueRows.single.expected, '9000.00');
+      final stock = inv(
+        's',
+        type: AssetType.stock,
+        intent: Intent.trading,
+        market: Market.egx,
+        unit: egp,
+        start: day(2026, 1, 1),
+        rule: ZakatRule.trading100,
+      );
+      expect(v(d0(AssetType.stock)), isEmpty);
+      expect(
+        expectedVsActual(
+          ItemTimeline(
+            item(stock, [mIn('s', day(2026, 1, 1), '100', egp)]),
+            RateBook(const []),
+          ),
+          today,
+        ),
+        isNull,
+      );
+    });
+
+    test('AC-49 5,000.00 every 3 months on 2026-04-15, 07-15, 10-15, 2027-01-15; a 10 % monthly fund pays 83.33', () {
+      final p = planOf(friend(), [fpIn()], day(2027, 1, 20));
+      expect(dates(p.payoutRows), [
+        day(2026, 4, 15),
+        day(2026, 7, 15),
+        day(2026, 10, 15),
+        day(2027, 1, 15),
+      ]);
+      expectRows(p.payoutRows, ['5000.00', '5000.00', '5000.00', '5000.00']);
+      final monthly = Investment(
+        id: 'f',
+        name: 'f',
+        type: AssetType.fund,
+        intent: Intent.trading,
+        unit: egp,
+        startDate: day(2026, 1, 1),
+        zakatRule: ZakatRule.trading100,
+        payoutSchedule: Schedule.monthly,
+        expectedProfit: d('0.10'),
+      );
+      final m = planOf(monthly, [
+        mIn('f', day(2026, 1, 1), '10000', egp),
+      ], day(2026, 3, 2));
+      expectRows(m.payoutRows, ['83.33', '83.33']);
+    });
+
+    test(
+      'AC-50 rows fall on the last day of short months, counted from the start',
+      () {
+        Investment monthly(DateTime start, Schedule s) => Investment(
+          id: 'm',
+          name: 'm',
+          type: AssetType.fund,
+          intent: Intent.trading,
+          unit: egp,
+          startDate: start,
+          zakatRule: ZakatRule.trading100,
+          payoutSchedule: s,
+        );
+        final a = planOf(monthly(day(2026, 1, 31), Schedule.monthly), [
+          mIn('m', day(2026, 1, 31), '100', egp),
+        ], day(2026, 5, 15));
+        expect(dates(a.payoutRows), [
+          day(2026, 2, 28),
+          day(2026, 3, 31),
+          day(2026, 4, 30),
+        ]);
+        final b = planOf(monthly(day(2024, 2, 29), Schedule.yearly), [
+          mIn('m', day(2024, 2, 29), '100', egp),
+        ], day(2028, 3, 1));
+        expect(dates(b.payoutRows), [
+          day(2025, 2, 28),
+          day(2026, 2, 28),
+          day(2027, 2, 28),
+          day(2028, 2, 29),
+        ]);
+      },
+    );
+
+    test('AC-51 on 2026-10-17: three pending rows of 5,000.00; April/July show the line, October from 10-23; 15,000 / 0 / −15,000; 3 to confirm', () {
+      final h = [fpIn()];
+      final p = planOf(friend(), h, day(2026, 10, 17));
+      expect(dates(p.payoutRows), [
+        day(2026, 4, 15),
+        day(2026, 7, 15),
+        day(2026, 10, 15),
+      ]);
+      expectRows(p.payoutRows, ['5000.00', '5000.00', '5000.00']);
+      expect(p.payoutRows.every((r) => r.pending), isTrue);
+      expect(
+        [for (final r in p.payoutRows) r.noPayoutLine],
+        [true, true, false],
+      );
+      expect(p.payoutRows[1].from, day(2026, 4, 16));
+      expectDec(p.expectedSoFar, '15000.00');
+      expectDec(p.received, '0.00');
+      expectDec(p.difference, '-15000.00');
+      expect(p.toConfirm, 3);
+      expect(
+        planOf(friend(), h, day(2026, 10, 22)).payoutRows[2].noPayoutLine,
+        isFalse,
+      );
+      expect(
+        planOf(friend(), h, day(2026, 10, 23)).payoutRows[2].noPayoutLine,
+        isTrue,
+      );
+    });
+
+    test('AC-52 confirm April, edit July to 4,000, skip October: 15,000 / 9,000 / −6,000; year 15,000 / 9,000; July 5,000 / 4,000; October 5,000 / 0', () {
+      final on = day(2026, 10, 17);
+      final h = <HistoryEntry>[
+        fpIn(),
+        fpIncome(day(2026, 4, 15), '5000.00'),
+        fpIncome(day(2026, 7, 15), '4000'),
+        skip('fp', day(2026, 10, 15), PlanKind.payout),
+      ];
+      final p = planOf(friend(), h, on);
+      expect(
+        [for (final r in p.payoutRows) r.state],
+        [RowState.resolved, RowState.resolved, RowState.skipped],
+      );
+      expectDec(p.payoutRows[1].actualAmount, '4000.00');
+      final oct = p.payoutRows[2];
+      expect(oct.noPayoutLine, isTrue);
+      expect((oct.from, oct.date), (day(2026, 7, 16), day(2026, 10, 15)));
+      expectDec(p.expectedSoFar, '15000.00');
+      expectDec(p.received, '9000.00');
+      expectDec(p.difference, '-6000.00');
+      final year = p.payoutsIn(Period.year(2026, on));
+      expectDec(year.expected, '15000.00');
+      expectDec(year.received, '9000.00');
+      final july = p.payoutsIn(Period.month(2026, 7, on));
+      expectDec(july.expected, '5000.00');
+      expectDec(july.received, '4000.00');
+      final october = p.payoutsIn(Period.month(2026, 10, on));
+      expectDec(october.expected, '5000.00');
+      expectDec(october.received, '0.00');
+      expect(p.hasPending, isFalse);
+      expect(p.toConfirm, 0);
+    });
+
+    test('AC-53 confirm all: three income records of 5,000 on the row dates; received 15,000, difference 0, nothing pending', () {
+      final on = day(2026, 10, 17);
+      final before = planOf(friend(), [fpIn()], on);
+      final written = [
+        for (final r in before.pendingRows)
+          if (r.expected != null) fpIncome(r.date, r.expected.toString()),
+      ];
+      expect(
+        [for (final w in written) w.date],
+        [day(2026, 4, 15), day(2026, 7, 15), day(2026, 10, 15)],
+      );
+      expect(written.every((w) => w.amount.amount == d('5000')), isTrue);
+      final p = planOf(friend(), [fpIn(), ...written], on);
+      expectDec(p.received, '15000.00');
+      expectDec(p.difference, '0.00');
+      expect(p.hasPending, isFalse);
+    });
+
+    test('AC-54 hand-entered income within 7 days resolves its row; 2,000 on 05-30 is taken by none (17,000, +2,000)', () {
+      final on = day(2026, 10, 17);
+      final h = [
+        fpIn(),
+        fpIncome(day(2026, 4, 20), '5000'),
+        fpIncome(day(2026, 7, 14), '10000'),
+      ];
+      final p = planOf(friend(), h, on);
+      expectDec(p.payoutRows[0].actualAmount, '5000.00');
+      expectDec(p.payoutRows[1].actualAmount, '10000.00');
+      expect([for (final r in p.payoutRows) r.pending], [false, false, true]);
+      expectDec(p.expectedSoFar, '15000.00');
+      expectDec(p.received, '15000.00');
+      expectDec(p.difference, '0.00');
+      final q = planOf(friend(), [
+        ...h,
+        fpIncome(day(2026, 5, 30), '2000'),
+      ], on);
+      expect(
+        q.payoutRows.where((r) => r.actual?.date == day(2026, 5, 30)),
+        isEmpty,
+      );
+      expectDec(q.received, '17000.00');
+      expectDec(q.difference, '2000.00');
+    });
+
+    test('AC-55 money in and sales count from the next period: 5,000 / 6,000 / 3,500', () {
+      final p = planOf(friend(), [
+        fpIn(),
+        mIn('fp', day(2026, 8, 1), '20000', egp),
+        mOut('fp', day(2026, 11, 1), '50000', egp, MoneyOutKind.sale),
+      ], day(2027, 4, 20));
+      expect(dates(p.payoutRows).sublist(2), [
+        day(2026, 10, 15),
+        day(2027, 1, 15),
+        day(2027, 4, 15),
+      ]);
+      expectRows(p.payoutRows.sublist(2), ['5000.00', '6000.00', '3500.00']);
+    });
+
+    test('AC-56 after a full sale: no row after the closing date, old rows still open, not counted on Home', () {
+      final p = planOf(friend(), [
+        fpIn(),
+        mOut('fp', day(2026, 12, 1), '100000', egp, MoneyOutKind.sale),
+        val('fp', day(2026, 12, 1), '0'),
+      ], day(2027, 2, 1));
+      expect(dates(p.payoutRows), [
+        day(2026, 4, 15),
+        day(2026, 7, 15),
+        day(2026, 10, 15),
+      ]);
+      expect(p.payoutRows.every((r) => r.pending), isTrue);
+      expect(p.toConfirm, 0);
+      final confirmed = planOf(friend(), [
+        fpIn(),
+        mOut('fp', day(2026, 12, 1), '100000', egp, MoneyOutKind.sale),
+        val('fp', day(2026, 12, 1), '0'),
+        fpIncome(day(2026, 4, 15), '5000'),
+      ], day(2027, 2, 1));
+      expect(confirmed.payoutRows.first.state, RowState.resolved);
+      expectDec(confirmed.timeline.netValueAt(day(2027, 2, 1)), '0');
+    });
+
+    Investment noPct() => Investment(
+      id: 'np',
+      name: 'np',
+      type: AssetType.fund,
+      intent: Intent.trading,
+      unit: egp,
+      startDate: day(2026, 1, 31),
+      zakatRule: ZakatRule.trading100,
+      payoutSchedule: Schedule.monthly,
+      createdAt: _epoch,
+      updatedAt: _epoch,
+    );
+    List<HistoryEntry> noPctHistory() => [
+      mIn('np', day(2026, 1, 31), '50000', egp),
+      mOut('np', day(2026, 3, 5), '1200', egp, MoneyOutKind.income),
+      mOut('np', day(2026, 4, 2), '900', egp, MoneyOutKind.income),
+    ];
+
+    test('AC-57 no %: two rows received 1,200 / 900, the April row pending with no amount; the line from 05-10; received 2,100, no expected', () {
+      final p = planOf(noPct(), noPctHistory(), day(2026, 5, 7));
+      expectDec(p.payoutRows[0].actualAmount, '1200.00');
+      expectDec(p.payoutRows[1].actualAmount, '900.00');
+      final april = p.payoutRows[2];
+      expect(april.date, day(2026, 4, 30));
+      expect(april.pending, isTrue);
+      expect(april.expected, isNull);
+      expect(april.noPayoutLine, isFalse);
+      expect(
+        planOf(
+          noPct(),
+          noPctHistory(),
+          day(2026, 5, 10),
+        ).payoutRows[2].noPayoutLine,
+        isTrue,
+      );
+      expectDec(p.received, '2100.00');
+      expect(p.expectedSoFar, isNull);
+      expect(p.difference, isNull);
+    });
+
+    test('AC-73 adding 950 to the April row: received 3,050.00, the row is received', () {
+      final p = planOf(noPct(), [
+        ...noPctHistory(),
+        mOut('np', day(2026, 4, 30), '950', egp, MoneyOutKind.income),
+      ], day(2026, 5, 10));
+      expect(p.payoutRows[2].state, RowState.resolved);
+      expectDec(p.payoutRows[2].actualAmount, '950.00');
+      expectDec(p.received, '3050.00');
+    });
+
+    test('AC-58 Islamic deposit: interest does not resolve the 83.33 row; it shows the line; received 0.00', () {
+      final p = planOf(deposit(AccountKind.islamic), [
+        mIn('dep', day(2026, 1, 1), '10000', egp),
+        interest('dep', day(2026, 2, 1), '83.33', egp, InterestKind.paidOut),
+      ], day(2026, 2, 9));
+      final row = p.payoutRows.single;
+      expect(row.date, day(2026, 2, 1));
+      expectDec(row.expected, '83.33');
+      expect(row.pending, isTrue);
+      expect(row.noPayoutLine, isTrue);
+      expectDec(p.received, '0.00');
+    });
+
+    test('AC-58b conventional deposit: the check mark is interest paid out (to purify 83.33), value 10,000.00, February 0.00 %; a hand interest record resolves it, income does not', () {
+      final dep = deposit(AccountKind.conventional);
+      final start = mIn('dep', day(2026, 1, 1), '10000', egp);
+      final p = planOf(dep, [start], day(2026, 2, 9));
+      expectDec(p.payoutRows.single.expected, '83.33');
+      final confirmed = interest(
+        'dep',
+        day(2026, 2, 1),
+        p.payoutRows.single.expected.toString(),
+        egp,
+        InterestKind.paidOut,
+      );
+      final h = [start, confirmed];
+      final after = planOf(dep, h, day(2026, 2, 9));
+      expect(after.payoutRows.single.state, RowState.resolved);
+      final tl = ItemTimeline(item(dep, h), RateBook(const []));
+      expectDec(tl.toPurifyAt(day(2026, 2, 9)).amount, '83.33');
+      expectDec(tl.recordedValueAt(day(2026, 2, 9)), '10000.00');
+      expect(tl.incomeFlows(day(2025, 12, 31), day(2026, 12, 31)), isEmpty);
+      final feb = day(2026, 2, 28);
+      expectPct(
+        calc([
+          item(dep, h),
+        ], today: feb).item('dep', Period.month(2026, 2, feb)).dietz.r,
+        '0.00',
+      );
+      final byHand = planOf(dep, [
+        start,
+        interest('dep', day(2026, 2, 3), '83.33', egp, InterestKind.paidOut),
+      ], day(2026, 2, 9));
+      expect(byHand.payoutRows.single.state, RowState.resolved);
+      final income = planOf(dep, [
+        start,
+        mOut('dep', day(2026, 2, 3), '83.33', egp, MoneyOutKind.income),
+      ], day(2026, 2, 9));
+      expect(income.payoutRows.single.pending, isTrue);
+    });
+
+    test('AC-59 a new % moves pending rows to 6,000.00; April stays 5,000.00; 18,000 expected, 5,000 received', () {
+      final p = planOf(friend(profit: '0.24'), [
+        fpIn(),
+        fpIncome(day(2026, 4, 15), '5000'),
+      ], day(2026, 10, 17));
+      expectRows(p.payoutRows, ['6000.00', '6000.00', '6000.00']);
+      expectDec(p.payoutRows[0].actualAmount, '5000.00');
+      expect([for (final r in p.payoutRows) r.pending], [false, true, true]);
+      expectDec(p.expectedSoFar, '18000.00');
+      expectDec(p.received, '5000.00');
+    });
+
+    test('AC-60 V_exp 11,200.00; at the 07-01 update 12,635.39, −235.39 (−1.86 %), below; at 09-28 9,948.16, +151.84 (+1.53 %)', () {
+      final f = fund(check: Schedule.yearly);
+      expectDec(
+        planOf(f, [fundIn()], day(2027, 1, 1)).expectedValueAt(day(2027, 1, 1)),
+        '11200.00',
+      );
+      final h = [
+        fundIn(),
+        mIn('fund', day(2026, 4, 1), '2000', egp),
+        val('fund', day(2026, 7, 1), '12400'),
+        mOut('fund', day(2026, 8, 15), '3000', egp, MoneyOutKind.sale),
+        val('fund', day(2026, 9, 28), '10100'),
+      ];
+      final p = planOf(f, h, day(2026, 10, 1));
+      final first = p.valueChecks[0];
+      expect(first.date, day(2026, 7, 1));
+      expectDec(first.actualNet, '12400.00');
+      expectDec(first.expected, '12635.39');
+      expectDec(first.diff, '-235.39');
+      expectPct(first.diffPct, '-1.86');
+      expect(first.below, isTrue);
+      final second = p.valueChecks[1];
+      expectDec(second.actualNet, '10100.00');
+      expectDec(second.expected, '9948.16');
+      expectDec(second.diff, '151.84');
+      expectPct(second.diffPct, '1.53');
+      expect(second.below, isFalse);
+    });
+
+    test('AC-61 value rows 10,096.72 and 10,184.88; confirming February keeps March; March edited to 9,800: −384.88 (−3.78 %); a hand update on 02-05 resolves February', () {
+      final on = day(2026, 3, 5);
+      final p = planOf(fund(), [fundIn()], on);
+      expect(dates(p.valueRows), [day(2026, 2, 1), day(2026, 3, 1)]);
+      expectRows(p.valueRows, ['10096.72', '10184.88']);
+      final feb = val(
+        'fund',
+        day(2026, 2, 1),
+        p.valueRows[0].expected.toString(),
+      );
+      final q = planOf(fund(), [fundIn(), feb], on);
+      expect(q.valueRows[0].state, RowState.resolved);
+      expectDec(q.valueRows[0].actualAmount, '10096.72');
+      expect(q.valueRows[1].pending, isTrue);
+      expectDec(q.valueRows[1].expected, '10184.88');
+      final r = planOf(fund(), [
+        fundIn(),
+        feb,
+        val('fund', day(2026, 3, 1), '9800'),
+      ], on);
+      expect(r.hasPending, isFalse);
+      final march = r.valueChecks.last;
+      expectDec(march.actualNet, '9800.00');
+      expectDec(march.diff, '-384.88');
+      expectPct(march.diffPct, '-3.78');
+      final byHand = planOf(fund(), [
+        fundIn(),
+        val('fund', day(2026, 2, 5), '10050'),
+      ], on);
+      expect(byHand.valueRows[0].state, RowState.resolved);
+      expect(byHand.valueRows[0].actual!.date, day(2026, 2, 5));
+      expect(byHand.valueRows[1].pending, isTrue);
+    });
+
+    test('AC-62 the chart data: V_exp through the rows, hollow points at 10,096.72 and 10,184.88; income steps 5,000 / 10,000 / 15,000 vs 5,000 / 9,000', () {
+      final p = planOf(fund(), [fundIn()], day(2026, 3, 5));
+      expectDec(p.expectedValueAt(day(2026, 1, 1)), '10000.00');
+      expectDec(p.expectedValueAt(day(2026, 2, 1)), '10096.72');
+      expectDec(p.expectedValueAt(day(2026, 3, 1)), '10184.88');
+      expect(p.valueRows.every((r) => r.pending), isTrue);
+      final ac52 = planOf(friend(), [
+        fpIn(),
+        fpIncome(day(2026, 4, 15), '5000'),
+        fpIncome(day(2026, 7, 15), '4000'),
+        skip('fp', day(2026, 10, 15), PlanKind.payout),
+      ], day(2026, 10, 17));
+      var cumulative = Decimal.zero;
+      final expectedSteps = [
+        for (final r in ac52.payoutRows) cumulative += r.expected!,
+      ];
+      expect(expectedSteps, [d('5000'), d('10000'), d('15000')]);
+      cumulative = Decimal.zero;
+      final actualSteps = [
+        for (final x in ac52.receivedRecords)
+          (x.date, cumulative += ac52.timeline.inItemUnit(x)!),
+      ];
+      expect(actualSteps, [
+        (day(2026, 4, 15), d('5000')),
+        (day(2026, 7, 15), d('9000')),
+      ]);
+    });
+
+    test('AC-63 a plan changes no actual figure: every return, gain, set-aside, real, purchasing power, totals, stale marker', () {
+      final on = day(2026, 10, 17);
+      final cpi = {
+        egy: {2025: '0.30', 2026: '0.10'},
+      };
+      List<Object?> returns(Returns? r) => [
+        r?.dietz.bv,
+        r?.dietz.ev,
+        r?.dietz.cf,
+        r?.dietz.d,
+        r?.dietz.r,
+        r?.z,
+        r?.dividends,
+        r?.rz,
+        r?.i,
+        r?.real,
+        r?.realAfterZakat,
+        r?.pp?.gap,
+        r?.pp?.neededEnd,
+        r?.pp?.neededReturn,
+        r?.pp?.kept,
+      ];
+      List<Object?> all(Investment i) {
+        final c = calc(
+          [
+            item(i, [
+              fpIn(),
+              fpIncome(day(2026, 4, 20), '5000'),
+              val('fp', day(2026, 6, 30), '101000'),
+            ]),
+          ],
+          today: on,
+          cpi: cpi,
+        );
+        final s = c.sinceStart('fp');
+        return [
+          s.days,
+          s.gain,
+          s.gainBase,
+          s.simpleRoi,
+          s.simpleRoiBase,
+          s.sinceStartReturn,
+          s.annualised,
+          s.annualisedBase,
+          c.staleNow().itemIds,
+          ...returns(s.figures.base),
+          ...returns(s.figures.itemUnit),
+          for (final p in [
+            Period.year(2026, on),
+            Period.month(2026, 4, on),
+            Period.month(2026, 10, on),
+          ]) ...[
+            ...returns(c.item('fp', p).base),
+            ...returns(c.item('fp', p).itemUnit),
+            c.item('fp', p).staleValue,
+            c.item('fp', p).toPurify.amount,
+            c.item('fp', p).closed,
+            ...returns(c.portfolio(p, ViewUnit.base).totals),
+            c.portfolio(p, ViewUnit.base).staleValues,
+            c.portfolio(p, ViewUnit.base).toPurify.amount,
+          ],
+        ];
+      }
+
+      final withPlan = all(friend());
+      final noPlan = all(friend(profit: null, payout: null));
+      expect(withPlan.length, noPlan.length);
+      for (var i = 0; i < withPlan.length; i++) {
+        expect(withPlan[i], noPlan[i], reason: 'figure $i');
+      }
+      expect(withPlan.whereType<Decimal>().length, greaterThan(40));
+    });
+
+    test('AC-64 cases follow Q2 first, Q1 only with a %', () {
+      expect(friend(profit: null, q2: CapitalBack.no).peCase, PeCase.a);
+      expect(friend(profit: null, q2: CapitalBack.yes).peCase, PeCase.c);
+      expect(
+        friend(profit: null, q2: CapitalBack.notSure).peCase,
+        PeCase.notSure,
+      );
+      expect(friend(q1: ProfitBasis.shareOfProfit).peCase, PeCase.a);
+      expect(friend(q1: ProfitBasis.fixedPctOfMoney).peCase, PeCase.b);
+      expect(
+        friend(q1: ProfitBasis.notSure, q2: CapitalBack.yes).peCase,
+        PeCase.c,
+      );
+      expect(friend(q1: ProfitBasis.notSure).peCase, PeCase.notSure);
+      expect(
+        friend(q1: ProfitBasis.fixedPctOfMoney, q2: CapitalBack.notSure).peCase,
+        PeCase.notSure,
+      );
+      InvestmentDraft draft({
+        String? profit,
+        ProfitBasis? q1,
+        CapitalBack? q2,
+      }) => InvestmentDraft(
+        name: 'x',
+        type: AssetType.privateEquity,
+        intent: Intent.trading,
+        unit: egp,
+        startDate: day(2026, 1, 15),
+        firstPaid: Money(d('100000'), egp),
+        payoutSchedule: profit == null ? null : Schedule.quarterly,
+        expectedProfit: profit == null ? null : d(profit),
+        profitBasis: q1,
+        capitalBack: q2,
+      );
+      List<DraftError> v(InvestmentDraft x) =>
+          validate(x, today: today, settings: settings());
+      expect(v(draft()), [DraftError.answerCapitalBack]);
+      expect(v(draft(q2: CapitalBack.notSure)), isEmpty);
+      expect(v(draft(profit: '0.2', q2: CapitalBack.no)), [
+        DraftError.answerProfitBasis,
+      ]);
+      expect(
+        v(draft(profit: '0.2', q1: ProfitBasis.notSure, q2: CapitalBack.no)),
+        isEmpty,
+      );
+    });
+
+    List<HistoryEntry> twoPayouts() => [
+      fpIn(),
+      fpIncome(day(2026, 4, 15), '5000'),
+      fpIncome(day(2026, 7, 15), '5000'),
+    ];
+
+    test('AC-65 case A: gain 10,000.00, ROI 10.00 %, to purify 0.00; case C: gain 0.00, ROI 0.00 %, to purify 10,000.00, rows still received, zakat 100 %', () {
+      final on = day(2026, 10, 17);
+      final a = calc([
+        item(friend(), twoPayouts()),
+      ], today: on).sinceStart('fp');
+      expectDec(a.gain, '10000.00');
+      expectPct(a.simpleRoi, '10.00');
+      expectDec(a.figures.toPurify.amount, '0.00');
+      final caseC = friend(q2: CapitalBack.yes);
+      final c = calc([item(caseC, twoPayouts())], today: on).sinceStart('fp');
+      expectDec(c.gain, '0.00');
+      expectPct(c.simpleRoi, '0.00');
+      expectDec(c.figures.toPurify.amount, '10000.00');
+      final p = planOf(caseC, twoPayouts(), on);
+      expect(
+        [for (final r in p.payoutRows.take(2)) r.state],
+        [RowState.resolved, RowState.resolved],
+      );
+      expectDec(p.received, '10000.00');
+      final z = resolve(caseC, settings());
+      expectDec(z.share, '1.00');
+      expect(z.notice, ZakatNotice.capitalBackIsDebt);
+    });
+
+    test('AC-66 case B: gain 10,000.00 and the Shariah risk tag; share of profit removes it; not sure or case C has none', () {
+      final b = friend(q1: ProfitBasis.fixedPctOfMoney);
+      final s = calc([
+        item(b, twoPayouts()),
+      ], today: day(2026, 10, 17)).sinceStart('fp');
+      expectDec(s.gain, '10000.00');
+      expect(b.peCase, PeCase.b);
+      expect(b.shariahRisk, isTrue);
+      expect(friend(q1: ProfitBasis.shareOfProfit).shariahRisk, isFalse);
+      expect(friend(q1: ProfitBasis.notSure).shariahRisk, isFalse);
+      expect(
+        friend(
+          q1: ProfitBasis.fixedPctOfMoney,
+          q2: CapitalBack.yes,
+        ).shariahRisk,
+        isFalse,
+      );
+    });
+
+    test('AC-69 a record dated d ± 7 resolves the row; d ± 8 does not', () {
+      for (final ok in [day(2026, 4, 22), day(2026, 4, 8)]) {
+        final p = planOf(friend(), [
+          fpIn(),
+          fpIncome(ok, '5000'),
+        ], day(2026, 10, 17));
+        expect(p.payoutRows.first.state, RowState.resolved, reason: '$ok');
+      }
+      for (final no in [day(2026, 4, 23), day(2026, 4, 7)]) {
+        final p = planOf(friend(), [
+          fpIn(),
+          fpIncome(no, '5000'),
+        ], day(2026, 10, 17));
+        expect(p.payoutRows.first.pending, isTrue, reason: '$no');
+      }
+    });
+
+    test('AC-70 a cash deposit with a payout schedule must name the account kind; without a schedule it is not asked', () {
+      InvestmentDraft dep({Schedule? payout, AccountKind? kind}) =>
+          InvestmentDraft(
+            name: 'dep',
+            type: AssetType.cashDeposit,
+            unit: egp,
+            startDate: day(2026, 1, 1),
+            firstPaid: Money(d('10000'), egp),
+            payoutSchedule: payout,
+            accountKind: kind,
+          );
+      List<DraftError> v(InvestmentDraft x) =>
+          validate(x, today: today, settings: settings());
+      expect(v(dep(payout: Schedule.monthly)), [DraftError.answerAccountKind]);
+      expect(
+        v(dep(payout: Schedule.monthly, kind: AccountKind.conventional)),
+        isEmpty,
+      );
+      expect(v(dep()), isEmpty);
+    });
+
+    test('AC-71 case C give-away of 4,000 from payouts: to purify 6,000.00, gain stays 0.00, set-aside unchanged', () {
+      final caseC = friend(q2: CapitalBack.yes);
+      final on = day(2026, 10, 17);
+      final given = [
+        ...twoPayouts(),
+        interest(
+          'fp',
+          day(2026, 8, 1),
+          '4000',
+          egp,
+          InterestKind.givenAwayFromPaidOut,
+        ),
+      ];
+      final before = calc([item(caseC, twoPayouts())], today: on);
+      final after = calc([item(caseC, given)], today: on);
+      final s = after.sinceStart('fp');
+      expectDec(after.timeline('fp').toPurifyAt(on).amount, '6000.00');
+      expectDec(s.gain, '0.00');
+      final year = Period.year(2026, on);
+      expectDec(
+        after.item('fp', year).setAside,
+        before.item('fp', year).setAside.toString(),
+      );
+    });
+
+    test('AC-72 undo removes what was written: the rows are pending again', () {
+      final on = day(2026, 10, 17);
+      final p = planOf(friend(), [fpIn()], on);
+      expectDec(p.received, '0.00');
+      expect(p.toConfirm, 3);
+      final skipped = planOf(friend(), [
+        fpIn(),
+        skip('fp', day(2026, 10, 15), PlanKind.payout),
+      ], on);
+      expect(skipped.payoutRows.last.state, RowState.skipped);
+      expect(skipped.toConfirm, 2);
+    });
+
+    test('AC-75 Home counts 5 to confirm (3 + 2); after confirm all on the project, 2', () {
+      // AC-61's fund seen on the same day as AC-51: its two monthly rows are
+      // placed so both fall on or before 2026-10-17.
+      final on = day(2026, 10, 17);
+      final f = Investment(
+        id: 'fund',
+        name: 'fund',
+        type: AssetType.fund,
+        intent: Intent.trading,
+        unit: egp,
+        startDate: day(2026, 8, 17),
+        zakatRule: ZakatRule.trading100,
+        valueCheckSchedule: Schedule.monthly,
+        expectedGrowth: d('0.12'),
+      );
+      final fundOn = planOf(f, [
+        mIn('fund', day(2026, 8, 17), '10000', egp),
+      ], on);
+      final fp = planOf(friend(), [fpIn()], on);
+      expect(fundOn.toConfirm, 2);
+      expect(fp.toConfirm + fundOn.toConfirm, 5);
+      final confirmed = planOf(friend(), [
+        fpIn(),
+        for (final r in fp.pendingRows) fpIncome(r.date, r.expected.toString()),
+      ], on);
+      expect(confirmed.toConfirm + fundOn.toConfirm, 2);
     });
   });
 }

@@ -1,5 +1,6 @@
 /* Copyright (c) 2026-Present Osama Khalifa. All rights reserved. */
 
+import 'package:decimal/decimal.dart';
 import 'package:drift/drift.dart';
 
 import '../../../core/db/app_database.dart';
@@ -124,12 +125,14 @@ class DriftInvestmentsRepository implements InvestmentsRepository {
   );
 
   @override
-  Future<void> deleteEntry(String id) => guardStorage(() async {
-    final n = await (_db.delete(
-      _db.historyEntries,
-    )..where((t) => t.id.equals(id))).go();
-    if (n == 0) throw NotFound('entry $id');
-  });
+  Future<void> deleteEntries(List<String> ids) => guardStorage(
+    () => _db.transaction(() async {
+      final n = await (_db.delete(
+        _db.historyEntries,
+      )..where((t) => t.id.isIn(ids))).go();
+      if (n != ids.toSet().length) throw NotFound('entries $ids');
+    }),
+  );
 
   /// [updated] null keeps each entry's own value (restore).
   Future<void> _insertEntries(
@@ -167,6 +170,13 @@ InvestmentsCompanion _investmentRow(
   customZakatShare: Value(i.customZakatShare),
   inflationOverride: Value(i.inflationOverride?.iso3),
   notes: Value(i.notes),
+  payoutSchedule: Value(i.payoutSchedule?.name),
+  expectedProfit: Value(i.expectedProfit),
+  valueCheckSchedule: Value(i.valueCheckSchedule?.name),
+  expectedGrowth: Value(i.expectedGrowth),
+  profitBasis: Value(i.profitBasis?.name),
+  capitalBack: Value(i.capitalBack?.name),
+  accountKind: Value(i.accountKind?.name),
   createdAt: created,
   updatedAt: Value(updated),
 );
@@ -189,9 +199,25 @@ Investment _investmentOf(InvestmentRow r) => Investment(
       ? null
       : Country(r.inflationOverride!),
   notes: r.notes,
+  payoutSchedule: _byName(Schedule.values, r.payoutSchedule),
+  expectedProfit: r.expectedProfit,
+  valueCheckSchedule: _byName(Schedule.values, r.valueCheckSchedule),
+  expectedGrowth: r.expectedGrowth,
+  profitBasis: _byName(ProfitBasis.values, r.profitBasis),
+  capitalBack: _byName(CapitalBack.values, r.capitalBack),
+  accountKind: _byName(AccountKind.values, r.accountKind),
   createdAt: r.createdAt.toUtc(),
   updatedAt: r.updatedAt.toUtc(),
 );
+
+T? _byName<T extends Enum>(List<T> values, String? name) =>
+    name == null ? null : values.byName(name);
+
+/// A skip has no amount; the column is NOT NULL, so it stores 0 (spec E2).
+const _skipKinds = {
+  PlanKind.payout: 'payout_skipped',
+  PlanKind.value: 'value_skipped',
+};
 
 const _interestKinds = {
   InterestKind.keptInside: 'interest_kept_inside',
@@ -218,6 +244,7 @@ HistoryEntriesCompanion _entryRow(
       amount.unit.code,
     ),
     ValueUpdate(:final value) => ('value_update', value, null),
+    PlanSkip(:final plan) => (_skipKinds[plan]!, Decimal.zero, null),
   };
   return HistoryEntriesCompanion(
     id: Value(e.id),
@@ -259,6 +286,14 @@ HistoryEntry _entryOf(HistoryEntryRow r) {
       date: r.date,
       amount: money(),
       kind: r.kind == 'sale' ? MoneyOutKind.sale : MoneyOutKind.income,
+      createdAt: created,
+      updatedAt: updated,
+    ),
+    'payout_skipped' || 'value_skipped' => PlanSkip(
+      id: r.id,
+      investmentId: r.investmentId,
+      date: r.date,
+      plan: r.kind == 'payout_skipped' ? PlanKind.payout : PlanKind.value,
       createdAt: created,
       updatedAt: updated,
     ),

@@ -119,6 +119,92 @@ void main() {
     expect(tl.flowsIn(day(2025, 12, 31), day(2026, 12, 31)).length, 3);
   });
 
+  test('income keeps the recorded value; a sale lowers it (Q12)', () {
+    final tl = ItemTimeline(
+      InvestmentWithHistory(
+        investment: inv(egp),
+        history: [
+          mIn(day(2026, 1, 1), '1000', egp),
+          MoneyOut(
+            investmentId: 'a',
+            date: day(2026, 3, 1),
+            amount: Money(d('1500'), egp),
+            kind: MoneyOutKind.income,
+          ),
+          MoneyOut(
+            investmentId: 'a',
+            date: day(2026, 4, 1),
+            amount: Money(d('300'), egp),
+          ),
+        ],
+      ),
+      RateBook(const []),
+    );
+    expect(tl.recordedValueAt(day(2026, 3, 1)), d('1000'));
+    expect(tl.closedAt(day(2026, 3, 1)), isFalse);
+    expect(tl.recordedValueAt(day(2026, 4, 1)), d('700'));
+  });
+
+  test('a skip is not an actual record: no value, no flow, no activity', () {
+    final tl = ItemTimeline(
+      InvestmentWithHistory(
+        investment: inv(egp),
+        history: [
+          mIn(day(2026, 1, 1), '1000', egp),
+          PlanSkip(
+            investmentId: 'a',
+            date: day(2026, 2, 1),
+            plan: PlanKind.payout,
+          ),
+        ],
+      ),
+      RateBook(const []),
+    );
+    expect(tl.activeIn(day(2026, 1, 31), day(2026, 2, 28)), isFalse);
+    expect(tl.latestValueDate, day(2026, 1, 1));
+    expect(tl.flowsIn(day(2025, 12, 31), day(2026, 12, 31)).length, 1);
+  });
+
+  test('case C: income leaves flows and income, and is to purify (E5)', () {
+    final pe = Investment(
+      id: 'a',
+      name: 'a',
+      type: AssetType.privateEquity,
+      intent: Intent.longTerm,
+      unit: egp,
+      startDate: day(2026, 1, 1),
+      zakatRule: ZakatRule.longTermFullValue,
+      capitalBack: CapitalBack.yes,
+    );
+    final tl = ItemTimeline(
+      InvestmentWithHistory(
+        investment: pe,
+        history: [
+          mIn(day(2026, 1, 1), '1000', egp),
+          MoneyOut(
+            investmentId: 'a',
+            date: day(2026, 3, 1),
+            amount: Money(d('50'), egp),
+            kind: MoneyOutKind.income,
+          ),
+          InterestRecord(
+            investmentId: 'a',
+            date: day(2026, 4, 1),
+            amount: Money(d('20'), egp),
+            kind: InterestKind.givenAwayFromPaidOut,
+          ),
+        ],
+      ),
+      RateBook(const []),
+    );
+    final all = (day(2025, 12, 31), day(2026, 12, 31));
+    expect(tl.flowsIn(all.$1, all.$2).single.amount, d('1000'));
+    expect(tl.incomeFlows(all.$1, all.$2), isEmpty);
+    expect(tl.toPurifyAt(day(2026, 3, 1)).amount, d('50'));
+    expect(tl.toPurifyAt(day(2026, 4, 1)).amount, d('30'));
+    expect(tl.recordedValueAt(day(2026, 4, 1)), d('1000'));
+  });
+
   test('a missing rate is collected, never converted 1:1', () {
     final tl = ItemTimeline(
       InvestmentWithHistory(

@@ -20,4 +20,16 @@ void main() {
     expect(daysInYear(2028), 366);
     expect(daysInYear(2026), 365);
   });
+
+  test('AC-50 addMonths keeps the day or takes the last day of the month', () {
+    expect(
+      [for (var k = 1; k <= 3; k++) addMonths(day(2026, 1, 31), k)],
+      [day(2026, 2, 28), day(2026, 3, 31), day(2026, 4, 30)],
+    );
+    expect(
+      [for (var k = 1; k <= 4; k++) addMonths(day(2024, 2, 29), 12 * k)],
+      [day(2025, 2, 28), day(2026, 2, 28), day(2027, 2, 28), day(2028, 2, 29)],
+    );
+    expect(addMonths(day(2026, 11, 15), 3), day(2027, 2, 15));
+  });
 }

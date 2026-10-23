@@ -128,3 +128,39 @@ PurchasingPower? purchasingPower(DietzResult dz, Decimal z, Decimal i) {
     kept: gap >= Decimal.zero,
   );
 }
+
+/// Expected amounts are stored when confirmed, so they are rounded to 2 dp
+/// here, not at display (spec E9).
+Decimal _round2(Decimal x) => x.round(scale: 2);
+
+/// P_k = round2(C × p × m ÷ 12), p per year of the money in (story §5.6).
+Decimal expectedPayout({
+  required Decimal capital,
+  required Decimal rate,
+  required int months,
+}) => _round2(
+  divide(capital * rate * Decimal.fromInt(months), Decimal.fromInt(12)),
+);
+
+/// V_exp(on) = round2(max(0, Σ amount × (1 + g)^(days ÷ 365))) over [flows]
+/// dated on or before [on] (money in +, sales −; story §5.6).
+Decimal expectedValue({
+  required List<Flow> flows,
+  required Decimal growth,
+  required DateTime on,
+}) {
+  final factor = Decimal.one + growth;
+  final sum = sumOf([
+    for (final f in flows)
+      if (!f.date.isAfter(on))
+        f.amount *
+            powRatio(
+              factor,
+              divide(
+                Decimal.fromInt(daysBetween(f.date, on)),
+                Decimal.fromInt(365),
+              ),
+            ),
+  ]);
+  return _round2(sum < Decimal.zero ? Decimal.zero : sum);
+}

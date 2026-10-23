@@ -15,6 +15,7 @@ import 'package:flutter/material.dart' hide Intent;
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../support/app_harness.dart';
+import '../../../support/plan_seeds.dart';
 
 Future<void> seedBasic(Harness h) async {
   await h.setup();
@@ -289,6 +290,131 @@ void main() {
           await tester.tap(find.text('Fund A'));
           await tester.pumpAndSettle();
           expect(find.byType(ItemDetailScreen), findsOneWidget);
+        },
+      );
+      testScreen(
+        'AC-51, AC-75: rows show "3 to confirm" and "2 to confirm" (5 in all); after Confirm all on the project only "2"',
+        (tester) async {
+          final h = await pumpScreen(
+            tester,
+            const HomeScreen(),
+            locale: locale,
+            now: day(2026, 10, 17),
+            seed: (h) async {
+              await seedFriend(h);
+              await h.addItem(planFund(start: day(2026, 8, 17)), [
+                moneyIn('fund', day(2026, 8, 17), '10000'),
+              ]);
+            },
+          );
+          final l10n = l10nOf(tester);
+          expect(find.text(l10n.toConfirmPill(3)), findsOneWidget);
+          expect(find.text(l10n.toConfirmPill(2)), findsOneWidget);
+          expect(find.byKey(const ValueKey('to-confirm-fp')), findsOneWidget);
+          expect(find.byKey(const ValueKey('to-confirm-fund')), findsOneWidget);
+          expect(find.text(l10n.toConfirmPill(5)), findsNothing);
+          await tester.tap(find.text("Friend's project"));
+          await settle(tester);
+          await tester.tap(find.byKey(const ValueKey('confirm-all')));
+          await settle(tester);
+          final fp = (await tester.runAsync(() => h.items()))!
+              .firstWhere((x) => x.investment.id == 'fp');
+          expect(fp.history.whereType<MoneyOut>().length, 3);
+          Navigator.of(tester.element(find.byType(ItemDetailScreen))).pop();
+          await settle(tester);
+          expect(find.byKey(const ValueKey('to-confirm-fp')), findsNothing);
+          expect(find.text(l10n.toConfirmPill(2)), findsOneWidget);
+        },
+      );
+
+      testScreen('AC-56: a closed item is not counted', (tester) async {
+        await pumpScreen(
+          tester,
+          const HomeScreen(),
+          locale: locale,
+          now: day(2027, 2, 1),
+          seed: (h) => seedFriend(
+            h,
+            more: [
+              moneyOut('fp', day(2026, 12, 1), '100000'),
+              value('fp', day(2026, 12, 1), '0'),
+            ],
+          ),
+        );
+        expect(find.byKey(const ValueKey('to-confirm-fp')), findsNothing);
+      });
+      testScreen(
+        'A5: "oldest first" ignores skip dates (a skip is not an update)',
+        (tester) async {
+          await pumpScreen(
+            tester,
+            const HomeScreen(),
+            locale: locale,
+            seed: (h) async {
+              await h.setup();
+              await h.addItem(item('a', name: 'Fund A'), [
+                moneyIn('a', day(2026, 1, 1), '1000'),
+                value('a', day(2026, 9, 1), '1000'),
+              ]);
+              await h.addItem(item('b', name: 'Fund B'), [
+                moneyIn('b', day(2026, 1, 1), '1000'),
+                value('b', day(2026, 8, 1), '1000'),
+                PlanSkip(
+                  investmentId: 'b',
+                  date: day(2026, 10, 1),
+                  plan: PlanKind.value,
+                ),
+              ]);
+            },
+          );
+          final l10n = l10nOf(tester);
+          await tester.tap(find.byKey(const ValueKey('sort')));
+          await tester.pumpAndSettle();
+          await tester.tap(find.text(l10n.sortOldest).last);
+          await tester.pumpAndSettle();
+          expect(
+            tester.getTopLeft(find.text('Fund B')).dy,
+            lessThan(tester.getTopLeft(find.text('Fund A')).dy),
+          );
+        },
+      );
+      testScreen(
+        'AC-72: ✓ April then Undo: no income, April pending at 5,000.00, Home still "3 to confirm"',
+        (tester) async {
+          final h = await pumpScreen(
+            tester,
+            const HomeScreen(),
+            locale: locale,
+            now: day(2026, 10, 17),
+            seed: seedFriend,
+          );
+          final l10n = l10nOf(tester);
+          await tester.tap(find.text("Friend's project"));
+          await settle(tester);
+          await tester.tap(
+            find.byKey(const ValueKey('check-payout-2026-04-15')),
+          );
+          await settle(tester);
+          await tester.tap(find.text(l10n.undo));
+          await settle(tester);
+          final history = (await tester.runAsync(() => h.items()))!
+              .single
+              .history;
+          expect(history.whereType<MoneyOut>(), isEmpty);
+          expect(
+            find.byKey(const ValueKey('check-payout-2026-04-15')),
+            findsOneWidget,
+          );
+          expect(
+            find.descendant(
+              of: find.byKey(const ValueKey('row-payout-2026-04-15')),
+              matching: textPlain(RegExp(r'^5,000\.00 EGP$')),
+            ),
+            findsOneWidget,
+          );
+          Navigator.of(tester.element(find.byType(ItemDetailScreen))).pop();
+          await settle(tester);
+          expect(find.text(l10n.toConfirmPill(3)), findsOneWidget);
         },
       );
     });
