@@ -498,5 +498,22 @@
   "byCurrencyTitle": "حسب العملة",
   "chartValue": "القيمة",
   "chartPaidIn": "المدفوع",
-  "notEnoughMonths": "لا توجد أشهر كافية بعد. الرسم يحتاج شهرين على الأقل."
+  "notEnoughMonths": "لا توجد أشهر كافية بعد. الرسم يحتاج شهرين على الأقل.",
+  "settings": "الإعدادات",
+  "assumptionsSummary": "{currency} · {zakatYear}",
+  "settingsReadError": "تعذّرت قراءة الإعدادات.",
+  "aiHeading": "الذكاء الاصطناعي",
+  "aiCloudTitle": "استخدام الذكاء الاصطناعي السحابي",
+  "aiCloudSubtitle": "عند التشغيل، يغادر النص الذي ترسله إلى الذكاء الاصطناعي هاتفك ويذهب إلى المزوّد الذي تختاره أدناه.",
+  "aiProviderHeading": "مزوّد الذكاء الاصطناعي",
+  "aiVendorSubtitle": "مفتاحك الخاص. {notice}",
+  "aiKeyLabel": "مفتاح واجهة {vendor}",
+  "aiKeyHelper": "{help} يُحفظ على هذا الهاتف فقط.",
+  "aiKeySaved": "يوجد مفتاح محفوظ",
+  "aiRemoveKey": "حذف المفتاح",
+  "aiSaveKey": "حفظ المفتاح",
+  "aiStatusOff": "الذكاء الاصطناعي السحابي متوقف.",
+  "aiStatusPickVendor": "اختر مزوّدًا للذكاء الاصطناعي لاستخدامه.",
+  "aiStatusAddKey": "أضف مفتاح {vendor} لاستخدامه.",
+  "aiStatusUsingKey": "تستخدم مفتاح {vendor} الخاص بك."
 }

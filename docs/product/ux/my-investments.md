@@ -45,14 +45,14 @@ Q5 (real totals), Q6 (no third-unit conversion) and Q7 (Gregorian year) are deci
 | S5 | **Record sheet** | Bottom sheet | Money in, money out, value update, interest — one sheet. Same sheet edits a history entry. |
 | S6 | **Update all** | Main | Rate refresh + stale rates + stale item values. One list, one Save. |
 | S7 | **Period view** | Main | Month / Year, before/after set-aside, before/after inflation, purchasing-power gap, no-zakat switch with nisab hint. Portfolio or one item (scope picker). |
-| S8 | **Assumptions** | Main | Rates, inflation series, base, home inflation, zakat choices, no-zakat years. Replaces separate "Settings" and "Rates" screens. |
+| S8 | **Assumptions** | Opened from Settings (gear on every tab) | Rates, inflation series, base, home inflation, zakat choices, no-zakat years. Replaces separate "Settings" and "Rates" screens. |
 | S9 | **Why sheet** | Bottom sheet (one component) | Every explanation. |
 | — | *2026-10-17 additions (§2.12)* | no new screen | S3 gets the Private equity type and an **Expected (optional)** block. S4 gets **To confirm** (pending rows), **Plan vs actual** (numbers + charts) and the **Shariah risk** tag. S2 gets a pending badge. S5 opens pre-filled from a pending row. S7 gets one payouts line in item scope. |
 | — | Unit picker, inline rate entry | Shared sheets / rows | Used by S1, S3, S5, S6, S7, S8. |
 
 **Why merge this way:** three jobs — *record* (S3 + S5), *keep current* (S6, S8 for corrections), *judge* (S2, S4, S7). Rates, inflation and zakat choices are all "assumptions behind the numbers", so they live together in S8, and every why sheet deep-links to the exact S8 row.
 
-**Navigation:** a bottom tab bar — Overview · **Investments** · Zakat · Plan (2026-10-23). S2 is the root of the Investments tab, which opens at launch until Overview has content. Pushed screens cover the tab bar. Home top bar: title, **Assumptions** icon (S8). Everything else is reached by tapping content.
+**Navigation:** a bottom tab bar — Overview · **Investments** · Zakat · Plan (2026-10-23). S2 is the root of the Investments tab, which opens at launch until Overview has content. Pushed screens cover the tab bar. Every tab's top bar: title + **Settings** gear. Settings = Assumptions › (base currency · zakat year) + AI. Everything else is reached by tapping content.
 
 ---
 
@@ -83,7 +83,7 @@ Q5 (real totals), Q6 (no third-unit conversion) and Q7 (Gregorian year) are deci
 
 **No totals card (owner 2026-10-23).** The total, excluded items, to purify and this year's verdict live on the Overview tab only. Overview's total opens this tab.
 
-1. **Stale banner** (only if anything is stale, D8) — "4 values and 2 rates not updated this month · **Update all**" → S6.
+1. **Banner slot** (only when the list has items) — stale: "4 values and 2 rates not updated this month · **Update all**" → S6; nothing stale: "Everything is up to date for {month} · **Update all**" → S6 (D8).
 2. **List** — "Sort: Value ▾" (Value in base · Return since start · Name · Oldest update first). Default Value, highest first; persists. Sections **Open**, then **Closed (3)** collapsed.
 3. **Primary action:** floating **+ Add** (S3).
 
@@ -206,7 +206,7 @@ One scrolling form. Asset type is first; it decides which fields show. Hidden fi
 
 ### 2.6 Update all (S6) — the make-or-break flow
 
-**Entry point:** stale banner on S2; "rate missing" links on S2/S7; "Update all" on S8.
+**Entry point:** S2 banner slot (stale or up to date); Overview stale card; "rate missing" links on S2/S7. Not S8.
 
 **Goal:** monthly update of 10 items and 3 rates in under 60 seconds, one hand, never leaving the screen.
 
@@ -233,13 +233,12 @@ One scrolling form. Asset type is first; it decides which fields show. Hidden fi
 
 ### 2.7 Assumptions (S8)
 
-**Entry point:** Home top-bar icon; every why sheet's "Change" link (lands on the row).
+**Entry point:** Settings › Assumptions; every why sheet's "Change" link (lands on the row).
 
 1. **Base and home** — base currency (change → "All totals and months recalculate"), home inflation series.
 2. **Rates** — header **Refresh rates online** (same action as S6). Pairs in use, then "Other pairs". Row: "1 USD = 48.50 EGP · as of 15 Oct 2026" + origin tag **{source}** or **Typed by you**, stale/missing marker. If a typed and a fetched rate share a date: "Your rate is used (source gave 48.50)". Tap → pair history (dated; add, edit, delete + Undo; fetched rows are overridden by typing, not edited). Add-rate sheet: pair picker (§6.3), **swap direction**, date, rate, inverse shown live ("1 EGP = 0.0206 USD") so a reversed entry is visible (AC-23).
 3. **Inflation** — series in use. Row: "Egypt · 2026 assumed from 2025 · 2025 25.0 % shipped (World Bank, as of 2025)". Tap → year list, each year **Shipped** or **Yours**; tap a year → type an override; overridden years show "Reset to shipped" (AC-32). Empty series: "No data for {country}. Add a year to see real figures for items using it."
 4. **Zakat** — Zakat year, Long-term method, Jewellery ruling (each with Source; jewellery shows "Not asked yet" until first jewellery). **No zakat due by year**: one row per year with the switch, help text and nisab hint (same block as 2.10 step 7).
-5. **Update all** button → S6.
 
 ### 2.8 Missing-rate states (everywhere)
 
