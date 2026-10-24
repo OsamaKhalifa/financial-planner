@@ -1,7 +1,7 @@
 # Zakat on investments ("My Investments" page)
 
-**Owner:** islamic-consultant · **Status:** v0 draft · 2026-10-16 · updated 2026-10-17 (Private equity, expected profit)
-**Feeds:** "My Investments" story (ROI before/after zakat and inflation), UC-1, UC-3.
+**Owner:** islamic-consultant · **Status:** v0 draft · 2026-10-16 · updated 2026-10-17 (Private equity, expected profit) · updated 2026-10-23 (Part C — yearly zakat, UC-3) · updated 2026-10-23 (loop 1: C6, C8, C10; PM-Q4..Q6)
+**Feeds:** "My Investments" story (ROI before/after zakat and inflation), UC-1, UC-3 ("Zakat" story, `stories/zakat.md`).
 
 ## How to read this file
 
@@ -29,7 +29,9 @@
 
 - **Rule:** If the user keeps their zakat year on the solar (Gregorian) calendar, some bodies adjust the rate to 2.577% to cover the ~11 extra days. Others reject any change to the 1/40 rate. **Disagreement — user picks.**
 - **Reference:**
-  - AAOIFI SS 35 allows a solar year at 2.577% (2.5775% in a leap year). **[S]** via National Zakat Foundation UK (nzf.org.uk/knowledge/can-a-solar-year-be-used-for-zakat-calculation) and Islamic Markets summary. Section number **[U]**.
+  - AAOIFI SS 35 allows a solar year at 2.577%. **[S]** via National Zakat Foundation UK (nzf.org.uk/knowledge/can-a-solar-year-be-used-for-zakat-calculation) and Islamic Markets summary. Section number **[U]**. Checked again 2026-10-23: the NZF page gives 2.577% and says **nothing** about leap years.
+  - The same adjustment (add 11/354 to the rate) is credited to the "International Organization of the Contemporary Fiqh of Zakah" by fiqh.islamonline.net ("calculating zakah on the solar calendar"). **[S]**
+  - "2.5775% in a leap year" appears only in commercial calculators (Wahed). No trusted body found. **Not used** (Z-Q4).
   - Opposing view: Mufti Online (South Africa, Hanafi) — the rate is fixed by text at 1/40; no one may adjust it. Pay on the lunar date. **[S]** (islamqa.org/hanafi/muftionline/104249)
 - **App:** Setting "Zakat year: Lunar (2.5%) / Solar (2.577%, AAOIFI)". Default **Lunar**. Show both references on the setting.
 
@@ -232,6 +234,137 @@ Views (user picks):
 
 ---
 
+## Part C — Yearly zakat (UC-3)
+
+Story: [stories/zakat.md](../stories/zakat.md). This part covers only what the yearly calculation and the distribution log need. Rate, nisab, values, FX and item shares stay in Parts A and B.
+
+### C1. Cycle date and due date (hawl)
+
+- **Rule:** Zakat falls due when 12 lunar months have passed since the user's wealth first reached nisab. That day, every year, is the zakat date. With the solar option (A2), it is the same day and month in each Gregorian year, with r = 2.577%.
+- **Reference:**
+  - Abu Dawud 1573: no zakat until a year passes. **[V]** Muwatta Malik (Ibn Umar) says the same, with al-Shaybani *al-Asl* and al-Sarakhsi *al-Mabsut* — via Islamic Portal (islamqa.org/hanafi/islamicportal/175831). **[S]**
+  - Quran 9:36 (twelve months) and 2:189 (the new moons are time markers for people). **[V]**
+  - "The first time your wealth surpasses the Nisaab amount, that would be your Zakat-versary" — Darul Iftaa Birmingham (islamqa.org/hanafi/daruliftaa-birmingham/245155). **[S]**
+  - If the date is not known, use a best estimate: common fatwa practice. No named primary source found. **[U]**
+- **App:**
+  - Help text on the cycle-date question: "Your zakat date is the day your wealth first reached nisab, counted in Hijri months. If you already give zakat on a set date, use that date."
+  - One r per year. No T/Y factor (A1). A leap solar year still uses 2.577% (A2, Z-Q4).
+
+### C2. Changing the calendar or the cycle date
+
+- **Rule:** Zakat that is already due must not be pushed back. A zakat date may move earlier: that is giving early (C6). It may not move later in a way that makes one year longer than one hawl. Most scholars hold that zakat must be given when it falls due. Delay without a valid excuse is not allowed.
+- **Reference:**
+  - Delay after the year ends is not allowed without a valid excuse. Malik, Ahmad and most scholars hold that zakat is due at once. — Saudi Permanent Committee, via islamqa.info 13981. **[S]** Primary texts **[U]**.
+  - Hanafi: "It is not permissible to change your zakat date." You may give early on an estimate. On the real date, work out what is owed and make up any shortfall. Late zakat stays a debt until it is paid. — FatwaCentre (Mufti Abdur-Rahman Mangera, Mufti Zubair Patel), islamqa.org/hanafi/fatwacentre/178985. **[S]**
+- **App:**
+  1. A year that is **due**, distributing or settled is never rebuilt by a change of calendar or cycle date. It keeps its calendar, due date and r. A due year stays due until the user starts it, because its zakat is already owed.
+  2. Only **open** years may be rebuilt. After the change, the first new due date must be **on or before** the old due date of the open year. A first new year that ends later is not allowed. How the app meets this is a product choice.
+  3. After a switch from lunar to solar, every later year is about 11 days longer. That is the A2 view, and r = 2.577% covers it. Rule 2 applies only to the year of the change.
+
+### C3. Umm al-Qura vs local sighting; moving the due date
+
+- **Rule:** A lunar month starts when the new moon is seen. It has 29 or 30 days. A calculated calendar (Umm al-Qura) can differ from local sighting by one or two days. The user's year ends on the cycle day as their own community counts the month.
+- **Reference:**
+  - Bukhari 1909: fast when you see the new moon; if it is hidden, complete thirty days. **[S]** Bukhari 1907: a month may have 29 nights. **[S]** (ihadis.com, tohed.com; sunnah.com refused the fetch.) Quran 2:189. **[V]**
+  - Using Umm al-Qura as the converter is a product choice, not a Shariah rule. "±2 days covers sighting differences" is my reading. **[U]**
+- **App:**
+  - **Lunar:** the user may move the due date 1–2 days earlier or later. The moved date is the due date for values, rates, nisab and the notification.
+  - **Cycle day 30 in a month with 29 days:** use the 29th, the last day of that month. My reading **[U]**: this is never later than the real end of the year, so at worst the user gives one day early (C6).
+  - **Solar:** there is no sighting reason to move the date. Moving it earlier is giving early (C6), so that is fine. Moving it later delays zakat for no reason (C2). Shariah view: solar dates may move **earlier only**.
+  - Line under a Hijri due date: "Hijri dates use the Umm al-Qura calendar. If your month began on another day where you live, move your due date."
+
+### C4. Nisab on the due date, after deductions
+
+- **Rule:** On the due date, value all zakatable wealth and take off the debts the user deducts (A5). Then compare what is left with nisab. If it is below nisab, no zakat is due for that year.
+- **Reference:**
+  - Hanafi: "after evaluating one's zakaatable assets one will deduct his liabilities and debts". If the rest reaches nisab, zakat is due. — Council of Ulama Eastern Cape (islamqa.org/hanafi/councilofulama/50867), citing Ibn Abidin, *Radd al-Muhtar* 2/260. **[S]**
+  - Shafi'i: debt does not cancel zakat (A5). In the app this is "deduction off", so the gross total is compared.
+  - Hanafi: nisab must be held at the start and the end of the year — Islamic Portal 175831. **[S]**
+- **App:** `B = max(0, Σ L_i − debts)`, and zakat is due if `B ≥ nisab`. Both are taken on the due date. With deduction off, `debts = 0`, so the gross total is compared. That is the Shafi'i view, and it needs no second switch.
+- **Edge case — below nisab on the due date:** in the Hanafi view, the zakat date lapses. A new one starts on the day wealth next reaches nisab, and zakat is due one lunar year after that day (Islamic Portal 175831 **[S]**). v1 keeps the cycle date, so giving on it counts as giving early (C6): valid, never late. This is listed under "What we do not handle".
+
+### C5. Money owed to me and cash outside the list (extra lines)
+
+- **Rule:** Same as B1 and B9. A good debt counts at its full amount every year. A doubtful debt counts nothing until it is received. Once received, it is cash.
+- **Reference:** IIFA Res 1 (1/2) **[V]**; B1.
+- **App:** extra lines take only cash and good debts, both at 100%. A good debt needs the user to state that the debtor is able and willing to pay. Other kinds of wealth (gold, goods held for sale, a business) are not extra lines. They go in My Investments, where Part B gives each one its share.
+
+### C6. Giving before the due date (ta'jil)
+
+- **Rule:** The Hanafi, Shafi'i and Hanbali schools allow zakat to be given before it falls due. Conditions: the user already holds nisab when giving, and gives the money as zakat. The Shafi'i school also limits this to one year ahead. The Maliki school allows it only shortly before the due date. **[U]**
+- **Reference:**
+  - Abu Dawud 1624 (Ali): al-Abbas asked to give his zakat before it fell due, and the Prophet allowed it. Graded hasan by al-Albani, da'if by Zubair Ali Zai. **[S]** (sunnah.com listing seen through search; the page refused a direct fetch.) Tirmidhi 678 **[U]**.
+  - Conditions: nisab held when giving; one year ahead only; giver and recipient still eligible at the end of the year. — Darul Iftaa Jordan, Q 2974 (islamqa.org/shafii/darul-iftaa-jordan/228000). **[S]**
+  - Hanafi: give early, then check the amount on the real date — FatwaCentre 178985. **[S]**
+- **App:**
+  - A log entry dated before the due date counts toward that year and is marked "given before the due date".
+  - Help line: "This counts if you held nisab when you gave it and you gave it as zakat. The Maliki school accepts this only shortly before the due date."
+  - Earliest allowed date: the day after the previous year's due date. That keeps the entry inside the year's own hawl, which also meets the one-year limit.
+  - "Previous year's due date" is that year's **real** due date: the moved date if the user moved it (C3). Not the computed date.
+  - **First year in the app** (no previous year, PM-Q4): earliest date = the day after the cycle date one year before the first due date, in the first year's own calendar (lunar: same Hijri day and month in the year before, Umm al-Qura, day-30 rule of C3; solar: same Gregorian day in the year before, 29 Feb → 28 Feb). Why: the cycle date is the day wealth reached nisab (C1), so the first hawl starts there.
+  - The Maliki clause of the help line is still **[U]** (Open item 7). Its Source sheet shows "source not yet verified" for that clause only.
+
+### C7. Giving more than due
+
+- **Rule:** **Scholars disagree — the user picks.**
+  - Hanafi: an extra amount given **as zakat** may count toward next year's zakat.
+  - Shafi'i: the extra is voluntary sadaqah. It cannot become next year's zakat, because each year's zakat needs its own intention.
+- **Reference:** Darul Uloom Deoband, fatwa 28/76/D=01/1435, citing *Fatawa Darul Uloom* 6:93 (islamqa.org/hanafi/darulifta-deoband/109918). **[S]** Darul Iftaa Jordan, Q 3602 (islamqa.org/shafii/darul-iftaa-jordan/228988). **[S]**
+- **App:** show "Given {x} more than due." Not moving the extra is valid under both views, because the next year is still given in full. Below that, show: "Some scholars (Hanafi) let you count this toward next year if you gave it as zakat. Others (Shafi'i) count it as sadaqah. The app does not move it."
+
+### C8. Giving in another currency
+
+- **Rule:** Cash zakat may be given in another currency (A7). **Scholars differ on which exchange rate counts it — the user picks.**
+  - View 1: the rate on the day it is given. This is the view of the Sahibayn (Abu Yusuf and Muhammad), "the day of payment". Several contemporary Hanafi muftis prefer it, partly because it is better for the poor.
+  - View 2: the rate on the due date. This is Abu Hanifa's view, "the day it became due".
+- **Reference:**
+  - fatwa-ca (islamqa.org/hanafi/fatwa-ca/178598) explains both views. **[S]**
+  - Darul Iftaa Mahmudiyyah (islamqa.org/hanafi/daruliftaazambia/134900): use the due-date rate; a higher rate is allowed. **[S]**
+  - Muftionline (islamqa.org/hanafi/muftionline/46417): use the value at the time of giving. **[S]**
+  - Primary text, *Radd al-Muhtar* (Kitab al-Zakah). **[U]**
+- **App (v1, updated 2026-10-23 loop 1):** log entries may be in **any currency** (owner OQ-5). This replaces "base currency only".
+  1. **Rate view: (a) ask, no default.** Asked once, the first time the user logs an entry in a currency other than the year's base. Both views shown with who holds them and their Source: "the rate on the day you gave (Abu Yusuf and Muhammad)" / "the rate on your due date (Abu Hanifa)". Nothing pre-selected. The entry is not saved until answered. Never asked of a user who logs only base-currency entries.
+  2. Then a Zakat setting the user may change.
+  3. **Each entry stores the view, the rate and the rate date it was counted at.** A later change of view applies to **new entries only**. Old entries keep their counted amount. The user may edit an old entry to recount it (PM-Q5 answer).
+  4. Rate = the rate on the rate date. If the app uses an older rate (latest on or before), it shows that rate's date and says it is not the rate of the rate date. Never 1:1.
+  5. Shown on each entry: "{amount} {currency} at {rate} on {rate date} ({view})". The rate date must be the date of the rate used.
+
+### C9. Recomputing after part was given
+
+- **Rule:** Zakat due is the correct amount on the due date, not the first figure the app computed. If that figure was wrong, amounts already given as zakat count toward the corrected figure, and any shortfall is still owed. If the corrected figure is lower than what was given, C7 applies to the extra.
+- **Reference:**
+  - FatwaCentre 178985: on the real date, work out what is owed, then make up any shortfall or deal with any excess. Unpaid zakat stays a debt. **[S]**
+  - SeekersGuidance (Mawlana Ilyas Patel): you may give a projected amount, then check it on the true date. **[S]**
+- **App:** recompute is allowed and the log is kept. The state follows distributed vs the new Z (story §8). If the new Z is below distributed, show the C7 text.
+
+### C10. Due-date notification wording
+
+- **Rule:** The app must not tell the user that an act of worship is due when it has not checked. On the due date the zakat year ends. Whether zakat is due depends on nisab (A3, C4). When the app schedules the notification, it does not know that yet.
+- **Reference:** Abu Dawud 1573: nothing is due below 20 dinars or 200 dirhams. **[V]** See also A3.
+- **App:**
+  - **"Your zakat for {year} is due today" is not acceptable as one fixed text.** In a below-nisab year it is false. Acceptable: "Your zakat year {year} ends today. Open to see your zakat." That is true in every case.
+  - In-tab text for a year in state due, where the app knows the result:
+    - Z > 0: "Your zakat for {year} is due."
+    - Z = 0: "Your zakat year {year} ended on {date}. Below nisab: no zakat due."
+    - Incomplete: "Your zakat year {year} ended on {date}. Complete it to see your zakat."
+  - The ban on "late / missed / overdue" comes from P-3, which is about payouts, not zakat. For zakat it is a tone choice.
+  - **Decided (loop 1, PM-Q6): show** this line, with Source → C2: "Most scholars hold that zakat should be given when it falls due, and not delayed without a valid reason." It shows on a due year (Z > 0 or incomplete) and on a distributing year. Not on open, below-nisab or settled years. Not in the notification. Info colour, never error.
+
+### C11. What "settled" may and may not claim
+
+- **Rule:** Zakat is fulfilled only when it is given **as zakat** to people in the eight groups named in Quran 9:60. The app records amounts only. It cannot know the user's intention, and it cannot know whether a recipient may receive zakat. Interest given away is not zakat (Z-6).
+- **Reference:**
+  - Quran 9:60. **[V]**
+  - Each year's zakat needs its own intention — Darul Iftaa Jordan, Q 3602. **[S]**
+  - Sadaqah given in good faith to someone who did not qualify (a rich man, a thief) was accepted — Bukhari 1421, Muslim 1022. **[S]** (ihadis.com, hadithunlocked.com)
+  - Does this also cover obligatory zakat? Abu Hanifa and Muhammad: yes, if the giver took care. Abu Yusuf, and one Shafi'i view: no. **[U]** The app must not judge either way.
+- **App:**
+  - "Settled" means only one thing: **the amounts you logged reach the zakat due.** The app must say so. Show one line on every settled year and in the log help: "The app counts what you log. It cannot check that each person may receive zakat (Quran 9:60), or that you gave it as zakat. Do not log interest you gave away: it is not zakat."
+  - Never write "zakat paid", "accepted", "fulfilled" or "your duty is done". In Arabic, avoid برئت الذمة and تقبّل.
+  - A below-nisab year reads "below nisab: no zakat due", never "settled" alone.
+
+---
+
 ## Edge cases (cross-cutting)
 
 - **Mixed intent:** user bought shares long-term but now intends to sell → intent at the zakat date governs for trade goods. **[U]** App: let the user change intent; the zakat date value uses the current intent.
@@ -250,7 +383,10 @@ Views (user picks):
 - Long-term liabilities beyond one user-entered "due within 12 months" figure.
 - Gold-to-gold exchange flows (riba al-fadl checks) — must be reviewed before any such feature.
 - Interest purification — separate topic.
-- Paying zakat / tracking recipients.
+- Paying zakat. Recipients and whether they may receive zakat: the log records amounts only (C11).
+- A new zakat date after a below-nisab year (C4). The cycle date is kept, so giving on it counts as giving early.
+- Counting an amount given above the zakat due toward next year (C7, Hanafi view).
+- Zakat of years before the first year in the app (owner Q-O1). If any of it was not given, it is still owed (FatwaCentre 178985 **[S]**, C2). The app must say this once, on the cycle-date step (loop 1 item 1).
 
 ## Open verification items (must close before release)
 
@@ -260,6 +396,7 @@ Views (user picks):
 4. Muwatta reference on Aisha and jewelry; Abu Dawud 1562 grading.
 5. A named-scholar confirmation for showing real (inflation-adjusted) returns (A6.2), if the owner wants one.
 6. Private equity items (B6.1, P-1..P-5): case B (*fasid* mudarabah) primary text; AAOIFI SS 12 and SS 13 sections; see "Open items for this section" at the end.
+7. Part C: Tirmidhi 678; the Maliki limit on giving early (C6; searched 2026-10-23, not found — the reported "about a month" in *Mukhtasar Khalil* is unverified); *Radd al-Muhtar* on value at the day of giving vs the due date (C8); the Hanafi split on zakat given to someone who turns out not eligible (C11); "best estimate" when the nisab date is unknown (C1); the day-30 rule (C3); the minority Hanafi report that zakat is not due at once (C10 line); al-Suyuti's text of "ijtihad is not undone by ijtihad" (PM-Q5).
 
 ---
 
@@ -300,7 +437,7 @@ Story: `docs/product/stories/my-investments.md` §12. Each answer points to the 
   2. never be called "zakat due" or "zakat paid";
   3. use r and Y as a matched pair (Z-2);
   4. be 0 when the user says no zakat is due this year (already in story §9.4).
-  Supporting idea: paying zakat early (*ta'jil*) is allowed by the majority, based on al-Abbas paying early — Abu Dawud 1624, Tirmidhi 678. **[U]**, not verified in this pass. It shows that setting money aside before the due date is fine. It does **not** make a monthly amount due.
+  Supporting idea: paying zakat early (*ta'jil*) is allowed by the majority, based on al-Abbas paying early — Abu Dawud 1624 **[S]** (see C6), Tirmidhi 678 **[U]**. It shows that setting money aside before the due date is fine. It does **not** make a monthly amount due.
 - **Z-4 — Nisab.** Metal and weight: user picks gold 85 g or silver 595 g (A3). Count **pure** gold/silver content: pure g = g × karat/24. This is common practice; I did not verify a primary source for pure vs gross weight **[U]**. If the list is not all the user's wealth, the app cannot decide nisab. Keep the story's yes/no switch ("zakat due this year"), with the help text "decide using all your zakatable wealth, not only this list". The full nisab check belongs to UC-3.
 - **Z-5 — Gold/silver as unit or base.** **No objection.** Gold and silver are *thaman*, and nisab is set in their weight (A8). Base view C is fine as a display. Zakat is still computed per A1–A7 and only then shown in grams. Caution: riba al-fadl (Muslim 1587, A8). The app must never model gold-for-gold at unequal weight, or a deferred gold purchase.
 - **Z-6 — Interest on conventional deposits.** **Do not count it as return. Show it separately as "to purify".**
@@ -460,3 +597,107 @@ Nothing new. The existing value update lets the value drop. Return and zakat use
 - **[U]** AAOIFI SS 13 section on periodic payouts as advances on account.
 - **[U]** Crypto lending as a loan with a benefit.
 - **Before release:** I must review the Arabic text of Q1, Q2, the P-2 notices, the P-3 labels and lines, and the P-4b/P-4c texts. Wording in Arabic decides the fiqh meaning (e.g. ربح vs فائدة).
+
+---
+
+## Answers to the zakat story (Z-Q1..Z-Q8)
+
+Story: `docs/product/stories/zakat.md` §14.2. 2026-10-23.
+
+- **Z-Q1 — Giving early.** Yes. The amount counts toward the year and is marked "given before the due date". Conditions: the user held nisab when giving and gave it as zakat (C6). The tag is now **[S]**: Abu Dawud 1624, which al-Albani grades hasan, and Darul Iftaa Jordan Q 2974. Show the C6 help line instead of "source not yet verified". Earliest entry date: the day after the previous year's due date.
+- **Z-Q2 — Giving more than due.** Scholars disagree (C7). Hanafi (Deoband 28/76/D=01/1435): the extra may count toward next year if it was given as zakat. Shafi'i (Darul Iftaa Jordan Q 3602): the extra is sadaqah. "Not moved" is valid under both views, so keep it and show the C7 line naming both views.
+- **Z-Q3 — Another currency.** Allowed (A7). Which rate counts it is disputed: the rate on the day given (Sahibayn) or on the due date (Abu Hanifa). The user picks (C8). For v1, base currency only is fine, with the C8 help line.
+- **Z-Q4 — Leap solar year.** Use **2.577% always.** The NZF page gives 2.577% with no leap-year rule. The 2.5775% figure comes only from a commercial calculator. Also, 2.5 × 366/354.367 = 2.582%, so "2.5775% for 366 days" does not match its own idea. The A2 text is corrected.
+- **Z-Q5 — Dividends / profit received only.** A 0.00 line plus the notice is correct. Do not add r × income: zakat is on what is held on the due date (A4). Dividends still held are already cash, and spent ones are gone. Adding r × income would count held dividends twice and charge spent ones. Add to the notice: "If that cash is not in this year's lines, add it as an extra cash line."
+- **Z-Q6 — Order of deduction and nisab.** Confirmed: nisab is compared with B **after** the deduction (C4; Council of Ulama Eastern Cape, citing *Radd al-Muhtar* 2/260 **[S]**). With deduction off (the Shafi'i view), the same formula compares the gross total.
+- **Z-Q7 — Day 30, and a moved date.** Day 30 in a 29-day month: use the 29th (C3). This is my reading **[U]**, and it is never late. A moved date: yes, values, rates and nisab all use it (C3; Bukhari 1909 **[S]**).
+- **Z-Q8 — Recompute after giving.** Yes. Amounts already given count toward the new figure. Any shortfall is still owed, and any extra follows C7 (C9; FatwaCentre 178985 **[S]**).
+
+### Ask at setup vs default (Part C)
+
+| View | App behaviour | Reason |
+|---|---|---|
+| Month start: Umm al-Qura vs local sighting | **(b) Default Umm al-Qura.** The user moves the date ±1–2 days, with the C3 line. | Sighting is the basis (Bukhari 1909). A converter is needed to give any date at all, and the move covers the gap. |
+| Debt deduction before nisab | **(b) Default on** (A5, unchanged) | "Off" is the Shafi'i view, using the same formula (C4). |
+| Giving early (most schools vs Maliki) | **(b) Count it**, with the mark and the Maliki line | Most schools allow it. The user decides what to log, and the line names the other view (C6). |
+| Amount given above zakat due | **(b) Not moved**, with the line naming both views | Valid under both views (C7). |
+| Rate for a gift in another currency | **(a) Ask, no default** (v1 has other-currency entries, OQ-5). Asked once, at the first such entry. A later change applies to new entries only. | Both views are live among Hanafi muftis (C8). |
+
+### Verdict on the zakat story: **BLOCKER** (item 1). Items 2–11: CHANGES_REQUESTED.
+
+1. **BLOCKER — §5.1, §5.2 "First year", AC-6 (changing the calendar or the cycle date).**
+   - The problem: today a change rebuilds **due** years as well as open ones (§5.1 says "open or due year"). The first rebuilt year is the first due date on or after the change.
+   - Example: lunar, cycle date 1 Ramadan. 1448 AH is open and due about 2027-02-08. On 2026-10-23 the user switches to solar, 20 October. The first new year is "2027", due 2027-10-20.
+   - Impact: zakat on wealth whose year ends around 2027-02-08 moves about 8 months later, and the only notification is set for the late date. A due year that gets rebuilt loses zakat that is already owed. Most scholars do not allow delaying zakat that is due (C2).
+   - Fix: C2 App rules 1 and 2. Never rebuild a year that is due or later. The first new due date must be on or before the old due date of the open year. Add an AC with this example. This also matches §8 and AC-20 ("never deletes a year").
+2. **§5.4 and AC-35 (notification text), Q-O5.**
+   - The fixed text "Your zakat for {year} is due today" is false in a below-nisab year. Use a text that is true in both cases (C10).
+   - The in-tab due text (§5.4 last bullet, AC-39) needs the three texts of C10, one per result.
+   - Drop "following the Shariah file's wording rule (P-3)". P-3 is about payouts, so for zakat this ban is a tone choice, not a Shariah rule.
+3. **§4 "settled", §9, AC-26, AC-31:** add the C11 line on every settled year and in the log help. Add an AC that the line shows and that no text says "zakat paid", "accepted" or "fulfilled".
+4. **§9 "Given before the due date", AC-28:** replace "source not yet verified" with the C6 help line (now [S]). Refuse entries dated on or before the previous year's due date, and add that to the AC.
+5. **§9 "Given more than due", AC-29:** add the C7 line naming both views under "Given {x} more than due".
+6. **§9 "Currency", AC-30:** add the C8 help line.
+7. **§6.1 dividends notice, AC-15:** append "If that cash is not in this year's lines, add it as an extra cash line." (Z-Q5)
+8. **§7 line "Add any other zakatable wealth as an extra line":** extra lines take only cash and good debts. Change it to "Add other cash or money owed to you as an extra line. Add other assets in My Investments." (C5)
+9. **§5.1 cycle-date question, AC-1:** add the C1 help text. Without it, a new payer may enter today's date and be told zakat is due today, one year early.
+10. **§5.3, Q-O3:** the Shariah view is ±1–2 days for lunar and **earlier only** for solar (C3). Add the C3 Umm al-Qura line under the due date. AC-5 needs a solar case.
+11. **§13 rows 3, 8, 11, 14–18 and §14.2:** close Z-Q1..Z-Q8 by pointing to C1–C11. The §14.2 Z-Q4 premise ("AAOIFI uses 2.5775% in a leap year [S]") came from an error in this file. A2 is now corrected.
+
+**Worked numbers re-checked:** the §11 table, and AC-7, 10, 11, 15, 18, 19, 21, 25, 27, 29 and 32. All are correct.
+
+---
+
+## Answers to loop 1 (PM-Q4..Q6)
+
+Story `stories/zakat.md` §14.1b; UX `ux/zakat.md` "Open questions". 2026-10-23.
+
+- **PM-Q4 — Earliest log date in the first year. Approved.** The day after the cycle date one year before the first due date, in that year's own calendar. Why: the user's cycle date is the day wealth reached nisab (C1), so the first hawl starts there. An entry after it is inside the hawl, with nisab held (C6 conditions; Abu Dawud 1624 **[S]**; Darul Iftaa Jordan Q 2974 **[S]**). Story §5.2 already defines it this way. Rule text is now in C6. For every later year, "previous due date" means the real (moved) due date.
+- **PM-Q5 — Rate view changed later. Approved: new entries only.** A gift counted under one valid view stays counted. A later change of view does not undo it. This is the maxim "ijtihad is not undone by another ijtihad" (*al-ijtihad la yunqad bi-l-ijtihad*). Al-Suyuti lists it among the general maxims in *al-Ashbah wa al-Naza'ir*. Example: someone whose view of the qibla changes after prayer does not repeat the prayer. — via Mawsu'at al-Qawa'id al-Fiqhiyyah, dorar.net/qfiqhia/1164 **[S]**. Al-Suyuti's text **[U]**. The user may recount an old entry by editing it. That is their own act. Recounting at a higher value is always allowed (Darul Iftaa Mahmudiyyah **[S]**, C8). When the user changes the view, the app tells them: "Amounts already logged keep the rate they were counted at. Edit an amount to count it with the new view."
+- **PM-Q6 — The "do not delay" line. Yes, show it.** Text: "Most scholars hold that zakat should be given when it falls due, and not delayed without a valid reason." Source → C2. Where: due years (Z > 0 or incomplete) and distributing years. Not on open, below-nisab or settled years. Not in the notification. Why: this is the ruling behind the user's choice to give now or wait. Without it the user decides in the dark. Reference: Malik, Ahmad and most scholars — Saudi Permanent Committee via islamqa.info 13981 **[S]**. Late zakat stays a debt — FatwaCentre 178985 **[S]**. The Prophet hurried to give out gold of sadaqah he held, because he did not want it to stay with him overnight — Bukhari 1430 (Uqbah ibn al-Harith; also 851, 1221) **[S]** (ihadis.com/en/bukhari/hadith/1430). "Most scholars" is there because a minority Hanafi report holds the duty is not immediate **[U]**. It is not a tone problem: it has no "late", "missed" or "overdue" in it.
+- **C8 with other-currency entries in v1. Confirmed:** ask once, no default, both views named (Sahibayn / Abu Hanifa) with Source. C8 "App" is rewritten, so it no longer says "base currency only".
+
+### Owner decisions checked (owner rule 2026-10-23: on Shariah, this file wins)
+
+| Decision | Shariah check |
+|---|---|
+| Q-O1 first year only, no earlier years | **Allowed as scope.** But unpaid zakat of past years stays owed (C2). The app must say so once (loop 1 item 1). |
+| OQ-1 (a) no year rebuilt; new cycle after the last year | **Compliant**, stricter than C2. The first new year is never longer than one year of its own calendar. If it is shorter, the user is giving early (C6). |
+| Q-O3 lunar ±2, solar earlier only | Compliant (C3). |
+| Q-O4 days before 0–60, time 09:00 | Product setting. No Shariah issue. |
+| Q-O5 notification text per C10 | Compliant. |
+| OQ-4 extra given not moved | Compliant (C7). |
+| OQ-5 other-currency entries in v1 | Compliant with C8 as rewritten. |
+| Tone: no "late / missed / overdue" | Allowed as tone, **only because** the due text stays until the year is started and the PM-Q6 line shows. |
+| PM-Q3 (pending) notification off switch | No Shariah issue either way. The due text must stay. |
+
+No owner decision is overruled. One provisional UX/PM pick is reversed: PM-Q6 "not shown" → **shown**.
+
+### Verdict on the zakat story (loop 1) and the UX doc: **CHANGES_REQUESTED**
+
+No BLOCKER. Nothing computes or hides a riba figure. Interest stays out of the base (AC-14) and out of the log (C11).
+
+**Worked numbers re-checked:** §11 table (Σ 520,000.00, B 500,000.00, Z 12,500.00), AC-7, 10 (12,885.00), 11 (517,500.00 / 497,500.00 / 12,437.50), 14, 15, 18, 19, 21, 25 (650,000.00 / 630,000.00 / 510,000.00 / 15,750.00 / 10,750.00), 26, 27 (3,250.00; 12,000.00 → 500.00 more), 29, 30 (5,000.00 / 4,800.00), 32, 42 (2,600.00). All correct. Wrong only in UX examples (UX item 1).
+
+**For the PM (story):**
+1. **§5.1 / AC-1 — years before the first year (Q-O1).** On the cycle-date step add: "Zakat from years before {first year} is not counted here. If any of it was not given, it is still owed." Source → C2. Impact: a user whose wealth reached nisab years ago thinks the app's first year is all they owe.
+2. **AC-1, §5.1 — solar help text.** AC-1 says solar gets "the same help text", which says "counted in Hijri months". For solar it must read "counted in Gregorian months". The rest stays (C1, A2).
+3. **§7 "Open year", AC-23 — "Estimate. Zakat is due on {due date}."** This is the C10 problem again: in a below-nisab year it is false. Use "Estimate. Your zakat year ends on {due date}."
+4. **§6.1, §7, §9 — values and rates older than the due date.** A line takes the latest value, FX rate and metal rate on or before the due date. Zakat is on the value on the due date (A3, A7, B3). Show the value date on each line when it is before the due date. Show the rate date with "not the rate of {due date}" when they differ, for lines, the nisab metal rate and log entries. Add: "Zakat is on the value on your due date. If it changed, add a value or rate for {due date}." Do not make the year incomplete. Impact: a share price from months ago can under-state zakat, and the user cannot see it.
+5. **§5.2, §9 — "previous year's due date".** Say it means the real due date (moved if moved, C3, C6). Impact: with the computed date, an entry given inside the previous year's real hawl can count for the next year. That is giving two years ahead, beyond the Shafi'i one-year limit.
+6. **§9, AC-28 — first year.** Close PM-Q4 (C6). Add an AC: solar 20 October saved 2026-01-05, first year "2026": an entry dated 2025-10-21 is accepted, 2025-10-20 refused.
+7. **§9, AC-30 — rate-view change.** Close PM-Q5 (C8 item 3). Add the change text: "Amounts already logged keep the rate they were counted at. Edit an amount to count it with the new view."
+8. **§5.4 / §7 — PM-Q6.** Add the C10 line to due (Z > 0, incomplete) and distributing years, with Source C2, and an AC (extend AC-39).
+9. **AC-28 — "no 'source not yet verified'".** The Maliki clause of the C6 line is still [U]. Its Source sheet marks that clause "source not yet verified". The help line itself stays.
+10. **Z6 / A5 — long-term debts.** The debts why-text must state the dispute: "Scholars differ on long-term debts such as a mortgage. Some deduct only the part due in the next 12 months, some the whole debt, some none. This app deducts only what you enter here." (A5). Add it to AC-22's list.
+
+**For UX (ux/zakat.md):**
+1. **§2.4.7 log row, §2.5 Z7 live line, §4 distributing sketch — wrong rate pair.** "100.00 USD at 48.00 on 21 Oct 2026 (rate on the day you gave)" and "= 4,800.00 EGP at 48.00 on 21 Oct 2026" are wrong. In Yasmin's data, 48.00 is dated 20 Oct and 50.00 is dated 21 Oct. Day view, entry 21 Oct: "at 50.00 on 21 Oct 2026 (rate on the day you gave) = 5,000.00 EGP". Due-date view: "at 48.00 on 20 Oct 2026 (rate on your due date) = 4,800.00 EGP". Impact: the screen would claim one view while using the other's rate.
+2. **§2.5 Z7 rate view.** Name who holds each view in the radio labels: "the rate on the day you gave (Abu Yusuf and Muhammad)" / "the rate on your due date (Abu Hanifa)" (AC-30, C8). Add the PM-Q5 change text to the S8 row (§2.8 item 4).
+3. **§2.4.2 Open row.** "Estimate. Zakat is due on {due date}." → "Estimate. Your zakat year ends on {due date}." (PM item 3).
+4. **§2.4.2 result card — PM-Q6.** Add the C10 line under the due (Z > 0, incomplete) and distributing cards. Info style.
+5. **§2.1 step b — solar help.** Confirmed: "Hijri months" → "Gregorian months". Add the past-years line (PM item 1).
+6. **§2.4.4 rows, §2.4.3 nisab row — stale dates.** Show the value date / rate date and the PM item 4 note when it is before the due date.
+7. **§2.5 Z6 why — long-term debts dispute** (PM item 10).
+8. **§7 Arabic chip "مكتملة" for settled.** In Arabic it reads as "complete", which comes close to "fulfilled" (C11). Use "مسجَّلة بالكامل" (fully logged), or another word that speaks of the record, not the worship. The full Arabic review stays before release.
+9. **§9 items 7–8.** Close them: the story no longer rebuilds years, and C8 now covers other-currency entries.
