@@ -3110,6 +3110,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Not enough months yet. A chart needs at least 2.'**
   String get notEnoughMonths;
+
+  /// No description provided for @settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settings;
+
+  /// No description provided for @assumptionsSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{currency} · {zakatYear}'**
+  String assumptionsSummary(String currency, String zakatYear);
+
+  /// No description provided for @settingsReadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not read settings.'**
+  String get settingsReadError;
+
+  /// No description provided for @aiHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'AI'**
+  String get aiHeading;
+
+  /// No description provided for @aiCloudTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Use cloud AI'**
+  String get aiCloudTitle;
+
+  /// No description provided for @aiCloudSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'When on, the text you send to AI leaves your phone and goes to the AI provider you choose below.'**
+  String get aiCloudSubtitle;
+
+  /// No description provided for @aiProviderHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'AI provider'**
+  String get aiProviderHeading;
+
+  /// No description provided for @aiVendorSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your own key. {notice}'**
+  String aiVendorSubtitle(String notice);
+
+  /// No description provided for @aiKeyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{vendor} API key'**
+  String aiKeyLabel(String vendor);
+
+  /// No description provided for @aiKeyHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'{help} Stored only on this phone.'**
+  String aiKeyHelper(String help);
+
+  /// No description provided for @aiKeySaved.
+  ///
+  /// In en, this message translates to:
+  /// **'A key is saved'**
+  String get aiKeySaved;
+
+  /// No description provided for @aiRemoveKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove key'**
+  String get aiRemoveKey;
+
+  /// No description provided for @aiSaveKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Save key'**
+  String get aiSaveKey;
+
+  /// No description provided for @aiStatusOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud AI is off.'**
+  String get aiStatusOff;
+
+  /// No description provided for @aiStatusPickVendor.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick an AI provider to use it.'**
+  String get aiStatusPickVendor;
+
+  /// No description provided for @aiStatusAddKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your {vendor} key to use it.'**
+  String aiStatusAddKey(String vendor);
+
+  /// No description provided for @aiStatusUsingKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Using your own {vendor} key.'**
+  String aiStatusUsingKey(String vendor);
 }
 
 class _AppLocalizationsDelegate

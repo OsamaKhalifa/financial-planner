@@ -14,7 +14,6 @@ import '../domain/investment.dart';
 import 'inflation_series_screen.dart';
 import 'investments_providers.dart';
 import 'rate_history_screen.dart';
-import 'update_all_screen.dart';
 import 'why_sheet.dart';
 import 'widgets/labels.dart';
 import 'widgets/no_zakat_block.dart';
@@ -95,13 +94,6 @@ class AssumptionsScreen extends ConsumerWidget {
           const Divider(),
           Text(l10n.noZakatByYear, style: textTheme.titleSmall),
           for (var y = today.year; y >= firstYear; y--) NoZakatBlock(year: y),
-          const SizedBox(height: 16),
-          FilledButton(
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(builder: (_) => const UpdateAllScreen()),
-            ),
-            child: Text(l10n.updateAll),
-          ),
         ],
       ),
     );

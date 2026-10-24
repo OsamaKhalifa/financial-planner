@@ -1928,4 +1928,68 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get notEnoughMonths =>
       'لا توجد أشهر كافية بعد. الرسم يحتاج شهرين على الأقل.';
+
+  @override
+  String get settings => 'الإعدادات';
+
+  @override
+  String assumptionsSummary(String currency, String zakatYear) {
+    return '$currency · $zakatYear';
+  }
+
+  @override
+  String get settingsReadError => 'تعذّرت قراءة الإعدادات.';
+
+  @override
+  String get aiHeading => 'الذكاء الاصطناعي';
+
+  @override
+  String get aiCloudTitle => 'استخدام الذكاء الاصطناعي السحابي';
+
+  @override
+  String get aiCloudSubtitle =>
+      'عند التشغيل، يغادر النص الذي ترسله إلى الذكاء الاصطناعي هاتفك ويذهب إلى المزوّد الذي تختاره أدناه.';
+
+  @override
+  String get aiProviderHeading => 'مزوّد الذكاء الاصطناعي';
+
+  @override
+  String aiVendorSubtitle(String notice) {
+    return 'مفتاحك الخاص. $notice';
+  }
+
+  @override
+  String aiKeyLabel(String vendor) {
+    return 'مفتاح واجهة $vendor';
+  }
+
+  @override
+  String aiKeyHelper(String help) {
+    return '$help يُحفظ على هذا الهاتف فقط.';
+  }
+
+  @override
+  String get aiKeySaved => 'يوجد مفتاح محفوظ';
+
+  @override
+  String get aiRemoveKey => 'حذف المفتاح';
+
+  @override
+  String get aiSaveKey => 'حفظ المفتاح';
+
+  @override
+  String get aiStatusOff => 'الذكاء الاصطناعي السحابي متوقف.';
+
+  @override
+  String get aiStatusPickVendor => 'اختر مزوّدًا للذكاء الاصطناعي لاستخدامه.';
+
+  @override
+  String aiStatusAddKey(String vendor) {
+    return 'أضف مفتاح $vendor لاستخدامه.';
+  }
+
+  @override
+  String aiStatusUsingKey(String vendor) {
+    return 'تستخدم مفتاح $vendor الخاص بك.';
+  }
 }

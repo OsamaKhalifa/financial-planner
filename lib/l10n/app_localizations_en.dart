@@ -1931,4 +1931,68 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get notEnoughMonths =>
       'Not enough months yet. A chart needs at least 2.';
+
+  @override
+  String get settings => 'Settings';
+
+  @override
+  String assumptionsSummary(String currency, String zakatYear) {
+    return '$currency · $zakatYear';
+  }
+
+  @override
+  String get settingsReadError => 'Could not read settings.';
+
+  @override
+  String get aiHeading => 'AI';
+
+  @override
+  String get aiCloudTitle => 'Use cloud AI';
+
+  @override
+  String get aiCloudSubtitle =>
+      'When on, the text you send to AI leaves your phone and goes to the AI provider you choose below.';
+
+  @override
+  String get aiProviderHeading => 'AI provider';
+
+  @override
+  String aiVendorSubtitle(String notice) {
+    return 'Your own key. $notice';
+  }
+
+  @override
+  String aiKeyLabel(String vendor) {
+    return '$vendor API key';
+  }
+
+  @override
+  String aiKeyHelper(String help) {
+    return '$help Stored only on this phone.';
+  }
+
+  @override
+  String get aiKeySaved => 'A key is saved';
+
+  @override
+  String get aiRemoveKey => 'Remove key';
+
+  @override
+  String get aiSaveKey => 'Save key';
+
+  @override
+  String get aiStatusOff => 'Cloud AI is off.';
+
+  @override
+  String get aiStatusPickVendor => 'Pick an AI provider to use it.';
+
+  @override
+  String aiStatusAddKey(String vendor) {
+    return 'Add your $vendor key to use it.';
+  }
+
+  @override
+  String aiStatusUsingKey(String vendor) {
+    return 'Using your own $vendor key.';
+  }
 }

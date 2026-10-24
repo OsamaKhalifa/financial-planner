@@ -3,7 +3,9 @@ import 'package:financial_planner/core/ai/ai_providers.dart';
 import 'package:financial_planner/core/ai/ai_settings.dart';
 import 'package:financial_planner/core/ai/gemini_ai_client.dart';
 import 'package:financial_planner/features/settings/settings_screen.dart';
+import 'package:financial_planner/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -34,7 +36,18 @@ void main() {
   ) async {
     // The app root opens Setup on a fresh install, so open Settings directly.
     await tester.pumpWidget(
-      const ProviderScope(child: MaterialApp(home: SettingsScreen())),
+      const ProviderScope(
+        child: MaterialApp(
+          localizationsDelegates: [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: SettingsScreen(),
+        ),
+      ),
     );
     await tester.pumpAndSettle();
     await _pumpUntilFound(tester, find.text('Cloud AI is off.'));

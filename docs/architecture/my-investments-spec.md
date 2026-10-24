@@ -249,13 +249,14 @@ Writes: widgets call repository methods via `ref.read(...)`; streams refresh the
 | UX | File | Route kind | Engine/provider it reads |
 |---|---|---|---|
 | S1 Setup (2 steps: base + home inflation; zakat year + long-term method) | `setup_screen.dart` | root when `!settings.setupDone` | settings, unit order |
-| S2 Home (totals, this-year verdict, to-purify total, stale banner, list, sort) | `home_screen.dart` | root | portfolio(year, view), sinceStart per item, staleNow |
+| S2 Home (stale banner / up-to-date line, list, sort; actions: Settings) | `home_screen.dart` | root | portfolio(year, view), sinceStart per item, staleNow |
 | S3 Investment form (add/edit, fields per type, intent → zakat line, inline rate, price × qty) | `investment_form_screen.dart` | push (fullscreenDialog) | validate, defaultRule, resolve |
 | S4 Item detail (since-start card, zakat line, history) | `item_detail_screen.dart` | push | sinceStart, resolve |
 | S5 Record sheet (money in / money out / value update / interest) | `record_sheet.dart` | bottom sheet | timeline value for typo check |
 | S6 Update all (refresh card, as-of date, stale rates + values, one Save) | `update_all_screen.dart` | push | staleNow, refreshController |
 | S7 Period view (scope, month/year, grams toggle, ladder, verdict, markers, items, excluded, other periods, no-zakat switch + nisab hint) | `period_screen.dart` | push | portfolio/item figures, periodsBetween |
-| S8 Assumptions (+ pair history, series years) | `assumptions_screen.dart`, `rate_history_screen.dart`, `inflation_series_screen.dart` | push | rates, inflation book, settings |
+| S8 Assumptions (+ pair history, series years) | `assumptions_screen.dart`, `rate_history_screen.dart`, `inflation_series_screen.dart` | push from Settings | rates, inflation book, settings |
+| Settings (hub: Assumptions ›, AI) | `features/settings/settings_screen.dart` | push from the gear on every tab | settings, AI settings |
 | S9 Why sheet | `why_sheet.dart` | bottom sheet | the figures object passed in |
 | Shared | `widgets/unit_picker_sheet.dart`, `widgets/inline_rate_entry.dart`, `widgets/figure_text.dart` (number + marker + tap → S9) | | |
 
@@ -592,3 +593,51 @@ All decided by the orchestrator, 2026-10-17. Applied above.
 - **Q-E5 — accepted as cosmetic:** after a schedule or start-date change, old skips are ignored, but they come back if the old dates come back. Not fixed.
 - **Case C give-away — decided:** reuse "interest given away — from interest paid out to me". No new kind (E5, 12.4).
 - **Q12 — fix approved** (E11, 12.7). PM still edits the story text listed in 12.7.
+
+## 13. Fix — settings placement and the Investments title (2026-10-24)
+
+Scope: Investments app-bar title; one Settings gear on every tab (UX Option A); Settings becomes the hub that opens S8; "Update all" leaves S8 and lives in the Investments banner slot; Settings fully localized. Out: why-sheet "Change" deep links, new routes, new dependencies.
+
+### 13.1 Decisions
+
+- **D-1 — The gear is one public widget, `SettingsAction`, added to `lib/features/settings/settings_screen.dart`.** It is an `IconButton(tooltip: l10n.settings, icon: Icon(Icons.settings))` that does `Navigator.of(context).push(MaterialPageRoute(builder: (_) => const SettingsScreen()))` — the only navigator is the root one, as today (`main.dart`: pushed screens cover the tab bar). 4 callers: Overview, Investments, Zakat, Plan, each `AppBar(actions: const [SettingsAction()])`. *Rejected:* a new file `settings_action.dart` (the screen file it opens already fits); `lib/core/` (`architecture_test` forbids core → features); one app bar owned by `AppShell` (rewrites all 4 screens' scaffolds and collides with feat/overview and feat/zakat).
+- **D-2 — Settings is the hub; S8 is unchanged except the Update all button goes.** Row 1 is a `ListTile(key: 'settings-assumptions', title: l10n.assumptionsTitle, subtitle, trailing: chevron)` → push `AssumptionsScreen`. Then the existing AI section. *Rejected:* keeping a second Assumptions icon on Investments (two doors to one room, the problem being fixed).
+- **D-3 — Hub subtitle = base currency · zakat year, from `settingsProvider` only.** New key `assumptionsSummary(currency, zakatYear)` = "{currency} · {zakatYear}", where zakatYear is the existing `zakatYearLunar` / `zakatYearSolar` label. While settings load, or if a value is null, no subtitle. *Rejected:* "rates as of {date}" — the honest date is the oldest in-use pair, and that logic lives inside `AssumptionsScreen._rates` (base + items + `RateBook`); the newest date would hide a stale pair. Needs new plumbing → dropped per scope.
+- **D-4 — The banner slot on S2 always shows when the list has items.** Extend `_staleBanner`: stale → today's card; nothing stale → a plain (no container colour) `ListTile(key: 'up-to-date', title: l10n.allUpToDate(formatMonthYear(today)), trailing: TextButton(l10n.updateAll))` → S6. Same `TextButton` label in both states, so `find.text(l10n.updateAll)` works either way. The empty state shows neither. *Rejected:* new key "All up to date" — `allUpToDate(month)` already exists (S6 uses it), and staleness is per month, so the month is the true statement.
+- **D-5 — English text stays word for word what it is today.** Every hard-coded string in `settings_screen.dart` becomes an ARB key with the same English value, so tests that find English text (`settings_screen_test`, `integration_test/ai_live_test`) only need localization delegates, not new strings. *Rejected:* rewording in the same change (mixes a copy change into a refactor).
+- **D-6 — Vendor data (`AiVendor.name`, `keyHelp`, `dataNotice` in `lib/core/ai/ai_vendors.dart`) stays as vendor data, not ARB, in this fix.** The screen's own sentences around it are localized ("Your own key. {notice}", "{help} Stored only on this phone."). *Rejected:* `vendor.id → l10n key` mapping in the screen (a second source of vendor text; breaks `fake_ai_vendor` vendors); moving the text into ARB and off `AiVendor` (changes core/ai and its tests — out of this cut). **Open for owner:** in Arabic, the Gemini key help and data notice stay English until this is done.
+
+### 13.2 Assumptions
+
+- **A-1 — verified (read):** `test/architecture_test.dart` has no "features never import each other" check; overview already imports investments and `main.dart`, Investments already imports `settings_screen.dart`. New imports features/{overview,zakat,plan} → settings and settings → `investments/presentation/assumptions_screen.dart` pass the suite. The settings ↔ investments library cycle is legal Dart; it matches the existing `main.dart` ↔ `overview_screen.dart` cycle.
+- **A-2 — unverified — risk:** `settings_screen_test` pumps `SettingsScreen` without a database. After D-2 the screen watches `settingsProvider` (Drift). Without an `appDatabaseProvider` override it may error or leave a pending timer. Mitigation in 13.4: override with `Harness(...).db`.
+- **A-3 — verified (read):** the golden path reaches S6 today via the Assumptions tooltip (`test/support/golden_path.dart:120–122`) and then pops one extra route ("leave Assumptions too", `:135`). Both lines must change.
+- **A-4 — verified (read):** the `main_test` "Financial Planner" check is on the Setup screen (`setup_screen.dart:109` keeps `appTitle`). Not affected.
+
+### 13.3 Files, in order (each step: `flutter analyze` clean)
+
+1. `lib/l10n/app_en.arb`, `app_ar.arb` — add `settings` (Settings / الإعدادات), `assumptionsSummary`, and one key per string in `settings_screen.dart` (`settingsReadError`, `aiHeading`, `aiCloudTitle`, `aiCloudSubtitle`, `aiProviderHeading`, `aiVendorSubtitle{notice}`, `aiKeyLabel{vendor}`, `aiKeyHelper{help}`, `aiKeySaved`, `aiRemoveKey`, `aiSaveKey`, `aiStatusOff`, `aiStatusPickVendor`, `aiStatusAddKey{vendor}`, `aiStatusUsingKey{vendor}`). English = today's text exactly. Arabic: none of the banned words; profit = ربح. Run `flutter gen-l10n`.
+2. `lib/features/settings/settings_screen.dart` — add the copyright header; `context.l10n` for all strings; Assumptions row first (D-2, D-3); add `SettingsAction` (D-1).
+3. `lib/features/investments/presentation/assumptions_screen.dart` — delete the bottom `FilledButton` (Update all) and the now-unused `update_all_screen.dart` import. Nothing else.
+4. `lib/features/investments/presentation/home_screen.dart` — title `l10n.tabInvestments`; actions `const [SettingsAction()]` (drop the 'Settings' and `Icons.tune` buttons, and the `assumptions_screen.dart` import); `_staleBanner` per D-4 and called with no stale condition.
+5. `overview_screen.dart`, `zakat_screen.dart`, `plan_screen.dart` — import + `actions: const [SettingsAction()]`. **Only that line**, for merge with feat/overview and feat/zakat.
+6. Tests (13.4), then docs (13.5).
+
+### 13.4 Tests
+
+| Test | Change | Scope item |
+|---|---|---|
+| `test/features/investments/presentation/home_screen_test.dart` | **new:** app bar shows `l10n.tabInvestments`, not `appTitle`; **new:** no `Icons.tune`, one `find.byTooltip(l10n.settings)`; **new:** nothing stale → `up-to-date` line, tap `updateAll` → `UpdateAllScreen`; **new:** empty list → no banner, no up-to-date line. Existing stale-banner test stays. | 1, 2 |
+| `test/main_test.dart` | **new:** set-up shell, for each of the 4 tabs: `find.byTooltip(l10n.settings)` is there; tap → `SettingsScreen`, back → shell (en + ar). | 2 |
+| `test/features/settings/settings_screen_test.dart` | **must change:** `pumpSettings` adds the 4 localization delegates and `appDatabaseProvider.overrideWithValue(Harness(day(2026, 10, 16)).db)` (seed `setup()` for the subtitle test). **new:** Assumptions row first, subtitle = `assumptionsSummary(base, zakat year label)`, tap → `AssumptionsScreen`; **new:** Arabic run shows `الإعدادات` title and no English AI strings except vendor data (D-6). | 2, 3 |
+| `test/features/investments/presentation/assumptions_screen_test.dart` | **must change:** the test at ~`:368` that taps `updateAll` → now asserts `find.text(l10n.updateAll)` finds nothing (keep the no-zakat part). | 2 |
+| `test/support/golden_path.dart` (`test/golden_path_widget_test.dart`, `integration_test/golden_path_test.dart`) | **must change:** replace the tooltip tap with `tapText(l10n().updateAll)` on the Investments tab; delete the extra pop at `:135`. | 2 |
+| `integration_test/ai_live_test.dart` | **must change:** add the localization delegates to its `MaterialApp` (English finds stay valid by D-5). Device-only; run if a device is available. | 3 |
+| `test/l10n/expected_words_test.dart` | no change; must stay green (new keys are not expected-figure keys). | 3 |
+| `test/architecture_test.dart` | no change; must stay green (A-1). | 2 |
+
+### 13.5 Docs to make true
+
+- `docs/product/ux/my-investments.md` §1 — S8 row: "Opened from Settings (gear on every tab)"; Navigation line: every tab's top bar = title + **Settings** gear; Settings = Assumptions › (base · zakat year) + AI. §2.2 step 1: banner slot shows the stale banner, or "Everything is up to date for {month} · Update all"; only with items. §2.6 entry points: S2 banner slot (stale or up to date), Overview stale card, "rate missing" links — not S8. §2.7 entry: Settings › Assumptions (why-sheet deep links stay as written: separate follow-up); delete step 5.
+- This file, §6 screens table: S2 row (drop totals; "stale banner / up-to-date line, list, sort"; actions: Settings); S8 row: "push from Settings"; add a row "Settings (hub: Assumptions ›, AI) | `features/settings/settings_screen.dart` | push from the gear on every tab | settings, AI settings".
+- `docs/product/stories/my-investments.md` — checked, no navigation text; no change.

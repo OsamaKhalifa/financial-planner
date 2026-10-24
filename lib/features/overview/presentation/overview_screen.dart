@@ -20,6 +20,7 @@ import '../../investments/presentation/why_sheet.dart';
 import '../../investments/presentation/widgets/inflation_tag.dart';
 import '../../investments/presentation/widgets/labels.dart';
 import 'widgets/overview_charts.dart';
+import '../../settings/settings_screen.dart';
 
 /// Overview tab (UC-2). Every figure comes from [PortfolioCalculator]; this
 /// screen only lays them out.
@@ -33,7 +34,10 @@ class OverviewScreen extends ConsumerWidget {
     final base = ref.watch(settingsProvider).value?.baseCurrency;
     final today = ref.watch(todayProvider);
     Widget scaffold(Widget body) => Scaffold(
-      appBar: AppBar(title: Text(l10n.tabOverview)),
+      appBar: AppBar(
+        title: Text(l10n.tabOverview),
+        actions: const [SettingsAction()],
+      ),
       body: body,
     );
     if (calc == null || base == null) {

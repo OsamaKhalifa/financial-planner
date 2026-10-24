@@ -1484,5 +1484,67 @@
   "byCurrencyTitle": "By currency",
   "chartValue": "Value",
   "chartPaidIn": "Paid in",
-  "notEnoughMonths": "Not enough months yet. A chart needs at least 2."
+  "notEnoughMonths": "Not enough months yet. A chart needs at least 2.",
+  "settings": "Settings",
+  "assumptionsSummary": "{currency} · {zakatYear}",
+  "@assumptionsSummary": {
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      },
+      "zakatYear": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsReadError": "Could not read settings.",
+  "aiHeading": "AI",
+  "aiCloudTitle": "Use cloud AI",
+  "aiCloudSubtitle": "When on, the text you send to AI leaves your phone and goes to the AI provider you choose below.",
+  "aiProviderHeading": "AI provider",
+  "aiVendorSubtitle": "Your own key. {notice}",
+  "@aiVendorSubtitle": {
+    "placeholders": {
+      "notice": {
+        "type": "String"
+      }
+    }
+  },
+  "aiKeyLabel": "{vendor} API key",
+  "@aiKeyLabel": {
+    "placeholders": {
+      "vendor": {
+        "type": "String"
+      }
+    }
+  },
+  "aiKeyHelper": "{help} Stored only on this phone.",
+  "@aiKeyHelper": {
+    "placeholders": {
+      "help": {
+        "type": "String"
+      }
+    }
+  },
+  "aiKeySaved": "A key is saved",
+  "aiRemoveKey": "Remove key",
+  "aiSaveKey": "Save key",
+  "aiStatusOff": "Cloud AI is off.",
+  "aiStatusPickVendor": "Pick an AI provider to use it.",
+  "aiStatusAddKey": "Add your {vendor} key to use it.",
+  "@aiStatusAddKey": {
+    "placeholders": {
+      "vendor": {
+        "type": "String"
+      }
+    }
+  },
+  "aiStatusUsingKey": "Using your own {vendor} key.",
+  "@aiStatusUsingKey": {
+    "placeholders": {
+      "vendor": {
+        "type": "String"
+      }
+    }
+  }
 }

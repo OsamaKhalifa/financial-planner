@@ -117,8 +117,6 @@ Future<void> runGoldenPath(WidgetTester tester) async {
   now = DateTime(2026, 4, 30, 9);
   await startApp();
   await tapText(l10n().tabInvestments);
-  await tester.tap(find.byTooltip(l10n().assumptions));
-  await tester.pumpAndSettle();
   await tapText(l10n().updateAll);
   expect(requests, isEmpty, reason: 'nothing is fetched until asked');
   await tapKey('refresh');
@@ -132,9 +130,6 @@ Future<void> runGoldenPath(WidgetTester tester) async {
   expect(find.byKey(const ValueKey('update-save')), findsNothing);
 
   // The April view.
-  // Saving closed Update all; leave Assumptions too.
-  tester.state<NavigatorState>(find.byType(Navigator)).pop();
-  await tester.pumpAndSettle();
   await tapText(l10n().tabOverview);
   await tester.tap(find.byKey(const ValueKey('overview-verdict')));
   await tester.pumpAndSettle();

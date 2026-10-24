@@ -11,7 +11,6 @@ import '../domain/investment.dart';
 import '../domain/period.dart';
 import '../domain/portfolio_calculator.dart';
 import '../../settings/settings_screen.dart';
-import 'assumptions_screen.dart';
 import 'investment_form_screen.dart';
 import 'investments_providers.dart';
 import 'item_detail_screen.dart';
@@ -44,19 +43,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final today = ref.watch(todayProvider);
     Widget scaffold(Widget body, {Widget? fab}) => Scaffold(
       appBar: AppBar(
-        title: Text(l10n.appTitle),
-        actions: [
-          IconButton(
-            tooltip: 'Settings',
-            icon: const Icon(Icons.settings),
-            onPressed: () => _push(const SettingsScreen()),
-          ),
-          IconButton(
-            tooltip: l10n.assumptions,
-            icon: const Icon(Icons.tune),
-            onPressed: () => _push(const AssumptionsScreen()),
-          ),
-        ],
+        title: Text(l10n.tabInvestments),
+        actions: const [SettingsAction()],
       ),
       body: body,
       floatingActionButton: fab,
@@ -78,8 +66,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
         children: [
-          if (stale.itemIds.isNotEmpty || stale.ratePairs.isNotEmpty)
-            _staleBanner(context, stale),
+          _staleBanner(context, stale, today),
           const SizedBox(height: 8),
           _sortBar(context),
           ..._list(context, rows, stale, base),
@@ -130,8 +117,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _staleBanner(BuildContext context, StaleNow stale) {
+  Widget _staleBanner(BuildContext context, StaleNow stale, DateTime today) {
     final l10n = context.l10n;
+    final updateAll = TextButton(
+      onPressed: () => _push(const UpdateAllScreen()),
+      child: Text(l10n.updateAll),
+    );
+    if (stale.itemIds.isEmpty && stale.ratePairs.isEmpty) {
+      return ListTile(
+        key: const ValueKey('up-to-date'),
+        title: Text(
+          l10n.allUpToDate(
+            MaterialLocalizations.of(context).formatMonthYear(today),
+          ),
+        ),
+        trailing: updateAll,
+      );
+    }
     return Card(
       color: Theme.of(context).colorScheme.secondaryContainer,
       child: ListTile(
@@ -142,10 +144,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             '${stale.ratePairs.length}',
           ),
         ),
-        trailing: TextButton(
-          onPressed: () => _push(const UpdateAllScreen()),
-          child: Text(l10n.updateAll),
-        ),
+        trailing: updateAll,
       ),
     );
   }

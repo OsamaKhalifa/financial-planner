@@ -10,7 +10,6 @@ import 'package:financial_planner/features/investments/domain/investment.dart';
 import 'package:financial_planner/features/investments/presentation/assumptions_screen.dart';
 import 'package:financial_planner/features/investments/presentation/inflation_series_screen.dart';
 import 'package:financial_planner/features/investments/presentation/rate_history_screen.dart';
-import 'package:financial_planner/features/investments/presentation/update_all_screen.dart';
 import 'package:flutter/material.dart' hide Intent;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -349,7 +348,7 @@ void main() {
       });
 
       testScreen(
-        'every investment year has its own no-zakat switch; Update all is one tap away',
+        'every investment year has its own no-zakat switch; Update all lives on Investments, not here',
         (tester) async {
           await pumpScreen(
             tester,
@@ -365,10 +364,7 @@ void main() {
           final l10n = l10nOf(tester);
           await scrollTo(tester, find.byKey(const ValueKey('no-zakat-2025')));
           expect(find.byKey(const ValueKey('no-zakat-2026')), findsOneWidget);
-          await scrollTo(tester, find.text(l10n.updateAll));
-          await tester.tap(find.text(l10n.updateAll));
-          await tester.pumpAndSettle();
-          expect(find.byType(UpdateAllScreen), findsOneWidget);
+          expect(find.text(l10n.updateAll), findsNothing);
         },
       );
 

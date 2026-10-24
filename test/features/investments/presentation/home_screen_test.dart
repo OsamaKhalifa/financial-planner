@@ -101,6 +101,66 @@ void main() {
         expect(find.byType(UpdateAllScreen), findsOneWidget);
       });
 
+      testScreen('the app bar names the tab and carries one Settings gear', (
+        tester,
+      ) async {
+        await pumpScreen(
+          tester,
+          const HomeScreen(),
+          locale: locale,
+          seed: seedBasic,
+        );
+        final l10n = l10nOf(tester);
+        expect(
+          find.descendant(
+            of: find.byType(AppBar),
+            matching: find.text(l10n.tabInvestments),
+          ),
+          findsOneWidget,
+        );
+        expect(find.text(l10n.appTitle), findsNothing);
+        expect(find.byIcon(Icons.tune), findsNothing);
+        expect(find.byTooltip(l10n.settings), findsOneWidget);
+      });
+
+      testScreen('nothing stale: a quiet up-to-date line leads to Update all', (
+        tester,
+      ) async {
+        await pumpScreen(
+          tester,
+          const HomeScreen(),
+          locale: locale,
+          now: day(2026, 10, 16),
+          seed: (h) async {
+            await h.setup();
+            await h.addItem(item('fundA', name: 'Fund A'), [
+              moneyIn('fundA', day(2026, 1, 1), '1000'),
+              value('fundA', day(2026, 10, 10), '2000'),
+            ]);
+          },
+        );
+        final l10n = l10nOf(tester);
+        expect(find.byKey(const ValueKey('up-to-date')), findsOneWidget);
+        expect(find.textContaining(l10n.staleBanner('1', '0')), findsNothing);
+        await tester.tap(find.text(l10n.updateAll));
+        await tester.pumpAndSettle();
+        expect(find.byType(UpdateAllScreen), findsOneWidget);
+      });
+
+      testScreen('an empty list shows neither banner nor up-to-date line', (
+        tester,
+      ) async {
+        await pumpScreen(
+          tester,
+          const HomeScreen(),
+          locale: locale,
+          seed: (h) => h.setup(),
+        );
+        final l10n = l10nOf(tester);
+        expect(find.byKey(const ValueKey('up-to-date')), findsNothing);
+        expect(find.text(l10n.updateAll), findsNothing);
+      });
+
       testScreen('AC-21: an item with no rate is named on its row', (
         tester,
       ) async {
