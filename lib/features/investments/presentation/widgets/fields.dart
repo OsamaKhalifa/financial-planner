@@ -134,25 +134,21 @@ class CycleDateField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final narrow =
-        MediaQuery.sizeOf(context).width < 360 ||
-        MediaQuery.textScalerOf(context).scale(1) >= 1.3;
-    final fields = [
-      _monthMenu(context),
-      _dayMenu(context),
-    ].map((w) => narrow ? w : Expanded(child: w)).toList();
     final error = _error(context);
     final hint = _hint(context);
+    // Stacked at every width: half a phone is too narrow for "Jumada
+    // al-Akhirah" or its Arabic name, and the menu has no ellipsis.
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (narrow)
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [fields[0], const SizedBox(height: 12), fields[1]],
-          )
-        else
-          Row(children: [fields[0], const SizedBox(width: 12), fields[1]]),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _monthMenu(context),
+            const SizedBox(height: 12),
+            _dayMenu(context),
+          ],
+        ),
         if (error != null)
           Padding(
             padding: const EdgeInsets.only(top: 4),
