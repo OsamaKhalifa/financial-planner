@@ -365,7 +365,14 @@
   "zakatLineDividends": "Zakat: on dividends only, when received",
   "zakatLineCompany": "Zakat: 0 % — the company pays zakat",
   "zakatNeedsChoice": "Zakat: not set yet — answer the zakat question in this form",
-  "zakatReasonTrading": "You hold this to sell. Trade goods pay 2.5 % of market value.",
+  "zakatReasonTrading": "You hold this to sell. Trade goods pay {rate} of market value.",
+  "@zakatReasonTrading": {
+    "placeholders": {
+      "rate": {
+        "type": "String"
+      }
+    }
+  },
   "zakatReasonSavings": "Held as savings: zakat on market value.",
   "zakatReasonCash": "Cash is zakatable in full.",
   "zakatReasonSukuk": "Sukuk: 100 % of value by default.",
@@ -1546,5 +1553,876 @@
         "type": "String"
       }
     }
-  }
+  },
+  "hijriMonth": "{m, select, 1{Muharram}2{Safar}3{Rabi' al-Awwal}4{Rabi' al-Thani}5{Jumada al-Ula}6{Jumada al-Akhirah}7{Rajab}8{Sha'ban}9{Ramadan}10{Shawwal}11{Dhu al-Qa'dah}12{Dhu al-Hijjah}other{{m}}}",
+  "@hijriMonth": {
+    "placeholders": {
+      "m": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatSetupNisabTitle": "Which nisab do you use?",
+  "zakatNisabGold": "Gold — 85 g",
+  "zakatNisabSilver": "Silver — 595 g",
+  "zakatNisabAtRate": "= {amount} at your rate of {date}",
+  "@zakatNisabAtRate": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatNisabAddRate": "{metal, select, gold{Add a gold rate to see it}silver{Add a silver rate to see it}other{{metal}}}",
+  "@zakatNisabAddRate": {
+    "placeholders": {
+      "metal": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatNisabWhy": "Zakat is due only if your zakatable wealth reaches the nisab. Scholars differ on which metal to use for money.",
+  "zakatSetupCycleTitle": "When does your zakat year end?",
+  "zakatCycleHelp": "{calendar, select, lunar{Your zakat date is the day your wealth first reached nisab, counted in Hijri months. If you already give zakat on a set date, use that date.}solar{Your zakat date is the day your wealth first reached nisab, counted in Gregorian months. If you already give zakat on a set date, use that date.}other{{calendar}}}",
+  "@zakatCycleHelp": {
+    "placeholders": {
+      "calendar": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatCycleNotToday": "Not today's date, unless that is your zakat date.",
+  "zakatCalendarLine": "{calendar, select, lunar{Hijri calendar (Umm al-Qura), because your zakat year is lunar}solar{Gregorian calendar, because your zakat year is solar}other{{calendar}}}",
+  "@zakatCalendarLine": {
+    "placeholders": {
+      "calendar": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatNextDue": "Next due date: {date}",
+  "@zakatNextDue": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatThisYearCalled": "This year is called {label}.",
+  "@zakatThisYearCalled": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatPastYears": "Zakat from years before {year} is not counted here. If any of it was not given, it is still owed.",
+  "@zakatPastYears": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatDay30": "In a year where this month has 29 days, the 29th is used.",
+  "zakatFeb29": "In other years, 28 February is used.",
+  "zakatSetupMonth": "Month",
+  "zakatSetupDay": "Day",
+  "zakatBadDay": "{month} has {days} days. Pick a day.",
+  "@zakatBadDay": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      },
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatMonthSemantics": "Zakat month, {name}, {n} of 12",
+  "@zakatMonthSemantics": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatDaySemantics": "Zakat day, {n}",
+  "@zakatDaySemantics": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatSetupRemindTitle": "Remind me",
+  "reminderDaysLabel": "Days before",
+  "reminderDaysHelp": "0 = on the due date.",
+  "reminderDaysError": "Enter 0 to 60.",
+  "reminderTimeLabel": "Time",
+  "reminderPreview": "One notification on {date} at {time}: “{text}”",
+  "@reminderPreview": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "text": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderPast": "This time has passed for {year}, so {year} gets no notification. This tab still shows when its year ends.",
+  "@reminderPast": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderPermissionLine": "Your phone will ask if this app may show notifications. Nothing is sent from your phone.",
+  "reminderDenied": "Notifications are off. This tab still shows when your zakat year ends.",
+  "reminderTitle": "Zakat",
+  "reminderBodyToday": "Your zakat year {year} ends today. Open to see your zakat.",
+  "@reminderBodyToday": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderBodyOn": "Your zakat year {year} ends on {date}. Open to see your zakat.",
+  "@reminderBodyOn": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderSwitch": "Year-end notification",
+  "reminderOffSubtitle": "Off. This tab still shows when your zakat year ends.",
+  "reminderOnSubtitle": "{days, plural, =0{On the due date at {time}} =1{1 day before the due date at {time}} other{{days} days before the due date at {time}}}",
+  "@reminderOnSubtitle": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderBlocked": "Notifications are off for this app in your phone settings.",
+  "reminderOpenSettings": "Open settings",
+  "zakatYearLabel": "{calendar, select, lunar{{n} AH}solar{{n}}other{{n}}}",
+  "@zakatYearLabel": {
+    "placeholders": {
+      "calendar": {
+        "type": "String"
+      },
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatState": "{state, select, open{Open}due{Due}distributing{Distributing}settled{Settled}belowNisab{Below nisab: no zakat due}other{{state}}}",
+  "@zakatState": {
+    "placeholders": {
+      "state": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatEstimateTag": "Estimate",
+  "zakatDueIs": "Your zakat for {year} is due.",
+  "@zakatDueIs": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatDueBelow": "Your zakat year {year} ended on {date}. Below nisab: no zakat due.",
+  "@zakatDueBelow": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatDueIncomplete": "Your zakat year {year} ended on {date}. Complete it to see your zakat.",
+  "@zakatDueIncomplete": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatDueDelayLine": "Most scholars hold that zakat should be given when it falls due, and not delayed without a valid reason.",
+  "zakatUmmAlQuraLine": "Hijri dates use the Umm al-Qura calendar. If your month began on another day where you live, move your due date.",
+  "zakatMovedFrom": "{calendar, select, lunar{Moved from {date} (Umm al-Qura)}solar{Moved from {date}}other{{date}}}",
+  "@zakatMovedFrom": {
+    "placeholders": {
+      "calendar": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatMoveDate": "Move date",
+  "zakatResultOpenLine": "Estimate. Your zakat year ends on {date}.",
+  "@zakatResultOpenLine": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatResultUsesToday": "Uses today's values and rates.",
+  "zakatResultStartFrom": "You can start distribution from {date}.",
+  "@zakatResultStartFrom": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatResultDue": "Zakat due",
+  "zakatResultRateOf": "{rate} of {amount} zakatable wealth",
+  "@zakatResultRateOf": {
+    "placeholders": {
+      "rate": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatResultBelow": "Below nisab: no zakat due for this year.",
+  "zakatResultBelowFigures": "Zakatable {wealth} · nisab {nisab}",
+  "@zakatResultBelowFigures": {
+    "placeholders": {
+      "wealth": {
+        "type": "String"
+      },
+      "nisab": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatResultEmpty": "Nothing to count yet.",
+  "zakatAddInvestment": "Add investment",
+  "zakatAddLineHere": "Add a line here",
+  "zakatResultIncomplete": "Zakat can't be worked out yet. {n, plural, =1{1 thing is missing:} other{{n} things are missing:}}",
+  "@zakatResultIncomplete": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "zakatStart": "Start distribution",
+  "zakatStartExplain": "Freezes this year's figures. Later changes to your investments, rates or settings will not change it.",
+  "zakatClose": "Close this year",
+  "zakatCloseExplain": "Freezes this year's figures. No zakat is due.",
+  "zakatRemaining": "Remaining",
+  "zakatSettledLine": "The amounts you logged reach the zakat due.",
+  "zakatFrozenBelow": "Below nisab: no zakat due.",
+  "zakatStartedSnack": "{label} started. Figures frozen.",
+  "@zakatStartedSnack": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatClosedSnack": "{label} closed. Below nisab: no zakat due.",
+  "@zakatClosedSnack": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatReachedSnack": "The amounts you logged reach the zakat due for {label}.",
+  "@zakatReachedSnack": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatFixRate": "{pair} rate missing on {date} · {names}",
+  "@zakatFixRate": {
+    "placeholders": {
+      "pair": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      },
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatFixJewellery": "Is jewellery that is worn zakatable? Not answered · {names}",
+  "@zakatFixJewellery": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatFixLongTerm": "How are long-held shares counted? Not chosen · {names}",
+  "@zakatFixLongTerm": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatFixNisab": "Nisab not chosen",
+  "zakatFixAddRate": "Add rate",
+  "zakatFixAnswer": "Answer",
+  "zakatFixChoose": "Choose",
+  "zakatFrozenBanner": "Frozen on {date}. Later changes do not change this year.",
+  "@zakatFrozenBanner": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatRecompute": "Recompute",
+  "zakatStartedHeader": "Started on {date} · {calendar, select, lunar{Lunar}solar{Solar}other{{calendar}}} · {rate}",
+  "@zakatStartedHeader": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "calendar": {
+        "type": "String"
+      },
+      "rate": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatAddsTitle": "How it adds up",
+  "zakatAddsLines": "Lines total",
+  "zakatAddsDebts": "Debts within 12 months",
+  "zakatAddsNotDeducted": "not deducted",
+  "zakatAddsBase": "Zakatable wealth",
+  "zakatAddsNisab": "{metal, select, gold{Nisab · gold 85 g}silver{Nisab · silver 595 g}other{{metal}}}",
+  "@zakatAddsNisab": {
+    "placeholders": {
+      "metal": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatAddsNisabCalc": "{grams} g × {rate} on {date}",
+  "@zakatAddsNisabCalc": {
+    "placeholders": {
+      "grams": {
+        "type": "String"
+      },
+      "rate": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatAddsReaches": "Reaches nisab?",
+  "zakatAddsYes": "Yes — {wealth} ≥ {nisab}",
+  "@zakatAddsYes": {
+    "placeholders": {
+      "wealth": {
+        "type": "String"
+      },
+      "nisab": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatAddsNo": "No — below nisab",
+  "zakatAddsRate": "{calendar, select, lunar{Rate (lunar)}solar{Rate (solar)}other{Rate}}",
+  "@zakatAddsRate": {
+    "placeholders": {
+      "calendar": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatAddsRounding": "Worked out from the zakatable wealth, not by adding the line amounts, so lines can differ by up to 0.01 each.",
+  "zakatAddsDeductionOffWhy": "With deduction off, the full total is compared with nisab (Shafi'i view).",
+  "zakatLineShare": "{share} of {amount}",
+  "@zakatLineShare": {
+    "placeholders": {
+      "share": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatLineZakat": "zakat {amount}",
+  "@zakatLineZakat": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatLineConverted": "{amount} · converted at {rate} on {date}",
+  "@zakatLineConverted": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "rate": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatLineValueDate": "value of {date}",
+  "@zakatLineValueDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatLineNotRateOf": "not the rate of {date}",
+  "@zakatLineNotRateOf": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatOldDateNote": "Zakat is on the value on your due date. If it changed, add a value or rate for {date}.",
+  "@zakatOldDateNote": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatAddValueFor": "Add value for {date}",
+  "@zakatAddValueFor": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatAddRateFor": "Add rate for {date}",
+  "@zakatAddRateFor": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatRecomputeForNewer": "Recompute to use a newer value.",
+  "zakatLineRateMissing": "{pair} rate missing",
+  "@zakatLineRateMissing": {
+    "placeholders": {
+      "pair": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatQuestionName": "{question, select, jewellery{Is jewellery that is worn zakatable?}longTermMethod{How are long-held shares counted?}other{{question}}}",
+  "@zakatQuestionName": {
+    "placeholders": {
+      "question": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatNotAnswered": "Not answered",
+  "zakatLineNetInterest": "net of {amount} interest kept inside (to purify)",
+  "@zakatLineNetInterest": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatLineDividendsNotice": "Zakat on your dividends is counted with your cash. If that cash is not in this year's lines, add it as an extra cash line.",
+  "zakatAddCashLine": "Add cash line",
+  "zakatLineDeleted": "Deleted from your investments",
+  "zakatLineFrozenBanner": "{label} is frozen. Changes here do not change it. Recompute it to use new values.",
+  "@zakatLineFrozenBanner": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatInvestmentsTitle": "Your investments ({n})",
+  "@zakatInvestmentsTitle": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "zakatNoInvestments": "No investments on this date.",
+  "zakatExtraTitle": "Extra lines ({n})",
+  "@zakatExtraTitle": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "zakatAddLine": "Add line",
+  "zakatExtraSheetTitle": "Extra line",
+  "zakatExtraKindCash": "Cash not in the list",
+  "zakatExtraKindOwed": "Money owed to me",
+  "zakatExtraOtherAssets": "Other assets (gold, goods for sale, a business) go in My Investments, where each gets its zakat share.",
+  "zakatOpenInvestments": "Open My Investments",
+  "zakatExtraLabel": "Label",
+  "zakatExtraGoodDebt": "The person is able and willing to pay me back.",
+  "zakatExtraDoubtful": "A doubtful debt has no zakat until you receive it.",
+  "zakatExtraCountedOnly": "Counted in {year} only.",
+  "@zakatExtraCountedOnly": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatExtraLive": "= {amount} at {rate} on {date}",
+  "@zakatExtraLive": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "rate": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatErrExtraLabel": "Enter a label.",
+  "zakatErrGoodDebt": "Confirm that the person is able and willing to pay.",
+  "zakatErrAmount": "Enter an amount above 0.",
+  "zakatDebtsTitle": "Debts I must pay within 12 months",
+  "zakatDebtsHelp": "Instalments and bills due in the next year.",
+  "zakatDebtsWhy": "Scholars differ on long-term debts such as a mortgage. Some deduct only the part due in the next 12 months, some the whole debt, some none. This app deducts only what you enter here.",
+  "zakatDebtsDeduct": "Deduct",
+  "zakatDebtsZakat": "zakat −{amount}",
+  "@zakatDebtsZakat": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatGiftTitle": "Amount given",
+  "zakatGiftAdd": "Add amount given",
+  "zakatGiftGivenOf": "Given {given} of {due}",
+  "@zakatGiftGivenOf": {
+    "placeholders": {
+      "given": {
+        "type": "String"
+      },
+      "due": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatGiftRemaining": "Remaining {amount}",
+  "@zakatGiftRemaining": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatGiftSemantics": "Given {given} of {due}. Remaining {remaining}.",
+  "@zakatGiftSemantics": {
+    "placeholders": {
+      "given": {
+        "type": "String"
+      },
+      "due": {
+        "type": "String"
+      },
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatGiftEmpty": "Nothing logged yet. Add each amount you give.",
+  "zakatGiftDateError": "Pick a date after {date}, the end of your previous zakat year.",
+  "@zakatGiftDateError": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatGiftDateFuture": "Pick a date that is not in the future.",
+  "zakatGiftViewTitle": "Which rate counts this amount?",
+  "zakatGiftViewDay": "the rate on the day you gave (Abu Yusuf and Muhammad)",
+  "zakatGiftViewDue": "the rate on your due date (Abu Hanifa)",
+  "zakatGiftViewHelp": "Scholars differ on the rate.",
+  "zakatGiftCountedAt": "{amount} · counted at {rate} on {date} ({view, select, dayGiven{rate on the day you gave}dueDate{rate on your due date}other{{view}}})",
+  "@zakatGiftCountedAt": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "rate": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      },
+      "view": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatGiftLive": "= {counted} · counted at {rate} on {date}",
+  "@zakatGiftLive": {
+    "placeholders": {
+      "counted": {
+        "type": "String"
+      },
+      "rate": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatGiftTypeRate": "1 {from} = ____ {to} on {date}",
+  "@zakatGiftTypeRate": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatGiftEarly": "Given before the due date",
+  "zakatGiftEarlyHelp": "This counts if you held nisab when you gave it and you gave it as zakat. The Maliki school accepts this only shortly before the due date.",
+  "zakatGiftOver": "Given {amount} more than due.",
+  "@zakatGiftOver": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatGiftOverHelp": "Some scholars (Hanafi) let you count this toward next year if you gave it as zakat. Others (Shafi'i) count it as sadaqah. The app does not move it.",
+  "zakatGiftLogNote": "The app counts what you log. It cannot check that each person may receive zakat (Quran 9:60), or that you gave it as zakat. Do not log interest you gave away: it is not zakat.",
+  "zakatGiftAbout": "About logging",
+  "zakatRateViewChanged": "Amounts already logged keep the rate they were counted at. Edit an amount to count it with the new view.",
+  "zakatRecomputeTitle": "Recompute {label} from today's data for {date}?",
+  "@zakatRecomputeTitle": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatRecomputePreview": "Zakat due: {before} → {after} · given stays {given}",
+  "@zakatRecomputePreview": {
+    "placeholders": {
+      "before": {
+        "type": "String"
+      },
+      "after": {
+        "type": "String"
+      },
+      "given": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatRecomputeHelp": "What you already gave counts toward the new figure.",
+  "zakatNoteA4": "Nisab is checked on the due date only.",
+  "zakatNoteA8": "Gold, silver and all other wealth are added together by value.",
+  "zakatNoteZ4": "Based on the lines of this year only. Add other cash or money owed to you as an extra line. Add other assets in My Investments.",
+  "zakatHistoryTitle": "History",
+  "zakatHistoryGiven": "given {amount}",
+  "@zakatHistoryGiven": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatSettingsTooltip": "Zakat settings",
+  "zakatSettingsNisab": "Nisab standard",
+  "zakatSettingsNisabHelp": "Frozen years keep the nisab they were started with.",
+  "zakatSettingsCycle": "Zakat cycle date",
+  "zakatCycleValue": "{calendar, select, lunar{{day} {month} (Hijri)}solar{{day} {month} (Gregorian)}other{{day} {month}}}",
+  "@zakatCycleValue": {
+    "placeholders": {
+      "calendar": {
+        "type": "String"
+      },
+      "day": {
+        "type": "String"
+      },
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatNotSetYet": "Not set yet",
+  "zakatSettingsRateView": "Rate for giving in another currency",
+  "zakatSettingsRateViewNone": "Not asked yet",
+  "zakatChangeToTitle": "{calendar, select, lunar{Change to lunar (Hijri)?}solar{Change to solar (Gregorian)?}other{Change?}}",
+  "@zakatChangeToTitle": {
+    "placeholders": {
+      "calendar": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatChangeCycleTitle": "Change the zakat cycle date?",
+  "zakatChangeKeep": "These years keep their dates and rate:",
+  "zakatChangeKeepRow": "{label} · {state} · {date} · {rate}",
+  "@zakatChangeKeepRow": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "state": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      },
+      "rate": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatChangeStartsAfter": "{calendar, select, lunar{Your lunar cycle starts after {date}.}solar{Your solar cycle starts after {date}.}other{{date}}}",
+  "@zakatChangeStartsAfter": {
+    "placeholders": {
+      "calendar": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatChangeFirstYear": "{calendar, select, lunar{First lunar year: {label}, ends {date} ({rate}).}solar{First solar year: {label}, ends {date} ({rate}).}other{{label}}}",
+  "@zakatChangeFirstYear": {
+    "placeholders": {
+      "calendar": {
+        "type": "String"
+      },
+      "label": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      },
+      "rate": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatChangeAppliesFrom": "The new date applies from the year after {label}.",
+  "@zakatChangeAppliesFrom": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatMoveTitle": "Move the due date",
+  "zakatMoveUmmAlQura": "Umm al-Qura",
+  "zakatMoveSolarLine": "You can move a solar date earlier only. Giving early is allowed; giving later delays zakat.",
+  "zakatMoveInfo": "All figures and the notification use the new date. Next year is not affected.",
+  "src_A4": "One zakat date a year. If your wealth held nisab for a full lunar year, zakat is due on all zakatable wealth you hold that day, including money added during the year: Abu Dawud 1573; IIFA Res 28 (3/4) §4. Shafi'i and Hanbali schools give new wealth its own year from the day it was acquired; this app uses the single date. Nisab is checked on the due date only. Hanafi: nisab must exist at the start and the end of the year (A4).",
+  "src_A5": "Debts you must pay within 12 months may be deducted from zakatable wealth. Scholars differ on long-term debts such as a mortgage: deduct the next 12 months of instalments, deduct all, or deduct none. The Shafi'i view is that debt does not reduce zakat (al-Nawawi, al-Majmu') — source not yet verified. AAOIFI SS 35 lists deductible liabilities — section numbers not yet verified (A5, C4).",
+  "src_A7": "Every currency is money for zakat (IIFA Res 21 (9/3)). Convert each holding at the rate on the due date (Darul Iftaa Mahmudiyyah; no AAOIFI or IIFA text found on the rate date) and add them (National Zakat Foundation UK). Giving zakat in another currency is allowed (A7).",
+  "src_A8": "Gold, silver and all other wealth are added together by value. Hanafis and Malikis combine by value; Shafi'is do not combine gold and silver — primary source not yet verified (A8).",
+  "src_B9": "A good debt (the debtor is able and willing to pay) is zakatable every year, as if it were cash in hand. A doubtful debt has no zakat until it is received (IIFA Res 1 (1/2); Saudi Permanent Committee) (B9).",
+  "src_Z4": "Based on the lines of this year only. Extra lines take cash and good debts only (IIFA Res 1 (1/2)); gold, goods for sale and a business belong in My Investments. Nisab is priced as grams of the metal you chose times its rate on the due date; the pricing rule is not yet verified (Z-4, C5).",
+  "src_C1": "Zakat falls due when 12 lunar months have passed since your wealth first reached nisab: Abu Dawud 1573; Quran 9:36 and 2:189; Darul Iftaa Birmingham. If the date is not known, use a best estimate — common fatwa practice, source not yet verified (C1).",
+  "src_C2": "Zakat that is already due must not be pushed later. Most scholars hold that zakat is given when it falls due and not delayed without a valid reason (Saudi Permanent Committee, islamqa 13981; primary texts not yet verified). Hanafi: a zakat date may not be changed; you may give early on an estimate, then check the amount on the real date and make up any shortfall (FatwaCentre, 178985) (C2).",
+  "src_C3": "A lunar month starts when the new moon is seen and has 29 or 30 days (Bukhari 1909 and 1907; Quran 2:189). Umm al-Qura is a calculated calendar and can differ from local sighting by a day or two. Using it is a product choice, and moving the date by up to 2 days is the consultant's reading — source not yet verified. A cycle day 30 in a 29-day month uses the 29th — reading not yet verified. A solar date may move earlier only (C3).",
+  "src_C4": "Value all zakatable wealth on the due date and take off the debts you deduct. If what is left reaches nisab, zakat is due (Hanafi: Ibn Abidin, Radd al-Muhtar 2/260, via Council of Ulama Eastern Cape). Shafi'i: debt does not cancel zakat; in the app that is deduction off. Below nisab, nothing is due (Abu Dawud 1573) (C4).",
+  "src_C5": "A good debt counts in full every year; a doubtful debt counts nothing until it is received (IIFA Res 1 (1/2)). Other wealth (gold, goods for sale, a business) goes in My Investments (C5).",
+  "src_C6": "Giving zakat before it falls due is allowed: Abu Dawud 1624 (Ali; al-Abbas asked to give early and the Prophet allowed it; graded hasan by al-Albani, da'if by Zubair Ali Zai). Conditions: you hold nisab when you give it and you give it as zakat; the Shafi'i school limits it to one year ahead (Darul Iftaa Jordan, Q 2974); Hanafi: give early, then check the amount on the real date (FatwaCentre 178985). The Maliki school accepts this only shortly before the due date — source not yet verified (C6).",
+  "src_C7": "Hanafi: an extra amount given as zakat may count toward next year (Darul Uloom Deoband, fatwa 28/76/D=01/1435). Shafi'i: the extra is sadaqah, because each year's zakat needs its own intention (Darul Iftaa Jordan, Q 3602). The app does not move it, which is valid under both views (C7).",
+  "src_C8": "Scholars differ on the exchange rate that counts zakat given in another currency. The rate on the day you gave: Abu Yusuf and Muhammad (the Sahibayn); several contemporary Hanafi muftis prefer it (Muftionline 46417; fatwa-ca 178598). The rate on the due date: Abu Hanifa (Darul Iftaa Mahmudiyyah 134900, which allows a higher rate). The primary text, Radd al-Muhtar, is not yet verified (C8).",
+  "src_C9": "Zakat due is the correct amount on the due date, not the first figure the app worked out. What you already gave counts toward the corrected figure, and any shortfall is still owed (FatwaCentre 178985; SeekersGuidance, Mawlana Ilyas Patel). If the corrected figure is lower than what you gave, see C7 (C9).",
+  "src_C10": "Nothing is due below 20 dinars or 200 dirhams (Abu Dawud 1573). The notification says only that your zakat year ends, because the app has not yet checked that your wealth reaches nisab (C10).",
+  "src_C11": "Zakat is correct only when it is given as zakat to the eight groups named in Quran 9:60, and each year's zakat needs its own intention (Darul Iftaa Jordan, Q 3602). Sadaqah given in good faith to someone who did not qualify still counted as sadaqah (Bukhari 1421; Muslim 1022). Whether that also covers obligatory zakat is disputed (Abu Hanifa and Muhammad: yes, if the giver took care; Abu Yusuf: no) — not yet verified, and the app does not judge it. Interest given away is not zakat (Z-6) (C11).",
+  "zakatFixMetalRate": "{metal, select, gold{Add a gold rate to see the nisab on {date}}silver{Add a silver rate to see the nisab on {date}}other{{metal}}}",
+  "@zakatFixMetalRate": {
+    "placeholders": {
+      "metal": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "zakatWhyLinesTotal": "The sum of the zakatable amount of every line, each converted to your base currency at the rate on the due date.",
+  "zakatWhyBase": "The lines total minus the debts you deduct. Never below 0.",
+  "zakatWhyNisab": "Grams of the metal you chose times its rate on the due date.",
+  "zakatWhyReaches": "Zakat is due only if the zakatable wealth reaches the nisab.",
+  "zakatWhyRate": "The rate of your zakat year setting, for a full year. There is no day factor.",
+  "zakatWhyBelow": "The zakatable wealth is below the nisab on the due date, so no zakat is due for this year.",
+  "zakatWhyLineValue": "The value at the end of the due date: market value, not cost, net of interest kept inside, never adjusted for inflation.",
+  "zakatWhyLineRate": "The latest rate on or before the due date, typed or fetched.",
+  "zakatWhyExtra": "A line you added for this year only.",
+  "zakatWhyGiven": "The sum of the amounts you logged, in the currency of this year. Remaining is the zakat due minus what you gave, never below 0.",
+  "zakatErrExtraUnit": "Pick a currency. Gold and silver go in My Investments."
 }

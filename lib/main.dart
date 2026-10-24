@@ -6,14 +6,25 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/assumptions/assumptions_providers.dart';
 import 'features/investments/presentation/home_screen.dart';
+import 'features/investments/presentation/investments_providers.dart';
 import 'features/investments/presentation/setup_screen.dart';
 import 'features/overview/presentation/overview_screen.dart';
 import 'features/plan/presentation/plan_screen.dart';
 import 'features/zakat/presentation/zakat_screen.dart';
+import 'features/zakat/presentation/zakat_settings_section.dart';
 import 'l10n/app_localizations.dart';
 
 void main() {
-  runApp(const ProviderScope(child: App()));
+  runApp(
+    ProviderScope(
+      overrides: [
+        zakatSettingsSectionProvider.overrideWithValue(
+          zakatSettingsSectionBuilder,
+        ),
+      ],
+      child: const App(),
+    ),
+  );
 }
 
 class App extends StatelessWidget {
@@ -62,6 +73,7 @@ class AppShell extends StatefulWidget {
   const AppShell({super.key});
 
   static const investmentsTab = 1;
+  static const zakatTab = 2;
 
   static void select(BuildContext context, int tab) =>
       context.findAncestorStateOfType<_AppShellState>()?._select(tab);

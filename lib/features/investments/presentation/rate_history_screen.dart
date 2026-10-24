@@ -94,17 +94,26 @@ Future<void> showRateDialog(
   required Unit from,
   required Unit to,
   Rate? editing,
+  DateTime? on,
 }) => showDialog<void>(
   context: context,
-  builder: (_) => _RateDialog(from: from, to: to, editing: editing),
+  builder: (_) => _RateDialog(from: from, to: to, editing: editing, on: on),
 );
 
 class _RateDialog extends ConsumerStatefulWidget {
-  const _RateDialog({required this.from, required this.to, this.editing});
+  const _RateDialog({
+    required this.from,
+    required this.to,
+    this.editing,
+    this.on,
+  });
 
   final Unit from;
   final Unit to;
   final Rate? editing;
+
+  /// The date the rate is for when it is new (a zakat due date).
+  final DateTime? on;
 
   @override
   ConsumerState<_RateDialog> createState() => _RateDialogState();
@@ -113,7 +122,8 @@ class _RateDialog extends ConsumerStatefulWidget {
 class _RateDialogState extends ConsumerState<_RateDialog> {
   late Unit _from = widget.from;
   late Unit _to = widget.to;
-  late DateTime _date = widget.editing?.asOf ?? ref.read(todayProvider);
+  late DateTime _date =
+      widget.editing?.asOf ?? widget.on ?? ref.read(todayProvider);
   late final _rate = TextEditingController(
     text: widget.editing?.rate.toString() ?? '',
   );

@@ -32,6 +32,14 @@ abstract interface class AssumptionsRepository {
 
   Future<void> saveSettings(Settings s);
 
+  /// Ordered by `from`.
+  Stream<List<ZakatCycle>> watchZakatCycles();
+
+  /// One transaction: the settings row, then every cycle with
+  /// `from >= cycle.from` is deleted (it owns no existing year, Z5), then
+  /// [cycle] is inserted.
+  Future<void> saveZakatCycle(Settings settings, ZakatCycle cycle);
+
   Stream<Set<int>> watchNoZakatYears();
 
   Future<void> setNoZakatYear(int year, {required bool noZakat});

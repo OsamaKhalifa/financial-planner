@@ -1001,8 +1001,8 @@ abstract class AppLocalizations {
   /// No description provided for @zakatReasonTrading.
   ///
   /// In en, this message translates to:
-  /// **'You hold this to sell. Trade goods pay 2.5 % of market value.'**
-  String get zakatReasonTrading;
+  /// **'You hold this to sell. Trade goods pay {rate} of market value.'**
+  String zakatReasonTrading(String rate);
 
   /// No description provided for @zakatReasonSavings.
   ///
@@ -3212,6 +3212,1275 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Using your own {vendor} key.'**
   String aiStatusUsingKey(String vendor);
+
+  /// No description provided for @hijriMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'{m, select, 1{Muharram}2{Safar}3{Rabi\' al-Awwal}4{Rabi\' al-Thani}5{Jumada al-Ula}6{Jumada al-Akhirah}7{Rajab}8{Sha\'ban}9{Ramadan}10{Shawwal}11{Dhu al-Qa\'dah}12{Dhu al-Hijjah}other{{m}}}'**
+  String hijriMonth(String m);
+
+  /// No description provided for @zakatSetupNisabTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Which nisab do you use?'**
+  String get zakatSetupNisabTitle;
+
+  /// No description provided for @zakatNisabGold.
+  ///
+  /// In en, this message translates to:
+  /// **'Gold — 85 g'**
+  String get zakatNisabGold;
+
+  /// No description provided for @zakatNisabSilver.
+  ///
+  /// In en, this message translates to:
+  /// **'Silver — 595 g'**
+  String get zakatNisabSilver;
+
+  /// No description provided for @zakatNisabAtRate.
+  ///
+  /// In en, this message translates to:
+  /// **'= {amount} at your rate of {date}'**
+  String zakatNisabAtRate(String amount, String date);
+
+  /// No description provided for @zakatNisabAddRate.
+  ///
+  /// In en, this message translates to:
+  /// **'{metal, select, gold{Add a gold rate to see it}silver{Add a silver rate to see it}other{{metal}}}'**
+  String zakatNisabAddRate(String metal);
+
+  /// No description provided for @zakatNisabWhy.
+  ///
+  /// In en, this message translates to:
+  /// **'Zakat is due only if your zakatable wealth reaches the nisab. Scholars differ on which metal to use for money.'**
+  String get zakatNisabWhy;
+
+  /// No description provided for @zakatSetupCycleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'When does your zakat year end?'**
+  String get zakatSetupCycleTitle;
+
+  /// No description provided for @zakatCycleHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'{calendar, select, lunar{Your zakat date is the day your wealth first reached nisab, counted in Hijri months. If you already give zakat on a set date, use that date.}solar{Your zakat date is the day your wealth first reached nisab, counted in Gregorian months. If you already give zakat on a set date, use that date.}other{{calendar}}}'**
+  String zakatCycleHelp(String calendar);
+
+  /// No description provided for @zakatCycleNotToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Not today\'s date, unless that is your zakat date.'**
+  String get zakatCycleNotToday;
+
+  /// No description provided for @zakatCalendarLine.
+  ///
+  /// In en, this message translates to:
+  /// **'{calendar, select, lunar{Hijri calendar (Umm al-Qura), because your zakat year is lunar}solar{Gregorian calendar, because your zakat year is solar}other{{calendar}}}'**
+  String zakatCalendarLine(String calendar);
+
+  /// No description provided for @zakatNextDue.
+  ///
+  /// In en, this message translates to:
+  /// **'Next due date: {date}'**
+  String zakatNextDue(String date);
+
+  /// No description provided for @zakatThisYearCalled.
+  ///
+  /// In en, this message translates to:
+  /// **'This year is called {label}.'**
+  String zakatThisYearCalled(String label);
+
+  /// No description provided for @zakatPastYears.
+  ///
+  /// In en, this message translates to:
+  /// **'Zakat from years before {year} is not counted here. If any of it was not given, it is still owed.'**
+  String zakatPastYears(String year);
+
+  /// No description provided for @zakatDay30.
+  ///
+  /// In en, this message translates to:
+  /// **'In a year where this month has 29 days, the 29th is used.'**
+  String get zakatDay30;
+
+  /// No description provided for @zakatFeb29.
+  ///
+  /// In en, this message translates to:
+  /// **'In other years, 28 February is used.'**
+  String get zakatFeb29;
+
+  /// No description provided for @zakatSetupMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Month'**
+  String get zakatSetupMonth;
+
+  /// No description provided for @zakatSetupDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Day'**
+  String get zakatSetupDay;
+
+  /// No description provided for @zakatBadDay.
+  ///
+  /// In en, this message translates to:
+  /// **'{month} has {days} days. Pick a day.'**
+  String zakatBadDay(String month, String days);
+
+  /// No description provided for @zakatMonthSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Zakat month, {name}, {n} of 12'**
+  String zakatMonthSemantics(String name, String n);
+
+  /// No description provided for @zakatDaySemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Zakat day, {n}'**
+  String zakatDaySemantics(String n);
+
+  /// No description provided for @zakatSetupRemindTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remind me'**
+  String get zakatSetupRemindTitle;
+
+  /// No description provided for @reminderDaysLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Days before'**
+  String get reminderDaysLabel;
+
+  /// No description provided for @reminderDaysHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'0 = on the due date.'**
+  String get reminderDaysHelp;
+
+  /// No description provided for @reminderDaysError.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter 0 to 60.'**
+  String get reminderDaysError;
+
+  /// No description provided for @reminderTimeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Time'**
+  String get reminderTimeLabel;
+
+  /// No description provided for @reminderPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'One notification on {date} at {time}: “{text}”'**
+  String reminderPreview(String date, String time, String text);
+
+  /// No description provided for @reminderPast.
+  ///
+  /// In en, this message translates to:
+  /// **'This time has passed for {year}, so {year} gets no notification. This tab still shows when its year ends.'**
+  String reminderPast(String year);
+
+  /// No description provided for @reminderPermissionLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Your phone will ask if this app may show notifications. Nothing is sent from your phone.'**
+  String get reminderPermissionLine;
+
+  /// No description provided for @reminderDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications are off. This tab still shows when your zakat year ends.'**
+  String get reminderDenied;
+
+  /// No description provided for @reminderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Zakat'**
+  String get reminderTitle;
+
+  /// No description provided for @reminderBodyToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Your zakat year {year} ends today. Open to see your zakat.'**
+  String reminderBodyToday(String year);
+
+  /// No description provided for @reminderBodyOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Your zakat year {year} ends on {date}. Open to see your zakat.'**
+  String reminderBodyOn(String year, String date);
+
+  /// No description provided for @reminderSwitch.
+  ///
+  /// In en, this message translates to:
+  /// **'Year-end notification'**
+  String get reminderSwitch;
+
+  /// No description provided for @reminderOffSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Off. This tab still shows when your zakat year ends.'**
+  String get reminderOffSubtitle;
+
+  /// No description provided for @reminderOnSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{days, plural, =0{On the due date at {time}} =1{1 day before the due date at {time}} other{{days} days before the due date at {time}}}'**
+  String reminderOnSubtitle(int days, String time);
+
+  /// No description provided for @reminderBlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications are off for this app in your phone settings.'**
+  String get reminderBlocked;
+
+  /// No description provided for @reminderOpenSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open settings'**
+  String get reminderOpenSettings;
+
+  /// No description provided for @zakatYearLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{calendar, select, lunar{{n} AH}solar{{n}}other{{n}}}'**
+  String zakatYearLabel(String calendar, String n);
+
+  /// No description provided for @zakatState.
+  ///
+  /// In en, this message translates to:
+  /// **'{state, select, open{Open}due{Due}distributing{Distributing}settled{Settled}belowNisab{Below nisab: no zakat due}other{{state}}}'**
+  String zakatState(String state);
+
+  /// No description provided for @zakatEstimateTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimate'**
+  String get zakatEstimateTag;
+
+  /// No description provided for @zakatDueIs.
+  ///
+  /// In en, this message translates to:
+  /// **'Your zakat for {year} is due.'**
+  String zakatDueIs(String year);
+
+  /// No description provided for @zakatDueBelow.
+  ///
+  /// In en, this message translates to:
+  /// **'Your zakat year {year} ended on {date}. Below nisab: no zakat due.'**
+  String zakatDueBelow(String year, String date);
+
+  /// No description provided for @zakatDueIncomplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Your zakat year {year} ended on {date}. Complete it to see your zakat.'**
+  String zakatDueIncomplete(String year, String date);
+
+  /// No description provided for @zakatDueDelayLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Most scholars hold that zakat should be given when it falls due, and not delayed without a valid reason.'**
+  String get zakatDueDelayLine;
+
+  /// No description provided for @zakatUmmAlQuraLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Hijri dates use the Umm al-Qura calendar. If your month began on another day where you live, move your due date.'**
+  String get zakatUmmAlQuraLine;
+
+  /// No description provided for @zakatMovedFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'{calendar, select, lunar{Moved from {date} (Umm al-Qura)}solar{Moved from {date}}other{{date}}}'**
+  String zakatMovedFrom(String calendar, String date);
+
+  /// No description provided for @zakatMoveDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Move date'**
+  String get zakatMoveDate;
+
+  /// No description provided for @zakatResultOpenLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimate. Your zakat year ends on {date}.'**
+  String zakatResultOpenLine(String date);
+
+  /// No description provided for @zakatResultUsesToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Uses today\'s values and rates.'**
+  String get zakatResultUsesToday;
+
+  /// No description provided for @zakatResultStartFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'You can start distribution from {date}.'**
+  String zakatResultStartFrom(String date);
+
+  /// No description provided for @zakatResultDue.
+  ///
+  /// In en, this message translates to:
+  /// **'Zakat due'**
+  String get zakatResultDue;
+
+  /// No description provided for @zakatResultRateOf.
+  ///
+  /// In en, this message translates to:
+  /// **'{rate} of {amount} zakatable wealth'**
+  String zakatResultRateOf(String rate, String amount);
+
+  /// No description provided for @zakatResultBelow.
+  ///
+  /// In en, this message translates to:
+  /// **'Below nisab: no zakat due for this year.'**
+  String get zakatResultBelow;
+
+  /// No description provided for @zakatResultBelowFigures.
+  ///
+  /// In en, this message translates to:
+  /// **'Zakatable {wealth} · nisab {nisab}'**
+  String zakatResultBelowFigures(String wealth, String nisab);
+
+  /// No description provided for @zakatResultEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing to count yet.'**
+  String get zakatResultEmpty;
+
+  /// No description provided for @zakatAddInvestment.
+  ///
+  /// In en, this message translates to:
+  /// **'Add investment'**
+  String get zakatAddInvestment;
+
+  /// No description provided for @zakatAddLineHere.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a line here'**
+  String get zakatAddLineHere;
+
+  /// No description provided for @zakatResultIncomplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Zakat can\'t be worked out yet. {n, plural, =1{1 thing is missing:} other{{n} things are missing:}}'**
+  String zakatResultIncomplete(int n);
+
+  /// No description provided for @zakatStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start distribution'**
+  String get zakatStart;
+
+  /// No description provided for @zakatStartExplain.
+  ///
+  /// In en, this message translates to:
+  /// **'Freezes this year\'s figures. Later changes to your investments, rates or settings will not change it.'**
+  String get zakatStartExplain;
+
+  /// No description provided for @zakatClose.
+  ///
+  /// In en, this message translates to:
+  /// **'Close this year'**
+  String get zakatClose;
+
+  /// No description provided for @zakatCloseExplain.
+  ///
+  /// In en, this message translates to:
+  /// **'Freezes this year\'s figures. No zakat is due.'**
+  String get zakatCloseExplain;
+
+  /// No description provided for @zakatRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'Remaining'**
+  String get zakatRemaining;
+
+  /// No description provided for @zakatSettledLine.
+  ///
+  /// In en, this message translates to:
+  /// **'The amounts you logged reach the zakat due.'**
+  String get zakatSettledLine;
+
+  /// No description provided for @zakatFrozenBelow.
+  ///
+  /// In en, this message translates to:
+  /// **'Below nisab: no zakat due.'**
+  String get zakatFrozenBelow;
+
+  /// No description provided for @zakatStartedSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'{label} started. Figures frozen.'**
+  String zakatStartedSnack(String label);
+
+  /// No description provided for @zakatClosedSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'{label} closed. Below nisab: no zakat due.'**
+  String zakatClosedSnack(String label);
+
+  /// No description provided for @zakatReachedSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'The amounts you logged reach the zakat due for {label}.'**
+  String zakatReachedSnack(String label);
+
+  /// No description provided for @zakatFixRate.
+  ///
+  /// In en, this message translates to:
+  /// **'{pair} rate missing on {date} · {names}'**
+  String zakatFixRate(String pair, String date, String names);
+
+  /// No description provided for @zakatFixJewellery.
+  ///
+  /// In en, this message translates to:
+  /// **'Is jewellery that is worn zakatable? Not answered · {names}'**
+  String zakatFixJewellery(String names);
+
+  /// No description provided for @zakatFixLongTerm.
+  ///
+  /// In en, this message translates to:
+  /// **'How are long-held shares counted? Not chosen · {names}'**
+  String zakatFixLongTerm(String names);
+
+  /// No description provided for @zakatFixNisab.
+  ///
+  /// In en, this message translates to:
+  /// **'Nisab not chosen'**
+  String get zakatFixNisab;
+
+  /// No description provided for @zakatFixAddRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Add rate'**
+  String get zakatFixAddRate;
+
+  /// No description provided for @zakatFixAnswer.
+  ///
+  /// In en, this message translates to:
+  /// **'Answer'**
+  String get zakatFixAnswer;
+
+  /// No description provided for @zakatFixChoose.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose'**
+  String get zakatFixChoose;
+
+  /// No description provided for @zakatFrozenBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'Frozen on {date}. Later changes do not change this year.'**
+  String zakatFrozenBanner(String date);
+
+  /// No description provided for @zakatRecompute.
+  ///
+  /// In en, this message translates to:
+  /// **'Recompute'**
+  String get zakatRecompute;
+
+  /// No description provided for @zakatStartedHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Started on {date} · {calendar, select, lunar{Lunar}solar{Solar}other{{calendar}}} · {rate}'**
+  String zakatStartedHeader(String date, String calendar, String rate);
+
+  /// No description provided for @zakatAddsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How it adds up'**
+  String get zakatAddsTitle;
+
+  /// No description provided for @zakatAddsLines.
+  ///
+  /// In en, this message translates to:
+  /// **'Lines total'**
+  String get zakatAddsLines;
+
+  /// No description provided for @zakatAddsDebts.
+  ///
+  /// In en, this message translates to:
+  /// **'Debts within 12 months'**
+  String get zakatAddsDebts;
+
+  /// No description provided for @zakatAddsNotDeducted.
+  ///
+  /// In en, this message translates to:
+  /// **'not deducted'**
+  String get zakatAddsNotDeducted;
+
+  /// No description provided for @zakatAddsBase.
+  ///
+  /// In en, this message translates to:
+  /// **'Zakatable wealth'**
+  String get zakatAddsBase;
+
+  /// No description provided for @zakatAddsNisab.
+  ///
+  /// In en, this message translates to:
+  /// **'{metal, select, gold{Nisab · gold 85 g}silver{Nisab · silver 595 g}other{{metal}}}'**
+  String zakatAddsNisab(String metal);
+
+  /// No description provided for @zakatAddsNisabCalc.
+  ///
+  /// In en, this message translates to:
+  /// **'{grams} g × {rate} on {date}'**
+  String zakatAddsNisabCalc(String grams, String rate, String date);
+
+  /// No description provided for @zakatAddsReaches.
+  ///
+  /// In en, this message translates to:
+  /// **'Reaches nisab?'**
+  String get zakatAddsReaches;
+
+  /// No description provided for @zakatAddsYes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes — {wealth} ≥ {nisab}'**
+  String zakatAddsYes(String wealth, String nisab);
+
+  /// No description provided for @zakatAddsNo.
+  ///
+  /// In en, this message translates to:
+  /// **'No — below nisab'**
+  String get zakatAddsNo;
+
+  /// No description provided for @zakatAddsRate.
+  ///
+  /// In en, this message translates to:
+  /// **'{calendar, select, lunar{Rate (lunar)}solar{Rate (solar)}other{Rate}}'**
+  String zakatAddsRate(String calendar);
+
+  /// No description provided for @zakatAddsRounding.
+  ///
+  /// In en, this message translates to:
+  /// **'Worked out from the zakatable wealth, not by adding the line amounts, so lines can differ by up to 0.01 each.'**
+  String get zakatAddsRounding;
+
+  /// No description provided for @zakatAddsDeductionOffWhy.
+  ///
+  /// In en, this message translates to:
+  /// **'With deduction off, the full total is compared with nisab (Shafi\'i view).'**
+  String get zakatAddsDeductionOffWhy;
+
+  /// No description provided for @zakatLineShare.
+  ///
+  /// In en, this message translates to:
+  /// **'{share} of {amount}'**
+  String zakatLineShare(String share, String amount);
+
+  /// No description provided for @zakatLineZakat.
+  ///
+  /// In en, this message translates to:
+  /// **'zakat {amount}'**
+  String zakatLineZakat(String amount);
+
+  /// No description provided for @zakatLineConverted.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} · converted at {rate} on {date}'**
+  String zakatLineConverted(String amount, String rate, String date);
+
+  /// No description provided for @zakatLineValueDate.
+  ///
+  /// In en, this message translates to:
+  /// **'value of {date}'**
+  String zakatLineValueDate(String date);
+
+  /// No description provided for @zakatLineNotRateOf.
+  ///
+  /// In en, this message translates to:
+  /// **'not the rate of {date}'**
+  String zakatLineNotRateOf(String date);
+
+  /// No description provided for @zakatOldDateNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Zakat is on the value on your due date. If it changed, add a value or rate for {date}.'**
+  String zakatOldDateNote(String date);
+
+  /// No description provided for @zakatAddValueFor.
+  ///
+  /// In en, this message translates to:
+  /// **'Add value for {date}'**
+  String zakatAddValueFor(String date);
+
+  /// No description provided for @zakatAddRateFor.
+  ///
+  /// In en, this message translates to:
+  /// **'Add rate for {date}'**
+  String zakatAddRateFor(String date);
+
+  /// No description provided for @zakatRecomputeForNewer.
+  ///
+  /// In en, this message translates to:
+  /// **'Recompute to use a newer value.'**
+  String get zakatRecomputeForNewer;
+
+  /// No description provided for @zakatLineRateMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'{pair} rate missing'**
+  String zakatLineRateMissing(String pair);
+
+  /// No description provided for @zakatQuestionName.
+  ///
+  /// In en, this message translates to:
+  /// **'{question, select, jewellery{Is jewellery that is worn zakatable?}longTermMethod{How are long-held shares counted?}other{{question}}}'**
+  String zakatQuestionName(String question);
+
+  /// No description provided for @zakatNotAnswered.
+  ///
+  /// In en, this message translates to:
+  /// **'Not answered'**
+  String get zakatNotAnswered;
+
+  /// No description provided for @zakatLineNetInterest.
+  ///
+  /// In en, this message translates to:
+  /// **'net of {amount} interest kept inside (to purify)'**
+  String zakatLineNetInterest(String amount);
+
+  /// No description provided for @zakatLineDividendsNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Zakat on your dividends is counted with your cash. If that cash is not in this year\'s lines, add it as an extra cash line.'**
+  String get zakatLineDividendsNotice;
+
+  /// No description provided for @zakatAddCashLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Add cash line'**
+  String get zakatAddCashLine;
+
+  /// No description provided for @zakatLineDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted from your investments'**
+  String get zakatLineDeleted;
+
+  /// No description provided for @zakatLineFrozenBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'{label} is frozen. Changes here do not change it. Recompute it to use new values.'**
+  String zakatLineFrozenBanner(String label);
+
+  /// No description provided for @zakatInvestmentsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your investments ({n})'**
+  String zakatInvestmentsTitle(int n);
+
+  /// No description provided for @zakatNoInvestments.
+  ///
+  /// In en, this message translates to:
+  /// **'No investments on this date.'**
+  String get zakatNoInvestments;
+
+  /// No description provided for @zakatExtraTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Extra lines ({n})'**
+  String zakatExtraTitle(int n);
+
+  /// No description provided for @zakatAddLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Add line'**
+  String get zakatAddLine;
+
+  /// No description provided for @zakatExtraSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Extra line'**
+  String get zakatExtraSheetTitle;
+
+  /// No description provided for @zakatExtraKindCash.
+  ///
+  /// In en, this message translates to:
+  /// **'Cash not in the list'**
+  String get zakatExtraKindCash;
+
+  /// No description provided for @zakatExtraKindOwed.
+  ///
+  /// In en, this message translates to:
+  /// **'Money owed to me'**
+  String get zakatExtraKindOwed;
+
+  /// No description provided for @zakatExtraOtherAssets.
+  ///
+  /// In en, this message translates to:
+  /// **'Other assets (gold, goods for sale, a business) go in My Investments, where each gets its zakat share.'**
+  String get zakatExtraOtherAssets;
+
+  /// No description provided for @zakatOpenInvestments.
+  ///
+  /// In en, this message translates to:
+  /// **'Open My Investments'**
+  String get zakatOpenInvestments;
+
+  /// No description provided for @zakatExtraLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Label'**
+  String get zakatExtraLabel;
+
+  /// No description provided for @zakatExtraGoodDebt.
+  ///
+  /// In en, this message translates to:
+  /// **'The person is able and willing to pay me back.'**
+  String get zakatExtraGoodDebt;
+
+  /// No description provided for @zakatExtraDoubtful.
+  ///
+  /// In en, this message translates to:
+  /// **'A doubtful debt has no zakat until you receive it.'**
+  String get zakatExtraDoubtful;
+
+  /// No description provided for @zakatExtraCountedOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Counted in {year} only.'**
+  String zakatExtraCountedOnly(String year);
+
+  /// No description provided for @zakatExtraLive.
+  ///
+  /// In en, this message translates to:
+  /// **'= {amount} at {rate} on {date}'**
+  String zakatExtraLive(String amount, String rate, String date);
+
+  /// No description provided for @zakatErrExtraLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a label.'**
+  String get zakatErrExtraLabel;
+
+  /// No description provided for @zakatErrGoodDebt.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm that the person is able and willing to pay.'**
+  String get zakatErrGoodDebt;
+
+  /// No description provided for @zakatErrAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter an amount above 0.'**
+  String get zakatErrAmount;
+
+  /// No description provided for @zakatDebtsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Debts I must pay within 12 months'**
+  String get zakatDebtsTitle;
+
+  /// No description provided for @zakatDebtsHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Instalments and bills due in the next year.'**
+  String get zakatDebtsHelp;
+
+  /// No description provided for @zakatDebtsWhy.
+  ///
+  /// In en, this message translates to:
+  /// **'Scholars differ on long-term debts such as a mortgage. Some deduct only the part due in the next 12 months, some the whole debt, some none. This app deducts only what you enter here.'**
+  String get zakatDebtsWhy;
+
+  /// No description provided for @zakatDebtsDeduct.
+  ///
+  /// In en, this message translates to:
+  /// **'Deduct'**
+  String get zakatDebtsDeduct;
+
+  /// No description provided for @zakatDebtsZakat.
+  ///
+  /// In en, this message translates to:
+  /// **'zakat −{amount}'**
+  String zakatDebtsZakat(String amount);
+
+  /// No description provided for @zakatGiftTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount given'**
+  String get zakatGiftTitle;
+
+  /// No description provided for @zakatGiftAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add amount given'**
+  String get zakatGiftAdd;
+
+  /// No description provided for @zakatGiftGivenOf.
+  ///
+  /// In en, this message translates to:
+  /// **'Given {given} of {due}'**
+  String zakatGiftGivenOf(String given, String due);
+
+  /// No description provided for @zakatGiftRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'Remaining {amount}'**
+  String zakatGiftRemaining(String amount);
+
+  /// No description provided for @zakatGiftSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Given {given} of {due}. Remaining {remaining}.'**
+  String zakatGiftSemantics(String given, String due, String remaining);
+
+  /// No description provided for @zakatGiftEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing logged yet. Add each amount you give.'**
+  String get zakatGiftEmpty;
+
+  /// No description provided for @zakatGiftDateError.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a date after {date}, the end of your previous zakat year.'**
+  String zakatGiftDateError(String date);
+
+  /// No description provided for @zakatGiftDateFuture.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a date that is not in the future.'**
+  String get zakatGiftDateFuture;
+
+  /// No description provided for @zakatGiftViewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Which rate counts this amount?'**
+  String get zakatGiftViewTitle;
+
+  /// No description provided for @zakatGiftViewDay.
+  ///
+  /// In en, this message translates to:
+  /// **'the rate on the day you gave (Abu Yusuf and Muhammad)'**
+  String get zakatGiftViewDay;
+
+  /// No description provided for @zakatGiftViewDue.
+  ///
+  /// In en, this message translates to:
+  /// **'the rate on your due date (Abu Hanifa)'**
+  String get zakatGiftViewDue;
+
+  /// No description provided for @zakatGiftViewHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Scholars differ on the rate.'**
+  String get zakatGiftViewHelp;
+
+  /// No description provided for @zakatGiftCountedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} · counted at {rate} on {date} ({view, select, dayGiven{rate on the day you gave}dueDate{rate on your due date}other{{view}}})'**
+  String zakatGiftCountedAt(
+    String amount,
+    String rate,
+    String date,
+    String view,
+  );
+
+  /// No description provided for @zakatGiftLive.
+  ///
+  /// In en, this message translates to:
+  /// **'= {counted} · counted at {rate} on {date}'**
+  String zakatGiftLive(String counted, String rate, String date);
+
+  /// No description provided for @zakatGiftTypeRate.
+  ///
+  /// In en, this message translates to:
+  /// **'1 {from} = ____ {to} on {date}'**
+  String zakatGiftTypeRate(String from, String to, String date);
+
+  /// No description provided for @zakatGiftEarly.
+  ///
+  /// In en, this message translates to:
+  /// **'Given before the due date'**
+  String get zakatGiftEarly;
+
+  /// No description provided for @zakatGiftEarlyHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'This counts if you held nisab when you gave it and you gave it as zakat. The Maliki school accepts this only shortly before the due date.'**
+  String get zakatGiftEarlyHelp;
+
+  /// No description provided for @zakatGiftOver.
+  ///
+  /// In en, this message translates to:
+  /// **'Given {amount} more than due.'**
+  String zakatGiftOver(String amount);
+
+  /// No description provided for @zakatGiftOverHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Some scholars (Hanafi) let you count this toward next year if you gave it as zakat. Others (Shafi\'i) count it as sadaqah. The app does not move it.'**
+  String get zakatGiftOverHelp;
+
+  /// No description provided for @zakatGiftLogNote.
+  ///
+  /// In en, this message translates to:
+  /// **'The app counts what you log. It cannot check that each person may receive zakat (Quran 9:60), or that you gave it as zakat. Do not log interest you gave away: it is not zakat.'**
+  String get zakatGiftLogNote;
+
+  /// No description provided for @zakatGiftAbout.
+  ///
+  /// In en, this message translates to:
+  /// **'About logging'**
+  String get zakatGiftAbout;
+
+  /// No description provided for @zakatRateViewChanged.
+  ///
+  /// In en, this message translates to:
+  /// **'Amounts already logged keep the rate they were counted at. Edit an amount to count it with the new view.'**
+  String get zakatRateViewChanged;
+
+  /// No description provided for @zakatRecomputeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Recompute {label} from today\'s data for {date}?'**
+  String zakatRecomputeTitle(String label, String date);
+
+  /// No description provided for @zakatRecomputePreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Zakat due: {before} → {after} · given stays {given}'**
+  String zakatRecomputePreview(String before, String after, String given);
+
+  /// No description provided for @zakatRecomputeHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'What you already gave counts toward the new figure.'**
+  String get zakatRecomputeHelp;
+
+  /// No description provided for @zakatNoteA4.
+  ///
+  /// In en, this message translates to:
+  /// **'Nisab is checked on the due date only.'**
+  String get zakatNoteA4;
+
+  /// No description provided for @zakatNoteA8.
+  ///
+  /// In en, this message translates to:
+  /// **'Gold, silver and all other wealth are added together by value.'**
+  String get zakatNoteA8;
+
+  /// No description provided for @zakatNoteZ4.
+  ///
+  /// In en, this message translates to:
+  /// **'Based on the lines of this year only. Add other cash or money owed to you as an extra line. Add other assets in My Investments.'**
+  String get zakatNoteZ4;
+
+  /// No description provided for @zakatHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get zakatHistoryTitle;
+
+  /// No description provided for @zakatHistoryGiven.
+  ///
+  /// In en, this message translates to:
+  /// **'given {amount}'**
+  String zakatHistoryGiven(String amount);
+
+  /// No description provided for @zakatSettingsTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Zakat settings'**
+  String get zakatSettingsTooltip;
+
+  /// No description provided for @zakatSettingsNisab.
+  ///
+  /// In en, this message translates to:
+  /// **'Nisab standard'**
+  String get zakatSettingsNisab;
+
+  /// No description provided for @zakatSettingsNisabHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Frozen years keep the nisab they were started with.'**
+  String get zakatSettingsNisabHelp;
+
+  /// No description provided for @zakatSettingsCycle.
+  ///
+  /// In en, this message translates to:
+  /// **'Zakat cycle date'**
+  String get zakatSettingsCycle;
+
+  /// No description provided for @zakatCycleValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{calendar, select, lunar{{day} {month} (Hijri)}solar{{day} {month} (Gregorian)}other{{day} {month}}}'**
+  String zakatCycleValue(String calendar, String day, String month);
+
+  /// No description provided for @zakatNotSetYet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not set yet'**
+  String get zakatNotSetYet;
+
+  /// No description provided for @zakatSettingsRateView.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate for giving in another currency'**
+  String get zakatSettingsRateView;
+
+  /// No description provided for @zakatSettingsRateViewNone.
+  ///
+  /// In en, this message translates to:
+  /// **'Not asked yet'**
+  String get zakatSettingsRateViewNone;
+
+  /// No description provided for @zakatChangeToTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{calendar, select, lunar{Change to lunar (Hijri)?}solar{Change to solar (Gregorian)?}other{Change?}}'**
+  String zakatChangeToTitle(String calendar);
+
+  /// No description provided for @zakatChangeCycleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Change the zakat cycle date?'**
+  String get zakatChangeCycleTitle;
+
+  /// No description provided for @zakatChangeKeep.
+  ///
+  /// In en, this message translates to:
+  /// **'These years keep their dates and rate:'**
+  String get zakatChangeKeep;
+
+  /// No description provided for @zakatChangeKeepRow.
+  ///
+  /// In en, this message translates to:
+  /// **'{label} · {state} · {date} · {rate}'**
+  String zakatChangeKeepRow(
+    String label,
+    String state,
+    String date,
+    String rate,
+  );
+
+  /// No description provided for @zakatChangeStartsAfter.
+  ///
+  /// In en, this message translates to:
+  /// **'{calendar, select, lunar{Your lunar cycle starts after {date}.}solar{Your solar cycle starts after {date}.}other{{date}}}'**
+  String zakatChangeStartsAfter(String calendar, String date);
+
+  /// No description provided for @zakatChangeFirstYear.
+  ///
+  /// In en, this message translates to:
+  /// **'{calendar, select, lunar{First lunar year: {label}, ends {date} ({rate}).}solar{First solar year: {label}, ends {date} ({rate}).}other{{label}}}'**
+  String zakatChangeFirstYear(
+    String calendar,
+    String label,
+    String date,
+    String rate,
+  );
+
+  /// No description provided for @zakatChangeAppliesFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'The new date applies from the year after {label}.'**
+  String zakatChangeAppliesFrom(String label);
+
+  /// No description provided for @zakatMoveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Move the due date'**
+  String get zakatMoveTitle;
+
+  /// No description provided for @zakatMoveUmmAlQura.
+  ///
+  /// In en, this message translates to:
+  /// **'Umm al-Qura'**
+  String get zakatMoveUmmAlQura;
+
+  /// No description provided for @zakatMoveSolarLine.
+  ///
+  /// In en, this message translates to:
+  /// **'You can move a solar date earlier only. Giving early is allowed; giving later delays zakat.'**
+  String get zakatMoveSolarLine;
+
+  /// No description provided for @zakatMoveInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'All figures and the notification use the new date. Next year is not affected.'**
+  String get zakatMoveInfo;
+
+  /// No description provided for @src_A4.
+  ///
+  /// In en, this message translates to:
+  /// **'One zakat date a year. If your wealth held nisab for a full lunar year, zakat is due on all zakatable wealth you hold that day, including money added during the year: Abu Dawud 1573; IIFA Res 28 (3/4) §4. Shafi\'i and Hanbali schools give new wealth its own year from the day it was acquired; this app uses the single date. Nisab is checked on the due date only. Hanafi: nisab must exist at the start and the end of the year (A4).'**
+  String get src_A4;
+
+  /// No description provided for @src_A5.
+  ///
+  /// In en, this message translates to:
+  /// **'Debts you must pay within 12 months may be deducted from zakatable wealth. Scholars differ on long-term debts such as a mortgage: deduct the next 12 months of instalments, deduct all, or deduct none. The Shafi\'i view is that debt does not reduce zakat (al-Nawawi, al-Majmu\') — source not yet verified. AAOIFI SS 35 lists deductible liabilities — section numbers not yet verified (A5, C4).'**
+  String get src_A5;
+
+  /// No description provided for @src_A7.
+  ///
+  /// In en, this message translates to:
+  /// **'Every currency is money for zakat (IIFA Res 21 (9/3)). Convert each holding at the rate on the due date (Darul Iftaa Mahmudiyyah; no AAOIFI or IIFA text found on the rate date) and add them (National Zakat Foundation UK). Giving zakat in another currency is allowed (A7).'**
+  String get src_A7;
+
+  /// No description provided for @src_A8.
+  ///
+  /// In en, this message translates to:
+  /// **'Gold, silver and all other wealth are added together by value. Hanafis and Malikis combine by value; Shafi\'is do not combine gold and silver — primary source not yet verified (A8).'**
+  String get src_A8;
+
+  /// No description provided for @src_B9.
+  ///
+  /// In en, this message translates to:
+  /// **'A good debt (the debtor is able and willing to pay) is zakatable every year, as if it were cash in hand. A doubtful debt has no zakat until it is received (IIFA Res 1 (1/2); Saudi Permanent Committee) (B9).'**
+  String get src_B9;
+
+  /// No description provided for @src_Z4.
+  ///
+  /// In en, this message translates to:
+  /// **'Based on the lines of this year only. Extra lines take cash and good debts only (IIFA Res 1 (1/2)); gold, goods for sale and a business belong in My Investments. Nisab is priced as grams of the metal you chose times its rate on the due date; the pricing rule is not yet verified (Z-4, C5).'**
+  String get src_Z4;
+
+  /// No description provided for @src_C1.
+  ///
+  /// In en, this message translates to:
+  /// **'Zakat falls due when 12 lunar months have passed since your wealth first reached nisab: Abu Dawud 1573; Quran 9:36 and 2:189; Darul Iftaa Birmingham. If the date is not known, use a best estimate — common fatwa practice, source not yet verified (C1).'**
+  String get src_C1;
+
+  /// No description provided for @src_C2.
+  ///
+  /// In en, this message translates to:
+  /// **'Zakat that is already due must not be pushed later. Most scholars hold that zakat is given when it falls due and not delayed without a valid reason (Saudi Permanent Committee, islamqa 13981; primary texts not yet verified). Hanafi: a zakat date may not be changed; you may give early on an estimate, then check the amount on the real date and make up any shortfall (FatwaCentre, 178985) (C2).'**
+  String get src_C2;
+
+  /// No description provided for @src_C3.
+  ///
+  /// In en, this message translates to:
+  /// **'A lunar month starts when the new moon is seen and has 29 or 30 days (Bukhari 1909 and 1907; Quran 2:189). Umm al-Qura is a calculated calendar and can differ from local sighting by a day or two. Using it is a product choice, and moving the date by up to 2 days is the consultant\'s reading — source not yet verified. A cycle day 30 in a 29-day month uses the 29th — reading not yet verified. A solar date may move earlier only (C3).'**
+  String get src_C3;
+
+  /// No description provided for @src_C4.
+  ///
+  /// In en, this message translates to:
+  /// **'Value all zakatable wealth on the due date and take off the debts you deduct. If what is left reaches nisab, zakat is due (Hanafi: Ibn Abidin, Radd al-Muhtar 2/260, via Council of Ulama Eastern Cape). Shafi\'i: debt does not cancel zakat; in the app that is deduction off. Below nisab, nothing is due (Abu Dawud 1573) (C4).'**
+  String get src_C4;
+
+  /// No description provided for @src_C5.
+  ///
+  /// In en, this message translates to:
+  /// **'A good debt counts in full every year; a doubtful debt counts nothing until it is received (IIFA Res 1 (1/2)). Other wealth (gold, goods for sale, a business) goes in My Investments (C5).'**
+  String get src_C5;
+
+  /// No description provided for @src_C6.
+  ///
+  /// In en, this message translates to:
+  /// **'Giving zakat before it falls due is allowed: Abu Dawud 1624 (Ali; al-Abbas asked to give early and the Prophet allowed it; graded hasan by al-Albani, da\'if by Zubair Ali Zai). Conditions: you hold nisab when you give it and you give it as zakat; the Shafi\'i school limits it to one year ahead (Darul Iftaa Jordan, Q 2974); Hanafi: give early, then check the amount on the real date (FatwaCentre 178985). The Maliki school accepts this only shortly before the due date — source not yet verified (C6).'**
+  String get src_C6;
+
+  /// No description provided for @src_C7.
+  ///
+  /// In en, this message translates to:
+  /// **'Hanafi: an extra amount given as zakat may count toward next year (Darul Uloom Deoband, fatwa 28/76/D=01/1435). Shafi\'i: the extra is sadaqah, because each year\'s zakat needs its own intention (Darul Iftaa Jordan, Q 3602). The app does not move it, which is valid under both views (C7).'**
+  String get src_C7;
+
+  /// No description provided for @src_C8.
+  ///
+  /// In en, this message translates to:
+  /// **'Scholars differ on the exchange rate that counts zakat given in another currency. The rate on the day you gave: Abu Yusuf and Muhammad (the Sahibayn); several contemporary Hanafi muftis prefer it (Muftionline 46417; fatwa-ca 178598). The rate on the due date: Abu Hanifa (Darul Iftaa Mahmudiyyah 134900, which allows a higher rate). The primary text, Radd al-Muhtar, is not yet verified (C8).'**
+  String get src_C8;
+
+  /// No description provided for @src_C9.
+  ///
+  /// In en, this message translates to:
+  /// **'Zakat due is the correct amount on the due date, not the first figure the app worked out. What you already gave counts toward the corrected figure, and any shortfall is still owed (FatwaCentre 178985; SeekersGuidance, Mawlana Ilyas Patel). If the corrected figure is lower than what you gave, see C7 (C9).'**
+  String get src_C9;
+
+  /// No description provided for @src_C10.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing is due below 20 dinars or 200 dirhams (Abu Dawud 1573). The notification says only that your zakat year ends, because the app has not yet checked that your wealth reaches nisab (C10).'**
+  String get src_C10;
+
+  /// No description provided for @src_C11.
+  ///
+  /// In en, this message translates to:
+  /// **'Zakat is correct only when it is given as zakat to the eight groups named in Quran 9:60, and each year\'s zakat needs its own intention (Darul Iftaa Jordan, Q 3602). Sadaqah given in good faith to someone who did not qualify still counted as sadaqah (Bukhari 1421; Muslim 1022). Whether that also covers obligatory zakat is disputed (Abu Hanifa and Muhammad: yes, if the giver took care; Abu Yusuf: no) — not yet verified, and the app does not judge it. Interest given away is not zakat (Z-6) (C11).'**
+  String get src_C11;
+
+  /// No description provided for @zakatFixMetalRate.
+  ///
+  /// In en, this message translates to:
+  /// **'{metal, select, gold{Add a gold rate to see the nisab on {date}}silver{Add a silver rate to see the nisab on {date}}other{{metal}}}'**
+  String zakatFixMetalRate(String metal, String date);
+
+  /// No description provided for @zakatWhyLinesTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'The sum of the zakatable amount of every line, each converted to your base currency at the rate on the due date.'**
+  String get zakatWhyLinesTotal;
+
+  /// No description provided for @zakatWhyBase.
+  ///
+  /// In en, this message translates to:
+  /// **'The lines total minus the debts you deduct. Never below 0.'**
+  String get zakatWhyBase;
+
+  /// No description provided for @zakatWhyNisab.
+  ///
+  /// In en, this message translates to:
+  /// **'Grams of the metal you chose times its rate on the due date.'**
+  String get zakatWhyNisab;
+
+  /// No description provided for @zakatWhyReaches.
+  ///
+  /// In en, this message translates to:
+  /// **'Zakat is due only if the zakatable wealth reaches the nisab.'**
+  String get zakatWhyReaches;
+
+  /// No description provided for @zakatWhyRate.
+  ///
+  /// In en, this message translates to:
+  /// **'The rate of your zakat year setting, for a full year. There is no day factor.'**
+  String get zakatWhyRate;
+
+  /// No description provided for @zakatWhyBelow.
+  ///
+  /// In en, this message translates to:
+  /// **'The zakatable wealth is below the nisab on the due date, so no zakat is due for this year.'**
+  String get zakatWhyBelow;
+
+  /// No description provided for @zakatWhyLineValue.
+  ///
+  /// In en, this message translates to:
+  /// **'The value at the end of the due date: market value, not cost, net of interest kept inside, never adjusted for inflation.'**
+  String get zakatWhyLineValue;
+
+  /// No description provided for @zakatWhyLineRate.
+  ///
+  /// In en, this message translates to:
+  /// **'The latest rate on or before the due date, typed or fetched.'**
+  String get zakatWhyLineRate;
+
+  /// No description provided for @zakatWhyExtra.
+  ///
+  /// In en, this message translates to:
+  /// **'A line you added for this year only.'**
+  String get zakatWhyExtra;
+
+  /// No description provided for @zakatWhyGiven.
+  ///
+  /// In en, this message translates to:
+  /// **'The sum of the amounts you logged, in the currency of this year. Remaining is the zakat due minus what you gave, never below 0.'**
+  String get zakatWhyGiven;
+
+  /// No description provided for @zakatErrExtraUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a currency. Gold and silver go in My Investments.'**
+  String get zakatErrExtraUnit;
 }
 
 class _AppLocalizationsDelegate

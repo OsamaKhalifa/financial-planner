@@ -615,8 +615,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Zakat: not set yet — answer the zakat question in this form';
 
   @override
-  String get zakatReasonTrading =>
-      'You hold this to sell. Trade goods pay 2.5 % of market value.';
+  String zakatReasonTrading(String rate) {
+    return 'You hold this to sell. Trade goods pay $rate of market value.';
+  }
 
   @override
   String get zakatReasonSavings => 'Held as savings: zakat on market value.';
@@ -1995,4 +1996,962 @@ class AppLocalizationsEn extends AppLocalizations {
   String aiStatusUsingKey(String vendor) {
     return 'Using your own $vendor key.';
   }
+
+  @override
+  String hijriMonth(String m) {
+    String _temp0 = intl.Intl.selectLogic(m, {
+      '1': 'Muharram',
+      '2': 'Safar',
+      '3': 'Rabi\' al-Awwal',
+      '4': 'Rabi\' al-Thani',
+      '5': 'Jumada al-Ula',
+      '6': 'Jumada al-Akhirah',
+      '7': 'Rajab',
+      '8': 'Sha\'ban',
+      '9': 'Ramadan',
+      '10': 'Shawwal',
+      '11': 'Dhu al-Qa\'dah',
+      '12': 'Dhu al-Hijjah',
+      'other': '$m',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get zakatSetupNisabTitle => 'Which nisab do you use?';
+
+  @override
+  String get zakatNisabGold => 'Gold — 85 g';
+
+  @override
+  String get zakatNisabSilver => 'Silver — 595 g';
+
+  @override
+  String zakatNisabAtRate(String amount, String date) {
+    return '= $amount at your rate of $date';
+  }
+
+  @override
+  String zakatNisabAddRate(String metal) {
+    String _temp0 = intl.Intl.selectLogic(metal, {
+      'gold': 'Add a gold rate to see it',
+      'silver': 'Add a silver rate to see it',
+      'other': '$metal',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get zakatNisabWhy =>
+      'Zakat is due only if your zakatable wealth reaches the nisab. Scholars differ on which metal to use for money.';
+
+  @override
+  String get zakatSetupCycleTitle => 'When does your zakat year end?';
+
+  @override
+  String zakatCycleHelp(String calendar) {
+    String _temp0 = intl.Intl.selectLogic(calendar, {
+      'lunar': 'Your zakat date is the day your wealth first reached nisab, counted in Hijri months. If you already give zakat on a set date, use that date.',
+      'solar': 'Your zakat date is the day your wealth first reached nisab, counted in Gregorian months. If you already give zakat on a set date, use that date.',
+      'other': '$calendar',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get zakatCycleNotToday =>
+      'Not today\'s date, unless that is your zakat date.';
+
+  @override
+  String zakatCalendarLine(String calendar) {
+    String _temp0 = intl.Intl.selectLogic(calendar, {
+      'lunar': 'Hijri calendar (Umm al-Qura), because your zakat year is lunar',
+      'solar': 'Gregorian calendar, because your zakat year is solar',
+      'other': '$calendar',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String zakatNextDue(String date) {
+    return 'Next due date: $date';
+  }
+
+  @override
+  String zakatThisYearCalled(String label) {
+    return 'This year is called $label.';
+  }
+
+  @override
+  String zakatPastYears(String year) {
+    return 'Zakat from years before $year is not counted here. If any of it was not given, it is still owed.';
+  }
+
+  @override
+  String get zakatDay30 =>
+      'In a year where this month has 29 days, the 29th is used.';
+
+  @override
+  String get zakatFeb29 => 'In other years, 28 February is used.';
+
+  @override
+  String get zakatSetupMonth => 'Month';
+
+  @override
+  String get zakatSetupDay => 'Day';
+
+  @override
+  String zakatBadDay(String month, String days) {
+    return '$month has $days days. Pick a day.';
+  }
+
+  @override
+  String zakatMonthSemantics(String name, String n) {
+    return 'Zakat month, $name, $n of 12';
+  }
+
+  @override
+  String zakatDaySemantics(String n) {
+    return 'Zakat day, $n';
+  }
+
+  @override
+  String get zakatSetupRemindTitle => 'Remind me';
+
+  @override
+  String get reminderDaysLabel => 'Days before';
+
+  @override
+  String get reminderDaysHelp => '0 = on the due date.';
+
+  @override
+  String get reminderDaysError => 'Enter 0 to 60.';
+
+  @override
+  String get reminderTimeLabel => 'Time';
+
+  @override
+  String reminderPreview(String date, String time, String text) {
+    return 'One notification on $date at $time: “$text”';
+  }
+
+  @override
+  String reminderPast(String year) {
+    return 'This time has passed for $year, so $year gets no notification. This tab still shows when its year ends.';
+  }
+
+  @override
+  String get reminderPermissionLine =>
+      'Your phone will ask if this app may show notifications. Nothing is sent from your phone.';
+
+  @override
+  String get reminderDenied =>
+      'Notifications are off. This tab still shows when your zakat year ends.';
+
+  @override
+  String get reminderTitle => 'Zakat';
+
+  @override
+  String reminderBodyToday(String year) {
+    return 'Your zakat year $year ends today. Open to see your zakat.';
+  }
+
+  @override
+  String reminderBodyOn(String year, String date) {
+    return 'Your zakat year $year ends on $date. Open to see your zakat.';
+  }
+
+  @override
+  String get reminderSwitch => 'Year-end notification';
+
+  @override
+  String get reminderOffSubtitle =>
+      'Off. This tab still shows when your zakat year ends.';
+
+  @override
+  String reminderOnSubtitle(int days, String time) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days before the due date at $time',
+      one: '1 day before the due date at $time',
+      zero: 'On the due date at $time',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get reminderBlocked =>
+      'Notifications are off for this app in your phone settings.';
+
+  @override
+  String get reminderOpenSettings => 'Open settings';
+
+  @override
+  String zakatYearLabel(String calendar, String n) {
+    String _temp0 = intl.Intl.selectLogic(calendar, {
+      'lunar': '$n AH',
+      'solar': '$n',
+      'other': '$n',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String zakatState(String state) {
+    String _temp0 = intl.Intl.selectLogic(state, {
+      'open': 'Open',
+      'due': 'Due',
+      'distributing': 'Distributing',
+      'settled': 'Settled',
+      'belowNisab': 'Below nisab: no zakat due',
+      'other': '$state',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get zakatEstimateTag => 'Estimate';
+
+  @override
+  String zakatDueIs(String year) {
+    return 'Your zakat for $year is due.';
+  }
+
+  @override
+  String zakatDueBelow(String year, String date) {
+    return 'Your zakat year $year ended on $date. Below nisab: no zakat due.';
+  }
+
+  @override
+  String zakatDueIncomplete(String year, String date) {
+    return 'Your zakat year $year ended on $date. Complete it to see your zakat.';
+  }
+
+  @override
+  String get zakatDueDelayLine =>
+      'Most scholars hold that zakat should be given when it falls due, and not delayed without a valid reason.';
+
+  @override
+  String get zakatUmmAlQuraLine =>
+      'Hijri dates use the Umm al-Qura calendar. If your month began on another day where you live, move your due date.';
+
+  @override
+  String zakatMovedFrom(String calendar, String date) {
+    String _temp0 = intl.Intl.selectLogic(calendar, {
+      'lunar': 'Moved from $date (Umm al-Qura)',
+      'solar': 'Moved from $date',
+      'other': '$date',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get zakatMoveDate => 'Move date';
+
+  @override
+  String zakatResultOpenLine(String date) {
+    return 'Estimate. Your zakat year ends on $date.';
+  }
+
+  @override
+  String get zakatResultUsesToday => 'Uses today\'s values and rates.';
+
+  @override
+  String zakatResultStartFrom(String date) {
+    return 'You can start distribution from $date.';
+  }
+
+  @override
+  String get zakatResultDue => 'Zakat due';
+
+  @override
+  String zakatResultRateOf(String rate, String amount) {
+    return '$rate of $amount zakatable wealth';
+  }
+
+  @override
+  String get zakatResultBelow => 'Below nisab: no zakat due for this year.';
+
+  @override
+  String zakatResultBelowFigures(String wealth, String nisab) {
+    return 'Zakatable $wealth · nisab $nisab';
+  }
+
+  @override
+  String get zakatResultEmpty => 'Nothing to count yet.';
+
+  @override
+  String get zakatAddInvestment => 'Add investment';
+
+  @override
+  String get zakatAddLineHere => 'Add a line here';
+
+  @override
+  String zakatResultIncomplete(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n things are missing:',
+      one: '1 thing is missing:',
+    );
+    return 'Zakat can\'t be worked out yet. $_temp0';
+  }
+
+  @override
+  String get zakatStart => 'Start distribution';
+
+  @override
+  String get zakatStartExplain =>
+      'Freezes this year\'s figures. Later changes to your investments, rates or settings will not change it.';
+
+  @override
+  String get zakatClose => 'Close this year';
+
+  @override
+  String get zakatCloseExplain =>
+      'Freezes this year\'s figures. No zakat is due.';
+
+  @override
+  String get zakatRemaining => 'Remaining';
+
+  @override
+  String get zakatSettledLine => 'The amounts you logged reach the zakat due.';
+
+  @override
+  String get zakatFrozenBelow => 'Below nisab: no zakat due.';
+
+  @override
+  String zakatStartedSnack(String label) {
+    return '$label started. Figures frozen.';
+  }
+
+  @override
+  String zakatClosedSnack(String label) {
+    return '$label closed. Below nisab: no zakat due.';
+  }
+
+  @override
+  String zakatReachedSnack(String label) {
+    return 'The amounts you logged reach the zakat due for $label.';
+  }
+
+  @override
+  String zakatFixRate(String pair, String date, String names) {
+    return '$pair rate missing on $date · $names';
+  }
+
+  @override
+  String zakatFixJewellery(String names) {
+    return 'Is jewellery that is worn zakatable? Not answered · $names';
+  }
+
+  @override
+  String zakatFixLongTerm(String names) {
+    return 'How are long-held shares counted? Not chosen · $names';
+  }
+
+  @override
+  String get zakatFixNisab => 'Nisab not chosen';
+
+  @override
+  String get zakatFixAddRate => 'Add rate';
+
+  @override
+  String get zakatFixAnswer => 'Answer';
+
+  @override
+  String get zakatFixChoose => 'Choose';
+
+  @override
+  String zakatFrozenBanner(String date) {
+    return 'Frozen on $date. Later changes do not change this year.';
+  }
+
+  @override
+  String get zakatRecompute => 'Recompute';
+
+  @override
+  String zakatStartedHeader(String date, String calendar, String rate) {
+    String _temp0 = intl.Intl.selectLogic(calendar, {
+      'lunar': 'Lunar',
+      'solar': 'Solar',
+      'other': '$calendar',
+    });
+    return 'Started on $date · $_temp0 · $rate';
+  }
+
+  @override
+  String get zakatAddsTitle => 'How it adds up';
+
+  @override
+  String get zakatAddsLines => 'Lines total';
+
+  @override
+  String get zakatAddsDebts => 'Debts within 12 months';
+
+  @override
+  String get zakatAddsNotDeducted => 'not deducted';
+
+  @override
+  String get zakatAddsBase => 'Zakatable wealth';
+
+  @override
+  String zakatAddsNisab(String metal) {
+    String _temp0 = intl.Intl.selectLogic(metal, {
+      'gold': 'Nisab · gold 85 g',
+      'silver': 'Nisab · silver 595 g',
+      'other': '$metal',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String zakatAddsNisabCalc(String grams, String rate, String date) {
+    return '$grams g × $rate on $date';
+  }
+
+  @override
+  String get zakatAddsReaches => 'Reaches nisab?';
+
+  @override
+  String zakatAddsYes(String wealth, String nisab) {
+    return 'Yes — $wealth ≥ $nisab';
+  }
+
+  @override
+  String get zakatAddsNo => 'No — below nisab';
+
+  @override
+  String zakatAddsRate(String calendar) {
+    String _temp0 = intl.Intl.selectLogic(calendar, {
+      'lunar': 'Rate (lunar)',
+      'solar': 'Rate (solar)',
+      'other': 'Rate',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get zakatAddsRounding =>
+      'Worked out from the zakatable wealth, not by adding the line amounts, so lines can differ by up to 0.01 each.';
+
+  @override
+  String get zakatAddsDeductionOffWhy =>
+      'With deduction off, the full total is compared with nisab (Shafi\'i view).';
+
+  @override
+  String zakatLineShare(String share, String amount) {
+    return '$share of $amount';
+  }
+
+  @override
+  String zakatLineZakat(String amount) {
+    return 'zakat $amount';
+  }
+
+  @override
+  String zakatLineConverted(String amount, String rate, String date) {
+    return '$amount · converted at $rate on $date';
+  }
+
+  @override
+  String zakatLineValueDate(String date) {
+    return 'value of $date';
+  }
+
+  @override
+  String zakatLineNotRateOf(String date) {
+    return 'not the rate of $date';
+  }
+
+  @override
+  String zakatOldDateNote(String date) {
+    return 'Zakat is on the value on your due date. If it changed, add a value or rate for $date.';
+  }
+
+  @override
+  String zakatAddValueFor(String date) {
+    return 'Add value for $date';
+  }
+
+  @override
+  String zakatAddRateFor(String date) {
+    return 'Add rate for $date';
+  }
+
+  @override
+  String get zakatRecomputeForNewer => 'Recompute to use a newer value.';
+
+  @override
+  String zakatLineRateMissing(String pair) {
+    return '$pair rate missing';
+  }
+
+  @override
+  String zakatQuestionName(String question) {
+    String _temp0 = intl.Intl.selectLogic(question, {
+      'jewellery': 'Is jewellery that is worn zakatable?',
+      'longTermMethod': 'How are long-held shares counted?',
+      'other': '$question',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get zakatNotAnswered => 'Not answered';
+
+  @override
+  String zakatLineNetInterest(String amount) {
+    return 'net of $amount interest kept inside (to purify)';
+  }
+
+  @override
+  String get zakatLineDividendsNotice =>
+      'Zakat on your dividends is counted with your cash. If that cash is not in this year\'s lines, add it as an extra cash line.';
+
+  @override
+  String get zakatAddCashLine => 'Add cash line';
+
+  @override
+  String get zakatLineDeleted => 'Deleted from your investments';
+
+  @override
+  String zakatLineFrozenBanner(String label) {
+    return '$label is frozen. Changes here do not change it. Recompute it to use new values.';
+  }
+
+  @override
+  String zakatInvestmentsTitle(int n) {
+    return 'Your investments ($n)';
+  }
+
+  @override
+  String get zakatNoInvestments => 'No investments on this date.';
+
+  @override
+  String zakatExtraTitle(int n) {
+    return 'Extra lines ($n)';
+  }
+
+  @override
+  String get zakatAddLine => 'Add line';
+
+  @override
+  String get zakatExtraSheetTitle => 'Extra line';
+
+  @override
+  String get zakatExtraKindCash => 'Cash not in the list';
+
+  @override
+  String get zakatExtraKindOwed => 'Money owed to me';
+
+  @override
+  String get zakatExtraOtherAssets =>
+      'Other assets (gold, goods for sale, a business) go in My Investments, where each gets its zakat share.';
+
+  @override
+  String get zakatOpenInvestments => 'Open My Investments';
+
+  @override
+  String get zakatExtraLabel => 'Label';
+
+  @override
+  String get zakatExtraGoodDebt =>
+      'The person is able and willing to pay me back.';
+
+  @override
+  String get zakatExtraDoubtful =>
+      'A doubtful debt has no zakat until you receive it.';
+
+  @override
+  String zakatExtraCountedOnly(String year) {
+    return 'Counted in $year only.';
+  }
+
+  @override
+  String zakatExtraLive(String amount, String rate, String date) {
+    return '= $amount at $rate on $date';
+  }
+
+  @override
+  String get zakatErrExtraLabel => 'Enter a label.';
+
+  @override
+  String get zakatErrGoodDebt =>
+      'Confirm that the person is able and willing to pay.';
+
+  @override
+  String get zakatErrAmount => 'Enter an amount above 0.';
+
+  @override
+  String get zakatDebtsTitle => 'Debts I must pay within 12 months';
+
+  @override
+  String get zakatDebtsHelp => 'Instalments and bills due in the next year.';
+
+  @override
+  String get zakatDebtsWhy =>
+      'Scholars differ on long-term debts such as a mortgage. Some deduct only the part due in the next 12 months, some the whole debt, some none. This app deducts only what you enter here.';
+
+  @override
+  String get zakatDebtsDeduct => 'Deduct';
+
+  @override
+  String zakatDebtsZakat(String amount) {
+    return 'zakat −$amount';
+  }
+
+  @override
+  String get zakatGiftTitle => 'Amount given';
+
+  @override
+  String get zakatGiftAdd => 'Add amount given';
+
+  @override
+  String zakatGiftGivenOf(String given, String due) {
+    return 'Given $given of $due';
+  }
+
+  @override
+  String zakatGiftRemaining(String amount) {
+    return 'Remaining $amount';
+  }
+
+  @override
+  String zakatGiftSemantics(String given, String due, String remaining) {
+    return 'Given $given of $due. Remaining $remaining.';
+  }
+
+  @override
+  String get zakatGiftEmpty => 'Nothing logged yet. Add each amount you give.';
+
+  @override
+  String zakatGiftDateError(String date) {
+    return 'Pick a date after $date, the end of your previous zakat year.';
+  }
+
+  @override
+  String get zakatGiftDateFuture => 'Pick a date that is not in the future.';
+
+  @override
+  String get zakatGiftViewTitle => 'Which rate counts this amount?';
+
+  @override
+  String get zakatGiftViewDay =>
+      'the rate on the day you gave (Abu Yusuf and Muhammad)';
+
+  @override
+  String get zakatGiftViewDue => 'the rate on your due date (Abu Hanifa)';
+
+  @override
+  String get zakatGiftViewHelp => 'Scholars differ on the rate.';
+
+  @override
+  String zakatGiftCountedAt(
+    String amount,
+    String rate,
+    String date,
+    String view,
+  ) {
+    String _temp0 = intl.Intl.selectLogic(view, {
+      'dayGiven': 'rate on the day you gave',
+      'dueDate': 'rate on your due date',
+      'other': '$view',
+    });
+    return '$amount · counted at $rate on $date ($_temp0)';
+  }
+
+  @override
+  String zakatGiftLive(String counted, String rate, String date) {
+    return '= $counted · counted at $rate on $date';
+  }
+
+  @override
+  String zakatGiftTypeRate(String from, String to, String date) {
+    return '1 $from = ____ $to on $date';
+  }
+
+  @override
+  String get zakatGiftEarly => 'Given before the due date';
+
+  @override
+  String get zakatGiftEarlyHelp =>
+      'This counts if you held nisab when you gave it and you gave it as zakat. The Maliki school accepts this only shortly before the due date.';
+
+  @override
+  String zakatGiftOver(String amount) {
+    return 'Given $amount more than due.';
+  }
+
+  @override
+  String get zakatGiftOverHelp =>
+      'Some scholars (Hanafi) let you count this toward next year if you gave it as zakat. Others (Shafi\'i) count it as sadaqah. The app does not move it.';
+
+  @override
+  String get zakatGiftLogNote =>
+      'The app counts what you log. It cannot check that each person may receive zakat (Quran 9:60), or that you gave it as zakat. Do not log interest you gave away: it is not zakat.';
+
+  @override
+  String get zakatGiftAbout => 'About logging';
+
+  @override
+  String get zakatRateViewChanged =>
+      'Amounts already logged keep the rate they were counted at. Edit an amount to count it with the new view.';
+
+  @override
+  String zakatRecomputeTitle(String label, String date) {
+    return 'Recompute $label from today\'s data for $date?';
+  }
+
+  @override
+  String zakatRecomputePreview(String before, String after, String given) {
+    return 'Zakat due: $before → $after · given stays $given';
+  }
+
+  @override
+  String get zakatRecomputeHelp =>
+      'What you already gave counts toward the new figure.';
+
+  @override
+  String get zakatNoteA4 => 'Nisab is checked on the due date only.';
+
+  @override
+  String get zakatNoteA8 =>
+      'Gold, silver and all other wealth are added together by value.';
+
+  @override
+  String get zakatNoteZ4 =>
+      'Based on the lines of this year only. Add other cash or money owed to you as an extra line. Add other assets in My Investments.';
+
+  @override
+  String get zakatHistoryTitle => 'History';
+
+  @override
+  String zakatHistoryGiven(String amount) {
+    return 'given $amount';
+  }
+
+  @override
+  String get zakatSettingsTooltip => 'Zakat settings';
+
+  @override
+  String get zakatSettingsNisab => 'Nisab standard';
+
+  @override
+  String get zakatSettingsNisabHelp =>
+      'Frozen years keep the nisab they were started with.';
+
+  @override
+  String get zakatSettingsCycle => 'Zakat cycle date';
+
+  @override
+  String zakatCycleValue(String calendar, String day, String month) {
+    String _temp0 = intl.Intl.selectLogic(calendar, {
+      'lunar': '$day $month (Hijri)',
+      'solar': '$day $month (Gregorian)',
+      'other': '$day $month',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get zakatNotSetYet => 'Not set yet';
+
+  @override
+  String get zakatSettingsRateView => 'Rate for giving in another currency';
+
+  @override
+  String get zakatSettingsRateViewNone => 'Not asked yet';
+
+  @override
+  String zakatChangeToTitle(String calendar) {
+    String _temp0 = intl.Intl.selectLogic(calendar, {
+      'lunar': 'Change to lunar (Hijri)?',
+      'solar': 'Change to solar (Gregorian)?',
+      'other': 'Change?',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get zakatChangeCycleTitle => 'Change the zakat cycle date?';
+
+  @override
+  String get zakatChangeKeep => 'These years keep their dates and rate:';
+
+  @override
+  String zakatChangeKeepRow(
+    String label,
+    String state,
+    String date,
+    String rate,
+  ) {
+    return '$label · $state · $date · $rate';
+  }
+
+  @override
+  String zakatChangeStartsAfter(String calendar, String date) {
+    String _temp0 = intl.Intl.selectLogic(calendar, {
+      'lunar': 'Your lunar cycle starts after $date.',
+      'solar': 'Your solar cycle starts after $date.',
+      'other': '$date',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String zakatChangeFirstYear(
+    String calendar,
+    String label,
+    String date,
+    String rate,
+  ) {
+    String _temp0 = intl.Intl.selectLogic(calendar, {
+      'lunar': 'First lunar year: $label, ends $date ($rate).',
+      'solar': 'First solar year: $label, ends $date ($rate).',
+      'other': '$label',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String zakatChangeAppliesFrom(String label) {
+    return 'The new date applies from the year after $label.';
+  }
+
+  @override
+  String get zakatMoveTitle => 'Move the due date';
+
+  @override
+  String get zakatMoveUmmAlQura => 'Umm al-Qura';
+
+  @override
+  String get zakatMoveSolarLine =>
+      'You can move a solar date earlier only. Giving early is allowed; giving later delays zakat.';
+
+  @override
+  String get zakatMoveInfo =>
+      'All figures and the notification use the new date. Next year is not affected.';
+
+  @override
+  String get src_A4 =>
+      'One zakat date a year. If your wealth held nisab for a full lunar year, zakat is due on all zakatable wealth you hold that day, including money added during the year: Abu Dawud 1573; IIFA Res 28 (3/4) §4. Shafi\'i and Hanbali schools give new wealth its own year from the day it was acquired; this app uses the single date. Nisab is checked on the due date only. Hanafi: nisab must exist at the start and the end of the year (A4).';
+
+  @override
+  String get src_A5 =>
+      'Debts you must pay within 12 months may be deducted from zakatable wealth. Scholars differ on long-term debts such as a mortgage: deduct the next 12 months of instalments, deduct all, or deduct none. The Shafi\'i view is that debt does not reduce zakat (al-Nawawi, al-Majmu\') — source not yet verified. AAOIFI SS 35 lists deductible liabilities — section numbers not yet verified (A5, C4).';
+
+  @override
+  String get src_A7 =>
+      'Every currency is money for zakat (IIFA Res 21 (9/3)). Convert each holding at the rate on the due date (Darul Iftaa Mahmudiyyah; no AAOIFI or IIFA text found on the rate date) and add them (National Zakat Foundation UK). Giving zakat in another currency is allowed (A7).';
+
+  @override
+  String get src_A8 =>
+      'Gold, silver and all other wealth are added together by value. Hanafis and Malikis combine by value; Shafi\'is do not combine gold and silver — primary source not yet verified (A8).';
+
+  @override
+  String get src_B9 =>
+      'A good debt (the debtor is able and willing to pay) is zakatable every year, as if it were cash in hand. A doubtful debt has no zakat until it is received (IIFA Res 1 (1/2); Saudi Permanent Committee) (B9).';
+
+  @override
+  String get src_Z4 =>
+      'Based on the lines of this year only. Extra lines take cash and good debts only (IIFA Res 1 (1/2)); gold, goods for sale and a business belong in My Investments. Nisab is priced as grams of the metal you chose times its rate on the due date; the pricing rule is not yet verified (Z-4, C5).';
+
+  @override
+  String get src_C1 =>
+      'Zakat falls due when 12 lunar months have passed since your wealth first reached nisab: Abu Dawud 1573; Quran 9:36 and 2:189; Darul Iftaa Birmingham. If the date is not known, use a best estimate — common fatwa practice, source not yet verified (C1).';
+
+  @override
+  String get src_C2 =>
+      'Zakat that is already due must not be pushed later. Most scholars hold that zakat is given when it falls due and not delayed without a valid reason (Saudi Permanent Committee, islamqa 13981; primary texts not yet verified). Hanafi: a zakat date may not be changed; you may give early on an estimate, then check the amount on the real date and make up any shortfall (FatwaCentre, 178985) (C2).';
+
+  @override
+  String get src_C3 =>
+      'A lunar month starts when the new moon is seen and has 29 or 30 days (Bukhari 1909 and 1907; Quran 2:189). Umm al-Qura is a calculated calendar and can differ from local sighting by a day or two. Using it is a product choice, and moving the date by up to 2 days is the consultant\'s reading — source not yet verified. A cycle day 30 in a 29-day month uses the 29th — reading not yet verified. A solar date may move earlier only (C3).';
+
+  @override
+  String get src_C4 =>
+      'Value all zakatable wealth on the due date and take off the debts you deduct. If what is left reaches nisab, zakat is due (Hanafi: Ibn Abidin, Radd al-Muhtar 2/260, via Council of Ulama Eastern Cape). Shafi\'i: debt does not cancel zakat; in the app that is deduction off. Below nisab, nothing is due (Abu Dawud 1573) (C4).';
+
+  @override
+  String get src_C5 =>
+      'A good debt counts in full every year; a doubtful debt counts nothing until it is received (IIFA Res 1 (1/2)). Other wealth (gold, goods for sale, a business) goes in My Investments (C5).';
+
+  @override
+  String get src_C6 =>
+      'Giving zakat before it falls due is allowed: Abu Dawud 1624 (Ali; al-Abbas asked to give early and the Prophet allowed it; graded hasan by al-Albani, da\'if by Zubair Ali Zai). Conditions: you hold nisab when you give it and you give it as zakat; the Shafi\'i school limits it to one year ahead (Darul Iftaa Jordan, Q 2974); Hanafi: give early, then check the amount on the real date (FatwaCentre 178985). The Maliki school accepts this only shortly before the due date — source not yet verified (C6).';
+
+  @override
+  String get src_C7 =>
+      'Hanafi: an extra amount given as zakat may count toward next year (Darul Uloom Deoband, fatwa 28/76/D=01/1435). Shafi\'i: the extra is sadaqah, because each year\'s zakat needs its own intention (Darul Iftaa Jordan, Q 3602). The app does not move it, which is valid under both views (C7).';
+
+  @override
+  String get src_C8 =>
+      'Scholars differ on the exchange rate that counts zakat given in another currency. The rate on the day you gave: Abu Yusuf and Muhammad (the Sahibayn); several contemporary Hanafi muftis prefer it (Muftionline 46417; fatwa-ca 178598). The rate on the due date: Abu Hanifa (Darul Iftaa Mahmudiyyah 134900, which allows a higher rate). The primary text, Radd al-Muhtar, is not yet verified (C8).';
+
+  @override
+  String get src_C9 =>
+      'Zakat due is the correct amount on the due date, not the first figure the app worked out. What you already gave counts toward the corrected figure, and any shortfall is still owed (FatwaCentre 178985; SeekersGuidance, Mawlana Ilyas Patel). If the corrected figure is lower than what you gave, see C7 (C9).';
+
+  @override
+  String get src_C10 =>
+      'Nothing is due below 20 dinars or 200 dirhams (Abu Dawud 1573). The notification says only that your zakat year ends, because the app has not yet checked that your wealth reaches nisab (C10).';
+
+  @override
+  String get src_C11 =>
+      'Zakat is correct only when it is given as zakat to the eight groups named in Quran 9:60, and each year\'s zakat needs its own intention (Darul Iftaa Jordan, Q 3602). Sadaqah given in good faith to someone who did not qualify still counted as sadaqah (Bukhari 1421; Muslim 1022). Whether that also covers obligatory zakat is disputed (Abu Hanifa and Muhammad: yes, if the giver took care; Abu Yusuf: no) — not yet verified, and the app does not judge it. Interest given away is not zakat (Z-6) (C11).';
+
+  @override
+  String zakatFixMetalRate(String metal, String date) {
+    String _temp0 = intl.Intl.selectLogic(metal, {
+      'gold': 'Add a gold rate to see the nisab on $date',
+      'silver': 'Add a silver rate to see the nisab on $date',
+      'other': '$metal',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get zakatWhyLinesTotal =>
+      'The sum of the zakatable amount of every line, each converted to your base currency at the rate on the due date.';
+
+  @override
+  String get zakatWhyBase =>
+      'The lines total minus the debts you deduct. Never below 0.';
+
+  @override
+  String get zakatWhyNisab =>
+      'Grams of the metal you chose times its rate on the due date.';
+
+  @override
+  String get zakatWhyReaches =>
+      'Zakat is due only if the zakatable wealth reaches the nisab.';
+
+  @override
+  String get zakatWhyRate =>
+      'The rate of your zakat year setting, for a full year. There is no day factor.';
+
+  @override
+  String get zakatWhyBelow =>
+      'The zakatable wealth is below the nisab on the due date, so no zakat is due for this year.';
+
+  @override
+  String get zakatWhyLineValue =>
+      'The value at the end of the due date: market value, not cost, net of interest kept inside, never adjusted for inflation.';
+
+  @override
+  String get zakatWhyLineRate =>
+      'The latest rate on or before the due date, typed or fetched.';
+
+  @override
+  String get zakatWhyExtra => 'A line you added for this year only.';
+
+  @override
+  String get zakatWhyGiven =>
+      'The sum of the amounts you logged, in the currency of this year. Remaining is the zakat due minus what you gave, never below 0.';
+
+  @override
+  String get zakatErrExtraUnit =>
+      'Pick a currency. Gold and silver go in My Investments.';
 }

@@ -20,6 +20,10 @@ import 'package:financial_planner/core/reference/units.dart';
 import 'package:financial_planner/features/investments/data/drift_investments_repository.dart';
 import 'package:financial_planner/features/investments/domain/history_entry.dart';
 import 'package:financial_planner/features/investments/domain/investment.dart';
+import 'package:financial_planner/features/investments/presentation/investments_providers.dart';
+import 'package:financial_planner/features/zakat/data/drift_zakat_repository.dart';
+import 'package:financial_planner/features/zakat/presentation/zakat_providers.dart';
+import 'package:financial_planner/features/zakat/presentation/zakat_settings_section.dart';
 import 'package:financial_planner/l10n/app_localizations.dart';
 import 'package:flutter/material.dart' hide Intent;
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -30,6 +34,8 @@ import 'dart:ui' show CheckedState;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
+
+import 'fake_year_end_reminder.dart';
 
 const egp = Unit('EGP');
 const usd = Unit('USD');
@@ -63,12 +69,17 @@ class Harness {
   Harness(this.now) : db = AppDatabase(NativeDatabase.memory()) {
     investments = DriftInvestmentsRepository(db, () => now);
     assumptions = DriftAssumptionsRepository(db, () => now);
+    zakat = DriftZakatRepository(db, () => now);
   }
 
   DateTime now;
   final AppDatabase db;
   late final DriftInvestmentsRepository investments;
   late final DriftAssumptionsRepository assumptions;
+  late final DriftZakatRepository zakat;
+
+  /// What the app asks of the phone about notifications; never a real one.
+  final reminder = FakeYearEndReminder();
   final List<http.BaseRequest> requests = [];
   static Future<http.Response> _noNetwork(http.Request _) async =>
       throw StateError('unexpected network call');
@@ -83,15 +94,21 @@ class Harness {
     LongTermMethod? method,
     bool? jewellery,
     Country? home,
-  }) => assumptions.saveSettings(
-    Settings(
+    ZakatPrefs zakatPrefs = const ZakatPrefs(),
+    ZakatCycle? cycle,
+  }) {
+    final settings = Settings(
       baseCurrency: base,
-      zakatYear: year,
+      zakatYear: cycle?.calendar ?? year,
       longTermMethod: method,
       jewelleryZakatable: jewellery,
       homeInflation: home,
-    ),
-  );
+      zakat: zakatPrefs,
+    );
+    return cycle == null
+        ? assumptions.saveSettings(settings)
+        : assumptions.saveZakatCycle(settings, cycle);
+  }
 
   Future<void> addItem(Investment item, List<HistoryEntry> history) =>
       investments.create(item, history);
@@ -180,6 +197,10 @@ Future<Harness> pumpScreen(
       overrides: [
         appDatabaseProvider.overrideWithValue(h.db),
         clockProvider.overrideWithValue(() => h.now),
+        yearEndReminderProvider.overrideWithValue(h.reminder),
+        zakatSettingsSectionProvider.overrideWithValue(
+          zakatSettingsSectionBuilder,
+        ),
         shippedInflationProvider.overrideWith(
           (ref) => shipped ?? defaultShipped(),
         ),

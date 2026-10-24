@@ -255,6 +255,52 @@ final class NisabHint {
   final Money zakatableTotal;
 }
 
+/// One item as the zakat year sees it on a due date (story §6.1).
+final class HoldingOnDate {
+  const HoldingOnDate({
+    required this.investment,
+    required this.value,
+    required this.heldInterest,
+    required this.valueDate,
+    required this.toBase,
+    this.zakat,
+    this.question,
+  });
+
+  final Investment investment;
+
+  /// In the item unit, net of [heldInterest] (Z-6).
+  final Decimal value;
+  final Decimal heldInterest;
+
+  /// The date the value stands on; for metals, the later of the last entry and
+  /// the metal rate (Z16).
+  final DateTime valueDate;
+
+  /// Null when [investment]'s unit has no rate to the base: never 1:1.
+  final RateQuote? toBase;
+
+  /// Exactly one of [zakat] and [question] is set.
+  final ResolvedZakat? zakat;
+  final ZakatQuestion? question;
+}
+
+final class ZakatPosition {
+  const ZakatPosition({
+    required this.on,
+    required this.base,
+    required this.holdings,
+    required this.gold,
+    required this.silver,
+  });
+
+  final DateTime on;
+  final Unit base;
+  final List<HoldingOnDate> holdings;
+  final RateQuote? gold;
+  final RateQuote? silver;
+}
+
 final class StaleNow {
   const StaleNow({required this.itemIds, required this.ratePairs});
 
@@ -661,25 +707,59 @@ final class PortfolioCalculator {
     return q != null && q.asOf.isAfter(end) ? q.asOf : end;
   }
 
+  /// Every item open at the end of [on], valued and converted on that date
+  /// (story §6.1). A rate dated after [on] is never used (AC-11). [inBase]
+  /// is a started year's own base, which outlives a later change of the base
+  /// currency (AC-42).
+  ZakatPosition zakatPosition(DateTime on, {Unit? inBase}) {
+    final base = inBase ?? _base;
+    HoldingOnDate holding(ItemTimeline tl) {
+      final inv = tl.investment;
+      final question = pendingQuestion(inv, settings);
+      final toBase = rates.quote(inv.unit, base, on);
+      final entryDate = tl.valueDateAt(on);
+      return HoldingOnDate(
+        investment: inv,
+        value: tl.netValueAt(on),
+        heldInterest: tl.heldInterestAt(on),
+        valueDate: inv.unit.isMetal && toBase != null
+            ? later(entryDate, toBase.asOf)
+            : entryDate,
+        toBase: toBase,
+        zakat: question == null ? resolve(inv, settings) : null,
+        question: question,
+      );
+    }
+
+    return ZakatPosition(
+      on: on,
+      base: base,
+      holdings: [
+        for (final h in _items)
+          if (!h.investment.startDate.isAfter(on) &&
+              !timeline(h.investment.id).closedAt(on))
+            holding(timeline(h.investment.id)),
+      ],
+      gold: rates.quote(xauG, base, on),
+      silver: rates.quote(xagG, base, on),
+    );
+  }
+
   /// Nisab at today's metal rates, and Σ (value × zakat share) in the base
   /// currency (UX 2.10; the switch itself is never set from this).
   NisabHint nisabHint() {
-    Money? nisab(Unit metal, String grams) {
-      final q = rates.quote(metal, _base, today);
-      return q == null ? null : Money(Decimal.parse(grams) * q.rate, _base);
-    }
+    final p = zakatPosition(today);
+    Money? nisab(RateQuote? q, String grams) =>
+        q == null ? null : Money(Decimal.parse(grams) * q.rate, _base);
 
     var total = Decimal.zero;
-    for (final h in _items) {
-      final inv = h.investment;
-      if (inv.startDate.isAfter(today)) continue;
-      final value = timeline(inv.id).netValueAt(today);
-      final c = rates.convert(Money(value, inv.unit), _base, today);
-      if (c != null) total += c.amount * resolve(inv, settings).share;
+    for (final h in p.holdings) {
+      if (h.toBase == null || h.zakat == null) continue;
+      total += h.value * h.toBase!.rate * h.zakat!.share;
     }
     return NisabHint(
-      goldNisab: nisab(xauG, '85'),
-      silverNisab: nisab(xagG, '595'),
+      goldNisab: nisab(p.gold, '85'),
+      silverNisab: nisab(p.silver, '595'),
       zakatableTotal: Money(total, _base),
     );
   }

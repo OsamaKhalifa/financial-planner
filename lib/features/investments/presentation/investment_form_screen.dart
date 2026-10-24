@@ -1185,7 +1185,9 @@ class _FormState extends ConsumerState<InvestmentFormScreen> {
         l10n.zakatPeTrading,
       ZakatRule.longTermFullValue when type == AssetType.privateEquity =>
         l10n.peMethodFullNote,
-      ZakatRule.trading100 => l10n.zakatReasonTrading,
+      ZakatRule.trading100 => l10n.zakatReasonTrading(
+        context.percent(_effectiveSettings.zakatYear!.r).replaceAll('+', ''),
+      ),
       ZakatRule.cash100 => l10n.zakatReasonCash,
       ZakatRule.bullion100 => l10n.zakatReasonSavings,
       ZakatRule.jewelleryPerSetting => l10n.zakatReasonJewellery,

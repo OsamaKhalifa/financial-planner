@@ -17,13 +17,18 @@ part 'app_database.g.dart';
     InflationOverrides,
     AppSettings,
     NoZakatYears,
+    ZakatCycles,
+    ZakatYears,
+    ZakatExtraLines,
+    ZakatFrozenLines,
+    ZakatGifts,
   ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -51,6 +56,27 @@ class AppDatabase extends _$AppDatabase {
           "WHERE kind = 'value_update'",
         );
         await m.create(schema.historyOneSkipPerPlanDate);
+      }),
+      from2To3: (m, schema) => transaction(() async {
+        final s = schema.settings;
+        for (final c in [
+          s.nisabMetal,
+          s.reminderOn,
+          s.reminderDays,
+          s.reminderMinute,
+          s.reminderAsked,
+          s.givingRateView,
+        ]) {
+          await m.addColumn(s, c);
+        }
+        await m.create(schema.zakatCycles);
+        await m.create(schema.zakatYears);
+        await m.create(schema.zakatExtraLines);
+        await m.create(schema.zakatFrozenLines);
+        await m.create(schema.zakatGifts);
+        await m.create(schema.zakatExtraLinesByYear);
+        await m.create(schema.zakatFrozenLinesByYear);
+        await m.create(schema.zakatGiftsByYearDate);
       }),
     ),
     beforeOpen: (details) async {

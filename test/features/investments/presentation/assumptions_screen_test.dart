@@ -9,6 +9,8 @@ import 'package:financial_planner/core/reference/markets.dart';
 import 'package:financial_planner/features/investments/domain/investment.dart';
 import 'package:financial_planner/features/investments/presentation/assumptions_screen.dart';
 import 'package:financial_planner/features/investments/presentation/inflation_series_screen.dart';
+import 'package:financial_planner/features/investments/presentation/investments_providers.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:financial_planner/features/investments/presentation/rate_history_screen.dart';
 import 'package:flutter/material.dart' hide Intent;
 import 'package:flutter_test/flutter_test.dart';
@@ -182,11 +184,12 @@ void main() {
             tester,
             find.byKey(const ValueKey('assumptions-jewellery-yes')),
           );
-          expect(find.text(l10n.jewelleryNotAsked), findsOneWidget);
+          expect(find.text(l10n.jewelleryNotAsked), findsNWidgets(2));
           await tester.tap(
             find.byKey(const ValueKey('assumptions-jewellery-yes')),
           );
           await settle(tester);
+          expect(find.text(l10n.jewelleryNotAsked), findsOneWidget);
           final s = await settingsOf(tester, h);
           expect(s.zakatYear, ZakatYear.solar);
           expect(s.jewelleryZakatable, isTrue);
@@ -292,7 +295,12 @@ void main() {
           seed: seedUs,
         );
         final l10n = l10nOf(tester);
-        await tester.tap(find.text(l10n.change).last);
+        await tester.tap(
+          find.descendant(
+            of: find.byKey(const ValueKey('home-row')),
+            matching: find.text(l10n.change),
+          ),
+        );
         await tester.pumpAndSettle();
         await tapScrolled(
           tester,
@@ -402,6 +410,39 @@ void main() {
       });
     });
   }
+
+  group('S8 zakat section seam (Z2)', () {
+    testScreen('seam off: the zakat-year radio is S8\'s own', (tester) async {
+      await pumpScreen(tester, const AssumptionsScreen(), seed: seedUs);
+      await scrollTo(tester, find.byKey(const ValueKey('year-lunar')));
+      expect(find.byKey(const ValueKey('year-solar')), findsOneWidget);
+      expect(find.text('INJECTED'), findsNothing);
+    });
+
+    testScreen(
+      'seam on: the injected section replaces the radio, the other zakat rows stay',
+      (tester) async {
+        await pumpScreen(
+          tester,
+          ProviderScope(
+            overrides: [
+              zakatSettingsSectionProvider.overrideWithValue(
+                (_) => const Text('INJECTED'),
+              ),
+            ],
+            child: const AssumptionsScreen(),
+          ),
+          seed: seedUs,
+        );
+        final l10n = l10nOf(tester);
+        await scrollTo(tester, find.text('INJECTED'));
+        expect(find.byKey(const ValueKey('year-lunar')), findsNothing);
+        expect(find.byKey(const ValueKey('year-solar')), findsNothing);
+        expect(find.text(l10n.zakatYearTitle), findsNothing);
+        expect(find.text(l10n.longTermTitle), findsOneWidget);
+      },
+    );
+  });
 }
 
 Future<List<InvestmentWithHistory>> _items(

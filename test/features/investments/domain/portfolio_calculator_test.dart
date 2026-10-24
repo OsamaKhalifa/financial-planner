@@ -12,6 +12,7 @@ import 'package:financial_planner/features/investments/domain/history_entry.dart
 import 'package:financial_planner/features/investments/domain/investment.dart';
 import 'package:financial_planner/features/investments/domain/period.dart';
 import 'package:financial_planner/features/investments/domain/portfolio_calculator.dart';
+import 'package:financial_planner/features/investments/domain/zakat_rules.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../support/figures_view.dart';
@@ -658,6 +659,143 @@ void main() {
         expect(m.last.value, d('1000'));
         expect(m.last.paidIn, d('1000'));
       });
+    });
+  });
+
+  group('zakatPosition (Z9)', () {
+    final due = day(2026, 10, 20);
+    final xau = Unit.xauG;
+    final rates = [
+      Rate(from: usd, to: egp, rate: d('47'), asOf: day(2026, 10, 10)),
+      Rate(from: usd, to: egp, rate: d('48'), asOf: day(2026, 10, 20)),
+      Rate(from: usd, to: egp, rate: d('50'), asOf: day(2026, 10, 21)),
+      Rate(from: xau, to: egp, rate: d('5000'), asOf: day(2026, 10, 18)),
+    ];
+    final items = [
+      fund(
+        'us',
+        usd,
+        day(2026, 1, 1),
+        '1000',
+        value: '2000',
+        valueOn: day(2026, 10, 1),
+      ),
+      fund('started-later', egp, day(2026, 10, 21), '10'),
+      fund(
+        'sold',
+        egp,
+        day(2026, 1, 1),
+        '100',
+        value: '0',
+        valueOn: day(2026, 9, 1),
+      ),
+      InvestmentWithHistory(
+        investment: Investment(
+          id: 'ring',
+          name: 'ring',
+          type: AssetType.gold,
+          unit: xau,
+          startDate: day(2026, 1, 1),
+          zakatRule: ZakatRule.jewelleryPerSetting,
+        ),
+        history: [
+          MoneyIn(
+            investmentId: 'ring',
+            date: day(2026, 10, 1),
+            amount: Money(d('50'), xau),
+          ),
+        ],
+      ),
+      InvestmentWithHistory(
+        investment: Investment(
+          id: 'savings',
+          name: 'savings',
+          type: AssetType.cashDeposit,
+          unit: egp,
+          startDate: day(2026, 1, 1),
+          zakatRule: ZakatRule.cash100,
+        ),
+        history: [
+          MoneyIn(
+            investmentId: 'savings',
+            date: day(2026, 1, 1),
+            amount: Money(d('120000'), egp),
+          ),
+          InterestRecord(
+            investmentId: 'savings',
+            date: day(2026, 1, 2),
+            amount: Money(d('500'), egp),
+            kind: InterestKind.keptInside,
+          ),
+        ],
+      ),
+    ];
+
+    HoldingOnDate holding(ZakatPosition p, String id) =>
+        p.holdings.firstWhere((h) => h.investment.id == id);
+
+    test('AC-11, AC-13 keeps only items open at the end of the day, with the rate on or before it', () {
+      final p = calc(items, rates: rates).zakatPosition(due);
+      expect(p.on, due);
+      expect(p.base, egp);
+      expect(p.holdings.map((h) => h.investment.id).toSet(), {
+        'us',
+        'ring',
+        'savings',
+      });
+      final us = holding(p, 'us');
+      expect(us.value, d('2000'));
+      expect((us.toBase!.rate, us.toBase!.asOf), (d('48'), due));
+      expect(
+        calc(items, rates: rates)
+            .zakatPosition(day(2026, 10, 15))
+            .holdings
+            .firstWhere((h) => h.investment.id == 'us')
+            .toBase!
+            .rate,
+        d('47'),
+      );
+    });
+
+    test('AC-14 the value is net of interest kept inside, and the interest is kept apart', () {
+      final s = holding(
+        calc(items, rates: rates).zakatPosition(due),
+        'savings',
+      );
+      expect((s.value, s.heldInterest), (d('120000'), d('500')));
+      expect(s.toBase!.rate, Decimal.one);
+    });
+
+    test('a missing rate leaves toBase null: never 1:1', () {
+      final p = calc(items).zakatPosition(due);
+      expect(holding(p, 'us').toBase, isNull);
+      expect(holding(p, 'savings').toBase, isNotNull);
+      expect(p.gold, isNull);
+    });
+
+    test('AC-16 an unanswered ruling is a question, not a share', () {
+      final p = calc(items, rates: rates).zakatPosition(due);
+      final ring = holding(p, 'ring');
+      expect(ring.question, ZakatQuestion.jewellery);
+      expect(ring.zakat, isNull);
+      expect(holding(p, 'us').zakat!.share, Decimal.one);
+      expect(holding(p, 'us').question, isNull);
+    });
+
+    test('Z16 a metal item stands on the later of its last entry and the metal rate', () {
+      final p = calc(items, rates: rates).zakatPosition(due);
+      expect(holding(p, 'ring').valueDate, day(2026, 10, 18));
+      expect(holding(p, 'us').valueDate, day(2026, 10, 1));
+      expect((p.gold!.rate, p.gold!.asOf), (d('5000'), day(2026, 10, 18)));
+      expect(p.silver, isNull);
+    });
+
+    test('nisabHint is zakatPosition(today): same total, and an open question is skipped', () {
+      final c = calc(items, rates: rates, now: due);
+      final hint = c.nisabHint();
+      expect(hint.goldNisab, Money(d('425000'), egp));
+      expect(hint.silverNisab, isNull);
+      expect(hint.zakatableTotal, Money(d('216000'), egp));
     });
   });
 }

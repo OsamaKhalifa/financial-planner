@@ -83,7 +83,7 @@ Set monthly income and spending categories. Record spending by hand. See spent v
 - No bank integration, no broker integration.
 - No tax reporting (country-specific, out of scope).
 - No social features, no sharing, no leaderboards.
-- No notifications in v1 (opt-in local reminders in v1.1 maybe).
+- No notifications in v1, except one local zakat year-end notification (stories/zakat.md §5.4; owner decision 2026-10-23).
 - No ads, no in-app purchases, no premium tier.
 - No "robo-advisor." We do not pick investments.
 - No crypto beyond manual entry. Shariah consultant decides which coins are in scope at all.

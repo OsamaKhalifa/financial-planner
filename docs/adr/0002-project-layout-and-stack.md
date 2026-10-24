@@ -31,7 +31,7 @@ test/                           mirrors lib/ paths: lib/a/b.dart → test/a/b_te
 integration_test/golden_path_test.dart
 ```
 
-Import direction: `presentation → domain ← data`, `features → core`, never `core → features`, never feature → feature. Only `lib/core/db/` and `*/data/` import `package:drift`; only `lib/core/assumptions/data/rate_refresher.dart` imports `package:http`. A unit test (`test/architecture_test.dart`) greps `lib/` and fails on a violation.
+Import direction: `presentation → domain ← data`, `features → core`, never `core → features`. Feature-to-feature imports follow the amendment at the end of this file. Only `lib/core/db/` and `*/data/` import `package:drift`; only `lib/core/assumptions/data/rate_refresher.dart` imports `package:http`. A unit test (`test/architecture_test.dart`) greps `lib/` and fails on a violation.
 
 ### Dependencies (resolved with `flutter pub add --dry-run` on Flutter 3.47.7 / Dart 3.13.5, 2026-10-16)
 
@@ -88,3 +88,15 @@ Material 3 everywhere, with Flutter's `.adaptive` constructors (`Switch.adaptive
 - Deep links, a tab bar, or web support → reconsider `go_router`.
 - Provider count passes ~40 or boilerplate becomes a review complaint → reconsider `riverpod_generator`.
 - `flutter build apk --analyze-size` shows the sqlite native lib dominating app size.
+
+## Amendment 2026-10-24 — feature imports and the settings seam (zakat spec Z1, Z2)
+
+**Rule, as it really is:** a feature may import `features/investments`. `features/investments` never imports another feature, with one exception: `features/settings`. No other feature-to-feature import. `test/architecture_test.dart` enforces it: `lib/features/investments/` imports no `features/(zakat|overview|plan)/`, and `lib/features/zakat/` imports no `features/(overview|plan)/` and, from `features/settings/`, only `settings_screen.dart` (the gear every tab shows).
+
+**Why:** Overview already imports `features/investments` (11 imports, plus `main.dart` for `AppShell.select`) on `main`, so "never feature → feature" was already broken and untested. The Zakat tab needs `PortfolioCalculator`, `resolve()`, the why sheet, `DateField`, the unit picker, the rate dialog and `ItemDetailScreen`. Writing down what is true and testing it beats a third pattern.
+
+**Rejected:** zakat inside `features/investments/` (the folder becomes the whole app); callbacks injected from `main.dart` (10+ widgets and providers would pass them through constructors); moving the calculator and shared widgets to `lib/core/` (~40 files churn for no behaviour change).
+
+**One injection seam (Z2):** `zakatSettingsSectionProvider` (`Provider<WidgetBuilder?>`, default `null`) in `investments_providers.dart`, overridden in `main.dart` with the zakat feature's `ZakatSettingsSection`. When set, S8 shows it in place of its own zakat-year radio. It is the only place the arrow points backwards (investments to zakat), and it points through a provider, not an import.
+
+**Dependencies added by this feature:** `hijri` ([ADR-0007](0007-hijri-calendar.md)), `flutter_local_notifications` and `timezone` ([ADR-0008](0008-local-notifications.md)).

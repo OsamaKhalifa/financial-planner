@@ -90,7 +90,12 @@ class AssumptionsScreen extends ConsumerWidget {
             ),
           const Divider(),
           Text(l10n.zakatHeading, style: textTheme.titleSmall),
-          _zakat(context, settings, actions),
+          _zakat(
+            context,
+            settings,
+            actions,
+            ref.watch(zakatSettingsSectionProvider),
+          ),
           const Divider(),
           Text(l10n.noZakatByYear, style: textTheme.titleSmall),
           for (var y = today.year; y >= firstYear; y--) NoZakatBlock(year: y),
@@ -253,45 +258,50 @@ class AssumptionsScreen extends ConsumerWidget {
     BuildContext context,
     Settings settings,
     SettingsActions actions,
+    WidgetBuilder? zakatSection,
   ) {
     final l10n = context.l10n;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Expanded(child: Text(l10n.zakatYearTitle)),
-            TextButton(
-              onPressed: () => showWhy(
-                context,
-                Why(
-                  title: l10n.zakatYearTitle,
-                  what: l10n.zakatYearWhy,
-                  source: l10n.src_A1A2,
-                ),
-              ),
-              child: Text(l10n.source),
-            ),
-          ],
-        ),
-        RadioGroup<ZakatYear>(
-          groupValue: settings.zakatYear,
-          onChanged: (v) => actions.setZakatYear(v!),
-          child: Column(
+        if (zakatSection != null)
+          Builder(builder: zakatSection)
+        else ...[
+          Row(
             children: [
-              RadioListTile<ZakatYear>(
-                key: const ValueKey('year-lunar'),
-                value: ZakatYear.lunar,
-                title: Text(l10n.zakatYearLunar),
-              ),
-              RadioListTile<ZakatYear>(
-                key: const ValueKey('year-solar'),
-                value: ZakatYear.solar,
-                title: Text(l10n.zakatYearSolar),
+              Expanded(child: Text(l10n.zakatYearTitle)),
+              TextButton(
+                onPressed: () => showWhy(
+                  context,
+                  Why(
+                    title: l10n.zakatYearTitle,
+                    what: l10n.zakatYearWhy,
+                    source: l10n.src_A1A2,
+                  ),
+                ),
+                child: Text(l10n.source),
               ),
             ],
           ),
-        ),
+          RadioGroup<ZakatYear>(
+            groupValue: settings.zakatYear,
+            onChanged: (v) => actions.setZakatYear(v!),
+            child: Column(
+              children: [
+                RadioListTile<ZakatYear>(
+                  key: const ValueKey('year-lunar'),
+                  value: ZakatYear.lunar,
+                  title: Text(l10n.zakatYearLunar),
+                ),
+                RadioListTile<ZakatYear>(
+                  key: const ValueKey('year-solar'),
+                  value: ZakatYear.solar,
+                  title: Text(l10n.zakatYearSolar),
+                ),
+              ],
+            ),
+          ),
+        ],
         Row(
           children: [
             Expanded(child: Text(l10n.longTermTitle)),

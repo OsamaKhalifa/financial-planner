@@ -26,9 +26,16 @@ import 'widgets/plan_chart.dart';
 
 /// S4: returns since start, zakat line and the whole history.
 class ItemDetailScreen extends ConsumerWidget {
-  const ItemDetailScreen({super.key, required this.investmentId});
+  const ItemDetailScreen({
+    super.key,
+    required this.investmentId,
+    this.frozenNote,
+  });
 
   final String investmentId;
+
+  /// Set when a frozen zakat year opened this item (Z17).
+  final String? frozenNote;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -86,6 +93,14 @@ class ItemDetailScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
         children: [
+          if (frozenNote != null)
+            Card(
+              key: const ValueKey('frozen-note'),
+              child: ListTile(
+                leading: const Icon(Icons.info_outline),
+                title: Text(frozenNote!),
+              ),
+            ),
           Text(
             _subtitle(context, item),
             style: Theme.of(context).textTheme.bodyMedium,

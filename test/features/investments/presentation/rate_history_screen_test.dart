@@ -202,4 +202,35 @@ void main() {
       });
     });
   }
+
+  group('Z18 showRateDialog(on:)', () {
+    Widget opener(DateTime? on) => Scaffold(
+      body: Builder(
+        builder: (context) => TextButton(
+          onPressed: () => showRateDialog(context, from: usd, to: egp, on: on),
+          child: const Text('open'),
+        ),
+      ),
+    );
+
+    testScreen('a new rate starts on the given date', (tester) async {
+      await pumpScreen(tester, opener(day(2026, 10, 20)));
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+      final shown = MaterialLocalizations.of(
+        tester.element(find.byType(AlertDialog)),
+      ).formatMediumDate(day(2026, 10, 20));
+      expect(textPlain(shown), findsOneWidget);
+    });
+
+    testScreen('without a date it starts today', (tester) async {
+      await pumpScreen(tester, opener(null));
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+      final shown = MaterialLocalizations.of(
+        tester.element(find.byType(AlertDialog)),
+      ).formatMediumDate(day(2026, 10, 16));
+      expect(textPlain(shown), findsOneWidget);
+    });
+  });
 }

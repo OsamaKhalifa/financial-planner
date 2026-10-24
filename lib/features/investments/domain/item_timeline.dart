@@ -189,4 +189,10 @@ final class ItemTimeline {
   DateTime get latestValueDate => _entries
       .where((x) => x is! InterestRecord)
       .fold(investment.startDate, (a, x) => x.date.isAfter(a) ? x.date : a);
+
+  /// The latest value update or money in/out on or before [d], else the start
+  /// date. Interest does not move the value date (Z16).
+  DateTime valueDateAt(DateTime d) => _entries
+      .where((x) => x is! InterestRecord && !x.date.isAfter(d))
+      .fold(investment.startDate, (a, x) => x.date.isAfter(a) ? x.date : a);
 }

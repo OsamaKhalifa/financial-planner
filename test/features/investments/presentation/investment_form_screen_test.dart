@@ -165,6 +165,32 @@ void main() {
         },
       );
 
+      for (final (year, r) in [
+        (ZakatYear.lunar, '0.025'),
+        (ZakatYear.solar, '0.02577'),
+      ]) {
+        testScreen(
+          'A2: the trade-goods reason names the ${year.name} rate of the user',
+          (tester) async {
+            await pumpScreen(
+              tester,
+              const InvestmentFormScreen(presetType: AssetType.stock),
+              locale: locale,
+              seed: (h) => h.setup(year: year),
+            );
+            final l10n = l10nOf(tester);
+            await tapText(tester, l10n.intentTrading);
+            final rate = plain(
+              formatPercent(Decimal.parse(r), locale.languageCode),
+            ).replaceAll('+', '');
+            expect(
+              textPlain(plain(l10n.zakatReasonTrading(rate))),
+              findsOneWidget,
+            );
+          },
+        );
+      }
+
       testScreen(
         'a cash deposit saves, shows 100 % with its source, and opens the detail',
         (tester) async {

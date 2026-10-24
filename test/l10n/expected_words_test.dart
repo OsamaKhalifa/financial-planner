@@ -111,4 +111,79 @@ void main() {
     }
     expect((ar['fieldExpectedProfit'] as String).contains('ربح'), isTrue);
   });
+
+  group('AC-41 zakat texts', () {
+    // A My Investments form text (S3), not a Zakat-tab text: it says "by
+    // default" about the sukuk share.
+    const notOnZakatTab = {'zakatReasonSukuk'};
+
+    Map<String, String> zakatTexts(String lang) => {
+      for (final e in _arb(lang).entries)
+        if (e.value is String &&
+            !notOnZakatTab.contains(e.key) &&
+            (e.key.startsWith('zakat') ||
+                e.key.startsWith('reminder') ||
+                e.key.startsWith('src_C')))
+          e.key: e.value as String,
+    };
+
+    // As a word: المستقبل (the future) contains the letters of تقبّل.
+    final tabbal = RegExp('(^|[^\u0621-\u064A])[يتنأ]?تقبل');
+
+    String bare(String s) => s.replaceAll(RegExp('[\u064B-\u0652]'), '');
+
+    test('en: no claim of payment, acceptance or fulfilment, and no tone-breaking word', () {
+      final claims = RegExp(
+        r'zakat paid|accepted|fulfilled|your duty is done',
+        caseSensitive: false,
+      );
+      final tone = RegExp(
+        r'\b(late|missed|overdue|default)\b',
+        caseSensitive: false,
+      );
+      final texts = zakatTexts('en');
+      expect(texts.length, greaterThan(150));
+      for (final e in texts.entries) {
+        expect(
+          claims.hasMatch(e.value),
+          isFalse,
+          reason: '${e.key}: ${e.value}',
+        );
+        expect(tone.hasMatch(e.value), isFalse, reason: '${e.key}: ${e.value}');
+      }
+    });
+
+    test(
+      'ar: no برئت الذمة, no تقبّل, and the settled chip is never مكتملة',
+      () {
+        final texts = zakatTexts('ar');
+        expect(texts.length, greaterThan(150));
+        for (final e in texts.entries) {
+          final t = bare(e.value);
+          expect(t.contains('برئت الذمة'), isFalse, reason: e.key);
+          expect(tabbal.hasMatch(t), isFalse, reason: e.key);
+          expect(t.contains('مكتملة'), isFalse, reason: e.key);
+        }
+      },
+    );
+
+    test('the settled chip reads مسجَّلة بالكامل, and a frozen year below nisab never reads settled alone', () {
+      final ar = _arb('ar')['zakatState'] as String;
+      final en = _arb('en')['zakatState'] as String;
+      expect(ar, contains('settled{مسجَّلة بالكامل}'));
+      expect(ar, contains('belowNisab{دون النصاب: لا زكاة واجبة}'));
+      expect(en, contains('belowNisab{Below nisab: no zakat due}'));
+    });
+
+    test(
+      'C11 line is one key with the Quran 9:60 reference, in both languages',
+      () {
+        expect(
+          _arb('en')['zakatGiftLogNote'],
+          'The app counts what you log. It cannot check that each person may receive zakat (Quran 9:60), or that you gave it as zakat. Do not log interest you gave away: it is not zakat.',
+        );
+        expect(_arb('ar')['zakatGiftLogNote'], contains('التوبة 60'));
+      },
+    );
+  });
 }
