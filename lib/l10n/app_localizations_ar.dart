@@ -1906,4 +1906,26 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get shariahNoScreening => 'التطبيق لا يفحص الشركات شرعيًا بعد.';
+
+  @override
+  String get trendTitle => 'القيمة، آخر 12 شهرًا';
+
+  @override
+  String get paidInTitle => 'المدفوع مقابل القيمة';
+
+  @override
+  String get monthlyReturnTitle => 'العائد الشهري';
+
+  @override
+  String get byCurrencyTitle => 'حسب العملة';
+
+  @override
+  String get chartValue => 'القيمة';
+
+  @override
+  String get chartPaidIn => 'المدفوع';
+
+  @override
+  String get notEnoughMonths =>
+      'لا توجد أشهر كافية بعد. الرسم يحتاج شهرين على الأقل.';
 }
