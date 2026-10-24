@@ -708,12 +708,15 @@ final class PortfolioCalculator {
   }
 
   /// Every item open at the end of [on], valued and converted on that date
-  /// (story §6.1). A rate dated after [on] is never used (AC-11).
-  ZakatPosition zakatPosition(DateTime on) {
+  /// (story §6.1). A rate dated after [on] is never used (AC-11). [inBase]
+  /// is a started year's own base, which outlives a later change of the base
+  /// currency (AC-42).
+  ZakatPosition zakatPosition(DateTime on, {Unit? inBase}) {
+    final base = inBase ?? _base;
     HoldingOnDate holding(ItemTimeline tl) {
       final inv = tl.investment;
       final question = pendingQuestion(inv, settings);
-      final toBase = rates.quote(inv.unit, _base, on);
+      final toBase = rates.quote(inv.unit, base, on);
       final entryDate = tl.valueDateAt(on);
       return HoldingOnDate(
         investment: inv,
@@ -730,15 +733,15 @@ final class PortfolioCalculator {
 
     return ZakatPosition(
       on: on,
-      base: _base,
+      base: base,
       holdings: [
         for (final h in _items)
           if (!h.investment.startDate.isAfter(on) &&
               !timeline(h.investment.id).closedAt(on))
             holding(timeline(h.investment.id)),
       ],
-      gold: rates.quote(xauG, _base, on),
-      silver: rates.quote(xagG, _base, on),
+      gold: rates.quote(xauG, base, on),
+      silver: rates.quote(xagG, base, on),
     );
   }
 

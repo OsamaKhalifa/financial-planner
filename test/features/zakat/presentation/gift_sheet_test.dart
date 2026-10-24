@@ -285,6 +285,12 @@ void main() {
             ),
             findsOneWidget,
           );
+          expect(
+            textPlain(
+              l10n.zakatLineNotRateOf(shownDate(tester, day(2026, 10, 22))),
+            ),
+            findsOneWidget,
+          );
           await tapKey(tester, 'gift-save');
           final l = l10n;
           expect(
@@ -335,6 +341,12 @@ void main() {
           await enter(tester, inKey('gift-amount'), '100');
           await pickUnit(tester, 'gift-unit', 'USD');
           expect(find.byKey(const ValueKey('view-dueDate')), findsNothing);
+          expect(
+            textPlain(
+              l10n.zakatLineNotRateOf(shownDate(tester, day(2026, 10, 22))),
+            ),
+            findsNothing,
+          );
           await tapKey(tester, 'gift-save');
           expect(
             textPlain(
@@ -401,10 +413,11 @@ void main() {
           );
           await tester.tap(giftRows.first);
           await tester.pumpAndSettle();
+          await enter(tester, inKey('gift-amount'), '200');
           expect(
             textPlain(
               l10n.zakatGiftLive(
-                '4,800.00 EGP',
+                '9,600.00 EGP',
                 '48.00',
                 shownDate(tester, yasminDue),
               ),
@@ -413,8 +426,74 @@ void main() {
           );
           await tapKey(tester, 'gift-save');
           expect(
-            textPlain(l10n.zakatGiftRemaining('7,700.00 EGP')),
+            textPlain(l10n.zakatGiftRemaining('2,900.00 EGP')),
             findsOneWidget,
+          );
+        },
+      );
+
+      testScreen(
+        'PM-Q5: editing only the note keeps the rate, its date, the view and the counted amount',
+        (tester) async {
+          final h = await pumpStarted(
+            tester,
+            locale,
+            prefs: const ZakatPrefs(
+              nisab: NisabMetal.gold,
+              givingRateView: GivingRateView.dueDate,
+            ),
+            more: (h) => h.zakat.saveGift(
+              yasminDue,
+              gift(
+                '2026-10-22',
+                '100',
+                unit: usd,
+                rate: d('50'),
+                rateDate: day(2026, 10, 21),
+                view: GivingRateView.dayGiven,
+              ),
+            ),
+          );
+          final l10n = l10nOf(tester);
+          await tester.tap(giftRows.first);
+          await tester.pumpAndSettle();
+          expect(
+            textPlain(
+              l10n.zakatGiftLive(
+                '5,000.00 EGP',
+                '50.00',
+                shownDate(tester, day(2026, 10, 21)),
+              ),
+            ),
+            findsOneWidget,
+          );
+          await enter(
+            tester,
+            find.byKey(const ValueKey('gift-note')),
+            'Masjid',
+          );
+          await tapKey(tester, 'gift-save');
+          expect(
+            textPlain(l10n.zakatGiftRemaining('7,500.00 EGP')),
+            findsOneWidget,
+          );
+          final years = await tester.runAsync(() => h.zakat.watchYears().first);
+          final saved = years!.single.gifts.single;
+          expect(
+            (
+              saved.amount.amount,
+              saved.rate,
+              saved.rateDate,
+              saved.view,
+              saved.note,
+            ),
+            (
+              d('100'),
+              d('50'),
+              day(2026, 10, 21),
+              GivingRateView.dayGiven,
+              'Masjid',
+            ),
           );
         },
       );

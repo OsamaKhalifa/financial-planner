@@ -701,3 +701,21 @@ No BLOCKER. Nothing computes or hides a riba figure. Interest stays out of the b
 7. **§2.5 Z6 why — long-term debts dispute** (PM item 10).
 8. **§7 Arabic chip "مكتملة" for settled.** In Arabic it reads as "complete", which comes close to "fulfilled" (C11). Use "مسجَّلة بالكامل" (fully logged), or another word that speaks of the record, not the worship. The full Arabic review stays before release.
 9. **§9 items 7–8.** Close them: the story no longer rebuilds years, and C8 now covers other-currency entries.
+
+---
+
+## Review of the built Zakat tab (2026-10-24)
+
+Code reviewed: `lib/features/zakat/**`, the `zakat*`, `src_C*`, `src_A4..A8`, `src_B9`, `src_Z4`, `hijriMonth` and `reminder*` keys in `app_en.arb` / `app_ar.arb`.
+
+**Verdict: BLOCKER** (item 1). Items 2–7: CHANGES_REQUESTED.
+
+1. **BLOCKER — a lunar year can disappear after a cycle change (C2).** `yearSlots` / `_slotsOf` end the old cycle at the first slot whose **moved** due date is on or after the new cycle's `from`. `from` is the open year's due date + 1 day. Moving that open lunar year 1–2 days later (allowed by C3) after the change drops the year from the list. Its zakat is no longer shown, and the notification moves to the next cycle. Same harm as the loop-0 BLOCKER: zakat already owed is lost. Rule: a year that existed when the cycle changed must never be dropped. Test the computed key, not the moved date, against the next cycle's start, or start the new cycle after the latest date the open year may be moved to.
+2. **Recompute after a base-currency change (C9).** Recompute freezes the year in the new base currency, but gifts keep the old base. Gifts in the old base have no stored rate, so `counted()` fails. Gifts in a third currency are counted in the old base and added to a Z in the new base, so "settled" or "more than due" can be false. Rule: recompute keeps the year's frozen base currency.
+3. **Arabic fixes** — `src_C11`, `zakatGiftOverHelp`, `zakatMoveSolarLine`, `src_C9`, `zakatRateViewChanged`. Exact strings: see the handback of this review.
+4. **`zakatReasonTrading` uses a fixed "2.5 %"** — wrong for a solar-year user (A2, P-4c). Use the user's r.
+5. **Gift sheet live line** — when the rate used is older than the rate date, it must also say "not the rate of {date}" before save (C8 item 4). The saved row already does.
+6. **Magic numbers** — `ZakatYear` (`0.025`, `0.02577`) and `_gold`/`_silver` (85, 595) must point to this file (A1, A2, A3).
+7. **Editing only the note of an old foreign-currency gift recounts it** with the current view and rate. Allowed by PM-Q5, but only as the user's own choice. Keep the stored view and rate unless the amount, currency or date changes.
+
+Checked and compliant: nisab after the debt deduction; deduction on by default, with the long-term-debt dispute shown; extra lines cash and good debts only, metals refused; due, distributing and settled years kept when the cycle changes (apart from item 1); solar move earlier only, up to 2 days, and lunar ±2; Hijri day 30 → 29; 2.5 % / 2.577 %; gifts counted at the stored rate and view; recompute keeps gifts; "more than due" names both views and is not carried over; C10 due, below-nisab and incomplete texts; "do not delay" line only on due (Z > 0 or incomplete) and distributing years; C11 line on every settled year and in the log help; below-nisab frozen year never reads "Settled"; rate view asked once, no default, both views named; cycle-date help (Hijri / Gregorian); past-years line; notification text per C10, 09:00, 0–60 days. Arabic chip "مسجَّلة بالكامل" approved. ربح / فائدة are used correctly.

@@ -127,7 +127,7 @@ Be told when my zakat year ends, see how much zakat I owe for that year and wher
   - **View 1 — the day given** (Sahibayn: Abu Yusuf and Muhammad): rate date = the entry date.
   - **View 2 — the due date** (Abu Hanifa): rate date = the year's due date.
   - The entry shows "counted at {rate} on {date of that rate}", and "not the rate of {rate date}" when the two dates differ (§6.1).
-- **Rate view** — a Zakat setting, next to the cycle date, nisab standard and notification settings. **Asked, no default** (C8; "Ask at setup vs default (Part C)"), the first time the user logs an entry in a currency other than the year's base, with both views and their references. Later it can be changed there. The view used is stored on each entry; a change applies to **new entries only** (per consultant C8, PM-Q5: a gift counted under one valid view stays counted). When the user changes it, the app says: **"Amounts already logged keep the rate they were counted at. Edit an amount to count it with the new view."** Editing an entry counts it with the current view.
+- **Rate view** — a Zakat setting, next to the cycle date, nisab standard and notification settings. **Asked, no default** (C8; "Ask at setup vs default (Part C)"), the first time the user logs an entry in a currency other than the year's base, with both views and their references. Later it can be changed there. The view used is stored on each entry; a change applies to **new entries only** (per consultant C8, PM-Q5: a gift counted under one valid view stays counted). When the user changes it, the app says: **"Amounts already logged keep the rate they were counted at. Edit an amount to count it with the new view."** Editing an entry's amount, currency or date counts it with the current view; editing only its note keeps the rate and view it was saved with.
 - **Missing rate:** the entry cannot be saved until the user types the rate for that pair on the rate date. It is stored as a manual dated rate, like any other (my-investments §6.1), and used. Never 1:1.
 - **Distributed** = Σ counted amounts; **remaining** = max(0, Z − distributed). When distributed ≥ Z → **settled automatically**; if an edit or deletion drops it below Z → distributing again.
 - **Given before the due date** (per consultant C6, [S]): counts toward the year, marked "given before the due date", with the help line **"This counts if you held nisab when you gave it and you gave it as zakat. The Maliki school accepts this only shortly before the due date."** Its Source marks the Maliki clause "source not yet verified" (C6: [U]).
@@ -204,7 +204,7 @@ Be told when my zakat year ends, see how much zakat I owe for that year and wher
 - **AC-28** Given Yasmin's year as solar "2026" (previous year "2025" due 2025-10-20), When the user adds 2,000 EGP dated 2026-10-01 (before D), Then it is accepted, counted in distributed, marked "given before the due date", with the C6 help line "This counts if you held nisab when you gave it and you gave it as zakat. The Maliki school accepts this only shortly before the due date."; its Source marks the Maliki clause "source not yet verified" (C6 [U]); an entry dated **2025-10-21** is accepted; dated **2025-10-20** is refused. Given instead "2025"'s due date was moved to **2025-10-18** (§5.3), Then **2025-10-19** is accepted and **2025-10-18** is refused (the real date counts, C6).
 - **AC-46** (first year, PM-Q4, C6) Given solar, 20 October, saved on 2026-01-05 (first year "2026", no "2025" exists), "2026" distributing, Then an entry dated **2025-10-21** is accepted and one dated **2025-10-20** is refused.
 - **AC-29** Given Z = 12,500.00 and entries 13,000.00, Then remaining = **0.00**, settled, "Given 500.00 more than due." shows, and under it "Some scholars (Hanafi) let you count this toward next year if you gave it as zakat. Others (Shafi'i) count it as sadaqah. The app does not move it."; no other year's distributed or remaining changes.
-- **AC-30** Given Yasmin's year distributing (Z 12,500.00) and no rate view yet, When the user logs 100 **USD** on 2026-10-22, Then the rate view is asked — "the day given (Sahibayn)" / "the due date (Abu Hanifa)", with references, nothing pre-selected (C8) — and the entry is not saved until answered. With **day given**: counted at USD→EGP 50.00 on 2026-10-21 (latest on or before 2026-10-22) = **5,000.00**, remaining **7,500.00**, and the entry shows "counted at 50.00 on Oct 21, 2026" and "not the rate of Oct 22, 2026". With **due date**: counted at 48.00 on 2026-10-20 = **4,800.00**, remaining **7,700.00**, with no "not the rate of" text. The view is asked again for no later entry. It can be changed in the Zakat settings; When the user changes it, Then the app says "Amounts already logged keep the rate they were counted at. Edit an amount to count it with the new view.", the 100 USD entry still counts as before, and once the user edits that entry it counts with the new view (PM-Q5, C8). Given a user who logs only EGP entries, Then the rate view is never asked.
+- **AC-30** Given Yasmin's year distributing (Z 12,500.00) and no rate view yet, When the user logs 100 **USD** on 2026-10-22, Then the rate view is asked — "the day given (Sahibayn)" / "the due date (Abu Hanifa)", with references, nothing pre-selected (C8) — and the entry is not saved until answered. With **day given**: counted at USD→EGP 50.00 on 2026-10-21 (latest on or before 2026-10-22) = **5,000.00**, remaining **7,500.00**, and the entry shows "counted at 50.00 on Oct 21, 2026" and "not the rate of Oct 22, 2026". With **due date**: counted at 48.00 on 2026-10-20 = **4,800.00**, remaining **7,700.00**, with no "not the rate of" text. The view is asked again for no later entry. It can be changed in the Zakat settings; When the user changes it, Then the app says "Amounts already logged keep the rate they were counted at. Edit an amount to count it with the new view.", the 100 USD entry still counts as before, and once the user edits that entry's amount, currency or date it counts with the new view; a note-only edit keeps the old rate and view (PM-Q5, C8). Given a user who logs only EGP entries, Then the rate view is never asked.
 - **AC-31** Given a due year below nisab (Z = 0.00), Then the start action is named "Close this year" (not "Start distribution"); When the user picks it, Then it reads **"below nisab: no zakat due"** (never "settled" alone) and remaining = 0.00.
 - **AC-41** Given any text in the Zakat tab and the notification, in en and ar, Then none contains "zakat paid", "accepted", "fulfilled", "your duty is done", برئت الذمة or تقبّل; the C11 line shows on every settled year and in the log help.
 - **AC-42** Given the AC-30 user on day-given view, When they log 200 **SAR** on 2026-10-22 and no SAR→EGP (or EGP→SAR) rate exists on or before 2026-10-22, Then the entry cannot be saved until they type a rate; When they type 13.00, Then a manual rate SAR→EGP 13.00 dated 2026-10-22 is stored in the rate history and the entry counts **2,600.00**; with due-date view the rate asked for is dated 2026-10-20. No entry ever counts 1:1. Given a year started in EGP and the base currency later changed to USD, Then that year's entries still count in EGP.
@@ -290,7 +290,7 @@ Before release the consultant reviews the Arabic of every text in §5 and §6–
 - **PM-Q7** Start without a dialog → **decided (PM):** one action + 10 s Undo while the log is empty (§8, AC-43).
 - **PM-Q3** On/off for the year-end notification → **decided (owner, 2026-10-23):** yes, on by default once permission is given; off schedules nothing, the due text still shows (§5.4, AC-44).
 - **PM-Q4** Earliest log date in the first year → **decided (consultant, C6):** the day after the cycle date one year before the first due date; for later years, the day after the previous year's real (moved) due date (§5.2, §9, AC-28, AC-46).
-- **PM-Q5** Rate-view change → **decided (consultant, C8):** new entries only, with the change text; editing an entry recounts it (§9, AC-30).
+- **PM-Q5** Rate-view change → **decided (consultant, C8):** new entries only, with the change text; editing an entry's amount, currency or date recounts it; a note-only edit does not (§9, AC-30).
 - **PM-Q6** "Do not delay" line → **decided (consultant, C2): shown** on due (Z > 0 or incomplete) and distributing years, not elsewhere, not in the notification (§5.4, AC-39).
 
 ### 14.2 Islamic-consultant
@@ -308,51 +308,53 @@ All of Z-Q1…Z-Q8 are answered in zakat-on-investments.md "Answers to the zakat
 
 Owner: QA. Every AC has a test, named `AC-n …`. **U** = unit (domain: dates, lines, totals, states, log counting, notification scheduling against a fake scheduler) under `test/features/zakat/domain/`. **W** = widget test under `test/features/zakat/presentation/` (en and ar). **I** = `integration_test/` golden path: set cycle date (permission asked) and nisab → Yasmin's lines → open Savings, edit, back → Start distribution → an EGP entry and a USD entry (rate view asked) → settled → history → detail; plus a launch from the notification payload.
 
+Tags: **T** `test/l10n/zakat_story_texts_test.dart` (texts word for word, en); **Q** `test/features/zakat/presentation/year_screen_audit_test.dart` (QA audit of the year screen); **G** `test/golden_path_zakat_widget_test.dart` (headless run of the flow in `integration_test/golden_path_zakat_test.dart`).
+
 | AC | U | W | I |
 |---|---|---|---|
-| 1 | — | cycle date asked per calendar, nothing pre-filled, C1 help text ("Hijri" / "Gregorian months"), past-years line naming "2026" / "1448 AH", 31 Apr refused | ✓ (lunar) |
-| 2 | 1447 AH → 2026-02-18, 1448 AH → 2027-02-08; day 30 → 29 | label "1447 AH"; C3 line | — |
+| 1 | — | cycle date asked per calendar, nothing pre-filled, C1 help text ("Hijri" / "Gregorian months"), past-years line naming "2026" / "1448 AH", 31 Apr refused; **T** | ✓ (lunar) |
+| 2 | 1447 AH → 2026-02-18, 1448 AH → 2027-02-08; day 30 → 29 | label "1447 AH"; C3 line; **T** | — |
 | 3 | solar dates; 29 Feb rule | — | — |
 | 4 | first year (saved before / after the due date); open → due by date; next year from D + 1; due stays | — | — |
 | 5 | lunar ±2; solar −2…0 (2027-10-21 refused); label and next year unchanged; frozen year cannot move | move refused out of range | — |
-| 6 | C2 example: 1448 AH keeps 2027-02-08 and r 2.5 %; next "2027" due 2027-10-20 at 2.577 %; due / distributing kept; cycle-date change → "2028" due 2028-03-01 | "applies from the year after 1448 AH" | — |
+| 6 | C2 example: 1448 AH keeps 2027-02-08 and r 2.5 %; next "2027" due 2027-10-20 at 2.577 %; due / distributing kept; cycle-date change → "2028" due 2028-03-01; a year moved later after the change stays listed, in order; the new cycle starts the day after the later of its computed and moved date | "applies from the year after 1448 AH"; **T** | — |
 | 7 | 425,000.00 / 35,700.00 | nisab asked, nothing pre-selected | ✓ |
-| 8 | incomplete without metal rate | "Add a gold rate…" | — |
-| 9 | full table, Σ, B, Z; Y unused | every line shows its parts and source link | ✓ |
+| 8 | incomplete without metal rate | "Add a gold rate…"; **T** | — |
+| 9 | full table, Σ, B, Z; Y unused | every line shows its parts and source link; **T**; extra lines show share and zakat on the line (**Q**) | ✓ |
 | 10 | 12,885.00 | — | — |
-| 11 | value/rate on or before D; 47.00 case (94,000.00 + 23,500.00 → Σ 517,500.00, B 497,500.00, Z 12,437.50); not cost | "converted at 47.00 on Oct 10, 2026" on both USD lines | — |
+| 11 | value/rate on or before D; 47.00 case (94,000.00 + 23,500.00 → Σ 517,500.00, B 497,500.00, Z 12,437.50); not cost | "converted at 47.00 on Oct 10, 2026" on both USD lines; **T** | — |
 | 12 | incomplete, two lines named | missing-rate text | — |
 | 13 | in/out of the year; 0 % line kept | — | — |
 | 14 | net of H | — | — |
-| 15 | 0 line, B 480,000, Z 12,000.00; PE same | notice with the extra-cash sentence | — |
+| 15 | 0 line, B 480,000, Z 12,000.00; PE same | notice with the extra-cash sentence; **T**; **Q** | — |
 | 16 | unanswered question → incomplete | question named on the line | — |
-| 17 | 100 %, B1/B9; only two kinds; refusals; good-debt statement required; next year empty (domain only) | — | — |
-| 18 | off → 13,000.00; debts > lines → 0 | "not deducted" | — |
+| 17 | 100 %, B1/B9; only two kinds; refusals; good-debt statement required; next year empty (domain only) | **T** | — |
+| 18 | off → 13,000.00; debts > lines → 0 | "not deducted"; **T** | — |
 | 19 | below / at / silver | below-nisab label + A4, A8, Z-4 / C5 lines | — |
-| 20 | no silent answer (incl. rate view); no auto start/recompute/rebuild/delete/entry; only §8 state moves; switch untouched | — | — |
-| 21 | — | line opens item detail; back → 13,000.00 | ✓ |
-| 22 | every figure has a section; [U] flag | links and "source not yet verified"; debts why-text with the long-term-debts dispute; no inflation figure | — |
-| 23 | estimate when open; start guard (state, completeness, empty year) | "Estimate. Your zakat year ends on Oct 20, 2027."; reasons named; no confirm action; "Nothing to count yet." with no verdict | — |
+| 20 | no silent answer (incl. rate view); no auto start/recompute/rebuild/delete/entry; only §8 state moves; switch untouched | **Q** | — |
+| 21 | — | line opens item detail; back → 13,000.00 | ✓ (**G**) |
+| 22 | every figure has a section; [U] flag | links and "source not yet verified"; debts why-text with the long-term-debts dispute; no inflation figure; **T**; **Q** | — |
+| 23 | estimate when open; start guard (state, completeness, empty year) | "Estimate. Your zakat year ends on Oct 20, 2027."; reasons named; no confirm action; "Nothing to count yet." with no verdict | ✓ (**G**) |
 | 24 | frozen after every listed change | deleted line opens nothing; "recompute" message | ✓ (one change) |
 | 25 | recompute → 15,750.00; log kept; remaining 10,750.00 | — | — |
-| 26 | distributed / remaining / auto settled; refusals; delete → distributing; no entry on open/due | log entry, totals, C11 line on settled | ✓ |
+| 26 | distributed / remaining / auto settled; refusals; delete → distributing; no entry on open/due | log entry, totals, C11 line on settled; **T** | ✓ (**G**) |
 | 27 | settled → recompute → distributing, 3,250.00; recompute to 12,000.00 → 500.00 more | — | — |
-| 28 | early entry counted and marked; 2025-10-21 accepted, 2025-10-20 refused; moved 2025-10-18 → 10-19 accepted, 10-18 refused | C6 help line; Maliki clause Source "source not yet verified" | — |
-| 29 | over-distribution, no other year changes | "Given 500.00 more than due." + C7 line | — |
-| 30 | day given 5,000.00 / due date 4,800.00; asked once; change keeps old entries, edit recounts; EGP-only never asked | rate view asked, nothing pre-selected; "counted at 50.00 on Oct 21, 2026" + "not the rate of Oct 22, 2026"; change text | ✓ (USD entry) |
-| 31 | Z = 0 start → below nisab at once | action named "Close this year"; "below nisab: no zakat due", no "settled" alone | — |
-| 32 | order and states | rows in order, medium dates (en), labels per calendar, below-nisab state | ✓ |
-| 33 | — | detail shows every listed part, incl. entry rate and counted amount | ✓ |
+| 28 | early entry counted and marked; 2025-10-21 accepted, 2025-10-20 refused; moved 2025-10-18 → 10-19 accepted, 10-18 refused | C6 help line; Maliki clause Source "source not yet verified"; **T** | — |
+| 29 | over-distribution, no other year changes | "Given 500.00 more than due." + C7 line; **T** | — |
+| 30 | day given 5,000.00 / due date 4,800.00; asked once; change keeps old entries, an edit of amount, currency or date recounts, a note-only edit does not; EGP-only never asked | rate view asked, nothing pre-selected; "counted at 50.00 on Oct 21, 2026" + "not the rate of Oct 22, 2026"; change text; **T**; a note-only edit keeps rate, rate date, view and amount (`gift_sheet_test.dart`) | ✓ (USD entry) (**G**) |
+| 31 | Z = 0 start → below nisab at once | action named "Close this year"; "below nisab: no zakat due", no "settled" alone; **T** | — |
+| 32 | order and states | rows in order, medium dates (en), labels per calendar, below-nisab state | ✓ (**G**) |
+| 33 | — | detail shows every listed part, incl. entry rate and counted amount; **Q** | ✓ (**G**) |
 | 34 | — | no permission on first launch; asked once on first cycle-date save | ✓ |
-| 35 | solar: 2026-10-20 09:00; lunar 1 Ramadan saved 2026-10-23 → 1448 AH, 2027-02-08 09:00; C10 texts; no "is due"; banned words; no network | defaults 0 and 09:00 shown next to the cycle date | — |
-| 36 | — | — | ✓ (payload → year "2026") |
+| 35 | solar: 2026-10-20 09:00; lunar 1 Ramadan saved 2026-10-23 → 1448 AH, 2027-02-08 09:00; C10 texts; no "is due"; banned words; no network | defaults 0 and 09:00 shown next to the cycle date; **T** | — |
+| 36 | — | — | ✓ (payload → year "2026") (**G**) |
 | 37 | reschedule on due-date move, days-before/time change, app start; no move on cycle/calendar change; at most one (none when past or denied) | — | — |
 | 38 | denied → none scheduled, cycle date saved | due text without permission | — |
-| 39 | three due texts by result; gone after start; none for open; "do not delay" line on due Z > 0 / incomplete / distributing only, never in a notification | three texts (en, "Oct 20, 2026" / "Oct 20, 2024"), then two; C2 line and Source where due | — |
-| 40 | N = 3 at 20:30 → 2027-10-17 20:30, "ends on Oct 20, 2027" (en); back to 0 → "ends today"; 0–60 bounds; past fire moment → none | days before 61 / −1 refused | — |
-| 41 | `l10n` word scan, en and ar | C11 line on settled year and log help | — |
-| 42 | missing SAR rate → typed rate stored as manual rate, 2,600.00; due-date view asks for 2026-10-20; never 1:1; year keeps EGP after base change | rate asked before save | — |
-| 43 | Undo → due, live values; not after 10 s or once the log has an entry | one action, no question; Undo offered then gone | — |
+| 39 | three due texts by result; gone after start; none for open; "do not delay" line on due Z > 0 / incomplete / distributing only, never in a notification | three texts (en, "Oct 20, 2026" / "Oct 20, 2024"), then two; C2 line and Source where due; **T**; **Q** | — |
+| 40 | N = 3 at 20:30 → 2027-10-17 20:30, "ends on Oct 20, 2027" (en); back to 0 → "ends today"; 0–60 bounds; past fire moment → none | days before 61 / −1 refused; **T** | — |
+| 41 | `l10n` word scan, en and ar | C11 line on settled year and log help; **Q** | — |
+| 42 | missing SAR rate → typed rate stored as manual rate, 2,600.00; due-date view asks for 2026-10-20; never 1:1; year keeps EGP after base change; a foreign gift with no rate is refused | rate asked before save; recompute after a base change keeps EGP and the log (`year_screen_test.dart`) | — |
+| 43 | Undo → due, live values; not after 10 s or once the log has an entry | one action, no question; Undo offered then gone | ✓ (**G**) |
 | 44 | off → none scheduled (kept off across app start and changes); on → 2027-10-20 09:00 again | setting on by default after permission; due text with it off | — |
-| 45 | value date / rate date before D → date, "not the rate of", note; year stays complete; note gone after a D update | Savings note; USD lines; nisab rate note | — |
-| 46 | first year: 2025-10-21 accepted, 2025-10-20 refused | — | — |
+| 45 | value date / rate date before D → date, "not the rate of", note; year stays complete; note gone after a D update | Savings note; USD lines; nisab rate note; **T**; **Q** | — |
+| 46 | first year: 2025-10-21 accepted, 2025-10-20 refused | **T** | — |

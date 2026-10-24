@@ -6,6 +6,8 @@ import '../../reference/countries.dart';
 import '../../reference/units.dart';
 
 /// A matched pair (AC-9): the rate and the year length are never mixed.
+// WHY: rates and year lengths are fixed pairs, docs/product/shariah/zakat-on-investments.md
+// A1 (2.5 %, lunar) and A2 (2.577 %, solar); never mix them.
 enum ZakatYear {
   lunar('0.025', '354.367'),
   solar('0.02577', '365');

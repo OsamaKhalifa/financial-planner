@@ -1,5 +1,7 @@
 /* Copyright (c) 2026-Present Osama Khalifa. All rights reserved. */
 
+import 'dart:math';
+
 import 'package:decimal/decimal.dart';
 import 'package:financial_planner/core/assumptions/domain/settings.dart';
 import 'package:financial_planner/core/dates.dart';
@@ -90,6 +92,7 @@ ZakatYearRecord frozenRecord(
 
 void main() {
   reminderFireAtTests();
+  moneyProperties();
   group('compute', () {
     test('B is the lines minus the deducted debts, never below 0', () {
       final r = compute(
@@ -356,7 +359,7 @@ void main() {
       final moved = {day(2027, 2, 8): day(2027, 2, 6)};
       final first = yearSlots([lunar], moved, day(2026, 10, 23));
       final from = newCycleFrom(first, day(2026, 10, 23));
-      expect(from, day(2027, 2, 7));
+      expect(from, day(2027, 2, 9));
       final both = yearSlots(
         [
           lunar,
@@ -389,20 +392,39 @@ void main() {
 
     test('validateGift refuses 0, a metal, a date inside the last year and a future date', () {
       final today = day(2026, 10, 23);
-      expect(validateGift(gift('5000', day(2026, 10, 21)), s, today), isEmpty);
-      expect(validateGift(gift('5000', day(2025, 10, 21)), s, today), isEmpty);
-      expect(validateGift(gift('5000', day(2025, 10, 20)), s, today), [
+      expect(
+        validateGift(gift('5000', day(2026, 10, 21)), s, today, egp),
+        isEmpty,
+      );
+      expect(
+        validateGift(gift('5000', day(2025, 10, 21)), s, today, egp),
+        isEmpty,
+      );
+      expect(validateGift(gift('5000', day(2025, 10, 20)), s, today, egp), [
         GiftError.dateTooEarly,
       ]);
-      expect(validateGift(gift('5000', day(2026, 10, 24)), s, today), [
+      expect(validateGift(gift('5000', day(2026, 10, 24)), s, today, egp), [
         GiftError.dateInFuture,
       ]);
-      expect(validateGift(gift('0', day(2026, 10, 21)), s, today), [
+      expect(validateGift(gift('0', day(2026, 10, 21)), s, today, egp), [
         GiftError.amount,
       ]);
-      expect(validateGift(gift('1', day(2026, 10, 21), unit: xauG), s, today), [
-        GiftError.unit,
+      expect(
+        validateGift(gift('1', day(2026, 10, 21), unit: xauG), s, today, egp),
+        [GiftError.unit, GiftError.rate],
+      );
+    });
+
+    test('validateGift refuses a foreign gift with no rate, so counted never sees one', () {
+      final today = day(2026, 10, 23);
+      final on = day(2026, 10, 21);
+      expect(validateGift(gift('10', on, unit: usd), s, today, egp), [
+        GiftError.rate,
       ]);
+      expect(
+        validateGift(gift('10', on, unit: usd, rate: '48'), s, today, egp),
+        isEmpty,
+      );
     });
 
     test('given early means before the real due date', () {
@@ -606,6 +628,19 @@ void main() {
       ));
     });
 
+    test('a move never passes the neighbouring years', () {
+      final c = day(2027, 2, 8);
+      expect(
+        moveBounds(
+          ZakatYear.lunar,
+          c,
+          previousDue: day(2027, 2, 7),
+          nextDue: day(2027, 2, 9),
+        ),
+        (from: day(2027, 2, 8), to: day(2027, 2, 8)),
+      );
+    });
+
     test('outside the Hijri range there is no date', () {
       expect(dueDate(ZakatYear.lunar, 9, 1, 1600), isNull);
     });
@@ -619,5 +654,159 @@ void reminderFireAtTests() {
       DateTime(2027, 10, 17, 20, 30),
     );
     expect(reminderFireAt(day(2027, 3, 1), 5, 540), DateTime(2027, 2, 24, 9));
+  });
+}
+
+/// Property tests for the money rules (QA rule: rounding and the zakat sum).
+/// A fixed seed keeps a failure reproducible; the expected values are worked
+/// out here from the story's formulas, not read from `compute`.
+void moneyProperties() {
+  group('money properties (fixed seed)', () {
+    final rnd = Random(20261023);
+    Decimal cents(int max) => (Decimal.fromInt(rnd.nextInt(max)) / d('100'))
+        .toDecimal(scaleOnInfinitePrecision: 2);
+
+    test('B, the nisab edge and Z follow the story for 600 random years', () {
+      for (var n = 0; n < 600; n++) {
+        final share = [d('0'), d('0.25'), d('1')];
+        final lines = [
+          for (var k = 0; k <= rnd.nextInt(6); k++)
+            line(
+              'l$k',
+              cents(300000000).toString(),
+              share: share[rnd.nextInt(3)].toString(),
+            ),
+        ];
+        final debts = cents(200000000);
+        final deduct = rnd.nextBool();
+        final solar = rnd.nextBool();
+        final metal = rnd.nextBool() ? NisabMetal.gold : NisabMetal.silver;
+        final rate = d('${1 + rnd.nextInt(6000)}');
+        final r = compute(
+          inputs(
+            lines,
+            debts: debts.toString(),
+            deduct: deduct,
+            nisab: metal,
+            metal: rate.toString(),
+            calendar: solar ? ZakatYear.solar : ZakatYear.lunar,
+          ),
+        );
+        var sum = Decimal.zero;
+        for (final l in lines) {
+          sum += l.value * l.share!;
+        }
+        final raw = sum - (deduct ? debts : Decimal.zero);
+        final b = raw < Decimal.zero ? Decimal.zero : raw;
+        final grams = metal == NisabMetal.gold ? 85 : 595;
+        final nisab = Decimal.fromInt(grams) * rate;
+        final rz = solar ? d('0.02577') : d('0.025');
+        final why = 'lines $sum debts $debts deduct $deduct $metal @ $rate';
+        expect(r.linesTotal, sum, reason: why);
+        expect(r.b, b, reason: why);
+        expect(r.b >= Decimal.zero, isTrue, reason: why);
+        expect(r.nisab, nisab, reason: why);
+        expect(
+          r.z,
+          b >= nisab ? (rz * b).round(scale: 2) : d('0'),
+          reason: why,
+        );
+        if (r.z! > Decimal.zero) {
+          expect((r.z! - rz * b).abs() <= d('0.005'), isTrue, reason: why);
+        }
+        if (r.z! > Decimal.zero) {
+          var lineSum = Decimal.zero;
+          for (final l in lines) {
+            lineSum += l.lineZakat(rz)!;
+          }
+          final debtZakat = deduct ? (rz * debts).round(scale: 2) : d('0');
+          final gap = (lineSum - debtZakat - r.z!).abs();
+          expect(
+            gap <= d('0.01') * Decimal.fromInt(lines.length + 1),
+            isTrue,
+            reason: '$why: lines and Z differ by $gap',
+          );
+        }
+      }
+    });
+
+    test('one more cent of wealth never lowers Z, and B = nisab pays', () {
+      for (var n = 0; n < 300; n++) {
+        final base = cents(500000000);
+        final debts = cents(100000000);
+        final rate = d('${1 + rnd.nextInt(6000)}');
+        Decimal? z(Decimal value) => compute(
+          inputs(
+            [line('a', value.toString())],
+            debts: debts.toString(),
+            metal: rate.toString(),
+          ),
+        ).z;
+        final more = base + d('0.01');
+        expect(
+          z(more)! >= z(base)!,
+          isTrue,
+          reason: '$base +0.01 debts $debts',
+        );
+        final exact = Decimal.fromInt(85) * rate + debts;
+        expect(z(exact)! > Decimal.zero, isTrue, reason: 'B = nisab at $rate');
+        expect(z(exact - d('0.01')), d('0'), reason: 'one cent under at $rate');
+      }
+    });
+
+    test(
+      'distributed, remaining and over always add up to Z, for 500 random logs',
+      () {
+        for (var n = 0; n < 500; n++) {
+          final z = cents(300000000);
+          final gifts = [
+            for (var k = 0; k < rnd.nextInt(5); k++)
+              if (rnd.nextBool())
+                Gift(
+                  date: day(2026, 10, 21),
+                  amount: Money(cents(100000000) + d('0.01'), egp),
+                )
+              else
+                Gift(
+                  date: day(2026, 10, 21),
+                  amount: Money(cents(100000) + d('0.01'), usd),
+                  rate: cents(10000) + d('0.01'),
+                ),
+          ];
+          final p = progress(z, gifts, egp);
+          var sum = Decimal.zero;
+          for (final g in gifts) {
+            sum += g.amount.unit == egp
+                ? g.amount.amount
+                : (g.amount.amount * g.rate!).round(scale: 2);
+          }
+          final why = 'Z $z gifts ${gifts.length}';
+          expect(p.distributed, sum, reason: why);
+          expect(p.remaining - p.over, z - sum, reason: why);
+          expect(p.remaining * p.over, d('0'), reason: why);
+          expect(p.remaining >= Decimal.zero && p.over >= Decimal.zero, isTrue);
+        }
+      },
+    );
+
+    test('AC-20 a year nobody started is open or due by date alone, never distributing or settled', () {
+      final s = slot(day(2026, 10, 20));
+      final unstarted = ZakatYearRecord(
+        dueKey: s.key,
+        debts: d('1'),
+        deductDebts: true,
+      );
+      for (var offset = -400; offset <= 800; offset += 7) {
+        final today = day(2026, 10, 20).add(Duration(days: offset));
+        final expected = offset < 0 ? YearState.open : YearState.due;
+        for (final r in [null, unstarted]) {
+          expect(
+            stateOf(s, r, null, Decimal.zero, today),
+            expected,
+            reason: 'offset $offset',
+          );
+        }
+      }
+    });
   });
 }

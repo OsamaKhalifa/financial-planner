@@ -811,6 +811,49 @@ void main() {
       );
 
       testScreen(
+        'AC-42: recompute after a change of the base currency keeps the year in its own base and its log',
+        (tester) async {
+          final h = await pumpYear(
+            tester,
+            locale,
+            seed: (h) async {
+              await seedYasmin(h);
+              await startYears(h, [yasminDue]);
+              await h.zakat.saveGift(yasminDue, gift('2026-10-21', '5000'));
+            },
+          );
+          final l10n = l10nOf(tester);
+          await write(
+            tester,
+            () => h.assumptions.saveSettings(
+              const Settings(
+                baseCurrency: usd,
+                zakatYear: ZakatYear.lunar,
+                zakat: ZakatPrefs(nisab: NisabMetal.gold),
+              ),
+            ),
+          );
+          await writes(tester, [
+            () => h.rate(xauG, usd, '100', yasminDue),
+            () => h.rate(xagG, usd, '1', yasminDue),
+            () => h.rate(egp, usd, '0.02', yasminDue),
+            () => h.investments.saveEntries([
+              value('Savings', day(2026, 10, 18), '200000'),
+            ]),
+          ]);
+          await tapKey(tester, 'recompute');
+          await tapKey(tester, 'recompute-confirm');
+          await settle(tester);
+          expect(tester.takeException(), isNull);
+          expect(
+            textPlain('${l10n.zakatResultDue} 14,500.00 EGP'),
+            findsOneWidget,
+          );
+          expect(textPlain('9,500.00'), findsWidgets);
+        },
+      );
+
+      testScreen(
         'AC-27: a settled year recomputed to more is distributing again, to less it gives more than due',
         (tester) async {
           final h = await pumpYear(

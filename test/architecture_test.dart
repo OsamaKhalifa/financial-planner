@@ -128,7 +128,7 @@ void main() {
     },
   );
 
-  test('ADR-0002 amendment: zakat imports no overview or plan, and only the settings gear from settings', () {
+  test('ADR-0002 amendment: zakat imports no overview or plan', () {
     final bad = violations(
       (p) => p.startsWith('lib/features/zakat/'),
       RegExp(
@@ -137,4 +137,40 @@ void main() {
     );
     expect(bad, isEmpty);
   });
+
+  group(
+    'ADR-0002 amendment: zakat imports from settings only settings_screen.dart',
+    () {
+      final otherSettingsFile = RegExp(
+        r"""(import|export)\s+['"][^'"]*(features/|\.\./)settings/(?!settings_screen\.dart['"])""",
+      );
+
+      test('the pattern catches any other settings file', () {
+        expect(
+          otherSettingsFile.hasMatch("import '../../settings/x.dart';"),
+          isTrue,
+        );
+        expect(
+          otherSettingsFile.hasMatch(
+            "import 'package:financial_planner/features/settings/x.dart';",
+          ),
+          isTrue,
+        );
+        expect(
+          otherSettingsFile.hasMatch(
+            "import '../../settings/settings_screen.dart';",
+          ),
+          isFalse,
+        );
+      });
+
+      test('lib/features/zakat does not', () {
+        final bad = violations(
+          (p) => p.startsWith('lib/features/zakat/'),
+          otherSettingsFile,
+        );
+        expect(bad, isEmpty);
+      });
+    },
+  );
 }

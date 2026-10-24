@@ -40,10 +40,25 @@ DateTime? dueDate(ZakatYear cal, int month, int dayOfMonth, int year) {
 
 /// How far the user may move a computed due date (C3): lunar two days either
 /// way for moon sighting; solar earlier only, since later delays zakat (C2).
-({DateTime from, DateTime to}) moveBounds(ZakatYear cal, DateTime computed) => (
-  from: computed.subtract(const Duration(days: 2)),
-  to: cal == ZakatYear.lunar ? computed.add(const Duration(days: 2)) : computed,
-);
+/// A move never reaches the previous year's real due date or the next year's
+/// (a cycle's first year starts the day after the one before it, C6).
+({DateTime from, DateTime to}) moveBounds(
+  ZakatYear cal,
+  DateTime computed, {
+  DateTime? previousDue,
+  DateTime? nextDue,
+}) {
+  final from = computed.subtract(const Duration(days: 2));
+  final to = cal == ZakatYear.lunar
+      ? computed.add(const Duration(days: 2))
+      : computed;
+  final lowest = previousDue?.add(const Duration(days: 1));
+  final highest = nextDue?.subtract(const Duration(days: 1));
+  return (
+    from: lowest != null && lowest.isAfter(from) ? lowest : from,
+    to: highest != null && highest.isBefore(to) ? highest : to,
+  );
+}
 
 final class YearSlot {
   const YearSlot({
@@ -108,8 +123,8 @@ Iterable<YearSlot> _slotsOf(
     final key = dueDate(c.calendar, c.month, c.day, n);
     if (key == null) return;
     if (key.isBefore(c.from)) continue;
+    if (next != null && !key.isBefore(next)) return;
     final due = moved[key] ?? key;
-    if (next != null && !due.isBefore(next)) return;
     yield YearSlot(
       key: key,
       due: due,
@@ -123,12 +138,16 @@ Iterable<YearSlot> _slotsOf(
   }
 }
 
-/// Where a new calendar or cycle starts: the day after the open year's real
-/// due date, so zakat already due is never pushed later (C2, AC-6). With no
-/// year yet, today (Q-O1).
+/// Where a new calendar or cycle starts: the day after the open year's
+/// computed or real due date, whichever is later, so zakat already due is
+/// never pushed later (C2, AC-6) and a later move of the open year stays
+/// inside its own cycle. With no year yet, today (Q-O1).
 DateTime newCycleFrom(List<YearSlot> slots, DateTime today) {
   final open = slots.where((s) => !s.due.isBefore(today));
-  return open.isEmpty ? today : open.first.due.add(const Duration(days: 1));
+  if (open.isEmpty) return today;
+  final y = open.first;
+  final last = y.due.isAfter(y.key) ? y.due : y.key;
+  return last.add(const Duration(days: 1));
 }
 
 // ------------------------------------------------------------------- state
@@ -157,6 +176,8 @@ YearState stateOf(
 
 Decimal round2(Decimal v) => v.round(scale: 2);
 
+// WHY: nisab grams are fixed by docs/product/shariah/zakat-on-investments.md
+// A3 (gold 85 g, silver 595 g).
 final Decimal _gold = Decimal.fromInt(85);
 final Decimal _silver = Decimal.fromInt(595);
 
@@ -479,16 +500,18 @@ List<ExtraLineError> validateExtra(ExtraLine e) => [
 
 // ------------------------------------------------------------- gifts (§9)
 
-enum GiftError { amount, unit, dateTooEarly, dateInFuture }
+enum GiftError { amount, unit, rate, dateTooEarly, dateInFuture }
 
 /// The first day an entry may carry: the day after the previous year's real
 /// due date, which keeps it inside this year's own hawl (C6).
 DateTime earliestGiftDate(YearSlot s) =>
     s.previousDue.add(const Duration(days: 1));
 
-List<GiftError> validateGift(Gift g, YearSlot s, DateTime today) => [
+/// A gift in another currency carries its rate; [counted] relies on it.
+List<GiftError> validateGift(Gift g, YearSlot s, DateTime today, Unit base) => [
   if (g.amount.amount <= Decimal.zero) GiftError.amount,
   if (g.amount.unit.code.isEmpty || g.amount.unit.isMetal) GiftError.unit,
+  if (g.amount.unit != base && g.rate == null) GiftError.rate,
   if (g.date.isBefore(earliestGiftDate(s))) GiftError.dateTooEarly,
   if (g.date.isAfter(today)) GiftError.dateInFuture,
 ];

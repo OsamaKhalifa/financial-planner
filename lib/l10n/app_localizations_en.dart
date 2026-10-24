@@ -615,8 +615,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Zakat: not set yet — answer the zakat question in this form';
 
   @override
-  String get zakatReasonTrading =>
-      'You hold this to sell. Trade goods pay 2.5 % of market value.';
+  String zakatReasonTrading(String rate) {
+    return 'You hold this to sell. Trade goods pay $rate of market value.';
+  }
 
   @override
   String get zakatReasonSavings => 'Held as savings: zakat on market value.';

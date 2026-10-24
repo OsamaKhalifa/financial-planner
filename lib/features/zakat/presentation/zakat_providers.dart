@@ -145,14 +145,9 @@ class ZakatActions {
     int? reminderDays,
     int? reminderMinute,
   }) async {
-    final slots = _ref.read(zakatYearsProvider)?.map((y) => y.slot).toList();
+    final from = await _newCycleFrom();
     await _settings.saveZakatCycle(
-      ZakatCycle(
-        calendar: calendar,
-        month: month,
-        day: day,
-        from: newCycleFrom(slots ?? const [], _today),
-      ),
+      ZakatCycle(calendar: calendar, month: month, day: day, from: from),
       prefs: (p) => p.copyWith(
         reminderDays: reminderDays,
         reminderMinute: reminderMinute,
@@ -166,6 +161,17 @@ class ZakatActions {
     await _settings.setZakatPrefs((p) => p.copyWith(reminderAsked: true));
     _ref.invalidate(reminderPermittedProvider);
     return !granted;
+  }
+
+  /// A guess from a half-loaded list would start the new cycle on the wrong
+  /// day, so with cycles saved the years must be there.
+  Future<DateTime> _newCycleFrom() async {
+    final cycles = await _ref.read(zakatCyclesProvider.future);
+    final years = _ref.read(zakatYearsProvider);
+    if (years == null && cycles.isNotEmpty) {
+      throw StateError('The zakat years are not loaded yet.');
+    }
+    return newCycleFrom([for (final y in years ?? const []) y.slot], _today);
   }
 
   Future<void> moveDue(YearView v, DateTime to) => _repo.saveYear(
@@ -201,7 +207,7 @@ class ZakatActions {
     return liveInputs(
       v.slot,
       v.record,
-      calc.zakatPosition(v.slot.due),
+      calc.zakatPosition(v.slot.due, inBase: v.record?.frozen?.base),
       rates,
       settings.zakat,
     );
@@ -210,7 +216,11 @@ class ZakatActions {
   Future<void> recompute(YearView v) async =>
       _repo.freeze(v.slot.key, freeze(await liveInputsOf(v), _today));
 
-  Future<void> saveGift(YearView v, Gift g) => _repo.saveGift(v.slot.key, g);
+  Future<void> saveGift(YearView v, Gift g) {
+    final errors = validateGift(g, v.slot, _today, v.inputs.base);
+    if (errors.isNotEmpty) throw StateError('Gift refused: $errors');
+    return _repo.saveGift(v.slot.key, g);
+  }
 
   Future<void> deleteGift(String id) => _repo.deleteGift(id);
 }

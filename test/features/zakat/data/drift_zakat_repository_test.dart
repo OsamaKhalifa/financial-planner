@@ -366,4 +366,23 @@ void main() {
       throwsA(isA<Exception>()),
     );
   });
+
+  test('AC-29 a gift in one year changes no other year: log, start and state stay as they were', () async {
+    final next = day(2027, 10, 20);
+    await repo.freeze(due, frozenYear());
+    await repo.freeze(next, frozenYear());
+    await repo.saveYear(day(2028, 10, 20), debts: d('3'), deductDebts: true);
+    await repo.saveGift(due, gift(id: 'g1', amount: '13000'));
+    final years = {for (final y in await repo.watchYears().first) y.dueKey: y};
+    expect(years[due]!.gifts.map((g) => g.id), ['g1']);
+    expect(years[next]!.gifts, isEmpty);
+    expect(years[next]!.frozen, isNotNull);
+    expect(years[day(2028, 10, 20)]!.gifts, isEmpty);
+    expect(years[day(2028, 10, 20)]!.frozen, isNull);
+    await repo.deleteGift('g1');
+    expect(
+      (await repo.watchYears().first).every((y) => y.gifts.isEmpty),
+      isTrue,
+    );
+  });
 }

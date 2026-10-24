@@ -19,6 +19,7 @@ import '../../investments/presentation/widgets/unit_picker_sheet.dart';
 import '../domain/yearly_zakat.dart';
 import '../domain/zakat_year.dart';
 import 'zakat_labels.dart';
+import 'year_sections.dart';
 import 'zakat_providers.dart';
 import 'zakat_sheets.dart';
 
@@ -61,15 +62,18 @@ class _GiftSheetState extends ConsumerState<_GiftSheet> {
     super.dispose();
   }
 
-  Gift _draft({RateQuote? quote, GivingRateView? view}) => Gift(
-    id: widget.editing?.id,
-    date: _date,
-    amount: Money(parseAmount(_amount.text) ?? Decimal.zero, _unit),
-    rate: quote?.rate,
-    rateDate: quote?.asOf,
-    view: view,
-    note: _note.text.trim().isEmpty ? null : _note.text.trim(),
-  );
+  Money get _money => Money(parseAmount(_amount.text) ?? Decimal.zero, _unit);
+
+  Gift _draft({Decimal? rate, DateTime? rateDate, GivingRateView? view}) =>
+      Gift(
+        id: widget.editing?.id,
+        date: _date,
+        amount: _money,
+        rate: rate,
+        rateDate: rateDate,
+        view: view,
+        note: _note.text.trim().isEmpty ? null : _note.text.trim(),
+      );
 
   GivingRateView? get _view =>
       ref.read(settingsProvider).value?.zakat.givingRateView ?? _picked;
@@ -79,18 +83,34 @@ class _GiftSheetState extends ConsumerState<_GiftSheet> {
     return ref.read(rateBookProvider).value?.quote(_unit, _base, on);
   }
 
+  /// PM-Q5: an edit that leaves amount, currency and date alone keeps the rate
+  /// and view the entry was saved with.
+  bool get _ratesKept {
+    final e = widget.editing;
+    return e != null && e.amount == _money && e.date == _date;
+  }
+
+  Gift _toSave() {
+    final e = widget.editing;
+    if (_ratesKept) {
+      return _draft(rate: e!.rate, rateDate: e.rateDate, view: e.view);
+    }
+    final view = _unit == _base ? null : _view;
+    final quote = view == null ? null : _quote(view);
+    return _draft(rate: quote?.rate, rateDate: quote?.asOf, view: view);
+  }
+
   bool get _blocked {
-    if (_unit == _base) return false;
+    if (_unit == _base || _ratesKept) return false;
     final view = _view;
     return view == null || _quote(view) == null;
   }
 
   Future<void> _save() async {
     final today = ref.read(todayProvider);
-    final foreign = _unit != _base;
-    final view = foreign ? _view : null;
-    final gift = _draft(quote: view == null ? null : _quote(view), view: view);
-    if (validateGift(gift, widget.view.slot, today).isNotEmpty) {
+    final gift = _toSave();
+    final view = gift.view;
+    if (validateGift(gift, widget.view.slot, today, _base).isNotEmpty) {
       return setState(() => _tried = true);
     }
     final nav = Navigator.of(context);
@@ -157,7 +177,7 @@ class _GiftSheetState extends ConsumerState<_GiftSheet> {
     ref.watch(settingsProvider);
     ref.watch(rateBookProvider);
     final draft = _draft();
-    final errors = validateGift(draft, slot, today);
+    final errors = validateGift(draft, slot, today, _base);
     String? error(GiftError e, String text) =>
         errors.contains(e) && (_tried || e != GiftError.amount) ? text : null;
     return SheetBody(
@@ -311,10 +331,19 @@ class _GiftSheetState extends ConsumerState<_GiftSheet> {
     );
   }
 
+  ({Decimal rate, DateTime asOf})? _shown(GivingRateView view) {
+    final stored = _ratesKept ? widget.editing! : null;
+    if (stored?.rate != null) {
+      return (rate: stored!.rate!, asOf: stored.rateDate!);
+    }
+    final live = _quote(view);
+    return live == null ? null : (rate: live.rate, asOf: live.asOf);
+  }
+
   Widget _rateLine(BuildContext context, GivingRateView view) {
     final l10n = context.l10n;
     final on = giftRateDate(view, _draft(), widget.view.slot);
-    final quote = _quote(view);
+    final quote = _shown(view);
     final amount = parseAmount(_amount.text);
     if (quote == null) {
       return Row(
@@ -336,13 +365,20 @@ class _GiftSheetState extends ConsumerState<_GiftSheet> {
     if (amount == null) return const SizedBox.shrink();
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Text(
-        key: const ValueKey('gift-live'),
-        l10n.zakatGiftLive(
-          context.money(round2(amount * quote.rate), _base),
-          context.rateText(quote.rate),
-          context.date(quote.asOf),
-        ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            key: const ValueKey('gift-live'),
+            l10n.zakatGiftLive(
+              context.money(round2(amount * quote.rate), _base),
+              context.rateText(quote.rate),
+              context.date(quote.asOf),
+            ),
+          ),
+          if (quote.asOf.isBefore(on))
+            MarkerRow(l10n.zakatLineNotRateOf(context.date(on))),
+        ],
       ),
     );
   }

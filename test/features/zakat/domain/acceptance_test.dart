@@ -374,6 +374,38 @@ void main() {
         (2028, day(2028, 3, 1)),
       ]);
     });
+
+    test('AC-6 a year moved later after a cycle change stays listed and keeps its order', () {
+      final lunar = ZakatCycle(
+        calendar: ZakatYear.lunar,
+        month: 9,
+        day: 1,
+        from: day(2026, 1, 5),
+      );
+      final from = newCycleFrom(yearSlots([lunar], const {}, today), today);
+      final moved = {day(2027, 2, 8): day(2027, 2, 10)};
+      final after = yearSlots([lunar, solar20Oct(from)], moved, today);
+      expect(after.map((s) => (s.number, s.due)), [
+        (1447, day(2026, 2, 18)),
+        (1448, day(2027, 2, 10)),
+        (2027, day(2027, 10, 20)),
+      ]);
+      expect(earliestGiftDate(after[2]), day(2027, 2, 11));
+    });
+
+    test('AC-6 a new cycle starts the day after a moved open year', () {
+      final lunar = ZakatCycle(
+        calendar: ZakatYear.lunar,
+        month: 9,
+        day: 1,
+        from: day(2026, 1, 5),
+      );
+      final moved = {day(2027, 2, 8): day(2027, 2, 10)};
+      expect(
+        newCycleFrom(yearSlots([lunar], moved, today), today),
+        day(2027, 2, 11),
+      );
+    });
   });
 
   group('Yasmin\'s year (§11)', () {
@@ -1054,12 +1086,14 @@ void main() {
     });
 
     test('AC-26 an entry of 0, or dated 2026-10-24, is refused', () {
-      expect(validateGift(egpGift('0', day(2026, 10, 21)), dueSlot(), today), [
-        GiftError.amount,
-      ]);
-      expect(validateGift(egpGift('1', day(2026, 10, 24)), dueSlot(), today), [
-        GiftError.dateInFuture,
-      ]);
+      expect(
+        validateGift(egpGift('0', day(2026, 10, 21)), dueSlot(), today, egp),
+        [GiftError.amount],
+      );
+      expect(
+        validateGift(egpGift('1', day(2026, 10, 24)), dueSlot(), today, egp),
+        [GiftError.dateInFuture],
+      );
     });
 
     test('AC-27 a settled year recomputed to 15,750.00 is distributing again with 3,250.00 to give', () {
@@ -1112,14 +1146,14 @@ void main() {
         today,
       ).firstWhere((s) => s.number == 2026);
       final early = egpGift('2000', day(2026, 10, 1));
-      expect(validateGift(early, s2026, today), isEmpty);
+      expect(validateGift(early, s2026, today, egp), isEmpty);
       expect(givenEarly(early, s2026), isTrue);
       expect(progress(d('12885'), [early], egp).distributed, d('2000'));
       expect(
-        validateGift(egpGift('1', day(2025, 10, 21)), s2026, today),
+        validateGift(egpGift('1', day(2025, 10, 21)), s2026, today, egp),
         isEmpty,
       );
-      expect(validateGift(egpGift('1', day(2025, 10, 20)), s2026, today), [
+      expect(validateGift(egpGift('1', day(2025, 10, 20)), s2026, today, egp), [
         GiftError.dateTooEarly,
       ]);
     });
@@ -1137,10 +1171,10 @@ void main() {
         today,
       ).firstWhere((s) => s.number == 2026);
       expect(
-        validateGift(egpGift('1', day(2025, 10, 19)), s2026, today),
+        validateGift(egpGift('1', day(2025, 10, 19)), s2026, today, egp),
         isEmpty,
       );
-      expect(validateGift(egpGift('1', day(2025, 10, 18)), s2026, today), [
+      expect(validateGift(egpGift('1', day(2025, 10, 18)), s2026, today, egp), [
         GiftError.dateTooEarly,
       ]);
     });
@@ -1155,11 +1189,11 @@ void main() {
       final slots = yearSlots([cycle], const {}, day(2026, 1, 5));
       expect(slots.map((s) => s.number), [2026]);
       expect(
-        validateGift(egpGift('1', day(2025, 10, 21)), slots.single, today),
+        validateGift(egpGift('1', day(2025, 10, 21)), slots.single, today, egp),
         isEmpty,
       );
       expect(
-        validateGift(egpGift('1', day(2025, 10, 20)), slots.single, today),
+        validateGift(egpGift('1', day(2025, 10, 20)), slots.single, today, egp),
         [GiftError.dateTooEarly],
       );
     });
@@ -1465,6 +1499,114 @@ void main() {
         ),
         isNull,
       );
+    });
+  });
+
+  group('QA audit: figures the story names that no test pinned', () {
+    test('AC-9 zakat on every line and on the debts line adds up to Z, lunar and solar', () {
+      final expected = {
+        ZakatYear.lunar: (
+          lines: {
+            'Savings': '3000.00',
+            'Gold bar': '6250.00',
+            'US shares': '2400.00',
+            'EGX shares': '500.00',
+            'Home': '0.00',
+            'Cash at home': '250.00',
+            'Loan to my brother': '600.00',
+          },
+          debts: '-500.00',
+          z: '12500.00',
+        ),
+        ZakatYear.solar: (
+          lines: {
+            'Savings': '3092.40',
+            'Gold bar': '6442.50',
+            'US shares': '2473.92',
+            'EGX shares': '515.40',
+            'Home': '0.00',
+            'Cash at home': '257.70',
+            'Loan to my brother': '618.48',
+          },
+          debts: '-515.40',
+          z: '12885.00',
+        ),
+      };
+      for (final e in expected.entries) {
+        final y = yasmin(calendar: e.key);
+        final r = y.inputs.calendar.r;
+        var sum = Decimal.zero;
+        for (final l in e.value.lines.entries) {
+          final onLine = lineOf(y.inputs, l.key).lineZakat(r)!;
+          expect(money2(onLine), l.value, reason: '${e.key.name} ${l.key}');
+          sum += onLine;
+        }
+        final onDebts = -round2(r * y.inputs.debts);
+        expect(money2(onDebts), e.value.debts, reason: e.key.name);
+        expect(money2(sum + onDebts), e.value.z, reason: e.key.name);
+        expect(money2(y.result.z!), e.value.z, reason: e.key.name);
+      }
+    });
+
+    test('AC-9 the extra and item lines of Yasmin\'s year carry the units and values of the table', () {
+      final y = yasmin();
+      final table = {
+        'Savings': (egp, '120000', '120000'),
+        'Gold bar': (xauG, '50', '250000'),
+        'US shares': (usd, '2000', '96000'),
+        'EGX shares': (egp, '80000', '80000'),
+        'Home': (egp, '3000000', '3000000'),
+        'Cash at home': (egp, '10000', '10000'),
+        'Loan to my brother': (usd, '500', '24000'),
+      };
+      for (final e in table.entries) {
+        final l = lineOf(y.inputs, e.key);
+        expect(
+          (l.unit, l.value, l.inBase),
+          (e.value.$1, d(e.value.$2), d(e.value.$3)),
+          reason: e.key,
+        );
+      }
+    });
+
+    test('AC-33 a moved due date: every figure uses the moved day, here the 50.00 rate of 2026-10-21', () {
+      final moved = day(2026, 10, 21);
+      final slot = YearSlot(
+        key: due,
+        due: moved,
+        calendar: ZakatYear.lunar,
+        number: 1447,
+        previousDue: day(2025, 10, 9),
+      );
+      final book = RateBook(yasminRates());
+      final calc = PortfolioCalculator(
+        items: yasminItems(),
+        rates: book,
+        inflation: InflationBook(const ShippedInflation(series: {}), const []),
+        settings: const Settings(baseCurrency: egp, zakatYear: ZakatYear.lunar),
+        noZakatYears: const {},
+        today: today,
+      );
+      final i = liveInputs(
+        slot,
+        ZakatYearRecord(
+          dueKey: due,
+          movedDue: moved,
+          debts: d('20000'),
+          deductDebts: true,
+          extras: [cashAtHome(), loan()],
+        ),
+        calc.zakatPosition(moved),
+        book,
+        const ZakatPrefs(nisab: NisabMetal.gold),
+      );
+      final r = compute(i);
+      expect(lineOf(i, 'US shares').inBase, d('100000'));
+      expect(lineOf(i, 'Loan to my brother').inBase, d('25000'));
+      expect(r.linesTotal, d('525000'));
+      expect(r.b, d('505000'));
+      expect(money2(r.z!), '12625.00');
+      expect(i.metalRateDate, due);
     });
   });
 }

@@ -379,7 +379,14 @@ class _MoveDueSheetState extends ConsumerState<_MoveDueSheet> {
     final l10n = context.l10n;
     final slot = widget.view.slot;
     final lunar = slot.calendar == ZakatYear.lunar;
-    final bounds = moveBounds(slot.calendar, slot.key);
+    final years = ref.watch(zakatYearsProvider) ?? const <YearView>[];
+    final next = years.where((y) => y.slot.key.isAfter(slot.key));
+    final bounds = moveBounds(
+      slot.calendar,
+      slot.key,
+      previousDue: slot.previousDue,
+      nextDue: next.isEmpty ? null : next.first.slot.due,
+    );
     final options = [
       for (
         var d = bounds.from;

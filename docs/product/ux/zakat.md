@@ -177,7 +177,7 @@ S2 two-column row (start ≥ 40 %, end ≤ 60 %, empty lines collapse):
 
 #### 2.4.5 Extra lines and debts
 
-- **Extra lines (2)** + **Add line** (open, due). Row: label | amount in base; line 2 own amount + rate if not base; line 3 "Cash not in the list · B1" / "Money owed to me · B9". Tap → Z5. Frozen: read-only.
+- **Extra lines (2)** + **Add line** (open, due). Row: label | amount in base; line 2 own amount + rate if not base; line 3 the same share row as an item line, "100 % of 10,000.00 EGP" | "zakat 250.00" (AC-9: the extra line is at 100 %, B1 / B9); line 4 "Cash not in the list · B1" / "Money owed to me · B9". Tap → Z5. Frozen: read-only.
 - **Debts:** "Debts I must pay within 12 months" | "−20,000.00 EGP"; line 2 "zakat −500.00"; `Switch.adaptive` **Deduct** on its own row (on for a new year, AC-18; off → "not deducted", no minus). Tap amount → Z6. Source A5.
 
 #### 2.4.6 Frozen years (distributing, settled, frozen below nisab)

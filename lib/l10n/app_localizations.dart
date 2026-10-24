@@ -1001,8 +1001,8 @@ abstract class AppLocalizations {
   /// No description provided for @zakatReasonTrading.
   ///
   /// In en, this message translates to:
-  /// **'You hold this to sell. Trade goods pay 2.5 % of market value.'**
-  String get zakatReasonTrading;
+  /// **'You hold this to sell. Trade goods pay {rate} of market value.'**
+  String zakatReasonTrading(String rate);
 
   /// No description provided for @zakatReasonSavings.
   ///

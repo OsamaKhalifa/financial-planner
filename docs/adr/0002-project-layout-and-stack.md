@@ -91,7 +91,7 @@ Material 3 everywhere, with Flutter's `.adaptive` constructors (`Switch.adaptive
 
 ## Amendment 2026-10-24 — feature imports and the settings seam (zakat spec Z1, Z2)
 
-**Rule, as it really is:** a feature may import `features/investments`. `features/investments` never imports another feature, with one exception: `features/settings`. No other feature-to-feature import. `test/architecture_test.dart` enforces it: `lib/features/investments/` imports no `features/(zakat|overview|plan)/`, and `lib/features/zakat/` imports no `features/(overview|plan|settings)/`.
+**Rule, as it really is:** a feature may import `features/investments`. `features/investments` never imports another feature, with one exception: `features/settings`. No other feature-to-feature import. `test/architecture_test.dart` enforces it: `lib/features/investments/` imports no `features/(zakat|overview|plan)/`, and `lib/features/zakat/` imports no `features/(overview|plan)/` and, from `features/settings/`, only `settings_screen.dart` (the gear every tab shows).
 
 **Why:** Overview already imports `features/investments` (11 imports, plus `main.dart` for `AppShell.select`) on `main`, so "never feature → feature" was already broken and untested. The Zakat tab needs `PortfolioCalculator`, `resolve()`, the why sheet, `DateField`, the unit picker, the rate dialog and `ItemDetailScreen`. Writing down what is true and testing it beats a third pattern.
 

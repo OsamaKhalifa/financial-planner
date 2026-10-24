@@ -383,7 +383,6 @@ class _ItemLine extends ConsumerWidget {
   Widget _detail(BuildContext context) {
     final l10n = context.l10n;
     final base = view.inputs.base;
-    final style = Theme.of(context).textTheme.bodySmall;
     if (line.question != null) {
       return _withAction(
         Text(
@@ -406,24 +405,10 @@ class _ItemLine extends ConsumerWidget {
         ),
       );
     }
-    final share = l10n.zakatLineShare(
-      context.percentPlain(line.share!),
-      context.money(line.inBase!, base),
-    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Expanded(child: Text(share, style: style)),
-            Text(
-              l10n.zakatLineZakat(
-                context.amount(line.lineZakat(view.inputs.calendar.r)!),
-              ),
-              style: style,
-            ),
-          ],
-        ),
+        _ShareRow(view: view, line: line),
         if (line.unit != base) _converted(context),
         ..._valueMarker(context),
       ],
@@ -584,6 +569,39 @@ class ExtraLinesSection extends StatelessWidget {
   }
 }
 
+/// The share of a line, the amount it applies to, and the zakat on it.
+class _ShareRow extends StatelessWidget {
+  const _ShareRow({required this.view, required this.line});
+
+  final YearView view;
+  final ZakatLine line;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final style = Theme.of(context).textTheme.bodySmall;
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            l10n.zakatLineShare(
+              context.percentPlain(line.share!),
+              context.money(line.inBase!, view.inputs.base),
+            ),
+            style: style,
+          ),
+        ),
+        Text(
+          l10n.zakatLineZakat(
+            context.amount(line.lineZakat(view.inputs.calendar.r)!),
+          ),
+          style: style,
+        ),
+      ],
+    );
+  }
+}
+
 class _ExtraLine extends StatelessWidget {
   const _ExtraLine({required this.view, required this.line});
 
@@ -626,6 +644,7 @@ class _ExtraLine extends StatelessWidget {
               ],
             ),
             if (line.unit != base) _foreign(context),
+            if (!line.missingRate) _ShareRow(view: view, line: line),
             Row(
               children: [
                 Expanded(
