@@ -640,8 +640,771 @@ class Shape5 extends i0.VersionedTable {
       columnsByName['updated_at']! as i1.GeneratedColumn<int>;
 }
 
+final class Schema3 extends i0.VersionedSchema {
+  Schema3({required super.database}) : super(version: 3);
+  @override
+  late final List<i1.DatabaseSchemaEntity> entities = [
+    investments,
+    historyEntries,
+    rates,
+    inflationOverrides,
+    settings,
+    noZakatYears,
+    zakatCycles,
+    zakatYears,
+    zakatExtraLines,
+    zakatFrozenLines,
+    zakatGifts,
+    historyByInvestmentDate,
+    historyOneValueUpdatePerDay,
+    historyOneSkipPerPlanDate,
+    ratesByPair,
+    zakatExtraLinesByYear,
+    zakatFrozenLinesByYear,
+    zakatGiftsByYearDate,
+  ];
+  late final Shape0 investments = Shape0(
+    source: i0.VersionedTable(
+      entityName: 'investments',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_0,
+        _column_1,
+        _column_2,
+        _column_3,
+        _column_4,
+        _column_5,
+        _column_6,
+        _column_7,
+        _column_8,
+        _column_9,
+        _column_10,
+        _column_11,
+        _column_12,
+        _column_13,
+        _column_14,
+        _column_15,
+        _column_16,
+        _column_17,
+        _column_18,
+        _column_19,
+        _column_20,
+        _column_21,
+        _column_22,
+        _column_23,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape1 historyEntries = Shape1(
+    source: i0.VersionedTable(
+      entityName: 'history_entries',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_0,
+        _column_24,
+        _column_25,
+        _column_26,
+        _column_27,
+        _column_28,
+        _column_22,
+        _column_23,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape2 rates = Shape2(
+    source: i0.VersionedTable(
+      entityName: 'rates',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'PRIMARY KEY(id)',
+        'UNIQUE(from_unit, to_unit, as_of, source)',
+      ],
+      columns: [
+        _column_0,
+        _column_29,
+        _column_30,
+        _column_31,
+        _column_32,
+        _column_33,
+        _column_22,
+        _column_23,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape3 inflationOverrides = Shape3(
+    source: i0.VersionedTable(
+      entityName: 'inflation_overrides',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)', 'UNIQUE(country, year)'],
+      columns: [
+        _column_0,
+        _column_34,
+        _column_35,
+        _column_31,
+        _column_22,
+        _column_23,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape6 settings = Shape6(
+    source: i0.VersionedTable(
+      entityName: 'settings',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_0,
+        _column_36,
+        _column_37,
+        _column_38,
+        _column_39,
+        _column_40,
+        _column_41,
+        _column_42,
+        _column_43,
+        _column_44,
+        _column_45,
+        _column_46,
+        _column_22,
+        _column_23,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape5 noZakatYears = Shape5(
+    source: i0.VersionedTable(
+      entityName: 'no_zakat_years',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)', 'UNIQUE(year)'],
+      columns: [_column_0, _column_35, _column_22, _column_23],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape7 zakatCycles = Shape7(
+    source: i0.VersionedTable(
+      entityName: 'zakat_cycles',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)', 'UNIQUE(from_date)'],
+      columns: [
+        _column_0,
+        _column_47,
+        _column_48,
+        _column_49,
+        _column_50,
+        _column_22,
+        _column_23,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape8 zakatYears = Shape8(
+    source: i0.VersionedTable(
+      entityName: 'zakat_years',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)', 'UNIQUE(due_key)'],
+      columns: [
+        _column_0,
+        _column_51,
+        _column_52,
+        _column_53,
+        _column_54,
+        _column_55,
+        _column_56,
+        _column_57,
+        _column_58,
+        _column_59,
+        _column_22,
+        _column_23,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape9 zakatExtraLines = Shape9(
+    source: i0.VersionedTable(
+      entityName: 'zakat_extra_lines',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_0,
+        _column_60,
+        _column_61,
+        _column_25,
+        _column_27,
+        _column_6,
+        _column_62,
+        _column_22,
+        _column_23,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape10 zakatFrozenLines = Shape10(
+    source: i0.VersionedTable(
+      entityName: 'zakat_frozen_lines',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_0,
+        _column_60,
+        _column_63,
+        _column_33,
+        _column_64,
+        _column_1,
+        _column_6,
+        _column_65,
+        _column_66,
+        _column_67,
+        _column_68,
+        _column_69,
+        _column_70,
+        _column_71,
+        _column_72,
+        _column_73,
+        _column_22,
+        _column_23,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape11 zakatGifts = Shape11(
+    source: i0.VersionedTable(
+      entityName: 'zakat_gifts',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_0,
+        _column_60,
+        _column_26,
+        _column_27,
+        _column_6,
+        _column_68,
+        _column_69,
+        _column_74,
+        _column_75,
+        _column_22,
+        _column_23,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  final i1.Index historyByInvestmentDate = i1.Index(
+    'history_by_investment_date',
+    'CREATE INDEX history_by_investment_date ON history_entries (investment_id, date)',
+  );
+  final i1.Index historyOneValueUpdatePerDay = i1.Index(
+    'history_one_value_update_per_day',
+    'CREATE UNIQUE INDEX history_one_value_update_per_day ON history_entries (investment_id, date) WHERE kind = \'value_update\'',
+  );
+  final i1.Index historyOneSkipPerPlanDate = i1.Index(
+    'history_one_skip_per_plan_date',
+    'CREATE UNIQUE INDEX history_one_skip_per_plan_date ON history_entries (investment_id, kind, date) WHERE kind IN (\'payout_skipped\', \'value_skipped\')',
+  );
+  final i1.Index ratesByPair = i1.Index(
+    'rates_by_pair',
+    'CREATE INDEX rates_by_pair ON rates (from_unit, to_unit, as_of)',
+  );
+  final i1.Index zakatExtraLinesByYear = i1.Index(
+    'zakat_extra_lines_by_year',
+    'CREATE INDEX zakat_extra_lines_by_year ON zakat_extra_lines (year_id)',
+  );
+  final i1.Index zakatFrozenLinesByYear = i1.Index(
+    'zakat_frozen_lines_by_year',
+    'CREATE INDEX zakat_frozen_lines_by_year ON zakat_frozen_lines (year_id, position)',
+  );
+  final i1.Index zakatGiftsByYearDate = i1.Index(
+    'zakat_gifts_by_year_date',
+    'CREATE INDEX zakat_gifts_by_year_date ON zakat_gifts (year_id, date)',
+  );
+}
+
+class Shape6 extends i0.VersionedTable {
+  Shape6({required super.source, required super.alias}) : super.aliased();
+  i1.GeneratedColumn<String> get id =>
+      columnsByName['id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get baseCurrency =>
+      columnsByName['base_currency']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get homeInflation =>
+      columnsByName['home_inflation']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get zakatYear =>
+      columnsByName['zakat_year']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get longTermMethod =>
+      columnsByName['long_term_method']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get jewelleryZakatable =>
+      columnsByName['jewellery_zakatable']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<String> get nisabMetal =>
+      columnsByName['nisab_metal']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get reminderOn =>
+      columnsByName['reminder_on']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get reminderDays =>
+      columnsByName['reminder_days']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get reminderMinute =>
+      columnsByName['reminder_minute']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get reminderAsked =>
+      columnsByName['reminder_asked']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<String> get givingRateView =>
+      columnsByName['giving_rate_view']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get createdAt =>
+      columnsByName['created_at']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get updatedAt =>
+      columnsByName['updated_at']! as i1.GeneratedColumn<int>;
+}
+
+i1.GeneratedColumn<String> _column_41(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'nisab_metal',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NULL',
+    );
+i1.GeneratedColumn<int> _column_42(String aliasedName) =>
+    i1.GeneratedColumn<int>(
+      'reminder_on',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.int,
+      $customConstraints: 'NOT NULL DEFAULT 1 CHECK (reminder_on IN (0, 1))',
+      defaultValue: const i1.CustomExpression('1'),
+    );
+i1.GeneratedColumn<int> _column_43(String aliasedName) =>
+    i1.GeneratedColumn<int>(
+      'reminder_days',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.int,
+      $customConstraints: 'NOT NULL DEFAULT 0',
+      defaultValue: const i1.CustomExpression('0'),
+    );
+i1.GeneratedColumn<int> _column_44(String aliasedName) =>
+    i1.GeneratedColumn<int>(
+      'reminder_minute',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.int,
+      $customConstraints: 'NOT NULL DEFAULT 540',
+      defaultValue: const i1.CustomExpression('540'),
+    );
+i1.GeneratedColumn<int> _column_45(String aliasedName) =>
+    i1.GeneratedColumn<int>(
+      'reminder_asked',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.int,
+      $customConstraints: 'NOT NULL DEFAULT 0 CHECK (reminder_asked IN (0, 1))',
+      defaultValue: const i1.CustomExpression('0'),
+    );
+i1.GeneratedColumn<String> _column_46(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'giving_rate_view',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NULL',
+    );
+
+class Shape7 extends i0.VersionedTable {
+  Shape7({required super.source, required super.alias}) : super.aliased();
+  i1.GeneratedColumn<String> get id =>
+      columnsByName['id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get calendar =>
+      columnsByName['calendar']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get month =>
+      columnsByName['month']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get day =>
+      columnsByName['day']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<String> get fromDate =>
+      columnsByName['from_date']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get createdAt =>
+      columnsByName['created_at']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get updatedAt =>
+      columnsByName['updated_at']! as i1.GeneratedColumn<int>;
+}
+
+i1.GeneratedColumn<String> _column_47(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'calendar',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NOT NULL',
+    );
+i1.GeneratedColumn<int> _column_48(String aliasedName) =>
+    i1.GeneratedColumn<int>(
+      'month',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.int,
+      $customConstraints: 'NOT NULL',
+    );
+i1.GeneratedColumn<int> _column_49(String aliasedName) =>
+    i1.GeneratedColumn<int>(
+      'day',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.int,
+      $customConstraints: 'NOT NULL',
+    );
+i1.GeneratedColumn<String> _column_50(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'from_date',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NOT NULL',
+    );
+
+class Shape8 extends i0.VersionedTable {
+  Shape8({required super.source, required super.alias}) : super.aliased();
+  i1.GeneratedColumn<String> get id =>
+      columnsByName['id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get dueKey =>
+      columnsByName['due_key']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get movedDue =>
+      columnsByName['moved_due']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get debts =>
+      columnsByName['debts']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get deductDebts =>
+      columnsByName['deduct_debts']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<String> get startedOn =>
+      columnsByName['started_on']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get frozenBase =>
+      columnsByName['frozen_base']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get frozenNisabMetal =>
+      columnsByName['frozen_nisab_metal']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get frozenMetalRate =>
+      columnsByName['frozen_metal_rate']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get frozenMetalRateDate =>
+      columnsByName['frozen_metal_rate_date']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get createdAt =>
+      columnsByName['created_at']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get updatedAt =>
+      columnsByName['updated_at']! as i1.GeneratedColumn<int>;
+}
+
+i1.GeneratedColumn<String> _column_51(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'due_key',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NOT NULL',
+    );
+i1.GeneratedColumn<String> _column_52(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'moved_due',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NULL',
+    );
+i1.GeneratedColumn<String> _column_53(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'debts',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NOT NULL DEFAULT \'0\'',
+      defaultValue: const i1.CustomExpression('\'0\''),
+    );
+i1.GeneratedColumn<int> _column_54(String aliasedName) =>
+    i1.GeneratedColumn<int>(
+      'deduct_debts',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.int,
+      $customConstraints: 'NOT NULL DEFAULT 1 CHECK (deduct_debts IN (0, 1))',
+      defaultValue: const i1.CustomExpression('1'),
+    );
+i1.GeneratedColumn<String> _column_55(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'started_on',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NULL',
+    );
+i1.GeneratedColumn<String> _column_56(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'frozen_base',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NULL',
+    );
+i1.GeneratedColumn<String> _column_57(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'frozen_nisab_metal',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NULL',
+    );
+i1.GeneratedColumn<String> _column_58(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'frozen_metal_rate',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NULL',
+    );
+i1.GeneratedColumn<String> _column_59(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'frozen_metal_rate_date',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NULL',
+    );
+
+class Shape9 extends i0.VersionedTable {
+  Shape9({required super.source, required super.alias}) : super.aliased();
+  i1.GeneratedColumn<String> get id =>
+      columnsByName['id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get yearId =>
+      columnsByName['year_id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get label =>
+      columnsByName['label']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get kind =>
+      columnsByName['kind']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get amount =>
+      columnsByName['amount']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get unit =>
+      columnsByName['unit']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get goodDebtConfirmed =>
+      columnsByName['good_debt_confirmed']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get createdAt =>
+      columnsByName['created_at']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get updatedAt =>
+      columnsByName['updated_at']! as i1.GeneratedColumn<int>;
+}
+
+i1.GeneratedColumn<String> _column_60(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'year_id',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.string,
+      $customConstraints:
+          'NOT NULL REFERENCES zakat_years(id)ON DELETE CASCADE',
+    );
+i1.GeneratedColumn<String> _column_61(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'label',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NOT NULL',
+    );
+i1.GeneratedColumn<int> _column_62(String aliasedName) =>
+    i1.GeneratedColumn<int>(
+      'good_debt_confirmed',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.int,
+      $customConstraints: 'NOT NULL CHECK (good_debt_confirmed IN (0, 1))',
+    );
+
+class Shape10 extends i0.VersionedTable {
+  Shape10({required super.source, required super.alias}) : super.aliased();
+  i1.GeneratedColumn<String> get id =>
+      columnsByName['id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get yearId =>
+      columnsByName['year_id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get position =>
+      columnsByName['position']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<String> get source =>
+      columnsByName['source']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get refId =>
+      columnsByName['ref_id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get name =>
+      columnsByName['name']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get unit =>
+      columnsByName['unit']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get value =>
+      columnsByName['value']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get heldInterest =>
+      columnsByName['held_interest']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get valueDate =>
+      columnsByName['value_date']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get rate =>
+      columnsByName['rate']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get rateDate =>
+      columnsByName['rate_date']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get share =>
+      columnsByName['share']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get section =>
+      columnsByName['section']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get notice =>
+      columnsByName['notice']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get extraKind =>
+      columnsByName['extra_kind']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get createdAt =>
+      columnsByName['created_at']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get updatedAt =>
+      columnsByName['updated_at']! as i1.GeneratedColumn<int>;
+}
+
+i1.GeneratedColumn<int> _column_63(String aliasedName) =>
+    i1.GeneratedColumn<int>(
+      'position',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.int,
+      $customConstraints: 'NOT NULL',
+    );
+i1.GeneratedColumn<String> _column_64(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'ref_id',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NULL',
+    );
+i1.GeneratedColumn<String> _column_65(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'value',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NOT NULL',
+    );
+i1.GeneratedColumn<String> _column_66(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'held_interest',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NOT NULL',
+    );
+i1.GeneratedColumn<String> _column_67(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'value_date',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NULL',
+    );
+i1.GeneratedColumn<String> _column_68(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'rate',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NULL',
+    );
+i1.GeneratedColumn<String> _column_69(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'rate_date',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NULL',
+    );
+i1.GeneratedColumn<String> _column_70(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'share',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NOT NULL',
+    );
+i1.GeneratedColumn<String> _column_71(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'section',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NOT NULL',
+    );
+i1.GeneratedColumn<String> _column_72(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'notice',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NULL',
+    );
+i1.GeneratedColumn<String> _column_73(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'extra_kind',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NULL',
+    );
+
+class Shape11 extends i0.VersionedTable {
+  Shape11({required super.source, required super.alias}) : super.aliased();
+  i1.GeneratedColumn<String> get id =>
+      columnsByName['id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get yearId =>
+      columnsByName['year_id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get date =>
+      columnsByName['date']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get amount =>
+      columnsByName['amount']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get unit =>
+      columnsByName['unit']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get rate =>
+      columnsByName['rate']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get rateDate =>
+      columnsByName['rate_date']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get rateView =>
+      columnsByName['rate_view']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get note =>
+      columnsByName['note']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get createdAt =>
+      columnsByName['created_at']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get updatedAt =>
+      columnsByName['updated_at']! as i1.GeneratedColumn<int>;
+}
+
+i1.GeneratedColumn<String> _column_74(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'rate_view',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NULL',
+    );
+i1.GeneratedColumn<String> _column_75(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'note',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NULL',
+    );
 i0.MigrationStepWithVersion migrationSteps({
   required Future<void> Function(i1.Migrator m, Schema2 schema) from1To2,
+  required Future<void> Function(i1.Migrator m, Schema3 schema) from2To3,
 }) {
   return (currentVersion, database) async {
     switch (currentVersion) {
@@ -650,6 +1413,11 @@ i0.MigrationStepWithVersion migrationSteps({
         final migrator = i1.Migrator(database, schema);
         await from1To2(migrator, schema);
         return 2;
+      case 2:
+        final schema = Schema3(database: database);
+        final migrator = i1.Migrator(database, schema);
+        await from2To3(migrator, schema);
+        return 3;
       default:
         throw ArgumentError.value('Unknown migration from $currentVersion');
     }
@@ -658,6 +1426,7 @@ i0.MigrationStepWithVersion migrationSteps({
 
 i1.OnUpgrade stepByStep({
   required Future<void> Function(i1.Migrator m, Schema2 schema) from1To2,
+  required Future<void> Function(i1.Migrator m, Schema3 schema) from2To3,
 }) => i0.VersionedSchema.stepByStepHelper(
-  step: migrationSteps(from1To2: from1To2),
+  step: migrationSteps(from1To2: from1To2, from2To3: from2To3),
 );

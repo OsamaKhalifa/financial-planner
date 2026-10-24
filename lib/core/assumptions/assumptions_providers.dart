@@ -35,6 +35,10 @@ final settingsProvider = StreamProvider<Settings>(
   (ref) => ref.watch(assumptionsRepositoryProvider).watchSettings(),
 );
 
+final zakatCyclesProvider = StreamProvider<List<ZakatCycle>>(
+  (ref) => ref.watch(assumptionsRepositoryProvider).watchZakatCycles(),
+);
+
 final noZakatYearsProvider = StreamProvider<Set<int>>(
   (ref) => ref.watch(assumptionsRepositoryProvider).watchNoZakatYears(),
 );

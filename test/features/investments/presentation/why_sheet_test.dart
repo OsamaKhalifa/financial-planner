@@ -1,6 +1,10 @@
 /* Copyright (c) 2026-Present Osama Khalifa. All rights reserved. */
 
+import 'package:financial_planner/features/investments/domain/investment.dart';
+import 'package:financial_planner/features/investments/presentation/why_builders.dart';
 import 'package:financial_planner/features/investments/presentation/why_sheet.dart';
+import 'package:financial_planner/l10n/app_localizations_ar.dart';
+import 'package:financial_planner/l10n/app_localizations_en.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -89,4 +93,59 @@ void main() {
       });
     });
   }
+
+  group('AC-22 zakatSource for a yearly-zakat section is that section alone', () {
+    for (final l10n in [AppLocalizationsEn(), AppLocalizationsAr()]) {
+      test(
+        '${l10n.localeName}: A3..A8, B9, C1..C11 and Z4 each have their own text',
+        () {
+          final texts = {
+            'A3': l10n.src_A3,
+            'A4': l10n.src_A4,
+            'A5': l10n.src_A5,
+            'A7': l10n.src_A7,
+            'A8': l10n.src_A8,
+            'B9': l10n.src_B9,
+            'C1': l10n.src_C1,
+            'C2': l10n.src_C2,
+            'C3': l10n.src_C3,
+            'C4': l10n.src_C4,
+            'C5': l10n.src_C5,
+            'C6': l10n.src_C6,
+            'C7': l10n.src_C7,
+            'C8': l10n.src_C8,
+            'C9': l10n.src_C9,
+            'C10': l10n.src_C10,
+            'C11': l10n.src_C11,
+            'Z4': l10n.src_Z4,
+          };
+          for (final e in texts.entries) {
+            expect(zakatSource(l10n, e.key), e.value, reason: e.key);
+            expect(e.value, isNotEmpty);
+          }
+          expect(texts.values.toSet().length, texts.length);
+        },
+      );
+    }
+
+    test(
+      'an item section still starts with the rate rule, and B7 is now known',
+      () {
+        final l10n = AppLocalizationsEn();
+        expect(zakatSource(l10n, 'B1'), '${l10n.src_A1A2}\n\n${l10n.src_B1}');
+        expect(zakatSource(l10n, 'B7'), '${l10n.src_A1A2}\n\n${l10n.src_B7}');
+        expect(
+          zakatSource(l10n, 'B5', type: AssetType.other),
+          contains(l10n.src_B7),
+        );
+      },
+    );
+
+    test('C6 marks the Maliki clause and C1/C3 mark their readings as not yet verified', () {
+      final l10n = AppLocalizationsEn();
+      expect(l10n.src_C6, contains('Maliki'));
+      expect(l10n.src_C6, contains('not yet verified'));
+      expect(l10n.src_C3, contains('not yet verified'));
+    });
+  });
 }

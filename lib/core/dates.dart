@@ -1,5 +1,7 @@
 /* Copyright (c) 2026-Present Osama Khalifa. All rights reserved. */
 
+import 'package:hijri/hijri_calendar.dart';
+
 DateTime day(int year, int month, int dayOfMonth) =>
     DateTime.utc(year, month, dayOfMonth);
 
@@ -28,4 +30,28 @@ DateTime addMonths(DateTime start, int months) {
   return start.day > last.day
       ? last
       : DateTime.utc(start.year, start.month + months, start.day);
+}
+
+/// Umm al-Qura (ADR-0007). The package covers 1356-1500 AH and throws
+/// [ArgumentError] outside it; a date it cannot convert is null.
+DateTime? hijriToDate(int y, int m, int d) {
+  try {
+    final g = HijriCalendar().hijriToGregorian(y, m, d);
+    return DateTime.utc(g.year, g.month, g.day);
+  } on ArgumentError {
+    return null;
+  }
+}
+
+int? hijriMonthLength(int y, int m) {
+  try {
+    return HijriCalendar().getDaysInMonth(y, m);
+  } on ArgumentError {
+    return null;
+  }
+}
+
+({int y, int m, int d}) hijriOf(DateTime date) {
+  final h = HijriCalendar.fromDate(DateTime(date.year, date.month, date.day));
+  return (y: h.hYear, m: h.hMonth, d: h.hDay);
 }

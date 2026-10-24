@@ -6,7 +6,11 @@ import 'package:financial_planner/core/assumptions/data/rate_refresher.dart';
 import 'package:financial_planner/core/clock_provider.dart';
 import 'package:financial_planner/core/db/app_database.dart';
 import 'package:financial_planner/core/db/database_provider.dart';
+import 'package:financial_planner/core/dates.dart';
 import 'package:financial_planner/features/investments/presentation/investments_providers.dart';
+import 'package:financial_planner/features/zakat/presentation/zakat_providers.dart';
+import 'package:financial_planner/features/zakat/presentation/zakat_settings_section.dart';
+import 'package:financial_planner/core/assumptions/domain/settings.dart';
 import 'package:financial_planner/l10n/app_localizations.dart';
 import 'package:financial_planner/main.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +19,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 
+import 'fake_year_end_reminder.dart';
+import 'zakat_ui.dart' show pickCycleDate;
+
 /// The whole story through the real app, with a fixed clock and a fake
 /// network (spec §8, phase 5):
 ///
@@ -22,6 +29,9 @@ import 'package:http/testing.dart';
 /// 16 Apr 2026  record 4,000 money in
 /// 30 Apr 2026  Update all (fake refresh) with Fund A worth 14,500
 ///              April view: return 4.21 %, set-aside 30.69 (AC-12, AC-14)
+/// 30 Apr 2026  zakat: nisab gold, lunar cycle date ending 3 May (permission asked)
+///  3 May 2026  the year is due; open Fund A, record 1,000,000, Zakat is 25,000.00;
+///              start distribution, log 10,000 and 15,000: settled
 ///
 /// Each "day" restarts the app on the same database, as a user would.
 Future<void> runGoldenPath(WidgetTester tester) async {
@@ -33,6 +43,7 @@ Future<void> runGoldenPath(WidgetTester tester) async {
   final db = AppDatabase(NativeDatabase.memory());
   final requests = <http.BaseRequest>[];
   var now = DateTime(2026, 3, 31, 9);
+  final reminder = FakeYearEndReminder();
 
   Future<void> startApp() async {
     await tester.pumpWidget(
@@ -41,6 +52,10 @@ Future<void> runGoldenPath(WidgetTester tester) async {
         overrides: [
           appDatabaseProvider.overrideWithValue(db),
           clockProvider.overrideWithValue(() => now),
+          yearEndReminderProvider.overrideWithValue(reminder),
+          zakatSettingsSectionProvider.overrideWithValue(
+            zakatSettingsSectionBuilder,
+          ),
           httpClientProvider.overrideWithValue(
             MockClient((r) async {
               requests.add(r);
@@ -142,6 +157,66 @@ Future<void> runGoldenPath(WidgetTester tester) async {
   expect(shows('−30.69 EGP'), findsOneWidget);
   expect(find.text(l10n().setAsideNote), findsOneWidget);
 
+  // 30 April: the zakat tab asks nisab and cycle date, then the reminder.
+  await startApp();
+  await tapText(l10n().tabZakat);
+  expect(find.text(l10n().zakatSetupNisabTitle), findsOneWidget);
+  await tapKey('nisab-gold');
+  await tapKey('setup-next');
+  final dueOn = day(2026, 5, 3);
+  final hijri = hijriOf(dueOn);
+  expect(reminder.permissionRequests, 0);
+  await pickCycleDate(
+    tester,
+    const Locale('en'),
+    ZakatYear.lunar,
+    hijri.m,
+    hijri.d,
+  );
+  await tapKey('setup-next');
+  await tapKey('setup-next');
+  expect(reminder.permissionRequests, 1);
+  expect(reminder.pending!.fireAt, DateTime(2026, 5, 3, 9));
+  expect(find.byKey(const ValueKey('result-card')), findsOneWidget);
+
+  // 3 May: the year is due. Fund A is far below nisab until it is updated.
+  now = DateTime(2026, 5, 3, 9);
+  await startApp();
+  await tapText(l10n().tabZakat);
+  final yearLabel = l10n().zakatYearLabel('lunar', '${hijri.y}');
+  expect(find.text(l10n().zakatResultBelow), findsOneWidget);
+  await tapText('Fund A');
+  await tapText(l10n().record);
+  await enter(inKey('record-amount'), '1000000');
+  await tapKey('record-save');
+  tester.state<NavigatorState>(find.byType(Navigator)).pop();
+  await tester.pumpAndSettle();
+  expect(
+    plain(tester.widget<Text>(find.byKey(const ValueKey('zakat-due'))).data!),
+    '25,000.00 EGP',
+  );
+
+  await tapKey('start-year');
+  expect(find.text(l10n().zakatStartedSnack(yearLabel)), findsOneWidget);
+  // The snack bar sits over the button for its 10 seconds; Undo ends with it.
+  await tester.pump(const Duration(seconds: 1));
+  await tester.pump(const Duration(seconds: 11));
+  await tester.pumpAndSettle();
+  expect(find.text(l10n().undo), findsNothing);
+  await tapKey('add-gift');
+  await enter(inKey('gift-amount'), '10000');
+  await tapKey('gift-save');
+  await tapKey('add-gift');
+  await enter(inKey('gift-amount'), '15000');
+  await tapKey('gift-save');
+  expect(
+    plain(tester.widget<Text>(find.byKey(const ValueKey('settled'))).data!),
+    l10n().zakatState('settled'),
+  );
+  expect(find.byKey(const ValueKey('c11-line')), findsOneWidget);
+  await tapKey('zakat-history');
+  expect(find.byKey(ValueKey('history-${yearKeyOf(dueOn)}')), findsOneWidget);
+
   // The only network call of the whole story was the one the user asked for.
   expect(requests.length, 1);
   expect(requests.single.method, 'GET');
@@ -161,3 +236,5 @@ Future<String> _firstItemId(WidgetTester tester) async {
   );
   return items!.single.investment.id;
 }
+
+String yearKeyOf(DateTime d) => d.toIso8601String().substring(0, 10);

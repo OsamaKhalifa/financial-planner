@@ -1,5 +1,6 @@
 /* Copyright (c) 2026-Present Osama Khalifa. All rights reserved. */
 
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/assumptions/assumptions_providers.dart';
@@ -27,6 +28,10 @@ final investmentsRepositoryProvider = Provider<InvestmentsRepository>(
 final investmentsProvider = StreamProvider<List<InvestmentWithHistory>>(
   (ref) => ref.watch(investmentsRepositoryProvider).watchAll(),
 );
+
+/// ADR-0002 amendment (Z2): `main.dart` overrides it with the zakat feature's
+/// section; S8 shows it in place of its own zakat-year radio.
+final zakatSettingsSectionProvider = Provider<WidgetBuilder?>((ref) => null);
 
 final todayProvider = Provider<DateTime>(
   (ref) => today(ref.watch(clockProvider)),
@@ -176,6 +181,25 @@ class SettingsActions {
   Future<void> setJewellery({required bool zakatable}) =>
       _update((o) => _with(o, jewelleryZakatable: zakatable, keepMethod: true));
 
+  Future<void> setZakatPrefs(ZakatPrefs Function(ZakatPrefs old) change) =>
+      _update((o) => _with(o, zakat: change(o.zakat), keepMethod: true));
+
+  /// The calendar and the cycle are saved together (Z6): the year setting is
+  /// not changed until a cycle date is given.
+  Future<void> saveZakatCycle(
+    ZakatCycle cycle, {
+    ZakatPrefs Function(ZakatPrefs old)? prefs,
+  }) async {
+    final old = await _ref.read(settingsProvider.future);
+    final next = _with(
+      old,
+      zakatYear: cycle.calendar,
+      zakat: prefs?.call(old.zakat),
+      keepMethod: true,
+    );
+    await _ref.read(assumptionsRepositoryProvider).saveZakatCycle(next, cycle);
+  }
+
   Future<void> saveSettings(Settings s) =>
       _ref.read(assumptionsRepositoryProvider).saveSettings(s);
 }
@@ -187,6 +211,7 @@ Settings _with(
   ZakatYear? zakatYear,
   LongTermMethod? longTermMethod,
   bool? jewelleryZakatable,
+  ZakatPrefs? zakat,
   bool keepMethod = false,
   bool clearHome = false,
 }) => Settings(
@@ -195,4 +220,5 @@ Settings _with(
   zakatYear: zakatYear ?? s.zakatYear,
   longTermMethod: keepMethod ? s.longTermMethod : longTermMethod,
   jewelleryZakatable: jewelleryZakatable ?? s.jewelleryZakatable,
+  zakat: zakat ?? s.zakat,
 );

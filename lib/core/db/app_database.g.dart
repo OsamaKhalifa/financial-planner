@@ -2894,6 +2894,82 @@ class $AppSettingsTable extends AppSettings
       'CHECK ("jewellery_zakatable" IN (0, 1))',
     ),
   );
+  static const VerificationMeta _nisabMetalMeta = const VerificationMeta(
+    'nisabMetal',
+  );
+  @override
+  late final GeneratedColumn<String> nisabMetal = GeneratedColumn<String>(
+    'nisab_metal',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _reminderOnMeta = const VerificationMeta(
+    'reminderOn',
+  );
+  @override
+  late final GeneratedColumn<bool> reminderOn = GeneratedColumn<bool>(
+    'reminder_on',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("reminder_on" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _reminderDaysMeta = const VerificationMeta(
+    'reminderDays',
+  );
+  @override
+  late final GeneratedColumn<int> reminderDays = GeneratedColumn<int>(
+    'reminder_days',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _reminderMinuteMeta = const VerificationMeta(
+    'reminderMinute',
+  );
+  @override
+  late final GeneratedColumn<int> reminderMinute = GeneratedColumn<int>(
+    'reminder_minute',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(540),
+  );
+  static const VerificationMeta _reminderAskedMeta = const VerificationMeta(
+    'reminderAsked',
+  );
+  @override
+  late final GeneratedColumn<bool> reminderAsked = GeneratedColumn<bool>(
+    'reminder_asked',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("reminder_asked" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _givingRateViewMeta = const VerificationMeta(
+    'givingRateView',
+  );
+  @override
+  late final GeneratedColumn<String> givingRateView = GeneratedColumn<String>(
+    'giving_rate_view',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -2924,6 +3000,12 @@ class $AppSettingsTable extends AppSettings
     zakatYear,
     longTermMethod,
     jewelleryZakatable,
+    nisabMetal,
+    reminderOn,
+    reminderDays,
+    reminderMinute,
+    reminderAsked,
+    givingRateView,
     createdAt,
     updatedAt,
   ];
@@ -2986,6 +3068,54 @@ class $AppSettingsTable extends AppSettings
         ),
       );
     }
+    if (data.containsKey('nisab_metal')) {
+      context.handle(
+        _nisabMetalMeta,
+        nisabMetal.isAcceptableOrUnknown(data['nisab_metal']!, _nisabMetalMeta),
+      );
+    }
+    if (data.containsKey('reminder_on')) {
+      context.handle(
+        _reminderOnMeta,
+        reminderOn.isAcceptableOrUnknown(data['reminder_on']!, _reminderOnMeta),
+      );
+    }
+    if (data.containsKey('reminder_days')) {
+      context.handle(
+        _reminderDaysMeta,
+        reminderDays.isAcceptableOrUnknown(
+          data['reminder_days']!,
+          _reminderDaysMeta,
+        ),
+      );
+    }
+    if (data.containsKey('reminder_minute')) {
+      context.handle(
+        _reminderMinuteMeta,
+        reminderMinute.isAcceptableOrUnknown(
+          data['reminder_minute']!,
+          _reminderMinuteMeta,
+        ),
+      );
+    }
+    if (data.containsKey('reminder_asked')) {
+      context.handle(
+        _reminderAskedMeta,
+        reminderAsked.isAcceptableOrUnknown(
+          data['reminder_asked']!,
+          _reminderAskedMeta,
+        ),
+      );
+    }
+    if (data.containsKey('giving_rate_view')) {
+      context.handle(
+        _givingRateViewMeta,
+        givingRateView.isAcceptableOrUnknown(
+          data['giving_rate_view']!,
+          _givingRateViewMeta,
+        ),
+      );
+    }
     if (data.containsKey('created_at')) {
       context.handle(
         _createdAtMeta,
@@ -3035,6 +3165,30 @@ class $AppSettingsTable extends AppSettings
         DriftSqlType.bool,
         data['${effectivePrefix}jewellery_zakatable'],
       ),
+      nisabMetal: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}nisab_metal'],
+      ),
+      reminderOn: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}reminder_on'],
+      )!,
+      reminderDays: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}reminder_days'],
+      )!,
+      reminderMinute: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}reminder_minute'],
+      )!,
+      reminderAsked: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}reminder_asked'],
+      )!,
+      givingRateView: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}giving_rate_view'],
+      ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -3059,6 +3213,14 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
   final String? zakatYear;
   final String? longTermMethod;
   final bool? jewelleryZakatable;
+
+  /// v3 (zakat spec §2.1): the zakat preferences.
+  final String? nisabMetal;
+  final bool reminderOn;
+  final int reminderDays;
+  final int reminderMinute;
+  final bool reminderAsked;
+  final String? givingRateView;
   final DateTime createdAt;
   final DateTime updatedAt;
   const SettingsRow({
@@ -3068,6 +3230,12 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
     this.zakatYear,
     this.longTermMethod,
     this.jewelleryZakatable,
+    this.nisabMetal,
+    required this.reminderOn,
+    required this.reminderDays,
+    required this.reminderMinute,
+    required this.reminderAsked,
+    this.givingRateView,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -3089,6 +3257,16 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
     }
     if (!nullToAbsent || jewelleryZakatable != null) {
       map['jewellery_zakatable'] = Variable<bool>(jewelleryZakatable);
+    }
+    if (!nullToAbsent || nisabMetal != null) {
+      map['nisab_metal'] = Variable<String>(nisabMetal);
+    }
+    map['reminder_on'] = Variable<bool>(reminderOn);
+    map['reminder_days'] = Variable<int>(reminderDays);
+    map['reminder_minute'] = Variable<int>(reminderMinute);
+    map['reminder_asked'] = Variable<bool>(reminderAsked);
+    if (!nullToAbsent || givingRateView != null) {
+      map['giving_rate_view'] = Variable<String>(givingRateView);
     }
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
@@ -3113,6 +3291,16 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
       jewelleryZakatable: jewelleryZakatable == null && nullToAbsent
           ? const Value.absent()
           : Value(jewelleryZakatable),
+      nisabMetal: nisabMetal == null && nullToAbsent
+          ? const Value.absent()
+          : Value(nisabMetal),
+      reminderOn: Value(reminderOn),
+      reminderDays: Value(reminderDays),
+      reminderMinute: Value(reminderMinute),
+      reminderAsked: Value(reminderAsked),
+      givingRateView: givingRateView == null && nullToAbsent
+          ? const Value.absent()
+          : Value(givingRateView),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
     );
@@ -3132,6 +3320,12 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
       jewelleryZakatable: serializer.fromJson<bool?>(
         json['jewelleryZakatable'],
       ),
+      nisabMetal: serializer.fromJson<String?>(json['nisabMetal']),
+      reminderOn: serializer.fromJson<bool>(json['reminderOn']),
+      reminderDays: serializer.fromJson<int>(json['reminderDays']),
+      reminderMinute: serializer.fromJson<int>(json['reminderMinute']),
+      reminderAsked: serializer.fromJson<bool>(json['reminderAsked']),
+      givingRateView: serializer.fromJson<String?>(json['givingRateView']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
@@ -3146,6 +3340,12 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
       'zakatYear': serializer.toJson<String?>(zakatYear),
       'longTermMethod': serializer.toJson<String?>(longTermMethod),
       'jewelleryZakatable': serializer.toJson<bool?>(jewelleryZakatable),
+      'nisabMetal': serializer.toJson<String?>(nisabMetal),
+      'reminderOn': serializer.toJson<bool>(reminderOn),
+      'reminderDays': serializer.toJson<int>(reminderDays),
+      'reminderMinute': serializer.toJson<int>(reminderMinute),
+      'reminderAsked': serializer.toJson<bool>(reminderAsked),
+      'givingRateView': serializer.toJson<String?>(givingRateView),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
@@ -3158,6 +3358,12 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
     Value<String?> zakatYear = const Value.absent(),
     Value<String?> longTermMethod = const Value.absent(),
     Value<bool?> jewelleryZakatable = const Value.absent(),
+    Value<String?> nisabMetal = const Value.absent(),
+    bool? reminderOn,
+    int? reminderDays,
+    int? reminderMinute,
+    bool? reminderAsked,
+    Value<String?> givingRateView = const Value.absent(),
     DateTime? createdAt,
     DateTime? updatedAt,
   }) => SettingsRow(
@@ -3173,6 +3379,14 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
     jewelleryZakatable: jewelleryZakatable.present
         ? jewelleryZakatable.value
         : this.jewelleryZakatable,
+    nisabMetal: nisabMetal.present ? nisabMetal.value : this.nisabMetal,
+    reminderOn: reminderOn ?? this.reminderOn,
+    reminderDays: reminderDays ?? this.reminderDays,
+    reminderMinute: reminderMinute ?? this.reminderMinute,
+    reminderAsked: reminderAsked ?? this.reminderAsked,
+    givingRateView: givingRateView.present
+        ? givingRateView.value
+        : this.givingRateView,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
   );
@@ -3192,6 +3406,24 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
       jewelleryZakatable: data.jewelleryZakatable.present
           ? data.jewelleryZakatable.value
           : this.jewelleryZakatable,
+      nisabMetal: data.nisabMetal.present
+          ? data.nisabMetal.value
+          : this.nisabMetal,
+      reminderOn: data.reminderOn.present
+          ? data.reminderOn.value
+          : this.reminderOn,
+      reminderDays: data.reminderDays.present
+          ? data.reminderDays.value
+          : this.reminderDays,
+      reminderMinute: data.reminderMinute.present
+          ? data.reminderMinute.value
+          : this.reminderMinute,
+      reminderAsked: data.reminderAsked.present
+          ? data.reminderAsked.value
+          : this.reminderAsked,
+      givingRateView: data.givingRateView.present
+          ? data.givingRateView.value
+          : this.givingRateView,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
@@ -3206,6 +3438,12 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
           ..write('zakatYear: $zakatYear, ')
           ..write('longTermMethod: $longTermMethod, ')
           ..write('jewelleryZakatable: $jewelleryZakatable, ')
+          ..write('nisabMetal: $nisabMetal, ')
+          ..write('reminderOn: $reminderOn, ')
+          ..write('reminderDays: $reminderDays, ')
+          ..write('reminderMinute: $reminderMinute, ')
+          ..write('reminderAsked: $reminderAsked, ')
+          ..write('givingRateView: $givingRateView, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -3220,6 +3458,12 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
     zakatYear,
     longTermMethod,
     jewelleryZakatable,
+    nisabMetal,
+    reminderOn,
+    reminderDays,
+    reminderMinute,
+    reminderAsked,
+    givingRateView,
     createdAt,
     updatedAt,
   );
@@ -3233,6 +3477,12 @@ class SettingsRow extends DataClass implements Insertable<SettingsRow> {
           other.zakatYear == this.zakatYear &&
           other.longTermMethod == this.longTermMethod &&
           other.jewelleryZakatable == this.jewelleryZakatable &&
+          other.nisabMetal == this.nisabMetal &&
+          other.reminderOn == this.reminderOn &&
+          other.reminderDays == this.reminderDays &&
+          other.reminderMinute == this.reminderMinute &&
+          other.reminderAsked == this.reminderAsked &&
+          other.givingRateView == this.givingRateView &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
 }
@@ -3244,6 +3494,12 @@ class AppSettingsCompanion extends UpdateCompanion<SettingsRow> {
   final Value<String?> zakatYear;
   final Value<String?> longTermMethod;
   final Value<bool?> jewelleryZakatable;
+  final Value<String?> nisabMetal;
+  final Value<bool> reminderOn;
+  final Value<int> reminderDays;
+  final Value<int> reminderMinute;
+  final Value<bool> reminderAsked;
+  final Value<String?> givingRateView;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   final Value<int> rowid;
@@ -3254,6 +3510,12 @@ class AppSettingsCompanion extends UpdateCompanion<SettingsRow> {
     this.zakatYear = const Value.absent(),
     this.longTermMethod = const Value.absent(),
     this.jewelleryZakatable = const Value.absent(),
+    this.nisabMetal = const Value.absent(),
+    this.reminderOn = const Value.absent(),
+    this.reminderDays = const Value.absent(),
+    this.reminderMinute = const Value.absent(),
+    this.reminderAsked = const Value.absent(),
+    this.givingRateView = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -3265,6 +3527,12 @@ class AppSettingsCompanion extends UpdateCompanion<SettingsRow> {
     this.zakatYear = const Value.absent(),
     this.longTermMethod = const Value.absent(),
     this.jewelleryZakatable = const Value.absent(),
+    this.nisabMetal = const Value.absent(),
+    this.reminderOn = const Value.absent(),
+    this.reminderDays = const Value.absent(),
+    this.reminderMinute = const Value.absent(),
+    this.reminderAsked = const Value.absent(),
+    this.givingRateView = const Value.absent(),
     required DateTime createdAt,
     required DateTime updatedAt,
     this.rowid = const Value.absent(),
@@ -3278,6 +3546,12 @@ class AppSettingsCompanion extends UpdateCompanion<SettingsRow> {
     Expression<String>? zakatYear,
     Expression<String>? longTermMethod,
     Expression<bool>? jewelleryZakatable,
+    Expression<String>? nisabMetal,
+    Expression<bool>? reminderOn,
+    Expression<int>? reminderDays,
+    Expression<int>? reminderMinute,
+    Expression<bool>? reminderAsked,
+    Expression<String>? givingRateView,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<int>? rowid,
@@ -3289,6 +3563,12 @@ class AppSettingsCompanion extends UpdateCompanion<SettingsRow> {
       if (zakatYear != null) 'zakat_year': zakatYear,
       if (longTermMethod != null) 'long_term_method': longTermMethod,
       if (jewelleryZakatable != null) 'jewellery_zakatable': jewelleryZakatable,
+      if (nisabMetal != null) 'nisab_metal': nisabMetal,
+      if (reminderOn != null) 'reminder_on': reminderOn,
+      if (reminderDays != null) 'reminder_days': reminderDays,
+      if (reminderMinute != null) 'reminder_minute': reminderMinute,
+      if (reminderAsked != null) 'reminder_asked': reminderAsked,
+      if (givingRateView != null) 'giving_rate_view': givingRateView,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
@@ -3302,6 +3582,12 @@ class AppSettingsCompanion extends UpdateCompanion<SettingsRow> {
     Value<String?>? zakatYear,
     Value<String?>? longTermMethod,
     Value<bool?>? jewelleryZakatable,
+    Value<String?>? nisabMetal,
+    Value<bool>? reminderOn,
+    Value<int>? reminderDays,
+    Value<int>? reminderMinute,
+    Value<bool>? reminderAsked,
+    Value<String?>? givingRateView,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
     Value<int>? rowid,
@@ -3313,6 +3599,12 @@ class AppSettingsCompanion extends UpdateCompanion<SettingsRow> {
       zakatYear: zakatYear ?? this.zakatYear,
       longTermMethod: longTermMethod ?? this.longTermMethod,
       jewelleryZakatable: jewelleryZakatable ?? this.jewelleryZakatable,
+      nisabMetal: nisabMetal ?? this.nisabMetal,
+      reminderOn: reminderOn ?? this.reminderOn,
+      reminderDays: reminderDays ?? this.reminderDays,
+      reminderMinute: reminderMinute ?? this.reminderMinute,
+      reminderAsked: reminderAsked ?? this.reminderAsked,
+      givingRateView: givingRateView ?? this.givingRateView,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
@@ -3340,6 +3632,24 @@ class AppSettingsCompanion extends UpdateCompanion<SettingsRow> {
     if (jewelleryZakatable.present) {
       map['jewellery_zakatable'] = Variable<bool>(jewelleryZakatable.value);
     }
+    if (nisabMetal.present) {
+      map['nisab_metal'] = Variable<String>(nisabMetal.value);
+    }
+    if (reminderOn.present) {
+      map['reminder_on'] = Variable<bool>(reminderOn.value);
+    }
+    if (reminderDays.present) {
+      map['reminder_days'] = Variable<int>(reminderDays.value);
+    }
+    if (reminderMinute.present) {
+      map['reminder_minute'] = Variable<int>(reminderMinute.value);
+    }
+    if (reminderAsked.present) {
+      map['reminder_asked'] = Variable<bool>(reminderAsked.value);
+    }
+    if (givingRateView.present) {
+      map['giving_rate_view'] = Variable<String>(givingRateView.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -3361,6 +3671,12 @@ class AppSettingsCompanion extends UpdateCompanion<SettingsRow> {
           ..write('zakatYear: $zakatYear, ')
           ..write('longTermMethod: $longTermMethod, ')
           ..write('jewelleryZakatable: $jewelleryZakatable, ')
+          ..write('nisabMetal: $nisabMetal, ')
+          ..write('reminderOn: $reminderOn, ')
+          ..write('reminderDays: $reminderDays, ')
+          ..write('reminderMinute: $reminderMinute, ')
+          ..write('reminderAsked: $reminderAsked, ')
+          ..write('givingRateView: $givingRateView, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
@@ -3681,6 +3997,3450 @@ class NoZakatYearsCompanion extends UpdateCompanion<NoZakatYearRow> {
   }
 }
 
+class $ZakatCyclesTable extends ZakatCycles
+    with TableInfo<$ZakatCyclesTable, ZakatCycleRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ZakatCyclesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _calendarMeta = const VerificationMeta(
+    'calendar',
+  );
+  @override
+  late final GeneratedColumn<String> calendar = GeneratedColumn<String>(
+    'calendar',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _monthMeta = const VerificationMeta('month');
+  @override
+  late final GeneratedColumn<int> month = GeneratedColumn<int>(
+    'month',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _dayMeta = const VerificationMeta('day');
+  @override
+  late final GeneratedColumn<int> day = GeneratedColumn<int>(
+    'day',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<DateTime, String> fromDate =
+      GeneratedColumn<String>(
+        'from_date',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<DateTime>($ZakatCyclesTable.$converterfromDate);
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    calendar,
+    month,
+    day,
+    fromDate,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'zakat_cycles';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ZakatCycleRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('calendar')) {
+      context.handle(
+        _calendarMeta,
+        calendar.isAcceptableOrUnknown(data['calendar']!, _calendarMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_calendarMeta);
+    }
+    if (data.containsKey('month')) {
+      context.handle(
+        _monthMeta,
+        month.isAcceptableOrUnknown(data['month']!, _monthMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_monthMeta);
+    }
+    if (data.containsKey('day')) {
+      context.handle(
+        _dayMeta,
+        day.isAcceptableOrUnknown(data['day']!, _dayMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dayMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {fromDate},
+  ];
+  @override
+  ZakatCycleRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ZakatCycleRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      calendar: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}calendar'],
+      )!,
+      month: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}month'],
+      )!,
+      day: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}day'],
+      )!,
+      fromDate: $ZakatCyclesTable.$converterfromDate.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}from_date'],
+        )!,
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $ZakatCyclesTable createAlias(String alias) {
+    return $ZakatCyclesTable(attachedDatabase, alias);
+  }
+
+  static TypeConverter<DateTime, String> $converterfromDate =
+      const CalendarDateConverter();
+}
+
+class ZakatCycleRow extends DataClass implements Insertable<ZakatCycleRow> {
+  final String id;
+  final String calendar;
+  final int month;
+  final int day;
+  final DateTime fromDate;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const ZakatCycleRow({
+    required this.id,
+    required this.calendar,
+    required this.month,
+    required this.day,
+    required this.fromDate,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['calendar'] = Variable<String>(calendar);
+    map['month'] = Variable<int>(month);
+    map['day'] = Variable<int>(day);
+    {
+      map['from_date'] = Variable<String>(
+        $ZakatCyclesTable.$converterfromDate.toSql(fromDate),
+      );
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  ZakatCyclesCompanion toCompanion(bool nullToAbsent) {
+    return ZakatCyclesCompanion(
+      id: Value(id),
+      calendar: Value(calendar),
+      month: Value(month),
+      day: Value(day),
+      fromDate: Value(fromDate),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory ZakatCycleRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ZakatCycleRow(
+      id: serializer.fromJson<String>(json['id']),
+      calendar: serializer.fromJson<String>(json['calendar']),
+      month: serializer.fromJson<int>(json['month']),
+      day: serializer.fromJson<int>(json['day']),
+      fromDate: serializer.fromJson<DateTime>(json['fromDate']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'calendar': serializer.toJson<String>(calendar),
+      'month': serializer.toJson<int>(month),
+      'day': serializer.toJson<int>(day),
+      'fromDate': serializer.toJson<DateTime>(fromDate),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  ZakatCycleRow copyWith({
+    String? id,
+    String? calendar,
+    int? month,
+    int? day,
+    DateTime? fromDate,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => ZakatCycleRow(
+    id: id ?? this.id,
+    calendar: calendar ?? this.calendar,
+    month: month ?? this.month,
+    day: day ?? this.day,
+    fromDate: fromDate ?? this.fromDate,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  ZakatCycleRow copyWithCompanion(ZakatCyclesCompanion data) {
+    return ZakatCycleRow(
+      id: data.id.present ? data.id.value : this.id,
+      calendar: data.calendar.present ? data.calendar.value : this.calendar,
+      month: data.month.present ? data.month.value : this.month,
+      day: data.day.present ? data.day.value : this.day,
+      fromDate: data.fromDate.present ? data.fromDate.value : this.fromDate,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ZakatCycleRow(')
+          ..write('id: $id, ')
+          ..write('calendar: $calendar, ')
+          ..write('month: $month, ')
+          ..write('day: $day, ')
+          ..write('fromDate: $fromDate, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, calendar, month, day, fromDate, createdAt, updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ZakatCycleRow &&
+          other.id == this.id &&
+          other.calendar == this.calendar &&
+          other.month == this.month &&
+          other.day == this.day &&
+          other.fromDate == this.fromDate &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class ZakatCyclesCompanion extends UpdateCompanion<ZakatCycleRow> {
+  final Value<String> id;
+  final Value<String> calendar;
+  final Value<int> month;
+  final Value<int> day;
+  final Value<DateTime> fromDate;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const ZakatCyclesCompanion({
+    this.id = const Value.absent(),
+    this.calendar = const Value.absent(),
+    this.month = const Value.absent(),
+    this.day = const Value.absent(),
+    this.fromDate = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ZakatCyclesCompanion.insert({
+    required String id,
+    required String calendar,
+    required int month,
+    required int day,
+    required DateTime fromDate,
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       calendar = Value(calendar),
+       month = Value(month),
+       day = Value(day),
+       fromDate = Value(fromDate),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<ZakatCycleRow> custom({
+    Expression<String>? id,
+    Expression<String>? calendar,
+    Expression<int>? month,
+    Expression<int>? day,
+    Expression<String>? fromDate,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (calendar != null) 'calendar': calendar,
+      if (month != null) 'month': month,
+      if (day != null) 'day': day,
+      if (fromDate != null) 'from_date': fromDate,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ZakatCyclesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? calendar,
+    Value<int>? month,
+    Value<int>? day,
+    Value<DateTime>? fromDate,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return ZakatCyclesCompanion(
+      id: id ?? this.id,
+      calendar: calendar ?? this.calendar,
+      month: month ?? this.month,
+      day: day ?? this.day,
+      fromDate: fromDate ?? this.fromDate,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (calendar.present) {
+      map['calendar'] = Variable<String>(calendar.value);
+    }
+    if (month.present) {
+      map['month'] = Variable<int>(month.value);
+    }
+    if (day.present) {
+      map['day'] = Variable<int>(day.value);
+    }
+    if (fromDate.present) {
+      map['from_date'] = Variable<String>(
+        $ZakatCyclesTable.$converterfromDate.toSql(fromDate.value),
+      );
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ZakatCyclesCompanion(')
+          ..write('id: $id, ')
+          ..write('calendar: $calendar, ')
+          ..write('month: $month, ')
+          ..write('day: $day, ')
+          ..write('fromDate: $fromDate, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ZakatYearsTable extends ZakatYears
+    with TableInfo<$ZakatYearsTable, ZakatYearRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ZakatYearsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<DateTime, String> dueKey =
+      GeneratedColumn<String>(
+        'due_key',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<DateTime>($ZakatYearsTable.$converterdueKey);
+  @override
+  late final GeneratedColumnWithTypeConverter<DateTime?, String> movedDue =
+      GeneratedColumn<String>(
+        'moved_due',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      ).withConverter<DateTime?>($ZakatYearsTable.$convertermovedDuen);
+  @override
+  late final GeneratedColumnWithTypeConverter<Decimal, String> debts =
+      GeneratedColumn<String>(
+        'debts',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('0'),
+      ).withConverter<Decimal>($ZakatYearsTable.$converterdebts);
+  static const VerificationMeta _deductDebtsMeta = const VerificationMeta(
+    'deductDebts',
+  );
+  @override
+  late final GeneratedColumn<bool> deductDebts = GeneratedColumn<bool>(
+    'deduct_debts',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("deduct_debts" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<DateTime?, String> startedOn =
+      GeneratedColumn<String>(
+        'started_on',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      ).withConverter<DateTime?>($ZakatYearsTable.$converterstartedOnn);
+  static const VerificationMeta _frozenBaseMeta = const VerificationMeta(
+    'frozenBase',
+  );
+  @override
+  late final GeneratedColumn<String> frozenBase = GeneratedColumn<String>(
+    'frozen_base',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _frozenNisabMetalMeta = const VerificationMeta(
+    'frozenNisabMetal',
+  );
+  @override
+  late final GeneratedColumn<String> frozenNisabMetal = GeneratedColumn<String>(
+    'frozen_nisab_metal',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<Decimal?, String>
+  frozenMetalRate = GeneratedColumn<String>(
+    'frozen_metal_rate',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  ).withConverter<Decimal?>($ZakatYearsTable.$converterfrozenMetalRaten);
+  @override
+  late final GeneratedColumnWithTypeConverter<DateTime?, String>
+  frozenMetalRateDate = GeneratedColumn<String>(
+    'frozen_metal_rate_date',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  ).withConverter<DateTime?>($ZakatYearsTable.$converterfrozenMetalRateDaten);
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    dueKey,
+    movedDue,
+    debts,
+    deductDebts,
+    startedOn,
+    frozenBase,
+    frozenNisabMetal,
+    frozenMetalRate,
+    frozenMetalRateDate,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'zakat_years';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ZakatYearRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('deduct_debts')) {
+      context.handle(
+        _deductDebtsMeta,
+        deductDebts.isAcceptableOrUnknown(
+          data['deduct_debts']!,
+          _deductDebtsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('frozen_base')) {
+      context.handle(
+        _frozenBaseMeta,
+        frozenBase.isAcceptableOrUnknown(data['frozen_base']!, _frozenBaseMeta),
+      );
+    }
+    if (data.containsKey('frozen_nisab_metal')) {
+      context.handle(
+        _frozenNisabMetalMeta,
+        frozenNisabMetal.isAcceptableOrUnknown(
+          data['frozen_nisab_metal']!,
+          _frozenNisabMetalMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {dueKey},
+  ];
+  @override
+  ZakatYearRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ZakatYearRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      dueKey: $ZakatYearsTable.$converterdueKey.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}due_key'],
+        )!,
+      ),
+      movedDue: $ZakatYearsTable.$convertermovedDuen.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}moved_due'],
+        ),
+      ),
+      debts: $ZakatYearsTable.$converterdebts.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}debts'],
+        )!,
+      ),
+      deductDebts: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}deduct_debts'],
+      )!,
+      startedOn: $ZakatYearsTable.$converterstartedOnn.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}started_on'],
+        ),
+      ),
+      frozenBase: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}frozen_base'],
+      ),
+      frozenNisabMetal: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}frozen_nisab_metal'],
+      ),
+      frozenMetalRate: $ZakatYearsTable.$converterfrozenMetalRaten.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}frozen_metal_rate'],
+        ),
+      ),
+      frozenMetalRateDate: $ZakatYearsTable.$converterfrozenMetalRateDaten
+          .fromSql(
+            attachedDatabase.typeMapping.read(
+              DriftSqlType.string,
+              data['${effectivePrefix}frozen_metal_rate_date'],
+            ),
+          ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $ZakatYearsTable createAlias(String alias) {
+    return $ZakatYearsTable(attachedDatabase, alias);
+  }
+
+  static TypeConverter<DateTime, String> $converterdueKey =
+      const CalendarDateConverter();
+  static TypeConverter<DateTime, String> $convertermovedDue =
+      const CalendarDateConverter();
+  static TypeConverter<DateTime?, String?> $convertermovedDuen =
+      NullAwareTypeConverter.wrap($convertermovedDue);
+  static TypeConverter<Decimal, String> $converterdebts =
+      const DecimalConverter();
+  static TypeConverter<DateTime, String> $converterstartedOn =
+      const CalendarDateConverter();
+  static TypeConverter<DateTime?, String?> $converterstartedOnn =
+      NullAwareTypeConverter.wrap($converterstartedOn);
+  static TypeConverter<Decimal, String> $converterfrozenMetalRate =
+      const DecimalConverter();
+  static TypeConverter<Decimal?, String?> $converterfrozenMetalRaten =
+      NullAwareTypeConverter.wrap($converterfrozenMetalRate);
+  static TypeConverter<DateTime, String> $converterfrozenMetalRateDate =
+      const CalendarDateConverter();
+  static TypeConverter<DateTime?, String?> $converterfrozenMetalRateDaten =
+      NullAwareTypeConverter.wrap($converterfrozenMetalRateDate);
+}
+
+class ZakatYearRow extends DataClass implements Insertable<ZakatYearRow> {
+  final String id;
+
+  /// The computed due date (Z4); a moved due date never changes it.
+  final DateTime dueKey;
+  final DateTime? movedDue;
+  final Decimal debts;
+  final bool deductDebts;
+  final DateTime? startedOn;
+  final String? frozenBase;
+  final String? frozenNisabMetal;
+  final Decimal? frozenMetalRate;
+  final DateTime? frozenMetalRateDate;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const ZakatYearRow({
+    required this.id,
+    required this.dueKey,
+    this.movedDue,
+    required this.debts,
+    required this.deductDebts,
+    this.startedOn,
+    this.frozenBase,
+    this.frozenNisabMetal,
+    this.frozenMetalRate,
+    this.frozenMetalRateDate,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    {
+      map['due_key'] = Variable<String>(
+        $ZakatYearsTable.$converterdueKey.toSql(dueKey),
+      );
+    }
+    if (!nullToAbsent || movedDue != null) {
+      map['moved_due'] = Variable<String>(
+        $ZakatYearsTable.$convertermovedDuen.toSql(movedDue),
+      );
+    }
+    {
+      map['debts'] = Variable<String>(
+        $ZakatYearsTable.$converterdebts.toSql(debts),
+      );
+    }
+    map['deduct_debts'] = Variable<bool>(deductDebts);
+    if (!nullToAbsent || startedOn != null) {
+      map['started_on'] = Variable<String>(
+        $ZakatYearsTable.$converterstartedOnn.toSql(startedOn),
+      );
+    }
+    if (!nullToAbsent || frozenBase != null) {
+      map['frozen_base'] = Variable<String>(frozenBase);
+    }
+    if (!nullToAbsent || frozenNisabMetal != null) {
+      map['frozen_nisab_metal'] = Variable<String>(frozenNisabMetal);
+    }
+    if (!nullToAbsent || frozenMetalRate != null) {
+      map['frozen_metal_rate'] = Variable<String>(
+        $ZakatYearsTable.$converterfrozenMetalRaten.toSql(frozenMetalRate),
+      );
+    }
+    if (!nullToAbsent || frozenMetalRateDate != null) {
+      map['frozen_metal_rate_date'] = Variable<String>(
+        $ZakatYearsTable.$converterfrozenMetalRateDaten.toSql(
+          frozenMetalRateDate,
+        ),
+      );
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  ZakatYearsCompanion toCompanion(bool nullToAbsent) {
+    return ZakatYearsCompanion(
+      id: Value(id),
+      dueKey: Value(dueKey),
+      movedDue: movedDue == null && nullToAbsent
+          ? const Value.absent()
+          : Value(movedDue),
+      debts: Value(debts),
+      deductDebts: Value(deductDebts),
+      startedOn: startedOn == null && nullToAbsent
+          ? const Value.absent()
+          : Value(startedOn),
+      frozenBase: frozenBase == null && nullToAbsent
+          ? const Value.absent()
+          : Value(frozenBase),
+      frozenNisabMetal: frozenNisabMetal == null && nullToAbsent
+          ? const Value.absent()
+          : Value(frozenNisabMetal),
+      frozenMetalRate: frozenMetalRate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(frozenMetalRate),
+      frozenMetalRateDate: frozenMetalRateDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(frozenMetalRateDate),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory ZakatYearRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ZakatYearRow(
+      id: serializer.fromJson<String>(json['id']),
+      dueKey: serializer.fromJson<DateTime>(json['dueKey']),
+      movedDue: serializer.fromJson<DateTime?>(json['movedDue']),
+      debts: serializer.fromJson<Decimal>(json['debts']),
+      deductDebts: serializer.fromJson<bool>(json['deductDebts']),
+      startedOn: serializer.fromJson<DateTime?>(json['startedOn']),
+      frozenBase: serializer.fromJson<String?>(json['frozenBase']),
+      frozenNisabMetal: serializer.fromJson<String?>(json['frozenNisabMetal']),
+      frozenMetalRate: serializer.fromJson<Decimal?>(json['frozenMetalRate']),
+      frozenMetalRateDate: serializer.fromJson<DateTime?>(
+        json['frozenMetalRateDate'],
+      ),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'dueKey': serializer.toJson<DateTime>(dueKey),
+      'movedDue': serializer.toJson<DateTime?>(movedDue),
+      'debts': serializer.toJson<Decimal>(debts),
+      'deductDebts': serializer.toJson<bool>(deductDebts),
+      'startedOn': serializer.toJson<DateTime?>(startedOn),
+      'frozenBase': serializer.toJson<String?>(frozenBase),
+      'frozenNisabMetal': serializer.toJson<String?>(frozenNisabMetal),
+      'frozenMetalRate': serializer.toJson<Decimal?>(frozenMetalRate),
+      'frozenMetalRateDate': serializer.toJson<DateTime?>(frozenMetalRateDate),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  ZakatYearRow copyWith({
+    String? id,
+    DateTime? dueKey,
+    Value<DateTime?> movedDue = const Value.absent(),
+    Decimal? debts,
+    bool? deductDebts,
+    Value<DateTime?> startedOn = const Value.absent(),
+    Value<String?> frozenBase = const Value.absent(),
+    Value<String?> frozenNisabMetal = const Value.absent(),
+    Value<Decimal?> frozenMetalRate = const Value.absent(),
+    Value<DateTime?> frozenMetalRateDate = const Value.absent(),
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => ZakatYearRow(
+    id: id ?? this.id,
+    dueKey: dueKey ?? this.dueKey,
+    movedDue: movedDue.present ? movedDue.value : this.movedDue,
+    debts: debts ?? this.debts,
+    deductDebts: deductDebts ?? this.deductDebts,
+    startedOn: startedOn.present ? startedOn.value : this.startedOn,
+    frozenBase: frozenBase.present ? frozenBase.value : this.frozenBase,
+    frozenNisabMetal: frozenNisabMetal.present
+        ? frozenNisabMetal.value
+        : this.frozenNisabMetal,
+    frozenMetalRate: frozenMetalRate.present
+        ? frozenMetalRate.value
+        : this.frozenMetalRate,
+    frozenMetalRateDate: frozenMetalRateDate.present
+        ? frozenMetalRateDate.value
+        : this.frozenMetalRateDate,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  ZakatYearRow copyWithCompanion(ZakatYearsCompanion data) {
+    return ZakatYearRow(
+      id: data.id.present ? data.id.value : this.id,
+      dueKey: data.dueKey.present ? data.dueKey.value : this.dueKey,
+      movedDue: data.movedDue.present ? data.movedDue.value : this.movedDue,
+      debts: data.debts.present ? data.debts.value : this.debts,
+      deductDebts: data.deductDebts.present
+          ? data.deductDebts.value
+          : this.deductDebts,
+      startedOn: data.startedOn.present ? data.startedOn.value : this.startedOn,
+      frozenBase: data.frozenBase.present
+          ? data.frozenBase.value
+          : this.frozenBase,
+      frozenNisabMetal: data.frozenNisabMetal.present
+          ? data.frozenNisabMetal.value
+          : this.frozenNisabMetal,
+      frozenMetalRate: data.frozenMetalRate.present
+          ? data.frozenMetalRate.value
+          : this.frozenMetalRate,
+      frozenMetalRateDate: data.frozenMetalRateDate.present
+          ? data.frozenMetalRateDate.value
+          : this.frozenMetalRateDate,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ZakatYearRow(')
+          ..write('id: $id, ')
+          ..write('dueKey: $dueKey, ')
+          ..write('movedDue: $movedDue, ')
+          ..write('debts: $debts, ')
+          ..write('deductDebts: $deductDebts, ')
+          ..write('startedOn: $startedOn, ')
+          ..write('frozenBase: $frozenBase, ')
+          ..write('frozenNisabMetal: $frozenNisabMetal, ')
+          ..write('frozenMetalRate: $frozenMetalRate, ')
+          ..write('frozenMetalRateDate: $frozenMetalRateDate, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    dueKey,
+    movedDue,
+    debts,
+    deductDebts,
+    startedOn,
+    frozenBase,
+    frozenNisabMetal,
+    frozenMetalRate,
+    frozenMetalRateDate,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ZakatYearRow &&
+          other.id == this.id &&
+          other.dueKey == this.dueKey &&
+          other.movedDue == this.movedDue &&
+          other.debts == this.debts &&
+          other.deductDebts == this.deductDebts &&
+          other.startedOn == this.startedOn &&
+          other.frozenBase == this.frozenBase &&
+          other.frozenNisabMetal == this.frozenNisabMetal &&
+          other.frozenMetalRate == this.frozenMetalRate &&
+          other.frozenMetalRateDate == this.frozenMetalRateDate &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class ZakatYearsCompanion extends UpdateCompanion<ZakatYearRow> {
+  final Value<String> id;
+  final Value<DateTime> dueKey;
+  final Value<DateTime?> movedDue;
+  final Value<Decimal> debts;
+  final Value<bool> deductDebts;
+  final Value<DateTime?> startedOn;
+  final Value<String?> frozenBase;
+  final Value<String?> frozenNisabMetal;
+  final Value<Decimal?> frozenMetalRate;
+  final Value<DateTime?> frozenMetalRateDate;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const ZakatYearsCompanion({
+    this.id = const Value.absent(),
+    this.dueKey = const Value.absent(),
+    this.movedDue = const Value.absent(),
+    this.debts = const Value.absent(),
+    this.deductDebts = const Value.absent(),
+    this.startedOn = const Value.absent(),
+    this.frozenBase = const Value.absent(),
+    this.frozenNisabMetal = const Value.absent(),
+    this.frozenMetalRate = const Value.absent(),
+    this.frozenMetalRateDate = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ZakatYearsCompanion.insert({
+    required String id,
+    required DateTime dueKey,
+    this.movedDue = const Value.absent(),
+    this.debts = const Value.absent(),
+    this.deductDebts = const Value.absent(),
+    this.startedOn = const Value.absent(),
+    this.frozenBase = const Value.absent(),
+    this.frozenNisabMetal = const Value.absent(),
+    this.frozenMetalRate = const Value.absent(),
+    this.frozenMetalRateDate = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       dueKey = Value(dueKey),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<ZakatYearRow> custom({
+    Expression<String>? id,
+    Expression<String>? dueKey,
+    Expression<String>? movedDue,
+    Expression<String>? debts,
+    Expression<bool>? deductDebts,
+    Expression<String>? startedOn,
+    Expression<String>? frozenBase,
+    Expression<String>? frozenNisabMetal,
+    Expression<String>? frozenMetalRate,
+    Expression<String>? frozenMetalRateDate,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (dueKey != null) 'due_key': dueKey,
+      if (movedDue != null) 'moved_due': movedDue,
+      if (debts != null) 'debts': debts,
+      if (deductDebts != null) 'deduct_debts': deductDebts,
+      if (startedOn != null) 'started_on': startedOn,
+      if (frozenBase != null) 'frozen_base': frozenBase,
+      if (frozenNisabMetal != null) 'frozen_nisab_metal': frozenNisabMetal,
+      if (frozenMetalRate != null) 'frozen_metal_rate': frozenMetalRate,
+      if (frozenMetalRateDate != null)
+        'frozen_metal_rate_date': frozenMetalRateDate,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ZakatYearsCompanion copyWith({
+    Value<String>? id,
+    Value<DateTime>? dueKey,
+    Value<DateTime?>? movedDue,
+    Value<Decimal>? debts,
+    Value<bool>? deductDebts,
+    Value<DateTime?>? startedOn,
+    Value<String?>? frozenBase,
+    Value<String?>? frozenNisabMetal,
+    Value<Decimal?>? frozenMetalRate,
+    Value<DateTime?>? frozenMetalRateDate,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return ZakatYearsCompanion(
+      id: id ?? this.id,
+      dueKey: dueKey ?? this.dueKey,
+      movedDue: movedDue ?? this.movedDue,
+      debts: debts ?? this.debts,
+      deductDebts: deductDebts ?? this.deductDebts,
+      startedOn: startedOn ?? this.startedOn,
+      frozenBase: frozenBase ?? this.frozenBase,
+      frozenNisabMetal: frozenNisabMetal ?? this.frozenNisabMetal,
+      frozenMetalRate: frozenMetalRate ?? this.frozenMetalRate,
+      frozenMetalRateDate: frozenMetalRateDate ?? this.frozenMetalRateDate,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (dueKey.present) {
+      map['due_key'] = Variable<String>(
+        $ZakatYearsTable.$converterdueKey.toSql(dueKey.value),
+      );
+    }
+    if (movedDue.present) {
+      map['moved_due'] = Variable<String>(
+        $ZakatYearsTable.$convertermovedDuen.toSql(movedDue.value),
+      );
+    }
+    if (debts.present) {
+      map['debts'] = Variable<String>(
+        $ZakatYearsTable.$converterdebts.toSql(debts.value),
+      );
+    }
+    if (deductDebts.present) {
+      map['deduct_debts'] = Variable<bool>(deductDebts.value);
+    }
+    if (startedOn.present) {
+      map['started_on'] = Variable<String>(
+        $ZakatYearsTable.$converterstartedOnn.toSql(startedOn.value),
+      );
+    }
+    if (frozenBase.present) {
+      map['frozen_base'] = Variable<String>(frozenBase.value);
+    }
+    if (frozenNisabMetal.present) {
+      map['frozen_nisab_metal'] = Variable<String>(frozenNisabMetal.value);
+    }
+    if (frozenMetalRate.present) {
+      map['frozen_metal_rate'] = Variable<String>(
+        $ZakatYearsTable.$converterfrozenMetalRaten.toSql(
+          frozenMetalRate.value,
+        ),
+      );
+    }
+    if (frozenMetalRateDate.present) {
+      map['frozen_metal_rate_date'] = Variable<String>(
+        $ZakatYearsTable.$converterfrozenMetalRateDaten.toSql(
+          frozenMetalRateDate.value,
+        ),
+      );
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ZakatYearsCompanion(')
+          ..write('id: $id, ')
+          ..write('dueKey: $dueKey, ')
+          ..write('movedDue: $movedDue, ')
+          ..write('debts: $debts, ')
+          ..write('deductDebts: $deductDebts, ')
+          ..write('startedOn: $startedOn, ')
+          ..write('frozenBase: $frozenBase, ')
+          ..write('frozenNisabMetal: $frozenNisabMetal, ')
+          ..write('frozenMetalRate: $frozenMetalRate, ')
+          ..write('frozenMetalRateDate: $frozenMetalRateDate, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ZakatExtraLinesTable extends ZakatExtraLines
+    with TableInfo<$ZakatExtraLinesTable, ZakatExtraLineRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ZakatExtraLinesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _yearIdMeta = const VerificationMeta('yearId');
+  @override
+  late final GeneratedColumn<String> yearId = GeneratedColumn<String>(
+    'year_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES zakat_years (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _labelMeta = const VerificationMeta('label');
+  @override
+  late final GeneratedColumn<String> label = GeneratedColumn<String>(
+    'label',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _kindMeta = const VerificationMeta('kind');
+  @override
+  late final GeneratedColumn<String> kind = GeneratedColumn<String>(
+    'kind',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<Decimal, String> amount =
+      GeneratedColumn<String>(
+        'amount',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<Decimal>($ZakatExtraLinesTable.$converteramount);
+  static const VerificationMeta _unitMeta = const VerificationMeta('unit');
+  @override
+  late final GeneratedColumn<String> unit = GeneratedColumn<String>(
+    'unit',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _goodDebtConfirmedMeta = const VerificationMeta(
+    'goodDebtConfirmed',
+  );
+  @override
+  late final GeneratedColumn<bool> goodDebtConfirmed = GeneratedColumn<bool>(
+    'good_debt_confirmed',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("good_debt_confirmed" IN (0, 1))',
+    ),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    yearId,
+    label,
+    kind,
+    amount,
+    unit,
+    goodDebtConfirmed,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'zakat_extra_lines';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ZakatExtraLineRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('year_id')) {
+      context.handle(
+        _yearIdMeta,
+        yearId.isAcceptableOrUnknown(data['year_id']!, _yearIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_yearIdMeta);
+    }
+    if (data.containsKey('label')) {
+      context.handle(
+        _labelMeta,
+        label.isAcceptableOrUnknown(data['label']!, _labelMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_labelMeta);
+    }
+    if (data.containsKey('kind')) {
+      context.handle(
+        _kindMeta,
+        kind.isAcceptableOrUnknown(data['kind']!, _kindMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_kindMeta);
+    }
+    if (data.containsKey('unit')) {
+      context.handle(
+        _unitMeta,
+        unit.isAcceptableOrUnknown(data['unit']!, _unitMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_unitMeta);
+    }
+    if (data.containsKey('good_debt_confirmed')) {
+      context.handle(
+        _goodDebtConfirmedMeta,
+        goodDebtConfirmed.isAcceptableOrUnknown(
+          data['good_debt_confirmed']!,
+          _goodDebtConfirmedMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_goodDebtConfirmedMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ZakatExtraLineRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ZakatExtraLineRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      yearId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}year_id'],
+      )!,
+      label: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}label'],
+      )!,
+      kind: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}kind'],
+      )!,
+      amount: $ZakatExtraLinesTable.$converteramount.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}amount'],
+        )!,
+      ),
+      unit: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}unit'],
+      )!,
+      goodDebtConfirmed: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}good_debt_confirmed'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $ZakatExtraLinesTable createAlias(String alias) {
+    return $ZakatExtraLinesTable(attachedDatabase, alias);
+  }
+
+  static TypeConverter<Decimal, String> $converteramount =
+      const DecimalConverter();
+}
+
+class ZakatExtraLineRow extends DataClass
+    implements Insertable<ZakatExtraLineRow> {
+  final String id;
+  final String yearId;
+  final String label;
+
+  /// cash or owedToMe
+  final String kind;
+  final Decimal amount;
+  final String unit;
+  final bool goodDebtConfirmed;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const ZakatExtraLineRow({
+    required this.id,
+    required this.yearId,
+    required this.label,
+    required this.kind,
+    required this.amount,
+    required this.unit,
+    required this.goodDebtConfirmed,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['year_id'] = Variable<String>(yearId);
+    map['label'] = Variable<String>(label);
+    map['kind'] = Variable<String>(kind);
+    {
+      map['amount'] = Variable<String>(
+        $ZakatExtraLinesTable.$converteramount.toSql(amount),
+      );
+    }
+    map['unit'] = Variable<String>(unit);
+    map['good_debt_confirmed'] = Variable<bool>(goodDebtConfirmed);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  ZakatExtraLinesCompanion toCompanion(bool nullToAbsent) {
+    return ZakatExtraLinesCompanion(
+      id: Value(id),
+      yearId: Value(yearId),
+      label: Value(label),
+      kind: Value(kind),
+      amount: Value(amount),
+      unit: Value(unit),
+      goodDebtConfirmed: Value(goodDebtConfirmed),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory ZakatExtraLineRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ZakatExtraLineRow(
+      id: serializer.fromJson<String>(json['id']),
+      yearId: serializer.fromJson<String>(json['yearId']),
+      label: serializer.fromJson<String>(json['label']),
+      kind: serializer.fromJson<String>(json['kind']),
+      amount: serializer.fromJson<Decimal>(json['amount']),
+      unit: serializer.fromJson<String>(json['unit']),
+      goodDebtConfirmed: serializer.fromJson<bool>(json['goodDebtConfirmed']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'yearId': serializer.toJson<String>(yearId),
+      'label': serializer.toJson<String>(label),
+      'kind': serializer.toJson<String>(kind),
+      'amount': serializer.toJson<Decimal>(amount),
+      'unit': serializer.toJson<String>(unit),
+      'goodDebtConfirmed': serializer.toJson<bool>(goodDebtConfirmed),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  ZakatExtraLineRow copyWith({
+    String? id,
+    String? yearId,
+    String? label,
+    String? kind,
+    Decimal? amount,
+    String? unit,
+    bool? goodDebtConfirmed,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => ZakatExtraLineRow(
+    id: id ?? this.id,
+    yearId: yearId ?? this.yearId,
+    label: label ?? this.label,
+    kind: kind ?? this.kind,
+    amount: amount ?? this.amount,
+    unit: unit ?? this.unit,
+    goodDebtConfirmed: goodDebtConfirmed ?? this.goodDebtConfirmed,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  ZakatExtraLineRow copyWithCompanion(ZakatExtraLinesCompanion data) {
+    return ZakatExtraLineRow(
+      id: data.id.present ? data.id.value : this.id,
+      yearId: data.yearId.present ? data.yearId.value : this.yearId,
+      label: data.label.present ? data.label.value : this.label,
+      kind: data.kind.present ? data.kind.value : this.kind,
+      amount: data.amount.present ? data.amount.value : this.amount,
+      unit: data.unit.present ? data.unit.value : this.unit,
+      goodDebtConfirmed: data.goodDebtConfirmed.present
+          ? data.goodDebtConfirmed.value
+          : this.goodDebtConfirmed,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ZakatExtraLineRow(')
+          ..write('id: $id, ')
+          ..write('yearId: $yearId, ')
+          ..write('label: $label, ')
+          ..write('kind: $kind, ')
+          ..write('amount: $amount, ')
+          ..write('unit: $unit, ')
+          ..write('goodDebtConfirmed: $goodDebtConfirmed, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    yearId,
+    label,
+    kind,
+    amount,
+    unit,
+    goodDebtConfirmed,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ZakatExtraLineRow &&
+          other.id == this.id &&
+          other.yearId == this.yearId &&
+          other.label == this.label &&
+          other.kind == this.kind &&
+          other.amount == this.amount &&
+          other.unit == this.unit &&
+          other.goodDebtConfirmed == this.goodDebtConfirmed &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class ZakatExtraLinesCompanion extends UpdateCompanion<ZakatExtraLineRow> {
+  final Value<String> id;
+  final Value<String> yearId;
+  final Value<String> label;
+  final Value<String> kind;
+  final Value<Decimal> amount;
+  final Value<String> unit;
+  final Value<bool> goodDebtConfirmed;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const ZakatExtraLinesCompanion({
+    this.id = const Value.absent(),
+    this.yearId = const Value.absent(),
+    this.label = const Value.absent(),
+    this.kind = const Value.absent(),
+    this.amount = const Value.absent(),
+    this.unit = const Value.absent(),
+    this.goodDebtConfirmed = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ZakatExtraLinesCompanion.insert({
+    required String id,
+    required String yearId,
+    required String label,
+    required String kind,
+    required Decimal amount,
+    required String unit,
+    required bool goodDebtConfirmed,
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       yearId = Value(yearId),
+       label = Value(label),
+       kind = Value(kind),
+       amount = Value(amount),
+       unit = Value(unit),
+       goodDebtConfirmed = Value(goodDebtConfirmed),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<ZakatExtraLineRow> custom({
+    Expression<String>? id,
+    Expression<String>? yearId,
+    Expression<String>? label,
+    Expression<String>? kind,
+    Expression<String>? amount,
+    Expression<String>? unit,
+    Expression<bool>? goodDebtConfirmed,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (yearId != null) 'year_id': yearId,
+      if (label != null) 'label': label,
+      if (kind != null) 'kind': kind,
+      if (amount != null) 'amount': amount,
+      if (unit != null) 'unit': unit,
+      if (goodDebtConfirmed != null) 'good_debt_confirmed': goodDebtConfirmed,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ZakatExtraLinesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? yearId,
+    Value<String>? label,
+    Value<String>? kind,
+    Value<Decimal>? amount,
+    Value<String>? unit,
+    Value<bool>? goodDebtConfirmed,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return ZakatExtraLinesCompanion(
+      id: id ?? this.id,
+      yearId: yearId ?? this.yearId,
+      label: label ?? this.label,
+      kind: kind ?? this.kind,
+      amount: amount ?? this.amount,
+      unit: unit ?? this.unit,
+      goodDebtConfirmed: goodDebtConfirmed ?? this.goodDebtConfirmed,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (yearId.present) {
+      map['year_id'] = Variable<String>(yearId.value);
+    }
+    if (label.present) {
+      map['label'] = Variable<String>(label.value);
+    }
+    if (kind.present) {
+      map['kind'] = Variable<String>(kind.value);
+    }
+    if (amount.present) {
+      map['amount'] = Variable<String>(
+        $ZakatExtraLinesTable.$converteramount.toSql(amount.value),
+      );
+    }
+    if (unit.present) {
+      map['unit'] = Variable<String>(unit.value);
+    }
+    if (goodDebtConfirmed.present) {
+      map['good_debt_confirmed'] = Variable<bool>(goodDebtConfirmed.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ZakatExtraLinesCompanion(')
+          ..write('id: $id, ')
+          ..write('yearId: $yearId, ')
+          ..write('label: $label, ')
+          ..write('kind: $kind, ')
+          ..write('amount: $amount, ')
+          ..write('unit: $unit, ')
+          ..write('goodDebtConfirmed: $goodDebtConfirmed, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ZakatFrozenLinesTable extends ZakatFrozenLines
+    with TableInfo<$ZakatFrozenLinesTable, ZakatFrozenLineRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ZakatFrozenLinesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _yearIdMeta = const VerificationMeta('yearId');
+  @override
+  late final GeneratedColumn<String> yearId = GeneratedColumn<String>(
+    'year_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES zakat_years (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _positionMeta = const VerificationMeta(
+    'position',
+  );
+  @override
+  late final GeneratedColumn<int> position = GeneratedColumn<int>(
+    'position',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sourceMeta = const VerificationMeta('source');
+  @override
+  late final GeneratedColumn<String> source = GeneratedColumn<String>(
+    'source',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _refIdMeta = const VerificationMeta('refId');
+  @override
+  late final GeneratedColumn<String> refId = GeneratedColumn<String>(
+    'ref_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _unitMeta = const VerificationMeta('unit');
+  @override
+  late final GeneratedColumn<String> unit = GeneratedColumn<String>(
+    'unit',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<Decimal, String> value =
+      GeneratedColumn<String>(
+        'value',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<Decimal>($ZakatFrozenLinesTable.$convertervalue);
+  @override
+  late final GeneratedColumnWithTypeConverter<Decimal, String> heldInterest =
+      GeneratedColumn<String>(
+        'held_interest',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<Decimal>($ZakatFrozenLinesTable.$converterheldInterest);
+  @override
+  late final GeneratedColumnWithTypeConverter<DateTime?, String> valueDate =
+      GeneratedColumn<String>(
+        'value_date',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      ).withConverter<DateTime?>($ZakatFrozenLinesTable.$convertervalueDaten);
+  @override
+  late final GeneratedColumnWithTypeConverter<Decimal?, String> rate =
+      GeneratedColumn<String>(
+        'rate',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      ).withConverter<Decimal?>($ZakatFrozenLinesTable.$converterraten);
+  @override
+  late final GeneratedColumnWithTypeConverter<DateTime?, String> rateDate =
+      GeneratedColumn<String>(
+        'rate_date',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      ).withConverter<DateTime?>($ZakatFrozenLinesTable.$converterrateDaten);
+  @override
+  late final GeneratedColumnWithTypeConverter<Decimal, String> share =
+      GeneratedColumn<String>(
+        'share',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<Decimal>($ZakatFrozenLinesTable.$convertershare);
+  static const VerificationMeta _sectionMeta = const VerificationMeta(
+    'section',
+  );
+  @override
+  late final GeneratedColumn<String> section = GeneratedColumn<String>(
+    'section',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _noticeMeta = const VerificationMeta('notice');
+  @override
+  late final GeneratedColumn<String> notice = GeneratedColumn<String>(
+    'notice',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _extraKindMeta = const VerificationMeta(
+    'extraKind',
+  );
+  @override
+  late final GeneratedColumn<String> extraKind = GeneratedColumn<String>(
+    'extra_kind',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    yearId,
+    position,
+    source,
+    refId,
+    name,
+    unit,
+    value,
+    heldInterest,
+    valueDate,
+    rate,
+    rateDate,
+    share,
+    section,
+    notice,
+    extraKind,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'zakat_frozen_lines';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ZakatFrozenLineRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('year_id')) {
+      context.handle(
+        _yearIdMeta,
+        yearId.isAcceptableOrUnknown(data['year_id']!, _yearIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_yearIdMeta);
+    }
+    if (data.containsKey('position')) {
+      context.handle(
+        _positionMeta,
+        position.isAcceptableOrUnknown(data['position']!, _positionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_positionMeta);
+    }
+    if (data.containsKey('source')) {
+      context.handle(
+        _sourceMeta,
+        source.isAcceptableOrUnknown(data['source']!, _sourceMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sourceMeta);
+    }
+    if (data.containsKey('ref_id')) {
+      context.handle(
+        _refIdMeta,
+        refId.isAcceptableOrUnknown(data['ref_id']!, _refIdMeta),
+      );
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('unit')) {
+      context.handle(
+        _unitMeta,
+        unit.isAcceptableOrUnknown(data['unit']!, _unitMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_unitMeta);
+    }
+    if (data.containsKey('section')) {
+      context.handle(
+        _sectionMeta,
+        section.isAcceptableOrUnknown(data['section']!, _sectionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sectionMeta);
+    }
+    if (data.containsKey('notice')) {
+      context.handle(
+        _noticeMeta,
+        notice.isAcceptableOrUnknown(data['notice']!, _noticeMeta),
+      );
+    }
+    if (data.containsKey('extra_kind')) {
+      context.handle(
+        _extraKindMeta,
+        extraKind.isAcceptableOrUnknown(data['extra_kind']!, _extraKindMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ZakatFrozenLineRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ZakatFrozenLineRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      yearId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}year_id'],
+      )!,
+      position: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}position'],
+      )!,
+      source: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source'],
+      )!,
+      refId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}ref_id'],
+      ),
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      unit: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}unit'],
+      )!,
+      value: $ZakatFrozenLinesTable.$convertervalue.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}value'],
+        )!,
+      ),
+      heldInterest: $ZakatFrozenLinesTable.$converterheldInterest.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}held_interest'],
+        )!,
+      ),
+      valueDate: $ZakatFrozenLinesTable.$convertervalueDaten.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}value_date'],
+        ),
+      ),
+      rate: $ZakatFrozenLinesTable.$converterraten.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}rate'],
+        ),
+      ),
+      rateDate: $ZakatFrozenLinesTable.$converterrateDaten.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}rate_date'],
+        ),
+      ),
+      share: $ZakatFrozenLinesTable.$convertershare.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}share'],
+        )!,
+      ),
+      section: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}section'],
+      )!,
+      notice: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}notice'],
+      ),
+      extraKind: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}extra_kind'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $ZakatFrozenLinesTable createAlias(String alias) {
+    return $ZakatFrozenLinesTable(attachedDatabase, alias);
+  }
+
+  static TypeConverter<Decimal, String> $convertervalue =
+      const DecimalConverter();
+  static TypeConverter<Decimal, String> $converterheldInterest =
+      const DecimalConverter();
+  static TypeConverter<DateTime, String> $convertervalueDate =
+      const CalendarDateConverter();
+  static TypeConverter<DateTime?, String?> $convertervalueDaten =
+      NullAwareTypeConverter.wrap($convertervalueDate);
+  static TypeConverter<Decimal, String> $converterrate =
+      const DecimalConverter();
+  static TypeConverter<Decimal?, String?> $converterraten =
+      NullAwareTypeConverter.wrap($converterrate);
+  static TypeConverter<DateTime, String> $converterrateDate =
+      const CalendarDateConverter();
+  static TypeConverter<DateTime?, String?> $converterrateDaten =
+      NullAwareTypeConverter.wrap($converterrateDate);
+  static TypeConverter<Decimal, String> $convertershare =
+      const DecimalConverter();
+}
+
+class ZakatFrozenLineRow extends DataClass
+    implements Insertable<ZakatFrozenLineRow> {
+  final String id;
+  final String yearId;
+  final int position;
+
+  /// item or extra
+  final String source;
+
+  /// The investment or extra-line id.
+  final String? refId;
+  final String name;
+  final String unit;
+  final Decimal value;
+  final Decimal heldInterest;
+  final DateTime? valueDate;
+  final Decimal? rate;
+  final DateTime? rateDate;
+  final Decimal share;
+  final String section;
+  final String? notice;
+  final String? extraKind;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const ZakatFrozenLineRow({
+    required this.id,
+    required this.yearId,
+    required this.position,
+    required this.source,
+    this.refId,
+    required this.name,
+    required this.unit,
+    required this.value,
+    required this.heldInterest,
+    this.valueDate,
+    this.rate,
+    this.rateDate,
+    required this.share,
+    required this.section,
+    this.notice,
+    this.extraKind,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['year_id'] = Variable<String>(yearId);
+    map['position'] = Variable<int>(position);
+    map['source'] = Variable<String>(source);
+    if (!nullToAbsent || refId != null) {
+      map['ref_id'] = Variable<String>(refId);
+    }
+    map['name'] = Variable<String>(name);
+    map['unit'] = Variable<String>(unit);
+    {
+      map['value'] = Variable<String>(
+        $ZakatFrozenLinesTable.$convertervalue.toSql(value),
+      );
+    }
+    {
+      map['held_interest'] = Variable<String>(
+        $ZakatFrozenLinesTable.$converterheldInterest.toSql(heldInterest),
+      );
+    }
+    if (!nullToAbsent || valueDate != null) {
+      map['value_date'] = Variable<String>(
+        $ZakatFrozenLinesTable.$convertervalueDaten.toSql(valueDate),
+      );
+    }
+    if (!nullToAbsent || rate != null) {
+      map['rate'] = Variable<String>(
+        $ZakatFrozenLinesTable.$converterraten.toSql(rate),
+      );
+    }
+    if (!nullToAbsent || rateDate != null) {
+      map['rate_date'] = Variable<String>(
+        $ZakatFrozenLinesTable.$converterrateDaten.toSql(rateDate),
+      );
+    }
+    {
+      map['share'] = Variable<String>(
+        $ZakatFrozenLinesTable.$convertershare.toSql(share),
+      );
+    }
+    map['section'] = Variable<String>(section);
+    if (!nullToAbsent || notice != null) {
+      map['notice'] = Variable<String>(notice);
+    }
+    if (!nullToAbsent || extraKind != null) {
+      map['extra_kind'] = Variable<String>(extraKind);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  ZakatFrozenLinesCompanion toCompanion(bool nullToAbsent) {
+    return ZakatFrozenLinesCompanion(
+      id: Value(id),
+      yearId: Value(yearId),
+      position: Value(position),
+      source: Value(source),
+      refId: refId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(refId),
+      name: Value(name),
+      unit: Value(unit),
+      value: Value(value),
+      heldInterest: Value(heldInterest),
+      valueDate: valueDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(valueDate),
+      rate: rate == null && nullToAbsent ? const Value.absent() : Value(rate),
+      rateDate: rateDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(rateDate),
+      share: Value(share),
+      section: Value(section),
+      notice: notice == null && nullToAbsent
+          ? const Value.absent()
+          : Value(notice),
+      extraKind: extraKind == null && nullToAbsent
+          ? const Value.absent()
+          : Value(extraKind),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory ZakatFrozenLineRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ZakatFrozenLineRow(
+      id: serializer.fromJson<String>(json['id']),
+      yearId: serializer.fromJson<String>(json['yearId']),
+      position: serializer.fromJson<int>(json['position']),
+      source: serializer.fromJson<String>(json['source']),
+      refId: serializer.fromJson<String?>(json['refId']),
+      name: serializer.fromJson<String>(json['name']),
+      unit: serializer.fromJson<String>(json['unit']),
+      value: serializer.fromJson<Decimal>(json['value']),
+      heldInterest: serializer.fromJson<Decimal>(json['heldInterest']),
+      valueDate: serializer.fromJson<DateTime?>(json['valueDate']),
+      rate: serializer.fromJson<Decimal?>(json['rate']),
+      rateDate: serializer.fromJson<DateTime?>(json['rateDate']),
+      share: serializer.fromJson<Decimal>(json['share']),
+      section: serializer.fromJson<String>(json['section']),
+      notice: serializer.fromJson<String?>(json['notice']),
+      extraKind: serializer.fromJson<String?>(json['extraKind']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'yearId': serializer.toJson<String>(yearId),
+      'position': serializer.toJson<int>(position),
+      'source': serializer.toJson<String>(source),
+      'refId': serializer.toJson<String?>(refId),
+      'name': serializer.toJson<String>(name),
+      'unit': serializer.toJson<String>(unit),
+      'value': serializer.toJson<Decimal>(value),
+      'heldInterest': serializer.toJson<Decimal>(heldInterest),
+      'valueDate': serializer.toJson<DateTime?>(valueDate),
+      'rate': serializer.toJson<Decimal?>(rate),
+      'rateDate': serializer.toJson<DateTime?>(rateDate),
+      'share': serializer.toJson<Decimal>(share),
+      'section': serializer.toJson<String>(section),
+      'notice': serializer.toJson<String?>(notice),
+      'extraKind': serializer.toJson<String?>(extraKind),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  ZakatFrozenLineRow copyWith({
+    String? id,
+    String? yearId,
+    int? position,
+    String? source,
+    Value<String?> refId = const Value.absent(),
+    String? name,
+    String? unit,
+    Decimal? value,
+    Decimal? heldInterest,
+    Value<DateTime?> valueDate = const Value.absent(),
+    Value<Decimal?> rate = const Value.absent(),
+    Value<DateTime?> rateDate = const Value.absent(),
+    Decimal? share,
+    String? section,
+    Value<String?> notice = const Value.absent(),
+    Value<String?> extraKind = const Value.absent(),
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => ZakatFrozenLineRow(
+    id: id ?? this.id,
+    yearId: yearId ?? this.yearId,
+    position: position ?? this.position,
+    source: source ?? this.source,
+    refId: refId.present ? refId.value : this.refId,
+    name: name ?? this.name,
+    unit: unit ?? this.unit,
+    value: value ?? this.value,
+    heldInterest: heldInterest ?? this.heldInterest,
+    valueDate: valueDate.present ? valueDate.value : this.valueDate,
+    rate: rate.present ? rate.value : this.rate,
+    rateDate: rateDate.present ? rateDate.value : this.rateDate,
+    share: share ?? this.share,
+    section: section ?? this.section,
+    notice: notice.present ? notice.value : this.notice,
+    extraKind: extraKind.present ? extraKind.value : this.extraKind,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  ZakatFrozenLineRow copyWithCompanion(ZakatFrozenLinesCompanion data) {
+    return ZakatFrozenLineRow(
+      id: data.id.present ? data.id.value : this.id,
+      yearId: data.yearId.present ? data.yearId.value : this.yearId,
+      position: data.position.present ? data.position.value : this.position,
+      source: data.source.present ? data.source.value : this.source,
+      refId: data.refId.present ? data.refId.value : this.refId,
+      name: data.name.present ? data.name.value : this.name,
+      unit: data.unit.present ? data.unit.value : this.unit,
+      value: data.value.present ? data.value.value : this.value,
+      heldInterest: data.heldInterest.present
+          ? data.heldInterest.value
+          : this.heldInterest,
+      valueDate: data.valueDate.present ? data.valueDate.value : this.valueDate,
+      rate: data.rate.present ? data.rate.value : this.rate,
+      rateDate: data.rateDate.present ? data.rateDate.value : this.rateDate,
+      share: data.share.present ? data.share.value : this.share,
+      section: data.section.present ? data.section.value : this.section,
+      notice: data.notice.present ? data.notice.value : this.notice,
+      extraKind: data.extraKind.present ? data.extraKind.value : this.extraKind,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ZakatFrozenLineRow(')
+          ..write('id: $id, ')
+          ..write('yearId: $yearId, ')
+          ..write('position: $position, ')
+          ..write('source: $source, ')
+          ..write('refId: $refId, ')
+          ..write('name: $name, ')
+          ..write('unit: $unit, ')
+          ..write('value: $value, ')
+          ..write('heldInterest: $heldInterest, ')
+          ..write('valueDate: $valueDate, ')
+          ..write('rate: $rate, ')
+          ..write('rateDate: $rateDate, ')
+          ..write('share: $share, ')
+          ..write('section: $section, ')
+          ..write('notice: $notice, ')
+          ..write('extraKind: $extraKind, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    yearId,
+    position,
+    source,
+    refId,
+    name,
+    unit,
+    value,
+    heldInterest,
+    valueDate,
+    rate,
+    rateDate,
+    share,
+    section,
+    notice,
+    extraKind,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ZakatFrozenLineRow &&
+          other.id == this.id &&
+          other.yearId == this.yearId &&
+          other.position == this.position &&
+          other.source == this.source &&
+          other.refId == this.refId &&
+          other.name == this.name &&
+          other.unit == this.unit &&
+          other.value == this.value &&
+          other.heldInterest == this.heldInterest &&
+          other.valueDate == this.valueDate &&
+          other.rate == this.rate &&
+          other.rateDate == this.rateDate &&
+          other.share == this.share &&
+          other.section == this.section &&
+          other.notice == this.notice &&
+          other.extraKind == this.extraKind &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class ZakatFrozenLinesCompanion extends UpdateCompanion<ZakatFrozenLineRow> {
+  final Value<String> id;
+  final Value<String> yearId;
+  final Value<int> position;
+  final Value<String> source;
+  final Value<String?> refId;
+  final Value<String> name;
+  final Value<String> unit;
+  final Value<Decimal> value;
+  final Value<Decimal> heldInterest;
+  final Value<DateTime?> valueDate;
+  final Value<Decimal?> rate;
+  final Value<DateTime?> rateDate;
+  final Value<Decimal> share;
+  final Value<String> section;
+  final Value<String?> notice;
+  final Value<String?> extraKind;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const ZakatFrozenLinesCompanion({
+    this.id = const Value.absent(),
+    this.yearId = const Value.absent(),
+    this.position = const Value.absent(),
+    this.source = const Value.absent(),
+    this.refId = const Value.absent(),
+    this.name = const Value.absent(),
+    this.unit = const Value.absent(),
+    this.value = const Value.absent(),
+    this.heldInterest = const Value.absent(),
+    this.valueDate = const Value.absent(),
+    this.rate = const Value.absent(),
+    this.rateDate = const Value.absent(),
+    this.share = const Value.absent(),
+    this.section = const Value.absent(),
+    this.notice = const Value.absent(),
+    this.extraKind = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ZakatFrozenLinesCompanion.insert({
+    required String id,
+    required String yearId,
+    required int position,
+    required String source,
+    this.refId = const Value.absent(),
+    required String name,
+    required String unit,
+    required Decimal value,
+    required Decimal heldInterest,
+    this.valueDate = const Value.absent(),
+    this.rate = const Value.absent(),
+    this.rateDate = const Value.absent(),
+    required Decimal share,
+    required String section,
+    this.notice = const Value.absent(),
+    this.extraKind = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       yearId = Value(yearId),
+       position = Value(position),
+       source = Value(source),
+       name = Value(name),
+       unit = Value(unit),
+       value = Value(value),
+       heldInterest = Value(heldInterest),
+       share = Value(share),
+       section = Value(section),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<ZakatFrozenLineRow> custom({
+    Expression<String>? id,
+    Expression<String>? yearId,
+    Expression<int>? position,
+    Expression<String>? source,
+    Expression<String>? refId,
+    Expression<String>? name,
+    Expression<String>? unit,
+    Expression<String>? value,
+    Expression<String>? heldInterest,
+    Expression<String>? valueDate,
+    Expression<String>? rate,
+    Expression<String>? rateDate,
+    Expression<String>? share,
+    Expression<String>? section,
+    Expression<String>? notice,
+    Expression<String>? extraKind,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (yearId != null) 'year_id': yearId,
+      if (position != null) 'position': position,
+      if (source != null) 'source': source,
+      if (refId != null) 'ref_id': refId,
+      if (name != null) 'name': name,
+      if (unit != null) 'unit': unit,
+      if (value != null) 'value': value,
+      if (heldInterest != null) 'held_interest': heldInterest,
+      if (valueDate != null) 'value_date': valueDate,
+      if (rate != null) 'rate': rate,
+      if (rateDate != null) 'rate_date': rateDate,
+      if (share != null) 'share': share,
+      if (section != null) 'section': section,
+      if (notice != null) 'notice': notice,
+      if (extraKind != null) 'extra_kind': extraKind,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ZakatFrozenLinesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? yearId,
+    Value<int>? position,
+    Value<String>? source,
+    Value<String?>? refId,
+    Value<String>? name,
+    Value<String>? unit,
+    Value<Decimal>? value,
+    Value<Decimal>? heldInterest,
+    Value<DateTime?>? valueDate,
+    Value<Decimal?>? rate,
+    Value<DateTime?>? rateDate,
+    Value<Decimal>? share,
+    Value<String>? section,
+    Value<String?>? notice,
+    Value<String?>? extraKind,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return ZakatFrozenLinesCompanion(
+      id: id ?? this.id,
+      yearId: yearId ?? this.yearId,
+      position: position ?? this.position,
+      source: source ?? this.source,
+      refId: refId ?? this.refId,
+      name: name ?? this.name,
+      unit: unit ?? this.unit,
+      value: value ?? this.value,
+      heldInterest: heldInterest ?? this.heldInterest,
+      valueDate: valueDate ?? this.valueDate,
+      rate: rate ?? this.rate,
+      rateDate: rateDate ?? this.rateDate,
+      share: share ?? this.share,
+      section: section ?? this.section,
+      notice: notice ?? this.notice,
+      extraKind: extraKind ?? this.extraKind,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (yearId.present) {
+      map['year_id'] = Variable<String>(yearId.value);
+    }
+    if (position.present) {
+      map['position'] = Variable<int>(position.value);
+    }
+    if (source.present) {
+      map['source'] = Variable<String>(source.value);
+    }
+    if (refId.present) {
+      map['ref_id'] = Variable<String>(refId.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (unit.present) {
+      map['unit'] = Variable<String>(unit.value);
+    }
+    if (value.present) {
+      map['value'] = Variable<String>(
+        $ZakatFrozenLinesTable.$convertervalue.toSql(value.value),
+      );
+    }
+    if (heldInterest.present) {
+      map['held_interest'] = Variable<String>(
+        $ZakatFrozenLinesTable.$converterheldInterest.toSql(heldInterest.value),
+      );
+    }
+    if (valueDate.present) {
+      map['value_date'] = Variable<String>(
+        $ZakatFrozenLinesTable.$convertervalueDaten.toSql(valueDate.value),
+      );
+    }
+    if (rate.present) {
+      map['rate'] = Variable<String>(
+        $ZakatFrozenLinesTable.$converterraten.toSql(rate.value),
+      );
+    }
+    if (rateDate.present) {
+      map['rate_date'] = Variable<String>(
+        $ZakatFrozenLinesTable.$converterrateDaten.toSql(rateDate.value),
+      );
+    }
+    if (share.present) {
+      map['share'] = Variable<String>(
+        $ZakatFrozenLinesTable.$convertershare.toSql(share.value),
+      );
+    }
+    if (section.present) {
+      map['section'] = Variable<String>(section.value);
+    }
+    if (notice.present) {
+      map['notice'] = Variable<String>(notice.value);
+    }
+    if (extraKind.present) {
+      map['extra_kind'] = Variable<String>(extraKind.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ZakatFrozenLinesCompanion(')
+          ..write('id: $id, ')
+          ..write('yearId: $yearId, ')
+          ..write('position: $position, ')
+          ..write('source: $source, ')
+          ..write('refId: $refId, ')
+          ..write('name: $name, ')
+          ..write('unit: $unit, ')
+          ..write('value: $value, ')
+          ..write('heldInterest: $heldInterest, ')
+          ..write('valueDate: $valueDate, ')
+          ..write('rate: $rate, ')
+          ..write('rateDate: $rateDate, ')
+          ..write('share: $share, ')
+          ..write('section: $section, ')
+          ..write('notice: $notice, ')
+          ..write('extraKind: $extraKind, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ZakatGiftsTable extends ZakatGifts
+    with TableInfo<$ZakatGiftsTable, ZakatGiftRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ZakatGiftsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _yearIdMeta = const VerificationMeta('yearId');
+  @override
+  late final GeneratedColumn<String> yearId = GeneratedColumn<String>(
+    'year_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES zakat_years (id) ON DELETE CASCADE',
+    ),
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<DateTime, String> date =
+      GeneratedColumn<String>(
+        'date',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<DateTime>($ZakatGiftsTable.$converterdate);
+  @override
+  late final GeneratedColumnWithTypeConverter<Decimal, String> amount =
+      GeneratedColumn<String>(
+        'amount',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<Decimal>($ZakatGiftsTable.$converteramount);
+  static const VerificationMeta _unitMeta = const VerificationMeta('unit');
+  @override
+  late final GeneratedColumn<String> unit = GeneratedColumn<String>(
+    'unit',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<Decimal?, String> rate =
+      GeneratedColumn<String>(
+        'rate',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      ).withConverter<Decimal?>($ZakatGiftsTable.$converterraten);
+  @override
+  late final GeneratedColumnWithTypeConverter<DateTime?, String> rateDate =
+      GeneratedColumn<String>(
+        'rate_date',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      ).withConverter<DateTime?>($ZakatGiftsTable.$converterrateDaten);
+  static const VerificationMeta _rateViewMeta = const VerificationMeta(
+    'rateView',
+  );
+  @override
+  late final GeneratedColumn<String> rateView = GeneratedColumn<String>(
+    'rate_view',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _noteMeta = const VerificationMeta('note');
+  @override
+  late final GeneratedColumn<String> note = GeneratedColumn<String>(
+    'note',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    yearId,
+    date,
+    amount,
+    unit,
+    rate,
+    rateDate,
+    rateView,
+    note,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'zakat_gifts';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ZakatGiftRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('year_id')) {
+      context.handle(
+        _yearIdMeta,
+        yearId.isAcceptableOrUnknown(data['year_id']!, _yearIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_yearIdMeta);
+    }
+    if (data.containsKey('unit')) {
+      context.handle(
+        _unitMeta,
+        unit.isAcceptableOrUnknown(data['unit']!, _unitMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_unitMeta);
+    }
+    if (data.containsKey('rate_view')) {
+      context.handle(
+        _rateViewMeta,
+        rateView.isAcceptableOrUnknown(data['rate_view']!, _rateViewMeta),
+      );
+    }
+    if (data.containsKey('note')) {
+      context.handle(
+        _noteMeta,
+        note.isAcceptableOrUnknown(data['note']!, _noteMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ZakatGiftRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ZakatGiftRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      yearId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}year_id'],
+      )!,
+      date: $ZakatGiftsTable.$converterdate.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}date'],
+        )!,
+      ),
+      amount: $ZakatGiftsTable.$converteramount.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}amount'],
+        )!,
+      ),
+      unit: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}unit'],
+      )!,
+      rate: $ZakatGiftsTable.$converterraten.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}rate'],
+        ),
+      ),
+      rateDate: $ZakatGiftsTable.$converterrateDaten.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}rate_date'],
+        ),
+      ),
+      rateView: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}rate_view'],
+      ),
+      note: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}note'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $ZakatGiftsTable createAlias(String alias) {
+    return $ZakatGiftsTable(attachedDatabase, alias);
+  }
+
+  static TypeConverter<DateTime, String> $converterdate =
+      const CalendarDateConverter();
+  static TypeConverter<Decimal, String> $converteramount =
+      const DecimalConverter();
+  static TypeConverter<Decimal, String> $converterrate =
+      const DecimalConverter();
+  static TypeConverter<Decimal?, String?> $converterraten =
+      NullAwareTypeConverter.wrap($converterrate);
+  static TypeConverter<DateTime, String> $converterrateDate =
+      const CalendarDateConverter();
+  static TypeConverter<DateTime?, String?> $converterrateDaten =
+      NullAwareTypeConverter.wrap($converterrateDate);
+}
+
+class ZakatGiftRow extends DataClass implements Insertable<ZakatGiftRow> {
+  final String id;
+  final String yearId;
+  final DateTime date;
+  final Decimal amount;
+  final String unit;
+
+  /// Rate, rate date and rate view are all null when the unit is the year base.
+  final Decimal? rate;
+  final DateTime? rateDate;
+  final String? rateView;
+  final String? note;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const ZakatGiftRow({
+    required this.id,
+    required this.yearId,
+    required this.date,
+    required this.amount,
+    required this.unit,
+    this.rate,
+    this.rateDate,
+    this.rateView,
+    this.note,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['year_id'] = Variable<String>(yearId);
+    {
+      map['date'] = Variable<String>(
+        $ZakatGiftsTable.$converterdate.toSql(date),
+      );
+    }
+    {
+      map['amount'] = Variable<String>(
+        $ZakatGiftsTable.$converteramount.toSql(amount),
+      );
+    }
+    map['unit'] = Variable<String>(unit);
+    if (!nullToAbsent || rate != null) {
+      map['rate'] = Variable<String>(
+        $ZakatGiftsTable.$converterraten.toSql(rate),
+      );
+    }
+    if (!nullToAbsent || rateDate != null) {
+      map['rate_date'] = Variable<String>(
+        $ZakatGiftsTable.$converterrateDaten.toSql(rateDate),
+      );
+    }
+    if (!nullToAbsent || rateView != null) {
+      map['rate_view'] = Variable<String>(rateView);
+    }
+    if (!nullToAbsent || note != null) {
+      map['note'] = Variable<String>(note);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  ZakatGiftsCompanion toCompanion(bool nullToAbsent) {
+    return ZakatGiftsCompanion(
+      id: Value(id),
+      yearId: Value(yearId),
+      date: Value(date),
+      amount: Value(amount),
+      unit: Value(unit),
+      rate: rate == null && nullToAbsent ? const Value.absent() : Value(rate),
+      rateDate: rateDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(rateDate),
+      rateView: rateView == null && nullToAbsent
+          ? const Value.absent()
+          : Value(rateView),
+      note: note == null && nullToAbsent ? const Value.absent() : Value(note),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory ZakatGiftRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ZakatGiftRow(
+      id: serializer.fromJson<String>(json['id']),
+      yearId: serializer.fromJson<String>(json['yearId']),
+      date: serializer.fromJson<DateTime>(json['date']),
+      amount: serializer.fromJson<Decimal>(json['amount']),
+      unit: serializer.fromJson<String>(json['unit']),
+      rate: serializer.fromJson<Decimal?>(json['rate']),
+      rateDate: serializer.fromJson<DateTime?>(json['rateDate']),
+      rateView: serializer.fromJson<String?>(json['rateView']),
+      note: serializer.fromJson<String?>(json['note']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'yearId': serializer.toJson<String>(yearId),
+      'date': serializer.toJson<DateTime>(date),
+      'amount': serializer.toJson<Decimal>(amount),
+      'unit': serializer.toJson<String>(unit),
+      'rate': serializer.toJson<Decimal?>(rate),
+      'rateDate': serializer.toJson<DateTime?>(rateDate),
+      'rateView': serializer.toJson<String?>(rateView),
+      'note': serializer.toJson<String?>(note),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  ZakatGiftRow copyWith({
+    String? id,
+    String? yearId,
+    DateTime? date,
+    Decimal? amount,
+    String? unit,
+    Value<Decimal?> rate = const Value.absent(),
+    Value<DateTime?> rateDate = const Value.absent(),
+    Value<String?> rateView = const Value.absent(),
+    Value<String?> note = const Value.absent(),
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => ZakatGiftRow(
+    id: id ?? this.id,
+    yearId: yearId ?? this.yearId,
+    date: date ?? this.date,
+    amount: amount ?? this.amount,
+    unit: unit ?? this.unit,
+    rate: rate.present ? rate.value : this.rate,
+    rateDate: rateDate.present ? rateDate.value : this.rateDate,
+    rateView: rateView.present ? rateView.value : this.rateView,
+    note: note.present ? note.value : this.note,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  ZakatGiftRow copyWithCompanion(ZakatGiftsCompanion data) {
+    return ZakatGiftRow(
+      id: data.id.present ? data.id.value : this.id,
+      yearId: data.yearId.present ? data.yearId.value : this.yearId,
+      date: data.date.present ? data.date.value : this.date,
+      amount: data.amount.present ? data.amount.value : this.amount,
+      unit: data.unit.present ? data.unit.value : this.unit,
+      rate: data.rate.present ? data.rate.value : this.rate,
+      rateDate: data.rateDate.present ? data.rateDate.value : this.rateDate,
+      rateView: data.rateView.present ? data.rateView.value : this.rateView,
+      note: data.note.present ? data.note.value : this.note,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ZakatGiftRow(')
+          ..write('id: $id, ')
+          ..write('yearId: $yearId, ')
+          ..write('date: $date, ')
+          ..write('amount: $amount, ')
+          ..write('unit: $unit, ')
+          ..write('rate: $rate, ')
+          ..write('rateDate: $rateDate, ')
+          ..write('rateView: $rateView, ')
+          ..write('note: $note, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    yearId,
+    date,
+    amount,
+    unit,
+    rate,
+    rateDate,
+    rateView,
+    note,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ZakatGiftRow &&
+          other.id == this.id &&
+          other.yearId == this.yearId &&
+          other.date == this.date &&
+          other.amount == this.amount &&
+          other.unit == this.unit &&
+          other.rate == this.rate &&
+          other.rateDate == this.rateDate &&
+          other.rateView == this.rateView &&
+          other.note == this.note &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class ZakatGiftsCompanion extends UpdateCompanion<ZakatGiftRow> {
+  final Value<String> id;
+  final Value<String> yearId;
+  final Value<DateTime> date;
+  final Value<Decimal> amount;
+  final Value<String> unit;
+  final Value<Decimal?> rate;
+  final Value<DateTime?> rateDate;
+  final Value<String?> rateView;
+  final Value<String?> note;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const ZakatGiftsCompanion({
+    this.id = const Value.absent(),
+    this.yearId = const Value.absent(),
+    this.date = const Value.absent(),
+    this.amount = const Value.absent(),
+    this.unit = const Value.absent(),
+    this.rate = const Value.absent(),
+    this.rateDate = const Value.absent(),
+    this.rateView = const Value.absent(),
+    this.note = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ZakatGiftsCompanion.insert({
+    required String id,
+    required String yearId,
+    required DateTime date,
+    required Decimal amount,
+    required String unit,
+    this.rate = const Value.absent(),
+    this.rateDate = const Value.absent(),
+    this.rateView = const Value.absent(),
+    this.note = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       yearId = Value(yearId),
+       date = Value(date),
+       amount = Value(amount),
+       unit = Value(unit),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<ZakatGiftRow> custom({
+    Expression<String>? id,
+    Expression<String>? yearId,
+    Expression<String>? date,
+    Expression<String>? amount,
+    Expression<String>? unit,
+    Expression<String>? rate,
+    Expression<String>? rateDate,
+    Expression<String>? rateView,
+    Expression<String>? note,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (yearId != null) 'year_id': yearId,
+      if (date != null) 'date': date,
+      if (amount != null) 'amount': amount,
+      if (unit != null) 'unit': unit,
+      if (rate != null) 'rate': rate,
+      if (rateDate != null) 'rate_date': rateDate,
+      if (rateView != null) 'rate_view': rateView,
+      if (note != null) 'note': note,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ZakatGiftsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? yearId,
+    Value<DateTime>? date,
+    Value<Decimal>? amount,
+    Value<String>? unit,
+    Value<Decimal?>? rate,
+    Value<DateTime?>? rateDate,
+    Value<String?>? rateView,
+    Value<String?>? note,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return ZakatGiftsCompanion(
+      id: id ?? this.id,
+      yearId: yearId ?? this.yearId,
+      date: date ?? this.date,
+      amount: amount ?? this.amount,
+      unit: unit ?? this.unit,
+      rate: rate ?? this.rate,
+      rateDate: rateDate ?? this.rateDate,
+      rateView: rateView ?? this.rateView,
+      note: note ?? this.note,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (yearId.present) {
+      map['year_id'] = Variable<String>(yearId.value);
+    }
+    if (date.present) {
+      map['date'] = Variable<String>(
+        $ZakatGiftsTable.$converterdate.toSql(date.value),
+      );
+    }
+    if (amount.present) {
+      map['amount'] = Variable<String>(
+        $ZakatGiftsTable.$converteramount.toSql(amount.value),
+      );
+    }
+    if (unit.present) {
+      map['unit'] = Variable<String>(unit.value);
+    }
+    if (rate.present) {
+      map['rate'] = Variable<String>(
+        $ZakatGiftsTable.$converterraten.toSql(rate.value),
+      );
+    }
+    if (rateDate.present) {
+      map['rate_date'] = Variable<String>(
+        $ZakatGiftsTable.$converterrateDaten.toSql(rateDate.value),
+      );
+    }
+    if (rateView.present) {
+      map['rate_view'] = Variable<String>(rateView.value);
+    }
+    if (note.present) {
+      map['note'] = Variable<String>(note.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ZakatGiftsCompanion(')
+          ..write('id: $id, ')
+          ..write('yearId: $yearId, ')
+          ..write('date: $date, ')
+          ..write('amount: $amount, ')
+          ..write('unit: $unit, ')
+          ..write('rate: $rate, ')
+          ..write('rateDate: $rateDate, ')
+          ..write('rateView: $rateView, ')
+          ..write('note: $note, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3691,6 +7451,15 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $InflationOverridesTable(this);
   late final $AppSettingsTable appSettings = $AppSettingsTable(this);
   late final $NoZakatYearsTable noZakatYears = $NoZakatYearsTable(this);
+  late final $ZakatCyclesTable zakatCycles = $ZakatCyclesTable(this);
+  late final $ZakatYearsTable zakatYears = $ZakatYearsTable(this);
+  late final $ZakatExtraLinesTable zakatExtraLines = $ZakatExtraLinesTable(
+    this,
+  );
+  late final $ZakatFrozenLinesTable zakatFrozenLines = $ZakatFrozenLinesTable(
+    this,
+  );
+  late final $ZakatGiftsTable zakatGifts = $ZakatGiftsTable(this);
   late final Index historyByInvestmentDate = Index(
     'history_by_investment_date',
     'CREATE INDEX history_by_investment_date ON history_entries (investment_id, date)',
@@ -3707,6 +7476,18 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     'rates_by_pair',
     'CREATE INDEX rates_by_pair ON rates (from_unit, to_unit, as_of)',
   );
+  late final Index zakatExtraLinesByYear = Index(
+    'zakat_extra_lines_by_year',
+    'CREATE INDEX zakat_extra_lines_by_year ON zakat_extra_lines (year_id)',
+  );
+  late final Index zakatFrozenLinesByYear = Index(
+    'zakat_frozen_lines_by_year',
+    'CREATE INDEX zakat_frozen_lines_by_year ON zakat_frozen_lines (year_id, position)',
+  );
+  late final Index zakatGiftsByYearDate = Index(
+    'zakat_gifts_by_year_date',
+    'CREATE INDEX zakat_gifts_by_year_date ON zakat_gifts (year_id, date)',
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3718,10 +7499,18 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     inflationOverrides,
     appSettings,
     noZakatYears,
+    zakatCycles,
+    zakatYears,
+    zakatExtraLines,
+    zakatFrozenLines,
+    zakatGifts,
     historyByInvestmentDate,
     historyOneValueUpdatePerDay,
     historyOneSkipPerPlanDate,
     ratesByPair,
+    zakatExtraLinesByYear,
+    zakatFrozenLinesByYear,
+    zakatGiftsByYearDate,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -3731,6 +7520,27 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         limitUpdateKind: UpdateKind.delete,
       ),
       result: [TableUpdate('history_entries', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'zakat_years',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('zakat_extra_lines', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'zakat_years',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('zakat_frozen_lines', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'zakat_years',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('zakat_gifts', kind: UpdateKind.delete)],
     ),
   ]);
 }
@@ -5326,6 +9136,12 @@ typedef $$AppSettingsTableCreateCompanionBuilder =
       Value<String?> zakatYear,
       Value<String?> longTermMethod,
       Value<bool?> jewelleryZakatable,
+      Value<String?> nisabMetal,
+      Value<bool> reminderOn,
+      Value<int> reminderDays,
+      Value<int> reminderMinute,
+      Value<bool> reminderAsked,
+      Value<String?> givingRateView,
       required DateTime createdAt,
       required DateTime updatedAt,
       Value<int> rowid,
@@ -5338,6 +9154,12 @@ typedef $$AppSettingsTableUpdateCompanionBuilder =
       Value<String?> zakatYear,
       Value<String?> longTermMethod,
       Value<bool?> jewelleryZakatable,
+      Value<String?> nisabMetal,
+      Value<bool> reminderOn,
+      Value<int> reminderDays,
+      Value<int> reminderMinute,
+      Value<bool> reminderAsked,
+      Value<String?> givingRateView,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
       Value<int> rowid,
@@ -5379,6 +9201,36 @@ class $$AppSettingsTableFilterComposer
 
   ColumnFilters<bool> get jewelleryZakatable => $composableBuilder(
     column: $table.jewelleryZakatable,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nisabMetal => $composableBuilder(
+    column: $table.nisabMetal,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get reminderOn => $composableBuilder(
+    column: $table.reminderOn,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get reminderDays => $composableBuilder(
+    column: $table.reminderDays,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get reminderMinute => $composableBuilder(
+    column: $table.reminderMinute,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get reminderAsked => $composableBuilder(
+    column: $table.reminderAsked,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get givingRateView => $composableBuilder(
+    column: $table.givingRateView,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -5432,6 +9284,36 @@ class $$AppSettingsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get nisabMetal => $composableBuilder(
+    column: $table.nisabMetal,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get reminderOn => $composableBuilder(
+    column: $table.reminderOn,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get reminderDays => $composableBuilder(
+    column: $table.reminderDays,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get reminderMinute => $composableBuilder(
+    column: $table.reminderMinute,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get reminderAsked => $composableBuilder(
+    column: $table.reminderAsked,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get givingRateView => $composableBuilder(
+    column: $table.givingRateView,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -5475,6 +9357,36 @@ class $$AppSettingsTableAnnotationComposer
 
   GeneratedColumn<bool> get jewelleryZakatable => $composableBuilder(
     column: $table.jewelleryZakatable,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get nisabMetal => $composableBuilder(
+    column: $table.nisabMetal,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get reminderOn => $composableBuilder(
+    column: $table.reminderOn,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get reminderDays => $composableBuilder(
+    column: $table.reminderDays,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get reminderMinute => $composableBuilder(
+    column: $table.reminderMinute,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get reminderAsked => $composableBuilder(
+    column: $table.reminderAsked,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get givingRateView => $composableBuilder(
+    column: $table.givingRateView,
     builder: (column) => column,
   );
 
@@ -5522,6 +9434,12 @@ class $$AppSettingsTableTableManager
                 Value<String?> zakatYear = const Value.absent(),
                 Value<String?> longTermMethod = const Value.absent(),
                 Value<bool?> jewelleryZakatable = const Value.absent(),
+                Value<String?> nisabMetal = const Value.absent(),
+                Value<bool> reminderOn = const Value.absent(),
+                Value<int> reminderDays = const Value.absent(),
+                Value<int> reminderMinute = const Value.absent(),
+                Value<bool> reminderAsked = const Value.absent(),
+                Value<String?> givingRateView = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
@@ -5532,6 +9450,12 @@ class $$AppSettingsTableTableManager
                 zakatYear: zakatYear,
                 longTermMethod: longTermMethod,
                 jewelleryZakatable: jewelleryZakatable,
+                nisabMetal: nisabMetal,
+                reminderOn: reminderOn,
+                reminderDays: reminderDays,
+                reminderMinute: reminderMinute,
+                reminderAsked: reminderAsked,
+                givingRateView: givingRateView,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 rowid: rowid,
@@ -5544,6 +9468,12 @@ class $$AppSettingsTableTableManager
                 Value<String?> zakatYear = const Value.absent(),
                 Value<String?> longTermMethod = const Value.absent(),
                 Value<bool?> jewelleryZakatable = const Value.absent(),
+                Value<String?> nisabMetal = const Value.absent(),
+                Value<bool> reminderOn = const Value.absent(),
+                Value<int> reminderDays = const Value.absent(),
+                Value<int> reminderMinute = const Value.absent(),
+                Value<bool> reminderAsked = const Value.absent(),
+                Value<String?> givingRateView = const Value.absent(),
                 required DateTime createdAt,
                 required DateTime updatedAt,
                 Value<int> rowid = const Value.absent(),
@@ -5554,6 +9484,12 @@ class $$AppSettingsTableTableManager
                 zakatYear: zakatYear,
                 longTermMethod: longTermMethod,
                 jewelleryZakatable: jewelleryZakatable,
+                nisabMetal: nisabMetal,
+                reminderOn: reminderOn,
+                reminderDays: reminderDays,
+                reminderMinute: reminderMinute,
+                reminderAsked: reminderAsked,
+                givingRateView: givingRateView,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 rowid: rowid,
@@ -5782,6 +9718,2325 @@ typedef $$NoZakatYearsTableProcessedTableManager =
       NoZakatYearRow,
       PrefetchHooks Function()
     >;
+typedef $$ZakatCyclesTableCreateCompanionBuilder =
+    ZakatCyclesCompanion Function({
+      required String id,
+      required String calendar,
+      required int month,
+      required int day,
+      required DateTime fromDate,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<int> rowid,
+    });
+typedef $$ZakatCyclesTableUpdateCompanionBuilder =
+    ZakatCyclesCompanion Function({
+      Value<String> id,
+      Value<String> calendar,
+      Value<int> month,
+      Value<int> day,
+      Value<DateTime> fromDate,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$ZakatCyclesTableFilterComposer
+    extends Composer<_$AppDatabase, $ZakatCyclesTable> {
+  $$ZakatCyclesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get calendar => $composableBuilder(
+    column: $table.calendar,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get month => $composableBuilder(
+    column: $table.month,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get day => $composableBuilder(
+    column: $table.day,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<DateTime, DateTime, String> get fromDate =>
+      $composableBuilder(
+        column: $table.fromDate,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ZakatCyclesTableOrderingComposer
+    extends Composer<_$AppDatabase, $ZakatCyclesTable> {
+  $$ZakatCyclesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get calendar => $composableBuilder(
+    column: $table.calendar,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get month => $composableBuilder(
+    column: $table.month,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get day => $composableBuilder(
+    column: $table.day,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get fromDate => $composableBuilder(
+    column: $table.fromDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ZakatCyclesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ZakatCyclesTable> {
+  $$ZakatCyclesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get calendar =>
+      $composableBuilder(column: $table.calendar, builder: (column) => column);
+
+  GeneratedColumn<int> get month =>
+      $composableBuilder(column: $table.month, builder: (column) => column);
+
+  GeneratedColumn<int> get day =>
+      $composableBuilder(column: $table.day, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<DateTime, String> get fromDate =>
+      $composableBuilder(column: $table.fromDate, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$ZakatCyclesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ZakatCyclesTable,
+          ZakatCycleRow,
+          $$ZakatCyclesTableFilterComposer,
+          $$ZakatCyclesTableOrderingComposer,
+          $$ZakatCyclesTableAnnotationComposer,
+          $$ZakatCyclesTableCreateCompanionBuilder,
+          $$ZakatCyclesTableUpdateCompanionBuilder,
+          (
+            ZakatCycleRow,
+            BaseReferences<_$AppDatabase, $ZakatCyclesTable, ZakatCycleRow>,
+          ),
+          ZakatCycleRow,
+          PrefetchHooks Function()
+        > {
+  $$ZakatCyclesTableTableManager(_$AppDatabase db, $ZakatCyclesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ZakatCyclesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ZakatCyclesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ZakatCyclesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> calendar = const Value.absent(),
+                Value<int> month = const Value.absent(),
+                Value<int> day = const Value.absent(),
+                Value<DateTime> fromDate = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ZakatCyclesCompanion(
+                id: id,
+                calendar: calendar,
+                month: month,
+                day: day,
+                fromDate: fromDate,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String calendar,
+                required int month,
+                required int day,
+                required DateTime fromDate,
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => ZakatCyclesCompanion.insert(
+                id: id,
+                calendar: calendar,
+                month: month,
+                day: day,
+                fromDate: fromDate,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$ZakatCyclesTable, ZakatCycleRow>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $ZakatCyclesTable,
+                    ZakatCycleRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ZakatCyclesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ZakatCyclesTable,
+      ZakatCycleRow,
+      $$ZakatCyclesTableFilterComposer,
+      $$ZakatCyclesTableOrderingComposer,
+      $$ZakatCyclesTableAnnotationComposer,
+      $$ZakatCyclesTableCreateCompanionBuilder,
+      $$ZakatCyclesTableUpdateCompanionBuilder,
+      (
+        ZakatCycleRow,
+        BaseReferences<_$AppDatabase, $ZakatCyclesTable, ZakatCycleRow>,
+      ),
+      ZakatCycleRow,
+      PrefetchHooks Function()
+    >;
+typedef $$ZakatYearsTableCreateCompanionBuilder = ZakatYearsCompanion Function({
+  required String id,
+  required DateTime dueKey,
+  Value<DateTime?> movedDue,
+  Value<Decimal> debts,
+  Value<bool> deductDebts,
+  Value<DateTime?> startedOn,
+  Value<String?> frozenBase,
+  Value<String?> frozenNisabMetal,
+  Value<Decimal?> frozenMetalRate,
+  Value<DateTime?> frozenMetalRateDate,
+  required DateTime createdAt,
+  required DateTime updatedAt,
+  Value<int> rowid,
+});
+typedef $$ZakatYearsTableUpdateCompanionBuilder = ZakatYearsCompanion Function({
+  Value<String> id,
+  Value<DateTime> dueKey,
+  Value<DateTime?> movedDue,
+  Value<Decimal> debts,
+  Value<bool> deductDebts,
+  Value<DateTime?> startedOn,
+  Value<String?> frozenBase,
+  Value<String?> frozenNisabMetal,
+  Value<Decimal?> frozenMetalRate,
+  Value<DateTime?> frozenMetalRateDate,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
+  Value<int> rowid,
+});
+
+final class $$ZakatYearsTableReferences
+    extends BaseReferences<_$AppDatabase, $ZakatYearsTable, ZakatYearRow> {
+  $$ZakatYearsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$ZakatExtraLinesTable, List<ZakatExtraLineRow>>
+  _zakatExtraLinesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.zakatExtraLines,
+    aliasName: 'zakat_years__id__zakat_extra_lines__year_id',
+  );
+
+  $$ZakatExtraLinesTableProcessedTableManager get zakatExtraLinesRefs {
+    final manager = $$ZakatExtraLinesTableTableManager(
+      $_db,
+      $_db.zakatExtraLines,
+    ).filter((f) => f.yearId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _zakatExtraLinesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$ZakatFrozenLinesTable, List<ZakatFrozenLineRow>>
+  _zakatFrozenLinesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.zakatFrozenLines,
+    aliasName: 'zakat_years__id__zakat_frozen_lines__year_id',
+  );
+
+  $$ZakatFrozenLinesTableProcessedTableManager get zakatFrozenLinesRefs {
+    final manager = $$ZakatFrozenLinesTableTableManager(
+      $_db,
+      $_db.zakatFrozenLines,
+    ).filter((f) => f.yearId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _zakatFrozenLinesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$ZakatGiftsTable, List<ZakatGiftRow>>
+  _zakatGiftsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.zakatGifts,
+    aliasName: 'zakat_years__id__zakat_gifts__year_id',
+  );
+
+  $$ZakatGiftsTableProcessedTableManager get zakatGiftsRefs {
+    final manager = $$ZakatGiftsTableTableManager(
+      $_db,
+      $_db.zakatGifts,
+    ).filter((f) => f.yearId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_zakatGiftsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$ZakatYearsTableFilterComposer
+    extends Composer<_$AppDatabase, $ZakatYearsTable> {
+  $$ZakatYearsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<DateTime, DateTime, String> get dueKey =>
+      $composableBuilder(
+        column: $table.dueKey,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnWithTypeConverterFilters<DateTime?, DateTime, String> get movedDue =>
+      $composableBuilder(
+        column: $table.movedDue,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnWithTypeConverterFilters<Decimal, Decimal, String> get debts =>
+      $composableBuilder(
+        column: $table.debts,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnFilters<bool> get deductDebts => $composableBuilder(
+    column: $table.deductDebts,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<DateTime?, DateTime, String> get startedOn =>
+      $composableBuilder(
+        column: $table.startedOn,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnFilters<String> get frozenBase => $composableBuilder(
+    column: $table.frozenBase,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get frozenNisabMetal => $composableBuilder(
+    column: $table.frozenNisabMetal,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<Decimal?, Decimal, String>
+  get frozenMetalRate => $composableBuilder(
+    column: $table.frozenMetalRate,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<DateTime?, DateTime, String>
+  get frozenMetalRateDate => $composableBuilder(
+    column: $table.frozenMetalRateDate,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> zakatExtraLinesRefs(
+    Expression<bool> Function($$ZakatExtraLinesTableFilterComposer f) f,
+  ) {
+    final $$ZakatExtraLinesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.zakatExtraLines,
+      getReferencedColumn: (t) => t.yearId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ZakatExtraLinesTableFilterComposer(
+            $db: $db,
+            $table: $db.zakatExtraLines,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> zakatFrozenLinesRefs(
+    Expression<bool> Function($$ZakatFrozenLinesTableFilterComposer f) f,
+  ) {
+    final $$ZakatFrozenLinesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.zakatFrozenLines,
+      getReferencedColumn: (t) => t.yearId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ZakatFrozenLinesTableFilterComposer(
+            $db: $db,
+            $table: $db.zakatFrozenLines,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> zakatGiftsRefs(
+    Expression<bool> Function($$ZakatGiftsTableFilterComposer f) f,
+  ) {
+    final $$ZakatGiftsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.zakatGifts,
+      getReferencedColumn: (t) => t.yearId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ZakatGiftsTableFilterComposer(
+            $db: $db,
+            $table: $db.zakatGifts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$ZakatYearsTableOrderingComposer
+    extends Composer<_$AppDatabase, $ZakatYearsTable> {
+  $$ZakatYearsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get dueKey => $composableBuilder(
+    column: $table.dueKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get movedDue => $composableBuilder(
+    column: $table.movedDue,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get debts => $composableBuilder(
+    column: $table.debts,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get deductDebts => $composableBuilder(
+    column: $table.deductDebts,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get startedOn => $composableBuilder(
+    column: $table.startedOn,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get frozenBase => $composableBuilder(
+    column: $table.frozenBase,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get frozenNisabMetal => $composableBuilder(
+    column: $table.frozenNisabMetal,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get frozenMetalRate => $composableBuilder(
+    column: $table.frozenMetalRate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get frozenMetalRateDate => $composableBuilder(
+    column: $table.frozenMetalRateDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ZakatYearsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ZakatYearsTable> {
+  $$ZakatYearsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<DateTime, String> get dueKey =>
+      $composableBuilder(column: $table.dueKey, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<DateTime?, String> get movedDue =>
+      $composableBuilder(column: $table.movedDue, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<Decimal, String> get debts =>
+      $composableBuilder(column: $table.debts, builder: (column) => column);
+
+  GeneratedColumn<bool> get deductDebts => $composableBuilder(
+    column: $table.deductDebts,
+    builder: (column) => column,
+  );
+
+  GeneratedColumnWithTypeConverter<DateTime?, String> get startedOn =>
+      $composableBuilder(column: $table.startedOn, builder: (column) => column);
+
+  GeneratedColumn<String> get frozenBase => $composableBuilder(
+    column: $table.frozenBase,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get frozenNisabMetal => $composableBuilder(
+    column: $table.frozenNisabMetal,
+    builder: (column) => column,
+  );
+
+  GeneratedColumnWithTypeConverter<Decimal?, String> get frozenMetalRate =>
+      $composableBuilder(
+        column: $table.frozenMetalRate,
+        builder: (column) => column,
+      );
+
+  GeneratedColumnWithTypeConverter<DateTime?, String> get frozenMetalRateDate =>
+      $composableBuilder(
+        column: $table.frozenMetalRateDate,
+        builder: (column) => column,
+      );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  Expression<T> zakatExtraLinesRefs<T extends Object>(
+    Expression<T> Function($$ZakatExtraLinesTableAnnotationComposer a) f,
+  ) {
+    final $$ZakatExtraLinesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.zakatExtraLines,
+      getReferencedColumn: (t) => t.yearId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ZakatExtraLinesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.zakatExtraLines,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> zakatFrozenLinesRefs<T extends Object>(
+    Expression<T> Function($$ZakatFrozenLinesTableAnnotationComposer a) f,
+  ) {
+    final $$ZakatFrozenLinesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.zakatFrozenLines,
+      getReferencedColumn: (t) => t.yearId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ZakatFrozenLinesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.zakatFrozenLines,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> zakatGiftsRefs<T extends Object>(
+    Expression<T> Function($$ZakatGiftsTableAnnotationComposer a) f,
+  ) {
+    final $$ZakatGiftsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.zakatGifts,
+      getReferencedColumn: (t) => t.yearId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ZakatGiftsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.zakatGifts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$ZakatYearsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ZakatYearsTable,
+          ZakatYearRow,
+          $$ZakatYearsTableFilterComposer,
+          $$ZakatYearsTableOrderingComposer,
+          $$ZakatYearsTableAnnotationComposer,
+          $$ZakatYearsTableCreateCompanionBuilder,
+          $$ZakatYearsTableUpdateCompanionBuilder,
+          (ZakatYearRow, $$ZakatYearsTableReferences),
+          ZakatYearRow,
+          PrefetchHooks Function({
+            bool zakatExtraLinesRefs,
+            bool zakatFrozenLinesRefs,
+            bool zakatGiftsRefs,
+          })
+        > {
+  $$ZakatYearsTableTableManager(_$AppDatabase db, $ZakatYearsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ZakatYearsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ZakatYearsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ZakatYearsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<DateTime> dueKey = const Value.absent(),
+                Value<DateTime?> movedDue = const Value.absent(),
+                Value<Decimal> debts = const Value.absent(),
+                Value<bool> deductDebts = const Value.absent(),
+                Value<DateTime?> startedOn = const Value.absent(),
+                Value<String?> frozenBase = const Value.absent(),
+                Value<String?> frozenNisabMetal = const Value.absent(),
+                Value<Decimal?> frozenMetalRate = const Value.absent(),
+                Value<DateTime?> frozenMetalRateDate = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ZakatYearsCompanion(
+                id: id,
+                dueKey: dueKey,
+                movedDue: movedDue,
+                debts: debts,
+                deductDebts: deductDebts,
+                startedOn: startedOn,
+                frozenBase: frozenBase,
+                frozenNisabMetal: frozenNisabMetal,
+                frozenMetalRate: frozenMetalRate,
+                frozenMetalRateDate: frozenMetalRateDate,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required DateTime dueKey,
+                Value<DateTime?> movedDue = const Value.absent(),
+                Value<Decimal> debts = const Value.absent(),
+                Value<bool> deductDebts = const Value.absent(),
+                Value<DateTime?> startedOn = const Value.absent(),
+                Value<String?> frozenBase = const Value.absent(),
+                Value<String?> frozenNisabMetal = const Value.absent(),
+                Value<Decimal?> frozenMetalRate = const Value.absent(),
+                Value<DateTime?> frozenMetalRateDate = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => ZakatYearsCompanion.insert(
+                id: id,
+                dueKey: dueKey,
+                movedDue: movedDue,
+                debts: debts,
+                deductDebts: deductDebts,
+                startedOn: startedOn,
+                frozenBase: frozenBase,
+                frozenNisabMetal: frozenNisabMetal,
+                frozenMetalRate: frozenMetalRate,
+                frozenMetalRateDate: frozenMetalRateDate,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$ZakatYearsTable, ZakatYearRow>(table),
+                  $$ZakatYearsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({
+                zakatExtraLinesRefs = false,
+                zakatFrozenLinesRefs = false,
+                zakatGiftsRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (zakatExtraLinesRefs) db.zakatExtraLines,
+                    if (zakatFrozenLinesRefs) db.zakatFrozenLines,
+                    if (zakatGiftsRefs) db.zakatGifts,
+                  ],
+                  addJoins: null,
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (zakatExtraLinesRefs)
+                        await $_getPrefetchedData<
+                          ZakatYearRow,
+                          $ZakatYearsTable,
+                          ZakatExtraLineRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ZakatYearsTableReferences
+                              ._zakatExtraLinesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ZakatYearsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).zakatExtraLinesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.yearId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (zakatFrozenLinesRefs)
+                        await $_getPrefetchedData<
+                          ZakatYearRow,
+                          $ZakatYearsTable,
+                          ZakatFrozenLineRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ZakatYearsTableReferences
+                              ._zakatFrozenLinesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ZakatYearsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).zakatFrozenLinesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.yearId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (zakatGiftsRefs)
+                        await $_getPrefetchedData<
+                          ZakatYearRow,
+                          $ZakatYearsTable,
+                          ZakatGiftRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ZakatYearsTableReferences
+                              ._zakatGiftsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ZakatYearsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).zakatGiftsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.yearId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$ZakatYearsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ZakatYearsTable,
+      ZakatYearRow,
+      $$ZakatYearsTableFilterComposer,
+      $$ZakatYearsTableOrderingComposer,
+      $$ZakatYearsTableAnnotationComposer,
+      $$ZakatYearsTableCreateCompanionBuilder,
+      $$ZakatYearsTableUpdateCompanionBuilder,
+      (ZakatYearRow, $$ZakatYearsTableReferences),
+      ZakatYearRow,
+      PrefetchHooks Function({
+        bool zakatExtraLinesRefs,
+        bool zakatFrozenLinesRefs,
+        bool zakatGiftsRefs,
+      })
+    >;
+typedef $$ZakatExtraLinesTableCreateCompanionBuilder =
+    ZakatExtraLinesCompanion Function({
+      required String id,
+      required String yearId,
+      required String label,
+      required String kind,
+      required Decimal amount,
+      required String unit,
+      required bool goodDebtConfirmed,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<int> rowid,
+    });
+typedef $$ZakatExtraLinesTableUpdateCompanionBuilder =
+    ZakatExtraLinesCompanion Function({
+      Value<String> id,
+      Value<String> yearId,
+      Value<String> label,
+      Value<String> kind,
+      Value<Decimal> amount,
+      Value<String> unit,
+      Value<bool> goodDebtConfirmed,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+
+final class $$ZakatExtraLinesTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $ZakatExtraLinesTable,
+          ZakatExtraLineRow
+        > {
+  $$ZakatExtraLinesTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ZakatYearsTable _yearIdTable(_$AppDatabase db) =>
+      db.zakatYears.createAlias('zakat_extra_lines__year_id__zakat_years__id');
+
+  $$ZakatYearsTableProcessedTableManager get yearId {
+    final $_column = $_itemColumn<String>('year_id')!;
+
+    final manager = $$ZakatYearsTableTableManager(
+      $_db,
+      $_db.zakatYears,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_yearIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$ZakatExtraLinesTableFilterComposer
+    extends Composer<_$AppDatabase, $ZakatExtraLinesTable> {
+  $$ZakatExtraLinesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get label => $composableBuilder(
+    column: $table.label,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<Decimal, Decimal, String> get amount =>
+      $composableBuilder(
+        column: $table.amount,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnFilters<String> get unit => $composableBuilder(
+    column: $table.unit,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get goodDebtConfirmed => $composableBuilder(
+    column: $table.goodDebtConfirmed,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ZakatYearsTableFilterComposer get yearId {
+    final $$ZakatYearsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.yearId,
+      referencedTable: $db.zakatYears,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ZakatYearsTableFilterComposer(
+            $db: $db,
+            $table: $db.zakatYears,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ZakatExtraLinesTableOrderingComposer
+    extends Composer<_$AppDatabase, $ZakatExtraLinesTable> {
+  $$ZakatExtraLinesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get label => $composableBuilder(
+    column: $table.label,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get amount => $composableBuilder(
+    column: $table.amount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get unit => $composableBuilder(
+    column: $table.unit,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get goodDebtConfirmed => $composableBuilder(
+    column: $table.goodDebtConfirmed,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ZakatYearsTableOrderingComposer get yearId {
+    final $$ZakatYearsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.yearId,
+      referencedTable: $db.zakatYears,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ZakatYearsTableOrderingComposer(
+            $db: $db,
+            $table: $db.zakatYears,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ZakatExtraLinesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ZakatExtraLinesTable> {
+  $$ZakatExtraLinesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get label =>
+      $composableBuilder(column: $table.label, builder: (column) => column);
+
+  GeneratedColumn<String> get kind =>
+      $composableBuilder(column: $table.kind, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<Decimal, String> get amount =>
+      $composableBuilder(column: $table.amount, builder: (column) => column);
+
+  GeneratedColumn<String> get unit =>
+      $composableBuilder(column: $table.unit, builder: (column) => column);
+
+  GeneratedColumn<bool> get goodDebtConfirmed => $composableBuilder(
+    column: $table.goodDebtConfirmed,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  $$ZakatYearsTableAnnotationComposer get yearId {
+    final $$ZakatYearsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.yearId,
+      referencedTable: $db.zakatYears,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ZakatYearsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.zakatYears,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ZakatExtraLinesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ZakatExtraLinesTable,
+          ZakatExtraLineRow,
+          $$ZakatExtraLinesTableFilterComposer,
+          $$ZakatExtraLinesTableOrderingComposer,
+          $$ZakatExtraLinesTableAnnotationComposer,
+          $$ZakatExtraLinesTableCreateCompanionBuilder,
+          $$ZakatExtraLinesTableUpdateCompanionBuilder,
+          (ZakatExtraLineRow, $$ZakatExtraLinesTableReferences),
+          ZakatExtraLineRow,
+          PrefetchHooks Function({bool yearId})
+        > {
+  $$ZakatExtraLinesTableTableManager(
+    _$AppDatabase db,
+    $ZakatExtraLinesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ZakatExtraLinesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ZakatExtraLinesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ZakatExtraLinesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> yearId = const Value.absent(),
+                Value<String> label = const Value.absent(),
+                Value<String> kind = const Value.absent(),
+                Value<Decimal> amount = const Value.absent(),
+                Value<String> unit = const Value.absent(),
+                Value<bool> goodDebtConfirmed = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ZakatExtraLinesCompanion(
+                id: id,
+                yearId: yearId,
+                label: label,
+                kind: kind,
+                amount: amount,
+                unit: unit,
+                goodDebtConfirmed: goodDebtConfirmed,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String yearId,
+                required String label,
+                required String kind,
+                required Decimal amount,
+                required String unit,
+                required bool goodDebtConfirmed,
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => ZakatExtraLinesCompanion.insert(
+                id: id,
+                yearId: yearId,
+                label: label,
+                kind: kind,
+                amount: amount,
+                unit: unit,
+                goodDebtConfirmed: goodDebtConfirmed,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$ZakatExtraLinesTable, ZakatExtraLineRow>(table),
+                  $$ZakatExtraLinesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({yearId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (yearId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.yearId,
+                        referencedTable: $$ZakatExtraLinesTableReferences
+                            ._yearIdTable(db),
+                        referencedColumn: $$ZakatExtraLinesTableReferences
+                            ._yearIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$ZakatExtraLinesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ZakatExtraLinesTable,
+      ZakatExtraLineRow,
+      $$ZakatExtraLinesTableFilterComposer,
+      $$ZakatExtraLinesTableOrderingComposer,
+      $$ZakatExtraLinesTableAnnotationComposer,
+      $$ZakatExtraLinesTableCreateCompanionBuilder,
+      $$ZakatExtraLinesTableUpdateCompanionBuilder,
+      (ZakatExtraLineRow, $$ZakatExtraLinesTableReferences),
+      ZakatExtraLineRow,
+      PrefetchHooks Function({bool yearId})
+    >;
+typedef $$ZakatFrozenLinesTableCreateCompanionBuilder =
+    ZakatFrozenLinesCompanion Function({
+      required String id,
+      required String yearId,
+      required int position,
+      required String source,
+      Value<String?> refId,
+      required String name,
+      required String unit,
+      required Decimal value,
+      required Decimal heldInterest,
+      Value<DateTime?> valueDate,
+      Value<Decimal?> rate,
+      Value<DateTime?> rateDate,
+      required Decimal share,
+      required String section,
+      Value<String?> notice,
+      Value<String?> extraKind,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<int> rowid,
+    });
+typedef $$ZakatFrozenLinesTableUpdateCompanionBuilder =
+    ZakatFrozenLinesCompanion Function({
+      Value<String> id,
+      Value<String> yearId,
+      Value<int> position,
+      Value<String> source,
+      Value<String?> refId,
+      Value<String> name,
+      Value<String> unit,
+      Value<Decimal> value,
+      Value<Decimal> heldInterest,
+      Value<DateTime?> valueDate,
+      Value<Decimal?> rate,
+      Value<DateTime?> rateDate,
+      Value<Decimal> share,
+      Value<String> section,
+      Value<String?> notice,
+      Value<String?> extraKind,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+
+final class $$ZakatFrozenLinesTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $ZakatFrozenLinesTable,
+          ZakatFrozenLineRow
+        > {
+  $$ZakatFrozenLinesTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ZakatYearsTable _yearIdTable(_$AppDatabase db) =>
+      db.zakatYears.createAlias('zakat_frozen_lines__year_id__zakat_years__id');
+
+  $$ZakatYearsTableProcessedTableManager get yearId {
+    final $_column = $_itemColumn<String>('year_id')!;
+
+    final manager = $$ZakatYearsTableTableManager(
+      $_db,
+      $_db.zakatYears,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_yearIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$ZakatFrozenLinesTableFilterComposer
+    extends Composer<_$AppDatabase, $ZakatFrozenLinesTable> {
+  $$ZakatFrozenLinesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get source => $composableBuilder(
+    column: $table.source,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get refId => $composableBuilder(
+    column: $table.refId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get unit => $composableBuilder(
+    column: $table.unit,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<Decimal, Decimal, String> get value =>
+      $composableBuilder(
+        column: $table.value,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnWithTypeConverterFilters<Decimal, Decimal, String> get heldInterest =>
+      $composableBuilder(
+        column: $table.heldInterest,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnWithTypeConverterFilters<DateTime?, DateTime, String> get valueDate =>
+      $composableBuilder(
+        column: $table.valueDate,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnWithTypeConverterFilters<Decimal?, Decimal, String> get rate =>
+      $composableBuilder(
+        column: $table.rate,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnWithTypeConverterFilters<DateTime?, DateTime, String> get rateDate =>
+      $composableBuilder(
+        column: $table.rateDate,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnWithTypeConverterFilters<Decimal, Decimal, String> get share =>
+      $composableBuilder(
+        column: $table.share,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnFilters<String> get section => $composableBuilder(
+    column: $table.section,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get notice => $composableBuilder(
+    column: $table.notice,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get extraKind => $composableBuilder(
+    column: $table.extraKind,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ZakatYearsTableFilterComposer get yearId {
+    final $$ZakatYearsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.yearId,
+      referencedTable: $db.zakatYears,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ZakatYearsTableFilterComposer(
+            $db: $db,
+            $table: $db.zakatYears,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ZakatFrozenLinesTableOrderingComposer
+    extends Composer<_$AppDatabase, $ZakatFrozenLinesTable> {
+  $$ZakatFrozenLinesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get source => $composableBuilder(
+    column: $table.source,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get refId => $composableBuilder(
+    column: $table.refId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get unit => $composableBuilder(
+    column: $table.unit,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get value => $composableBuilder(
+    column: $table.value,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get heldInterest => $composableBuilder(
+    column: $table.heldInterest,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get valueDate => $composableBuilder(
+    column: $table.valueDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get rate => $composableBuilder(
+    column: $table.rate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get rateDate => $composableBuilder(
+    column: $table.rateDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get share => $composableBuilder(
+    column: $table.share,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get section => $composableBuilder(
+    column: $table.section,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get notice => $composableBuilder(
+    column: $table.notice,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get extraKind => $composableBuilder(
+    column: $table.extraKind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ZakatYearsTableOrderingComposer get yearId {
+    final $$ZakatYearsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.yearId,
+      referencedTable: $db.zakatYears,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ZakatYearsTableOrderingComposer(
+            $db: $db,
+            $table: $db.zakatYears,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ZakatFrozenLinesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ZakatFrozenLinesTable> {
+  $$ZakatFrozenLinesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get position =>
+      $composableBuilder(column: $table.position, builder: (column) => column);
+
+  GeneratedColumn<String> get source =>
+      $composableBuilder(column: $table.source, builder: (column) => column);
+
+  GeneratedColumn<String> get refId =>
+      $composableBuilder(column: $table.refId, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get unit =>
+      $composableBuilder(column: $table.unit, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<Decimal, String> get value =>
+      $composableBuilder(column: $table.value, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<Decimal, String> get heldInterest =>
+      $composableBuilder(
+        column: $table.heldInterest,
+        builder: (column) => column,
+      );
+
+  GeneratedColumnWithTypeConverter<DateTime?, String> get valueDate =>
+      $composableBuilder(column: $table.valueDate, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<Decimal?, String> get rate =>
+      $composableBuilder(column: $table.rate, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<DateTime?, String> get rateDate =>
+      $composableBuilder(column: $table.rateDate, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<Decimal, String> get share =>
+      $composableBuilder(column: $table.share, builder: (column) => column);
+
+  GeneratedColumn<String> get section =>
+      $composableBuilder(column: $table.section, builder: (column) => column);
+
+  GeneratedColumn<String> get notice =>
+      $composableBuilder(column: $table.notice, builder: (column) => column);
+
+  GeneratedColumn<String> get extraKind =>
+      $composableBuilder(column: $table.extraKind, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  $$ZakatYearsTableAnnotationComposer get yearId {
+    final $$ZakatYearsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.yearId,
+      referencedTable: $db.zakatYears,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ZakatYearsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.zakatYears,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ZakatFrozenLinesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ZakatFrozenLinesTable,
+          ZakatFrozenLineRow,
+          $$ZakatFrozenLinesTableFilterComposer,
+          $$ZakatFrozenLinesTableOrderingComposer,
+          $$ZakatFrozenLinesTableAnnotationComposer,
+          $$ZakatFrozenLinesTableCreateCompanionBuilder,
+          $$ZakatFrozenLinesTableUpdateCompanionBuilder,
+          (ZakatFrozenLineRow, $$ZakatFrozenLinesTableReferences),
+          ZakatFrozenLineRow,
+          PrefetchHooks Function({bool yearId})
+        > {
+  $$ZakatFrozenLinesTableTableManager(
+    _$AppDatabase db,
+    $ZakatFrozenLinesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ZakatFrozenLinesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ZakatFrozenLinesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ZakatFrozenLinesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> yearId = const Value.absent(),
+                Value<int> position = const Value.absent(),
+                Value<String> source = const Value.absent(),
+                Value<String?> refId = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String> unit = const Value.absent(),
+                Value<Decimal> value = const Value.absent(),
+                Value<Decimal> heldInterest = const Value.absent(),
+                Value<DateTime?> valueDate = const Value.absent(),
+                Value<Decimal?> rate = const Value.absent(),
+                Value<DateTime?> rateDate = const Value.absent(),
+                Value<Decimal> share = const Value.absent(),
+                Value<String> section = const Value.absent(),
+                Value<String?> notice = const Value.absent(),
+                Value<String?> extraKind = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ZakatFrozenLinesCompanion(
+                id: id,
+                yearId: yearId,
+                position: position,
+                source: source,
+                refId: refId,
+                name: name,
+                unit: unit,
+                value: value,
+                heldInterest: heldInterest,
+                valueDate: valueDate,
+                rate: rate,
+                rateDate: rateDate,
+                share: share,
+                section: section,
+                notice: notice,
+                extraKind: extraKind,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String yearId,
+                required int position,
+                required String source,
+                Value<String?> refId = const Value.absent(),
+                required String name,
+                required String unit,
+                required Decimal value,
+                required Decimal heldInterest,
+                Value<DateTime?> valueDate = const Value.absent(),
+                Value<Decimal?> rate = const Value.absent(),
+                Value<DateTime?> rateDate = const Value.absent(),
+                required Decimal share,
+                required String section,
+                Value<String?> notice = const Value.absent(),
+                Value<String?> extraKind = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => ZakatFrozenLinesCompanion.insert(
+                id: id,
+                yearId: yearId,
+                position: position,
+                source: source,
+                refId: refId,
+                name: name,
+                unit: unit,
+                value: value,
+                heldInterest: heldInterest,
+                valueDate: valueDate,
+                rate: rate,
+                rateDate: rateDate,
+                share: share,
+                section: section,
+                notice: notice,
+                extraKind: extraKind,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$ZakatFrozenLinesTable, ZakatFrozenLineRow>(
+                    table,
+                  ),
+                  $$ZakatFrozenLinesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({yearId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (yearId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.yearId,
+                        referencedTable: $$ZakatFrozenLinesTableReferences
+                            ._yearIdTable(db),
+                        referencedColumn: $$ZakatFrozenLinesTableReferences
+                            ._yearIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$ZakatFrozenLinesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ZakatFrozenLinesTable,
+      ZakatFrozenLineRow,
+      $$ZakatFrozenLinesTableFilterComposer,
+      $$ZakatFrozenLinesTableOrderingComposer,
+      $$ZakatFrozenLinesTableAnnotationComposer,
+      $$ZakatFrozenLinesTableCreateCompanionBuilder,
+      $$ZakatFrozenLinesTableUpdateCompanionBuilder,
+      (ZakatFrozenLineRow, $$ZakatFrozenLinesTableReferences),
+      ZakatFrozenLineRow,
+      PrefetchHooks Function({bool yearId})
+    >;
+typedef $$ZakatGiftsTableCreateCompanionBuilder = ZakatGiftsCompanion Function({
+  required String id,
+  required String yearId,
+  required DateTime date,
+  required Decimal amount,
+  required String unit,
+  Value<Decimal?> rate,
+  Value<DateTime?> rateDate,
+  Value<String?> rateView,
+  Value<String?> note,
+  required DateTime createdAt,
+  required DateTime updatedAt,
+  Value<int> rowid,
+});
+typedef $$ZakatGiftsTableUpdateCompanionBuilder = ZakatGiftsCompanion Function({
+  Value<String> id,
+  Value<String> yearId,
+  Value<DateTime> date,
+  Value<Decimal> amount,
+  Value<String> unit,
+  Value<Decimal?> rate,
+  Value<DateTime?> rateDate,
+  Value<String?> rateView,
+  Value<String?> note,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
+  Value<int> rowid,
+});
+
+final class $$ZakatGiftsTableReferences
+    extends BaseReferences<_$AppDatabase, $ZakatGiftsTable, ZakatGiftRow> {
+  $$ZakatGiftsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $ZakatYearsTable _yearIdTable(_$AppDatabase db) =>
+      db.zakatYears.createAlias('zakat_gifts__year_id__zakat_years__id');
+
+  $$ZakatYearsTableProcessedTableManager get yearId {
+    final $_column = $_itemColumn<String>('year_id')!;
+
+    final manager = $$ZakatYearsTableTableManager(
+      $_db,
+      $_db.zakatYears,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_yearIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$ZakatGiftsTableFilterComposer
+    extends Composer<_$AppDatabase, $ZakatGiftsTable> {
+  $$ZakatGiftsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<DateTime, DateTime, String> get date =>
+      $composableBuilder(
+        column: $table.date,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnWithTypeConverterFilters<Decimal, Decimal, String> get amount =>
+      $composableBuilder(
+        column: $table.amount,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnFilters<String> get unit => $composableBuilder(
+    column: $table.unit,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<Decimal?, Decimal, String> get rate =>
+      $composableBuilder(
+        column: $table.rate,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnWithTypeConverterFilters<DateTime?, DateTime, String> get rateDate =>
+      $composableBuilder(
+        column: $table.rateDate,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnFilters<String> get rateView => $composableBuilder(
+    column: $table.rateView,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ZakatYearsTableFilterComposer get yearId {
+    final $$ZakatYearsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.yearId,
+      referencedTable: $db.zakatYears,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ZakatYearsTableFilterComposer(
+            $db: $db,
+            $table: $db.zakatYears,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ZakatGiftsTableOrderingComposer
+    extends Composer<_$AppDatabase, $ZakatGiftsTable> {
+  $$ZakatGiftsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get date => $composableBuilder(
+    column: $table.date,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get amount => $composableBuilder(
+    column: $table.amount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get unit => $composableBuilder(
+    column: $table.unit,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get rate => $composableBuilder(
+    column: $table.rate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get rateDate => $composableBuilder(
+    column: $table.rateDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get rateView => $composableBuilder(
+    column: $table.rateView,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ZakatYearsTableOrderingComposer get yearId {
+    final $$ZakatYearsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.yearId,
+      referencedTable: $db.zakatYears,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ZakatYearsTableOrderingComposer(
+            $db: $db,
+            $table: $db.zakatYears,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ZakatGiftsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ZakatGiftsTable> {
+  $$ZakatGiftsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<DateTime, String> get date =>
+      $composableBuilder(column: $table.date, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<Decimal, String> get amount =>
+      $composableBuilder(column: $table.amount, builder: (column) => column);
+
+  GeneratedColumn<String> get unit =>
+      $composableBuilder(column: $table.unit, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<Decimal?, String> get rate =>
+      $composableBuilder(column: $table.rate, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<DateTime?, String> get rateDate =>
+      $composableBuilder(column: $table.rateDate, builder: (column) => column);
+
+  GeneratedColumn<String> get rateView =>
+      $composableBuilder(column: $table.rateView, builder: (column) => column);
+
+  GeneratedColumn<String> get note =>
+      $composableBuilder(column: $table.note, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  $$ZakatYearsTableAnnotationComposer get yearId {
+    final $$ZakatYearsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.yearId,
+      referencedTable: $db.zakatYears,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ZakatYearsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.zakatYears,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ZakatGiftsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ZakatGiftsTable,
+          ZakatGiftRow,
+          $$ZakatGiftsTableFilterComposer,
+          $$ZakatGiftsTableOrderingComposer,
+          $$ZakatGiftsTableAnnotationComposer,
+          $$ZakatGiftsTableCreateCompanionBuilder,
+          $$ZakatGiftsTableUpdateCompanionBuilder,
+          (ZakatGiftRow, $$ZakatGiftsTableReferences),
+          ZakatGiftRow,
+          PrefetchHooks Function({bool yearId})
+        > {
+  $$ZakatGiftsTableTableManager(_$AppDatabase db, $ZakatGiftsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ZakatGiftsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ZakatGiftsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ZakatGiftsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> yearId = const Value.absent(),
+                Value<DateTime> date = const Value.absent(),
+                Value<Decimal> amount = const Value.absent(),
+                Value<String> unit = const Value.absent(),
+                Value<Decimal?> rate = const Value.absent(),
+                Value<DateTime?> rateDate = const Value.absent(),
+                Value<String?> rateView = const Value.absent(),
+                Value<String?> note = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ZakatGiftsCompanion(
+                id: id,
+                yearId: yearId,
+                date: date,
+                amount: amount,
+                unit: unit,
+                rate: rate,
+                rateDate: rateDate,
+                rateView: rateView,
+                note: note,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String yearId,
+                required DateTime date,
+                required Decimal amount,
+                required String unit,
+                Value<Decimal?> rate = const Value.absent(),
+                Value<DateTime?> rateDate = const Value.absent(),
+                Value<String?> rateView = const Value.absent(),
+                Value<String?> note = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => ZakatGiftsCompanion.insert(
+                id: id,
+                yearId: yearId,
+                date: date,
+                amount: amount,
+                unit: unit,
+                rate: rate,
+                rateDate: rateDate,
+                rateView: rateView,
+                note: note,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$ZakatGiftsTable, ZakatGiftRow>(table),
+                  $$ZakatGiftsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({yearId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (yearId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.yearId,
+                        referencedTable: $$ZakatGiftsTableReferences
+                            ._yearIdTable(db),
+                        referencedColumn: $$ZakatGiftsTableReferences
+                            ._yearIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$ZakatGiftsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ZakatGiftsTable,
+      ZakatGiftRow,
+      $$ZakatGiftsTableFilterComposer,
+      $$ZakatGiftsTableOrderingComposer,
+      $$ZakatGiftsTableAnnotationComposer,
+      $$ZakatGiftsTableCreateCompanionBuilder,
+      $$ZakatGiftsTableUpdateCompanionBuilder,
+      (ZakatGiftRow, $$ZakatGiftsTableReferences),
+      ZakatGiftRow,
+      PrefetchHooks Function({bool yearId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -5798,4 +12053,14 @@ class $AppDatabaseManager {
       $$AppSettingsTableTableManager(_db, _db.appSettings);
   $$NoZakatYearsTableTableManager get noZakatYears =>
       $$NoZakatYearsTableTableManager(_db, _db.noZakatYears);
+  $$ZakatCyclesTableTableManager get zakatCycles =>
+      $$ZakatCyclesTableTableManager(_db, _db.zakatCycles);
+  $$ZakatYearsTableTableManager get zakatYears =>
+      $$ZakatYearsTableTableManager(_db, _db.zakatYears);
+  $$ZakatExtraLinesTableTableManager get zakatExtraLines =>
+      $$ZakatExtraLinesTableTableManager(_db, _db.zakatExtraLines);
+  $$ZakatFrozenLinesTableTableManager get zakatFrozenLines =>
+      $$ZakatFrozenLinesTableTableManager(_db, _db.zakatFrozenLines);
+  $$ZakatGiftsTableTableManager get zakatGifts =>
+      $$ZakatGiftsTableTableManager(_db, _db.zakatGifts);
 }

@@ -26,6 +26,7 @@ Future<void> showRecordSheet(
   HistoryEntry? editing,
   RecordPreset? preset,
   PlanRow? row,
+  DateTime? date,
 }) => showModalBottomSheet<void>(
   context: context,
   isScrollControlled: true,
@@ -35,6 +36,7 @@ Future<void> showRecordSheet(
     editing: editing,
     preset: preset,
     row: row,
+    date: date,
   ),
 );
 
@@ -51,6 +53,7 @@ class RecordSheet extends ConsumerStatefulWidget {
     this.editing,
     this.preset,
     this.row,
+    this.date,
   });
 
   final String investmentId;
@@ -60,6 +63,9 @@ class RecordSheet extends ConsumerStatefulWidget {
   /// Opened from a pending row: kind, date and amount preset; the date stays
   /// within the row's 7-day window (architect Q-E2).
   final PlanRow? row;
+
+  /// The date of a new entry when it is not today (a zakat due date).
+  final DateTime? date;
 
   @override
   ConsumerState<RecordSheet> createState() => _RecordSheetState();
@@ -91,7 +97,7 @@ class _RecordSheetState extends ConsumerState<RecordSheet> {
   void _init(InvestmentWithHistory h) {
     if (_ready) return;
     _ready = true;
-    _date = ref.read(todayProvider);
+    _date = widget.date ?? ref.read(todayProvider);
     _unit = h.investment.unit;
     final e = widget.editing;
     if (widget.preset == RecordPreset.interestGivenAway) {

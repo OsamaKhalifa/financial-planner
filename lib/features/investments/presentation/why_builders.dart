@@ -34,8 +34,11 @@ Why whyReturn(BuildContext context, Returns r, Unit unit) {
 }
 
 /// The ruling text behind a zakat share: the rate and year (A1/A2) plus the
-/// asset section the item resolved to (Part B).
+/// asset section the item resolved to (Part B). A yearly-zakat section (Part
+/// C, A3..A8, B9, Z-4) is its own text.
 String zakatSource(AppLocalizations l10n, String section, {AssetType? type}) {
+  final yearly = _yearlySource(l10n, section);
+  if (yearly != null) return yearly;
   final asset = type == AssetType.other
       ? '${l10n.src_B5}\n\n${l10n.src_B6}\n\n${l10n.src_B7}'
       : switch (section) {
@@ -45,11 +48,35 @@ String zakatSource(AppLocalizations l10n, String section, {AssetType? type}) {
           'B4' => l10n.src_B4,
           'B5' => l10n.src_B5,
           'B6' => l10n.src_B6,
+          'B7' => l10n.src_B7,
           'B8' => l10n.src_B8,
           _ => null,
         };
   return [l10n.src_A1A2, ?asset].join('\n\n');
 }
+
+String? _yearlySource(AppLocalizations l10n, String section) =>
+    switch (section) {
+      'A3' => l10n.src_A3,
+      'A4' => l10n.src_A4,
+      'A5' => l10n.src_A5,
+      'A7' => l10n.src_A7,
+      'A8' => l10n.src_A8,
+      'B9' => l10n.src_B9,
+      'C1' => l10n.src_C1,
+      'C2' => l10n.src_C2,
+      'C3' => l10n.src_C3,
+      'C4' => l10n.src_C4,
+      'C5' => l10n.src_C5,
+      'C6' => l10n.src_C6,
+      'C7' => l10n.src_C7,
+      'C8' => l10n.src_C8,
+      'C9' => l10n.src_C9,
+      'C10' => l10n.src_C10,
+      'C11' => l10n.src_C11,
+      'Z4' => l10n.src_Z4,
+      _ => null,
+    };
 
 Why whySetAside(
   BuildContext context,

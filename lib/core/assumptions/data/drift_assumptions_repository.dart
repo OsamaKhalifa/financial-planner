@@ -4,6 +4,7 @@ import 'package:decimal/decimal.dart';
 import 'package:drift/drift.dart';
 
 import '../../db/app_database.dart';
+import '../../db/converters.dart';
 import '../../db/storage_guard.dart';
 import '../../ids.dart';
 import '../../reference/countries.dart';
@@ -147,7 +148,45 @@ class DriftAssumptionsRepository implements AssumptionsRepository {
           .map((r) => r == null ? const Settings() : _settingsOf(r));
 
   @override
-  Future<void> saveSettings(Settings s) => guardStorage(() async {
+  Future<void> saveSettings(Settings s) =>
+      guardStorage(() => _upsertSettings(s));
+
+  @override
+  Stream<List<ZakatCycle>> watchZakatCycles() =>
+      (_db.select(_db.zakatCycles)
+            ..orderBy([(t) => OrderingTerm.asc(t.fromDate)]))
+          .watch()
+          .map((rows) => [for (final r in rows) _cycleOf(r)]);
+
+  @override
+  Future<void> saveZakatCycle(Settings settings, ZakatCycle cycle) =>
+      guardStorage(
+        () => _db.transaction(() async {
+          await _upsertSettings(settings);
+          await (_db.delete(_db.zakatCycles)..where(
+                (t) => t.fromDate.isBiggerOrEqualValue(
+                  const CalendarDateConverter().toSql(cycle.from),
+                ),
+              ))
+              .go();
+          final now = _now().toUtc();
+          await _db
+              .into(_db.zakatCycles)
+              .insert(
+                ZakatCyclesCompanion(
+                  id: Value(cycle.id ?? newId()),
+                  calendar: Value(cycle.calendar.name),
+                  month: Value(cycle.month),
+                  day: Value(cycle.day),
+                  fromDate: Value(cycle.from),
+                  createdAt: Value(now),
+                  updatedAt: Value(now),
+                ),
+              );
+        }),
+      );
+
+  Future<void> _upsertSettings(Settings s) async {
     final now = _now().toUtc();
     AppSettingsCompanion row({required bool withCreated}) =>
         AppSettingsCompanion(
@@ -157,6 +196,12 @@ class DriftAssumptionsRepository implements AssumptionsRepository {
           zakatYear: Value(s.zakatYear?.name),
           longTermMethod: Value(s.longTermMethod?.name),
           jewelleryZakatable: Value(s.jewelleryZakatable),
+          nisabMetal: Value(s.zakat.nisab?.name),
+          reminderOn: Value(s.zakat.reminderOn),
+          reminderDays: Value(s.zakat.reminderDays),
+          reminderMinute: Value(s.zakat.reminderMinute),
+          reminderAsked: Value(s.zakat.reminderAsked),
+          givingRateView: Value(s.zakat.givingRateView?.name),
           createdAt: withCreated ? Value(now) : const Value.absent(),
           updatedAt: Value(now),
         );
@@ -169,7 +214,7 @@ class DriftAssumptionsRepository implements AssumptionsRepository {
             target: [_db.appSettings.id],
           ),
         );
-  });
+  }
 
   @override
   Stream<Set<int>> watchNoZakatYears() => _db
@@ -231,4 +276,24 @@ Settings _settingsOf(SettingsRow r) => Settings(
       ? null
       : LongTermMethod.values.byName(r.longTermMethod!),
   jewelleryZakatable: r.jewelleryZakatable,
+  zakat: ZakatPrefs(
+    nisab: r.nisabMetal == null
+        ? null
+        : NisabMetal.values.byName(r.nisabMetal!),
+    reminderOn: r.reminderOn,
+    reminderDays: r.reminderDays,
+    reminderMinute: r.reminderMinute,
+    reminderAsked: r.reminderAsked,
+    givingRateView: r.givingRateView == null
+        ? null
+        : GivingRateView.values.byName(r.givingRateView!),
+  ),
+);
+
+ZakatCycle _cycleOf(ZakatCycleRow r) => ZakatCycle(
+  id: r.id,
+  calendar: ZakatYear.values.byName(r.calendar),
+  month: r.month,
+  day: r.day,
+  from: r.fromDate,
 );

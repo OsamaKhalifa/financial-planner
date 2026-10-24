@@ -96,4 +96,45 @@ void main() {
       expect(bad, isEmpty);
     },
   );
+
+  test('package:hijri only in lib/core/dates.dart (ADR-0007)', () {
+    final bad = violations(
+      (p) => p != 'lib/core/dates.dart',
+      RegExp(r"""(import|export)\s+['"]package:hijri/"""),
+    );
+    expect(bad, isEmpty);
+  });
+
+  test('notification plugin and timezone only in local_year_end_reminder.dart (ADR-0008)', () {
+    final bad = violations(
+      (p) => p != 'lib/features/zakat/data/local_year_end_reminder.dart',
+      RegExp(
+        r"""(import|export)\s+['"]package:(flutter_local_notifications|timezone)/""",
+      ),
+    );
+    expect(bad, isEmpty);
+  });
+
+  test(
+    'ADR-0002 amendment: investments imports no zakat, overview or plan',
+    () {
+      final bad = violations(
+        (p) => p.startsWith('lib/features/investments/'),
+        RegExp(
+          r"""(import|export)\s+['"][^'"]*(features/|\.\./)(zakat|overview|plan)/""",
+        ),
+      );
+      expect(bad, isEmpty);
+    },
+  );
+
+  test('ADR-0002 amendment: zakat imports no overview or plan, and only the settings gear from settings', () {
+    final bad = violations(
+      (p) => p.startsWith('lib/features/zakat/'),
+      RegExp(
+        r"""(import|export)\s+['"][^'"]*(features/|\.\./)(overview|plan)/""",
+      ),
+    );
+    expect(bad, isEmpty);
+  });
 }

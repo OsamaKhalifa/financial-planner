@@ -129,6 +129,15 @@ class AppSettings extends Table {
   TextColumn get zakatYear => text().nullable()();
   TextColumn get longTermMethod => text().nullable()();
   BoolColumn get jewelleryZakatable => boolean().nullable()();
+
+  /// v3 (zakat spec §2.1): the zakat preferences.
+  TextColumn get nisabMetal => text().nullable()();
+  BoolColumn get reminderOn => boolean().withDefault(const Constant(true))();
+  IntColumn get reminderDays => integer().withDefault(const Constant(0))();
+  IntColumn get reminderMinute => integer().withDefault(const Constant(540))();
+  BoolColumn get reminderAsked =>
+      boolean().withDefault(const Constant(false))();
+  TextColumn get givingRateView => text().nullable()();
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();
 
@@ -150,4 +159,130 @@ class NoZakatYears extends Table {
   List<Set<Column>> get uniqueKeys => [
     {year},
   ];
+}
+
+@DataClassName('ZakatCycleRow')
+class ZakatCycles extends Table {
+  TextColumn get id => text()();
+  TextColumn get calendar => text()();
+  IntColumn get month => integer()();
+  IntColumn get day => integer()();
+  TextColumn get fromDate => text().map(const CalendarDateConverter())();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+
+  @override
+  List<Set<Column>> get uniqueKeys => [
+    {fromDate},
+  ];
+}
+
+@DataClassName('ZakatYearRow')
+class ZakatYears extends Table {
+  TextColumn get id => text()();
+
+  /// The computed due date (Z4); a moved due date never changes it.
+  TextColumn get dueKey => text().map(const CalendarDateConverter())();
+  TextColumn get movedDue =>
+      text().map(const CalendarDateConverter()).nullable()();
+  TextColumn get debts =>
+      text().map(const DecimalConverter()).withDefault(const Constant('0'))();
+  BoolColumn get deductDebts => boolean().withDefault(const Constant(true))();
+  TextColumn get startedOn =>
+      text().map(const CalendarDateConverter()).nullable()();
+  TextColumn get frozenBase => text().nullable()();
+  TextColumn get frozenNisabMetal => text().nullable()();
+  TextColumn get frozenMetalRate =>
+      text().map(const DecimalConverter()).nullable()();
+  TextColumn get frozenMetalRateDate =>
+      text().map(const CalendarDateConverter()).nullable()();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+
+  @override
+  List<Set<Column>> get uniqueKeys => [
+    {dueKey},
+  ];
+}
+
+@DataClassName('ZakatExtraLineRow')
+@TableIndex(name: 'zakat_extra_lines_by_year', columns: {#yearId})
+class ZakatExtraLines extends Table {
+  TextColumn get id => text()();
+  TextColumn get yearId =>
+      text().references(ZakatYears, #id, onDelete: KeyAction.cascade)();
+  TextColumn get label => text()();
+
+  /// cash or owedToMe
+  TextColumn get kind => text()();
+  TextColumn get amount => text().map(const DecimalConverter())();
+  TextColumn get unit => text()();
+  BoolColumn get goodDebtConfirmed => boolean()();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+@DataClassName('ZakatFrozenLineRow')
+@TableIndex(name: 'zakat_frozen_lines_by_year', columns: {#yearId, #position})
+class ZakatFrozenLines extends Table {
+  TextColumn get id => text()();
+  TextColumn get yearId =>
+      text().references(ZakatYears, #id, onDelete: KeyAction.cascade)();
+  IntColumn get position => integer()();
+
+  /// item or extra
+  TextColumn get source => text()();
+
+  /// The investment or extra-line id.
+  TextColumn get refId => text().nullable()();
+  TextColumn get name => text()();
+  TextColumn get unit => text()();
+  TextColumn get value => text().map(const DecimalConverter())();
+  TextColumn get heldInterest => text().map(const DecimalConverter())();
+  TextColumn get valueDate =>
+      text().map(const CalendarDateConverter()).nullable()();
+  TextColumn get rate => text().map(const DecimalConverter()).nullable()();
+  TextColumn get rateDate =>
+      text().map(const CalendarDateConverter()).nullable()();
+  TextColumn get share => text().map(const DecimalConverter())();
+  TextColumn get section => text()();
+  TextColumn get notice => text().nullable()();
+  TextColumn get extraKind => text().nullable()();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+@DataClassName('ZakatGiftRow')
+@TableIndex(name: 'zakat_gifts_by_year_date', columns: {#yearId, #date})
+class ZakatGifts extends Table {
+  TextColumn get id => text()();
+  TextColumn get yearId =>
+      text().references(ZakatYears, #id, onDelete: KeyAction.cascade)();
+  TextColumn get date => text().map(const CalendarDateConverter())();
+  TextColumn get amount => text().map(const DecimalConverter())();
+  TextColumn get unit => text()();
+
+  /// Rate, rate date and rate view are all null when the unit is the year base.
+  TextColumn get rate => text().map(const DecimalConverter()).nullable()();
+  TextColumn get rateDate =>
+      text().map(const CalendarDateConverter()).nullable()();
+  TextColumn get rateView => text().nullable()();
+  TextColumn get note => text().nullable()();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime()();
+
+  @override
+  Set<Column> get primaryKey => {id};
 }

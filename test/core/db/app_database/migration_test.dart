@@ -16,12 +16,14 @@ import 'package:financial_planner/features/investments/data/drift_investments_re
 import 'package:financial_planner/features/investments/domain/history_entry.dart';
 import 'package:financial_planner/features/investments/domain/investment.dart';
 import 'package:financial_planner/features/investments/domain/zakat_rules.dart';
+import 'package:financial_planner/features/zakat/data/drift_zakat_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'generated/schema.dart';
 
 import 'generated/schema_v1.dart' as v1;
 import 'generated/schema_v2.dart' as v2;
+import 'generated/schema_v3.dart' as v3;
 
 const _created = 1767225600; // 2026-01-01T00:00:00Z
 const _twentyDp = '1234.12345678901234567890';
@@ -296,6 +298,193 @@ void main() {
         ),
       ]),
       throwsA(isA<Conflict>()),
+    );
+    await db.close();
+  });
+
+  const v2Item = v2.InvestmentsData(
+    id: 'p',
+    name: 'Fund',
+    assetType: 'fund',
+    intent: 'longTerm',
+    market: 'other',
+    marketCountry: 'EGY',
+    unit: 'USD',
+    startDate: '2025-05-01',
+    quantity: '3.5',
+    purityKarat: 18,
+    purityFineness: 750,
+    zakatRule: 'custom',
+    customZakatShare: '0.5',
+    inflationOverride: 'USA',
+    notes: 'v2 note',
+    payoutSchedule: 'monthly',
+    expectedProfit: '0.1',
+    valueCheckSchedule: 'quarterly',
+    expectedGrowth: '0.05',
+    profitBasis: 'shareOfProfit',
+    capitalBack: 'yes',
+    accountKind: 'islamic',
+    createdAt: _created,
+    updatedAt: _created,
+  );
+
+  void insertV2(Batch b, v2.DatabaseAtV2 oldDb) {
+    b.insertAll(oldDb.investments, [v2Item]);
+    b.insertAll(oldDb.historyEntries, const [
+      v2.HistoryEntriesData(
+        id: 'hv',
+        investmentId: 'p',
+        kind: 'value_update',
+        date: '2025-12-31',
+        amount: _twentyDp,
+        createdAt: _created,
+        updatedAt: _created,
+      ),
+    ]);
+    b.insertAll(oldDb.rates, const [
+      v2.RatesData(
+        id: 'rt',
+        fromUnit: 'USD',
+        toUnit: 'EGP',
+        rate: '48.5',
+        asOf: '2025-06-01',
+        source: 'typed',
+        createdAt: _created,
+        updatedAt: _created,
+      ),
+      v2.RatesData(
+        id: 'rf',
+        fromUnit: 'USD',
+        toUnit: 'EGP',
+        rate: '48.75',
+        asOf: '2025-06-01',
+        source: 'currencyApi',
+        createdAt: _created,
+        updatedAt: _created,
+      ),
+    ]);
+    b.insertAll(oldDb.inflationOverrides, const [
+      v2.InflationOverridesData(
+        id: 'io',
+        country: 'EGY',
+        year: 2025,
+        rate: '0.25',
+        createdAt: _created,
+        updatedAt: _created,
+      ),
+    ]);
+    b.insertAll(oldDb.settings, const [
+      v2.SettingsData(
+        id: 'settings',
+        baseCurrency: 'EGP',
+        homeInflation: 'EGY',
+        zakatYear: 'lunar',
+        longTermMethod: 'proxy25',
+        jewelleryZakatable: 1,
+        createdAt: _created,
+        updatedAt: _created,
+      ),
+    ]);
+    b.insertAll(oldDb.noZakatYears, const [
+      v2.NoZakatYearsData(
+        id: 'nz',
+        year: 2024,
+        createdAt: _created,
+        updatedAt: _created,
+      ),
+    ]);
+  }
+
+  test('migration from v2 to v3 keeps every row; zakat prefs take their defaults; no zakat rows', () async {
+    await verifier.testWithDataIntegrity(
+      oldVersion: 2,
+      newVersion: 3,
+      createOld: v2.DatabaseAtV2.new,
+      createNew: v3.DatabaseAtV3.new,
+      openTestedDatabase: AppDatabase.new,
+      createItems: insertV2,
+      validateItems: (newDb) async {
+        expect(await newDb.select(newDb.investments).get(), [
+          v3.InvestmentsData(
+            id: v2Item.id,
+            name: v2Item.name,
+            assetType: v2Item.assetType,
+            intent: v2Item.intent,
+            market: v2Item.market,
+            marketCountry: v2Item.marketCountry,
+            unit: v2Item.unit,
+            startDate: v2Item.startDate,
+            quantity: v2Item.quantity,
+            purityKarat: v2Item.purityKarat,
+            purityFineness: v2Item.purityFineness,
+            zakatRule: v2Item.zakatRule,
+            customZakatShare: v2Item.customZakatShare,
+            inflationOverride: v2Item.inflationOverride,
+            notes: v2Item.notes,
+            payoutSchedule: v2Item.payoutSchedule,
+            expectedProfit: v2Item.expectedProfit,
+            valueCheckSchedule: v2Item.valueCheckSchedule,
+            expectedGrowth: v2Item.expectedGrowth,
+            profitBasis: v2Item.profitBasis,
+            capitalBack: v2Item.capitalBack,
+            accountKind: v2Item.accountKind,
+            createdAt: v2Item.createdAt,
+            updatedAt: v2Item.updatedAt,
+          ),
+        ]);
+        expect((await newDb.select(newDb.historyEntries).get()).length, 1);
+        expect((await newDb.select(newDb.rates).get()).length, 2);
+        expect((await newDb.select(newDb.inflationOverrides).get()).length, 1);
+        expect((await newDb.select(newDb.noZakatYears).get()).length, 1);
+        expect((await newDb.select(newDb.zakatCycles).get()), isEmpty);
+        expect((await newDb.select(newDb.zakatYears).get()), isEmpty);
+        expect((await newDb.select(newDb.zakatExtraLines).get()), isEmpty);
+        expect((await newDb.select(newDb.zakatFrozenLines).get()), isEmpty);
+        expect((await newDb.select(newDb.zakatGifts).get()), isEmpty);
+      },
+    );
+  });
+
+  test('after the v2 to v3 update, v2 data reads back the same through the repositories and the zakat prefs are the defaults', () async {
+    final schema = await verifier.schemaAt(2);
+    final old = v2.DatabaseAtV2(schema.newConnection());
+    await old.batch((b) => insertV2(b, old));
+    await old.close();
+
+    final db = AppDatabase(schema.newConnection());
+    final now = DateTime.utc(2026, 10, 24);
+    final investments = DriftInvestmentsRepository(db, () => now);
+    final assumptions = DriftAssumptionsRepository(db, () => now);
+
+    final i = (await investments.watchAll().first).single.investment;
+    expect(
+      (i.name, i.unit, i.quantity),
+      ('Fund', const Unit('USD'), Decimal.parse('3.5')),
+    );
+    expect(i.accountKind, AccountKind.islamic);
+    expect(i.capitalBack, CapitalBack.yes);
+    expect(i.notes, 'v2 note');
+
+    final s = await assumptions.watchSettings().first;
+    expect(s.baseCurrency, const Unit('EGP'));
+    expect(s.zakatYear, ZakatYear.lunar);
+    expect(s.longTermMethod, LongTermMethod.proxy25);
+    expect(s.jewelleryZakatable, isTrue);
+    final z = s.zakat;
+    expect(z.nisab, isNull);
+    expect(
+      (z.reminderOn, z.reminderDays, z.reminderMinute, z.reminderAsked),
+      (true, 0, 540, false),
+    );
+    expect(z.givingRateView, isNull);
+
+    expect((await assumptions.watchRates().first).length, 2);
+    expect(await assumptions.watchNoZakatYears().first, {2024});
+    expect(await assumptions.watchZakatCycles().first, isEmpty);
+    expect(
+      await DriftZakatRepository(db, () => now).watchYears().first,
+      isEmpty,
     );
     await db.close();
   });

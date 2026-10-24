@@ -32,4 +32,28 @@ void main() {
     );
     expect(addMonths(day(2026, 11, 15), 3), day(2027, 2, 15));
   });
+
+  test('hijriToDate gives UTC dates from Umm al-Qura (ADR-0007)', () {
+    expect(hijriToDate(1446, 9, 1), day(2025, 3, 1));
+    expect(hijriToDate(1447, 9, 1), day(2026, 2, 18));
+    expect(hijriToDate(1448, 9, 1), day(2027, 2, 8));
+    expect(hijriToDate(1448, 1, 1), day(2026, 6, 16));
+    expect(hijriToDate(1448, 9, 1)!.isUtc, isTrue);
+  });
+
+  test('hijriToDate is null outside 1356-1500 AH', () {
+    expect(hijriToDate(1300, 1, 1), isNull);
+    expect(hijriToDate(1600, 1, 1), isNull);
+  });
+
+  test('hijriMonthLength: Ramadan 1447 has 30 days, 1448 has 29', () {
+    expect(hijriMonthLength(1447, 9), 30);
+    expect(hijriMonthLength(1448, 9), 29);
+    expect(hijriMonthLength(1300, 1), isNull);
+  });
+
+  test('hijriOf maps a Gregorian day to its Hijri date', () {
+    expect(hijriOf(day(2026, 10, 23)), (y: 1448, m: 5, d: 12));
+    expect(hijriOf(day(2027, 2, 8)), (y: 1448, m: 9, d: 1));
+  });
 }

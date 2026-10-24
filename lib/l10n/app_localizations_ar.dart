@@ -1992,4 +1992,960 @@ class AppLocalizationsAr extends AppLocalizations {
   String aiStatusUsingKey(String vendor) {
     return 'تستخدم مفتاح $vendor الخاص بك.';
   }
+
+  @override
+  String hijriMonth(String m) {
+    String _temp0 = intl.Intl.selectLogic(m, {
+      '1': 'محرم',
+      '2': 'صفر',
+      '3': 'ربيع الأول',
+      '4': 'ربيع الآخر',
+      '5': 'جمادى الأولى',
+      '6': 'جمادى الآخرة',
+      '7': 'رجب',
+      '8': 'شعبان',
+      '9': 'رمضان',
+      '10': 'شوال',
+      '11': 'ذو القعدة',
+      '12': 'ذو الحجة',
+      'other': '$m',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get zakatSetupNisabTitle => 'أي نصاب تعتمد؟';
+
+  @override
+  String get zakatNisabGold => 'الذهب — 85 غرامًا';
+
+  @override
+  String get zakatNisabSilver => 'الفضة — 595 غرامًا';
+
+  @override
+  String zakatNisabAtRate(String amount, String date) {
+    return '= $amount بحسب سعرك بتاريخ $date';
+  }
+
+  @override
+  String zakatNisabAddRate(String metal) {
+    String _temp0 = intl.Intl.selectLogic(metal, {
+      'gold': 'أضِف سعر الذهب لتراه',
+      'silver': 'أضِف سعر الفضة لتراه',
+      'other': '$metal',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get zakatNisabWhy =>
+      'لا تجب الزكاة إلا إذا بلغ مالك الزكوي النصاب. ويختلف العلماء في أي المعدنين يُعتمد في النقود.';
+
+  @override
+  String get zakatSetupCycleTitle => 'متى تنتهي سنتك الزكوية؟';
+
+  @override
+  String zakatCycleHelp(String calendar) {
+    String _temp0 = intl.Intl.selectLogic(calendar, {
+      'lunar': 'تاريخ زكاتك هو اليوم الذي بلغ فيه مالك النصاب أول مرة، محسوبًا بالأشهر الهجرية. وإن كنت تزكّي في تاريخ ثابت فاعتمد ذلك التاريخ.',
+      'solar': 'تاريخ زكاتك هو اليوم الذي بلغ فيه مالك النصاب أول مرة، محسوبًا بالأشهر الميلادية. وإن كنت تزكّي في تاريخ ثابت فاعتمد ذلك التاريخ.',
+      'other': '$calendar',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get zakatCycleNotToday =>
+      'ليس تاريخ اليوم، إلا إن كان هو تاريخ زكاتك.';
+
+  @override
+  String zakatCalendarLine(String calendar) {
+    String _temp0 = intl.Intl.selectLogic(calendar, {
+      'lunar': 'التقويم الهجري (أم القرى)، لأن سنتك الزكوية قمرية',
+      'solar': 'التقويم الميلادي، لأن سنتك الزكوية شمسية',
+      'other': '$calendar',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String zakatNextDue(String date) {
+    return 'تاريخ الاستحقاق القادم: $date';
+  }
+
+  @override
+  String zakatThisYearCalled(String label) {
+    return 'تُسمّى هذه السنة $label.';
+  }
+
+  @override
+  String zakatPastYears(String year) {
+    return 'لا تُحسب هنا زكاة السنوات التي قبل $year. وما لم يُخرَج منها فهو لا يزال واجبًا عليك.';
+  }
+
+  @override
+  String get zakatDay30 =>
+      'في سنة يكون فيها هذا الشهر 29 يومًا يُعتمد اليوم التاسع والعشرون.';
+
+  @override
+  String get zakatFeb29 => 'في السنوات الأخرى يُعتمد 28 فبراير.';
+
+  @override
+  String get zakatSetupMonth => 'الشهر';
+
+  @override
+  String get zakatSetupDay => 'اليوم';
+
+  @override
+  String zakatBadDay(String month, String days) {
+    return '$month فيه $days يومًا. اختر يومًا.';
+  }
+
+  @override
+  String zakatMonthSemantics(String name, String n) {
+    return 'شهر الزكاة، $name، $n من 12';
+  }
+
+  @override
+  String zakatDaySemantics(String n) {
+    return 'يوم الزكاة، $n';
+  }
+
+  @override
+  String get zakatSetupRemindTitle => 'ذكّرني';
+
+  @override
+  String get reminderDaysLabel => 'عدد الأيام قبل الموعد';
+
+  @override
+  String get reminderDaysHelp => '0 = في يوم الاستحقاق نفسه.';
+
+  @override
+  String get reminderDaysError => 'أدخل رقمًا من 0 إلى 60.';
+
+  @override
+  String get reminderTimeLabel => 'الوقت';
+
+  @override
+  String reminderPreview(String date, String time, String text) {
+    return 'إشعار واحد يوم $date في الساعة $time: «$text»';
+  }
+
+  @override
+  String reminderPast(String year) {
+    return 'مرّ هذا الوقت بالنسبة إلى $year، فلن يصلك إشعار لهذه السنة. وتظل هذه الصفحة تُظهر موعد انتهائها.';
+  }
+
+  @override
+  String get reminderPermissionLine =>
+      'سيسألك هاتفك إن كان يجوز للتطبيق عرض الإشعارات. ولا يُرسَل شيء من هاتفك.';
+
+  @override
+  String get reminderDenied =>
+      'الإشعارات متوقفة. وتظل هذه الصفحة تُظهر موعد انتهاء سنتك الزكوية.';
+
+  @override
+  String get reminderTitle => 'الزكاة';
+
+  @override
+  String reminderBodyToday(String year) {
+    return 'تنتهي سنتك الزكوية $year اليوم. افتح التطبيق لترى زكاتك.';
+  }
+
+  @override
+  String reminderBodyOn(String year, String date) {
+    return 'تنتهي سنتك الزكوية $year في $date. افتح التطبيق لترى زكاتك.';
+  }
+
+  @override
+  String get reminderSwitch => 'إشعار نهاية السنة الزكوية';
+
+  @override
+  String get reminderOffSubtitle =>
+      'متوقف. وتظل هذه الصفحة تُظهر موعد انتهاء سنتك الزكوية.';
+
+  @override
+  String reminderOnSubtitle(int days, String time) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'قبل الاستحقاق بـ $days يومًا في الساعة $time',
+      few: 'قبل الاستحقاق بـ $days أيام في الساعة $time',
+      two: 'قبل الاستحقاق بيومين في الساعة $time',
+      one: 'قبل الاستحقاق بيوم واحد في الساعة $time',
+      zero: 'في يوم الاستحقاق في الساعة $time',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get reminderBlocked =>
+      'الإشعارات متوقفة لهذا التطبيق في إعدادات هاتفك.';
+
+  @override
+  String get reminderOpenSettings => 'فتح الإعدادات';
+
+  @override
+  String zakatYearLabel(String calendar, String n) {
+    String _temp0 = intl.Intl.selectLogic(calendar, {
+      'lunar': '$n هـ',
+      'solar': '$n',
+      'other': '$n',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String zakatState(String state) {
+    String _temp0 = intl.Intl.selectLogic(state, {
+      'open': 'مفتوحة',
+      'due': 'مستحقة',
+      'distributing': 'قيد التوزيع',
+      'settled': 'مسجَّلة بالكامل',
+      'belowNisab': 'دون النصاب: لا زكاة واجبة',
+      'other': '$state',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get zakatEstimateTag => 'تقدير';
+
+  @override
+  String zakatDueIs(String year) {
+    return 'زكاتك عن $year مستحقة.';
+  }
+
+  @override
+  String zakatDueBelow(String year, String date) {
+    return 'انتهت سنتك الزكوية $year في $date. دون النصاب: لا زكاة واجبة.';
+  }
+
+  @override
+  String zakatDueIncomplete(String year, String date) {
+    return 'انتهت سنتك الزكوية $year في $date. أكمل بياناتها لترى زكاتك.';
+  }
+
+  @override
+  String get zakatDueDelayLine =>
+      'يرى أكثر العلماء أن الزكاة تُخرَج عند وجوبها، ولا تؤخَّر دون عذر معتبر.';
+
+  @override
+  String get zakatUmmAlQuraLine =>
+      'التواريخ الهجرية بحسب تقويم أم القرى. وإن بدأ شهرك في يوم آخر في بلدك فانقل تاريخ الاستحقاق.';
+
+  @override
+  String zakatMovedFrom(String calendar, String date) {
+    String _temp0 = intl.Intl.selectLogic(calendar, {
+      'lunar': 'نُقل من $date (أم القرى)',
+      'solar': 'نُقل من $date',
+      'other': '$date',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get zakatMoveDate => 'نقل التاريخ';
+
+  @override
+  String zakatResultOpenLine(String date) {
+    return 'تقدير. تنتهي سنتك الزكوية في $date.';
+  }
+
+  @override
+  String get zakatResultUsesToday => 'يستخدم قيم اليوم وأسعاره.';
+
+  @override
+  String zakatResultStartFrom(String date) {
+    return 'يمكنك بدء التوزيع ابتداءً من $date.';
+  }
+
+  @override
+  String get zakatResultDue => 'الزكاة المستحقة';
+
+  @override
+  String zakatResultRateOf(String rate, String amount) {
+    return '$rate من $amount من المال الزكوي';
+  }
+
+  @override
+  String get zakatResultBelow => 'دون النصاب: لا زكاة واجبة عن هذه السنة.';
+
+  @override
+  String zakatResultBelowFigures(String wealth, String nisab) {
+    return 'المال الزكوي $wealth · النصاب $nisab';
+  }
+
+  @override
+  String get zakatResultEmpty => 'لا شيء يُحسب بعد.';
+
+  @override
+  String get zakatAddInvestment => 'إضافة استثمار';
+
+  @override
+  String get zakatAddLineHere => 'إضافة بند هنا';
+
+  @override
+  String zakatResultIncomplete(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: 'ينقص $n شيئًا:',
+      few: 'تنقص $n أشياء:',
+      two: 'ينقص شيئان:',
+      one: 'ينقص شيء واحد:',
+    );
+    return 'تعذّر حساب الزكاة حتى الآن. $_temp0';
+  }
+
+  @override
+  String get zakatStart => 'بدء التوزيع';
+
+  @override
+  String get zakatStartExplain =>
+      'يثبّت أرقام هذه السنة. ولن تغيّرها التعديلات اللاحقة على استثماراتك أو أسعارك أو إعداداتك.';
+
+  @override
+  String get zakatClose => 'إغلاق هذه السنة';
+
+  @override
+  String get zakatCloseExplain => 'يثبّت أرقام هذه السنة. لا زكاة واجبة.';
+
+  @override
+  String get zakatRemaining => 'المتبقي';
+
+  @override
+  String get zakatSettledLine => 'المبالغ التي سجّلتها بلغت الزكاة المستحقة.';
+
+  @override
+  String get zakatFrozenBelow => 'دون النصاب: لا زكاة واجبة.';
+
+  @override
+  String zakatStartedSnack(String label) {
+    return 'بدأ التوزيع لسنة $label. ثُبّتت الأرقام.';
+  }
+
+  @override
+  String zakatClosedSnack(String label) {
+    return 'أُغلقت سنة $label. دون النصاب: لا زكاة واجبة.';
+  }
+
+  @override
+  String zakatReachedSnack(String label) {
+    return 'المبالغ التي سجّلتها بلغت الزكاة المستحقة لسنة $label.';
+  }
+
+  @override
+  String zakatFixRate(String pair, String date, String names) {
+    return 'سعر $pair غير متوفر بتاريخ $date · $names';
+  }
+
+  @override
+  String zakatFixJewellery(String names) {
+    return 'هل في الحلي المستعمل زكاة؟ لم تُجب بعد · $names';
+  }
+
+  @override
+  String zakatFixLongTerm(String names) {
+    return 'كيف تُحسب الأسهم المقتناة طويلًا؟ لم تختر بعد · $names';
+  }
+
+  @override
+  String get zakatFixNisab => 'لم تختر النصاب';
+
+  @override
+  String get zakatFixAddRate => 'إضافة سعر';
+
+  @override
+  String get zakatFixAnswer => 'أجب';
+
+  @override
+  String get zakatFixChoose => 'اختر';
+
+  @override
+  String zakatFrozenBanner(String date) {
+    return 'ثُبّتت في $date. التعديلات اللاحقة لا تغيّر هذه السنة.';
+  }
+
+  @override
+  String get zakatRecompute => 'إعادة الحساب';
+
+  @override
+  String zakatStartedHeader(String date, String calendar, String rate) {
+    String _temp0 = intl.Intl.selectLogic(calendar, {
+      'lunar': 'قمرية',
+      'solar': 'شمسية',
+      'other': '$calendar',
+    });
+    return 'بدأت في $date · $_temp0 · $rate';
+  }
+
+  @override
+  String get zakatAddsTitle => 'كيف يُحسب المبلغ';
+
+  @override
+  String get zakatAddsLines => 'مجموع البنود';
+
+  @override
+  String get zakatAddsDebts => 'ديون تستحق خلال 12 شهرًا';
+
+  @override
+  String get zakatAddsNotDeducted => 'غير مخصومة';
+
+  @override
+  String get zakatAddsBase => 'المال الزكوي';
+
+  @override
+  String zakatAddsNisab(String metal) {
+    String _temp0 = intl.Intl.selectLogic(metal, {
+      'gold': 'النصاب · ذهب 85 غرامًا',
+      'silver': 'النصاب · فضة 595 غرامًا',
+      'other': '$metal',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String zakatAddsNisabCalc(String grams, String rate, String date) {
+    return '$grams غ × $rate بتاريخ $date';
+  }
+
+  @override
+  String get zakatAddsReaches => 'هل بلغ النصاب؟';
+
+  @override
+  String zakatAddsYes(String wealth, String nisab) {
+    return 'نعم — $wealth ≥ $nisab';
+  }
+
+  @override
+  String get zakatAddsNo => 'لا — دون النصاب';
+
+  @override
+  String zakatAddsRate(String calendar) {
+    String _temp0 = intl.Intl.selectLogic(calendar, {
+      'lunar': 'النسبة (قمرية)',
+      'solar': 'النسبة (شمسية)',
+      'other': 'النسبة',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get zakatAddsRounding =>
+      'تُحسب من المال الزكوي لا بجمع مبالغ البنود، فقد يختلف كل بند بما يصل إلى 0.01.';
+
+  @override
+  String get zakatAddsDeductionOffWhy =>
+      'عند إيقاف الخصم يُقارن المجموع كاملًا بالنصاب (قول الشافعية).';
+
+  @override
+  String zakatLineShare(String share, String amount) {
+    return '$share من $amount';
+  }
+
+  @override
+  String zakatLineZakat(String amount) {
+    return 'الزكاة $amount';
+  }
+
+  @override
+  String zakatLineConverted(String amount, String rate, String date) {
+    return '$amount · محوّل بسعر $rate بتاريخ $date';
+  }
+
+  @override
+  String zakatLineValueDate(String date) {
+    return 'قيمة بتاريخ $date';
+  }
+
+  @override
+  String zakatLineNotRateOf(String date) {
+    return 'ليس سعر $date';
+  }
+
+  @override
+  String zakatOldDateNote(String date) {
+    return 'الزكاة على القيمة في تاريخ استحقاقك. وإن تغيّرت فأضف قيمة أو سعرًا لتاريخ $date.';
+  }
+
+  @override
+  String zakatAddValueFor(String date) {
+    return 'إضافة قيمة لتاريخ $date';
+  }
+
+  @override
+  String zakatAddRateFor(String date) {
+    return 'إضافة سعر لتاريخ $date';
+  }
+
+  @override
+  String get zakatRecomputeForNewer => 'أعد حساب السنة لتستخدم قيمة أحدث.';
+
+  @override
+  String zakatLineRateMissing(String pair) {
+    return 'سعر $pair غير متوفر';
+  }
+
+  @override
+  String zakatQuestionName(String question) {
+    String _temp0 = intl.Intl.selectLogic(question, {
+      'jewellery': 'هل في الحلي المستعمل زكاة؟',
+      'longTermMethod': 'كيف تُحسب الأسهم المقتناة طويلًا؟',
+      'other': '$question',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get zakatNotAnswered => 'لم تُجب بعد';
+
+  @override
+  String zakatLineNetInterest(String amount) {
+    return 'بعد استبعاد فوائد $amount باقية داخل الاستثمار (يُتخلص منها)';
+  }
+
+  @override
+  String get zakatLineDividendsNotice =>
+      'زكاة أرباحك الموزعة تُحسب مع نقدك. وإن لم يكن ذلك النقد في بنود هذه السنة فأضفه بند نقد إضافيًا.';
+
+  @override
+  String get zakatAddCashLine => 'إضافة بند نقد';
+
+  @override
+  String get zakatLineDeleted => 'محذوف من استثماراتك';
+
+  @override
+  String zakatLineFrozenBanner(String label) {
+    return 'سنة $label مثبّتة. التعديلات هنا لا تغيّرها. أعد حسابها لتستخدم القيم الجديدة.';
+  }
+
+  @override
+  String zakatInvestmentsTitle(int n) {
+    return 'استثماراتك ($n)';
+  }
+
+  @override
+  String get zakatNoInvestments => 'لا استثمارات في هذا التاريخ.';
+
+  @override
+  String zakatExtraTitle(int n) {
+    return 'بنود إضافية ($n)';
+  }
+
+  @override
+  String get zakatAddLine => 'إضافة بند';
+
+  @override
+  String get zakatExtraSheetTitle => 'بند إضافي';
+
+  @override
+  String get zakatExtraKindCash => 'نقد ليس في القائمة';
+
+  @override
+  String get zakatExtraKindOwed => 'مال لي عند الغير';
+
+  @override
+  String get zakatExtraOtherAssets =>
+      'الأصول الأخرى (الذهب وبضاعة البيع والنشاط التجاري) مكانها قسم الاستثمارات، حيث يأخذ كل منها نصيبه من الزكاة.';
+
+  @override
+  String get zakatOpenInvestments => 'فتح الاستثمارات';
+
+  @override
+  String get zakatExtraLabel => 'الاسم';
+
+  @override
+  String get zakatExtraGoodDebt => 'المدين قادر وراغب في سداد ما عليه لي.';
+
+  @override
+  String get zakatExtraDoubtful =>
+      'الدين المشكوك في سداده لا زكاة فيه حتى تقبضه.';
+
+  @override
+  String zakatExtraCountedOnly(String year) {
+    return 'يُحسب في سنة $year فقط.';
+  }
+
+  @override
+  String zakatExtraLive(String amount, String rate, String date) {
+    return '= $amount بسعر $rate بتاريخ $date';
+  }
+
+  @override
+  String get zakatErrExtraLabel => 'أدخل اسمًا.';
+
+  @override
+  String get zakatErrGoodDebt => 'أكّد أن المدين قادر وراغب في السداد.';
+
+  @override
+  String get zakatErrAmount => 'أدخل مبلغًا أكبر من 0.';
+
+  @override
+  String get zakatDebtsTitle => 'ديون عليّ سدادها خلال 12 شهرًا';
+
+  @override
+  String get zakatDebtsHelp => 'الأقساط والفواتير المستحقة خلال السنة القادمة.';
+
+  @override
+  String get zakatDebtsWhy =>
+      'يختلف العلماء في الديون طويلة الأجل كقرض السكن. فمنهم من يخصم ما يستحق خلال 12 شهرًا فقط، ومنهم من يخصم الدين كله، ومنهم من لا يخصم شيئًا. وهذا التطبيق يخصم ما تدخله هنا فقط.';
+
+  @override
+  String get zakatDebtsDeduct => 'اخصم';
+
+  @override
+  String zakatDebtsZakat(String amount) {
+    return 'الزكاة −$amount';
+  }
+
+  @override
+  String get zakatGiftTitle => 'المبلغ المُخرَج';
+
+  @override
+  String get zakatGiftAdd => 'إضافة مبلغ مُخرَج';
+
+  @override
+  String zakatGiftGivenOf(String given, String due) {
+    return 'المُخرَج $given من $due';
+  }
+
+  @override
+  String zakatGiftRemaining(String amount) {
+    return 'المتبقي $amount';
+  }
+
+  @override
+  String zakatGiftSemantics(String given, String due, String remaining) {
+    return 'المُخرَج $given من $due. المتبقي $remaining.';
+  }
+
+  @override
+  String get zakatGiftEmpty => 'لم يُسجَّل شيء بعد. أضف كل مبلغ تُخرجه.';
+
+  @override
+  String zakatGiftDateError(String date) {
+    return 'اختر تاريخًا بعد $date، وهو نهاية سنتك الزكوية السابقة.';
+  }
+
+  @override
+  String get zakatGiftDateFuture => 'اختر تاريخًا ليس في المستقبل.';
+
+  @override
+  String get zakatGiftViewTitle => 'أي سعر يُحتسب به هذا المبلغ؟';
+
+  @override
+  String get zakatGiftViewDay => 'سعر يوم الإخراج (أبو يوسف ومحمد)';
+
+  @override
+  String get zakatGiftViewDue => 'سعر يوم الاستحقاق (أبو حنيفة)';
+
+  @override
+  String get zakatGiftViewHelp => 'يختلف العلماء في السعر المعتبر.';
+
+  @override
+  String zakatGiftCountedAt(
+    String amount,
+    String rate,
+    String date,
+    String view,
+  ) {
+    String _temp0 = intl.Intl.selectLogic(view, {
+      'dayGiven': 'سعر يوم الإخراج',
+      'dueDate': 'سعر يوم الاستحقاق',
+      'other': '$view',
+    });
+    return '$amount · محتسب بسعر $rate بتاريخ $date ($_temp0)';
+  }
+
+  @override
+  String zakatGiftLive(String counted, String rate, String date) {
+    return '= $counted · محتسب بسعر $rate بتاريخ $date';
+  }
+
+  @override
+  String zakatGiftTypeRate(String from, String to, String date) {
+    return '1 $from = ____ $to بتاريخ $date';
+  }
+
+  @override
+  String get zakatGiftEarly => 'أُخرج قبل تاريخ الاستحقاق';
+
+  @override
+  String get zakatGiftEarlyHelp =>
+      'يُحتسب هذا إن كنت تملك النصاب حين أخرجته وأخرجته على أنه زكاة. والمالكية لا يجيزون ذلك إلا قبل تاريخ الاستحقاق بوقت قصير.';
+
+  @override
+  String zakatGiftOver(String amount) {
+    return 'المُخرَج يزيد على المستحق بمقدار $amount.';
+  }
+
+  @override
+  String get zakatGiftOverHelp =>
+      'يرى بعض العلماء (الحنفية) أن تحتسبه من زكاة السنة القادمة إن أخرجته على أنه زكاة، ويرى آخرون (الشافعية) أنه صدقة. والتطبيق لا ينقله.';
+
+  @override
+  String get zakatGiftLogNote =>
+      'التطبيق يحتسب ما تسجّله. ولا يستطيع أن يتحقق من أن كل شخص يجوز له أخذ الزكاة (التوبة 60)، ولا من أنك أخرجته على أنه زكاة. ولا تسجّل فوائد تخلصت منها، فليست زكاة.';
+
+  @override
+  String get zakatGiftAbout => 'عن التسجيل';
+
+  @override
+  String get zakatRateViewChanged =>
+      'المبالغ المسجَّلة سابقًا تبقى بالسعر الذي احتُسبت به. عدّل المبلغ ليُحتسب بالطريقة الجديدة.';
+
+  @override
+  String zakatRecomputeTitle(String label, String date) {
+    return 'إعادة حساب سنة $label من بيانات اليوم لتاريخ $date؟';
+  }
+
+  @override
+  String zakatRecomputePreview(String before, String after, String given) {
+    return 'الزكاة المستحقة: $before ← $after · المُخرَج يبقى $given';
+  }
+
+  @override
+  String get zakatRecomputeHelp => 'ما أخرجتَه من قبل يُحتسب من الرقم الجديد.';
+
+  @override
+  String get zakatNoteA4 => 'يُفحص النصاب في تاريخ الاستحقاق فقط.';
+
+  @override
+  String get zakatNoteA8 => 'يُجمع الذهب والفضة وسائر المال معًا بحسب القيمة.';
+
+  @override
+  String get zakatNoteZ4 =>
+      'الحساب على بنود هذه السنة فقط. أضف أي نقد آخر أو مال لك عند الغير بندًا إضافيًا. وأضف الأصول الأخرى في الاستثمارات.';
+
+  @override
+  String get zakatHistoryTitle => 'السجل';
+
+  @override
+  String zakatHistoryGiven(String amount) {
+    return 'المُخرَج $amount';
+  }
+
+  @override
+  String get zakatSettingsTooltip => 'إعدادات الزكاة';
+
+  @override
+  String get zakatSettingsNisab => 'معيار النصاب';
+
+  @override
+  String get zakatSettingsNisabHelp =>
+      'السنوات المثبّتة تبقى على النصاب الذي بدأت به.';
+
+  @override
+  String get zakatSettingsCycle => 'تاريخ دورة الزكاة';
+
+  @override
+  String zakatCycleValue(String calendar, String day, String month) {
+    String _temp0 = intl.Intl.selectLogic(calendar, {
+      'lunar': '$day $month (هجري)',
+      'solar': '$day $month (ميلادي)',
+      'other': '$day $month',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get zakatNotSetYet => 'لم يُحدَّد بعد';
+
+  @override
+  String get zakatSettingsRateView => 'سعر الصرف عند الإخراج بعملة أخرى';
+
+  @override
+  String get zakatSettingsRateViewNone => 'لم يُسأل بعد';
+
+  @override
+  String zakatChangeToTitle(String calendar) {
+    String _temp0 = intl.Intl.selectLogic(calendar, {
+      'lunar': 'التحويل إلى القمري (الهجري)؟',
+      'solar': 'التحويل إلى الشمسي (الميلادي)؟',
+      'other': 'تغيير؟',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get zakatChangeCycleTitle => 'تغيير تاريخ دورة الزكاة؟';
+
+  @override
+  String get zakatChangeKeep => 'هذه السنوات تحتفظ بتواريخها ونسبتها:';
+
+  @override
+  String zakatChangeKeepRow(
+    String label,
+    String state,
+    String date,
+    String rate,
+  ) {
+    return '$label · $state · $date · $rate';
+  }
+
+  @override
+  String zakatChangeStartsAfter(String calendar, String date) {
+    String _temp0 = intl.Intl.selectLogic(calendar, {
+      'lunar': 'تبدأ دورتك القمرية بعد $date.',
+      'solar': 'تبدأ دورتك الشمسية بعد $date.',
+      'other': '$date',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String zakatChangeFirstYear(
+    String calendar,
+    String label,
+    String date,
+    String rate,
+  ) {
+    String _temp0 = intl.Intl.selectLogic(calendar, {
+      'lunar': 'أول سنة قمرية: $label، تنتهي في $date ($rate).',
+      'solar': 'أول سنة شمسية: $label، تنتهي في $date ($rate).',
+      'other': '$label',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String zakatChangeAppliesFrom(String label) {
+    return 'يسري التاريخ الجديد ابتداءً من السنة التي بعد $label.';
+  }
+
+  @override
+  String get zakatMoveTitle => 'نقل تاريخ الاستحقاق';
+
+  @override
+  String get zakatMoveUmmAlQura => 'أم القرى';
+
+  @override
+  String get zakatMoveSolarLine =>
+      'يمكنك نقل التاريخ الشمسي إلى ما قبله فقط. الإخراج المبكر جائز، أما التأخير فيؤخّر الزكاة.';
+
+  @override
+  String get zakatMoveInfo =>
+      'تستخدم كل الأرقام والإشعار التاريخ الجديد. ولا تتأثر السنة القادمة.';
+
+  @override
+  String get src_A4 =>
+      'تاريخ زكاة واحد في السنة. فإن بلغ مالك النصاب حولًا قمريًا كاملًا وجبت الزكاة في كل المال الزكوي الذي تملكه ذلك اليوم، بما فيه ما أُضيف خلال السنة: سنن أبي داود 1573؛ قرار المجمع 28 (3/4) §4. ويرى الشافعية والحنابلة أن للمال الجديد حولًا خاصًا من يوم اكتسابه، وهذا التطبيق يعتمد تاريخًا واحدًا. ويُفحص النصاب في تاريخ الاستحقاق فقط. وعند الحنفية يُشترط وجود النصاب في أول السنة وآخرها (A4).';
+
+  @override
+  String get src_A5 =>
+      'الديون التي يجب سدادها خلال 12 شهرًا يجوز خصمها من المال الزكوي. ويختلف العلماء في الديون طويلة الأجل كقرض السكن: فمنهم من يخصم أقساط الأشهر الاثني عشر القادمة، ومنهم من يخصم الدين كله، ومنهم من لا يخصم شيئًا. ومذهب الشافعية أن الدين لا يمنع الزكاة (النووي، المجموع) — المصدر لم يُتحقق منه بعد. ويذكر المعيار الشرعي 35 لأيوفي الالتزامات الجائز خصمها — أرقام البنود لم يُتحقق منها بعد (A5، C4).';
+
+  @override
+  String get src_A7 =>
+      'كل العملات نقود تجب فيها الزكاة (قرار المجمع 21 (9/3)). تُحوَّل كل ممتلكة بسعر يوم الاستحقاق (دار الإفتاء المحمودية؛ ولم يوجد نص لأيوفي أو المجمع في تاريخ السعر) ثم تُجمع (مؤسسة الزكاة الوطنية في بريطانيا). وإخراج الزكاة بعملة أخرى جائز (A7).';
+
+  @override
+  String get src_A8 =>
+      'يُجمع الذهب والفضة وسائر المال بحسب القيمة. فالحنفية والمالكية يضمّون بعضها إلى بعض بالقيمة، والشافعية لا يضمّون الذهب إلى الفضة — والمصدر الأصلي لم يُتحقق منه بعد (A8).';
+
+  @override
+  String get src_B9 =>
+      'الدين المرجو (المدين قادر وراغب في السداد) تجب فيه الزكاة كل سنة كأنه نقد في يدك. والدين المشكوك فيه لا زكاة فيه حتى يُقبض (قرار المجمع 1 (1/2)؛ اللجنة الدائمة بالسعودية) (B9).';
+
+  @override
+  String get src_Z4 =>
+      'الحساب على بنود هذه السنة فقط. والبنود الإضافية للنقد والديون المرجوة فقط (قرار المجمع 1 (1/2))، أما الذهب وبضاعة البيع والنشاط التجاري فمكانها الاستثمارات. ويُقدَّر النصاب بغرامات المعدن الذي اخترته في سعره يوم الاستحقاق، وقاعدة التسعير لم يُتحقق منها بعد (Z-4، C5).';
+
+  @override
+  String get src_C1 =>
+      'تجب الزكاة إذا مضت اثنا عشر شهرًا قمريًا منذ أن بلغ مالك النصاب أول مرة: سنن أبي داود 1573؛ التوبة 36 والبقرة 189؛ دار الإفتاء ببرمنغهام. وإن لم يُعرف التاريخ فيُعتمد أقرب تقدير — وهو من عمل الفتوى والمصدر لم يُتحقق منه بعد (C1).';
+
+  @override
+  String get src_C2 =>
+      'الزكاة التي وجبت لا يجوز تأخيرها. ويرى أكثر العلماء أن الزكاة تُخرَج عند وجوبها ولا تؤخَّر دون عذر معتبر (اللجنة الدائمة بالسعودية، islamqa 13981؛ والنصوص الأصلية لم يُتحقق منها بعد). وعند الحنفية لا يجوز تغيير تاريخ الزكاة؛ ويجوز الإخراج المبكر بالتقدير، ثم يُفحص المبلغ في التاريخ الحقيقي ويُكمَل النقص (مركز الفتوى، 178985) (C2).';
+
+  @override
+  String get src_C3 =>
+      'يبدأ الشهر القمري برؤية الهلال وهو تسعة وعشرون أو ثلاثون يومًا (البخاري 1909 و1907؛ البقرة 189). وتقويم أم القرى تقويم حسابي قد يختلف عن الرؤية المحلية بيوم أو يومين. واعتماده خيار في التطبيق، وجواز نقل التاريخ يومين هو فهم المستشار الشرعي — المصدر لم يُتحقق منه بعد. واليوم الثلاثون في شهر من تسعة وعشرين يُعتمد فيه اليوم التاسع والعشرون — الفهم لم يُتحقق منه بعد. ويُنقل التاريخ الشمسي إلى ما قبله فقط (C3).';
+
+  @override
+  String get src_C4 =>
+      'يُقدَّر كل المال الزكوي في تاريخ الاستحقاق ويُطرح منه ما تخصمه من الديون. فإن بلغ الباقي النصاب وجبت الزكاة (الحنفية: ابن عابدين، رد المحتار 2/260، عن مجلس علماء الكيب الشرقي). وعند الشافعية الدين لا يُسقط الزكاة، وهذا في التطبيق إيقاف الخصم. وإذا نقص عن النصاب فلا شيء واجب (سنن أبي داود 1573) (C4).';
+
+  @override
+  String get src_C5 =>
+      'الدين المرجو يُحسب كاملًا كل سنة، والدين المشكوك فيه لا يُحسب حتى يُقبض (قرار المجمع 1 (1/2)). وغيرهما من المال (الذهب وبضاعة البيع والنشاط التجاري) يوضع في الاستثمارات (C5).';
+
+  @override
+  String get src_C6 =>
+      'يجوز إخراج الزكاة قبل وجوبها: سنن أبي داود 1624 (علي؛ سأل العباس أن يعجّل صدقته فرخّص له النبي ﷺ؛ حسّنه الألباني وضعّفه زبير علي زئي). والشروط: أن تملك النصاب حين تخرجها وأن تخرجها على أنها زكاة؛ وقيّدها الشافعية بسنة واحدة (دار الإفتاء الأردنية، السؤال 2974)؛ وعند الحنفية يُخرج مبكرًا ثم يُفحص المبلغ في التاريخ الحقيقي (مركز الفتوى 178985). والمالكية لا يجيزون ذلك إلا قبل الاستحقاق بوقت قصير — المصدر لم يُتحقق منه بعد (C6).';
+
+  @override
+  String get src_C7 =>
+      'عند الحنفية ما زاد وأُخرج على أنه زكاة يجوز احتسابه من زكاة السنة القادمة (دار العلوم ديوبند، الفتوى 28/76/D=01/1435). وعند الشافعية الزائد صدقة، لأن لكل سنة نيتها (دار الإفتاء الأردنية، السؤال 3602). والتطبيق لا ينقله، وهذا صحيح على القولين (C7).';
+
+  @override
+  String get src_C8 =>
+      'يختلف العلماء في سعر الصرف الذي تُحتسب به الزكاة المُخرَجة بعملة أخرى. سعر يوم الإخراج: قول أبي يوسف ومحمد (الصاحبين)، ويرجّحه عدد من مفتي الحنفية المعاصرين (Muftionline 46417؛ fatwa-ca 178598). وسعر يوم الاستحقاق: قول أبي حنيفة (دار الإفتاء المحمودية 134900، وتجيز سعرًا أعلى). والنص الأصلي في رد المحتار لم يُتحقق منه بعد (C8).';
+
+  @override
+  String get src_C9 =>
+      'الزكاة المستحقة هي المبلغ الصحيح في تاريخ الاستحقاق لا أول رقم حسبه التطبيق. وما أخرجتَه يُحتسب من الرقم المصحَّح، وما نقص منه فهو لا يزال واجبًا (مركز الفتوى 178985؛ SeekersGuidance، المولانا إلياس باتل). وإن كان الرقم المصحَّح أقل مما أخرجتَه فانظر C7 (C9).';
+
+  @override
+  String get src_C10 =>
+      'لا شيء واجب فيما دون عشرين دينارًا أو مئتي درهم (سنن أبي داود 1573). ولذلك يقول الإشعار إن سنتك الزكوية تنتهي فقط، لأن التطبيق لم يتحقق بعد من بلوغ مالك النصاب (C10).';
+
+  @override
+  String get src_C11 =>
+      'تصح الزكاة إذا أُخرجت على أنها زكاة إلى الأصناف الثمانية في التوبة 60، ولكل سنة نيتها (دار الإفتاء الأردنية، السؤال 3602). والصدقة التي أُعطيت بحسن نية لمن لا يستحق بقيت صدقة (البخاري 1421؛ مسلم 1022). وهل يشمل ذلك الزكاة الواجبة محل خلاف (أبو حنيفة ومحمد: نعم إن اجتهد المعطي؛ أبو يوسف: لا) — لم يُتحقق منه بعد، والتطبيق لا يحكم فيه. والفوائد التي يُتخلص منها ليست زكاة (Z-6) (C11).';
+
+  @override
+  String zakatFixMetalRate(String metal, String date) {
+    String _temp0 = intl.Intl.selectLogic(metal, {
+      'gold': 'أضِف سعر الذهب لترى النصاب بتاريخ $date',
+      'silver': 'أضِف سعر الفضة لترى النصاب بتاريخ $date',
+      'other': '$metal',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get zakatWhyLinesTotal =>
+      'مجموع المبلغ الخاضع للزكاة في كل بند، بعد تحويل كل بند إلى عملتك الأساسية بسعر يوم الاستحقاق.';
+
+  @override
+  String get zakatWhyBase =>
+      'إجمالي البنود مطروحًا منه الديون التي تخصمها. ولا يقل عن صفر.';
+
+  @override
+  String get zakatWhyNisab =>
+      'غرامات المعدن الذي اخترته مضروبة في سعره يوم الاستحقاق.';
+
+  @override
+  String get zakatWhyReaches =>
+      'لا تجب الزكاة إلا إذا بلغ المال الخاضع للزكاة النصاب.';
+
+  @override
+  String get zakatWhyRate =>
+      'نسبة سنتك الزكوية المختارة لسنة كاملة، دون عامل أيام.';
+
+  @override
+  String get zakatWhyBelow =>
+      'المال الخاضع للزكاة أقل من النصاب في تاريخ الاستحقاق، فلا زكاة واجبة عن هذه السنة.';
+
+  @override
+  String get zakatWhyLineValue =>
+      'القيمة في نهاية يوم الاستحقاق: القيمة السوقية لا التكلفة، بعد طرح الفوائد المحتجزة، ودون تعديل بالتضخم.';
+
+  @override
+  String get zakatWhyLineRate =>
+      'أحدث سعر في يوم الاستحقاق أو قبله، سواء أدخلتَه أو جُلب.';
+
+  @override
+  String get zakatWhyExtra => 'بند أضفتَه لهذه السنة فقط.';
+
+  @override
+  String get zakatWhyGiven =>
+      'مجموع المبالغ التي سجلتَها بعملة هذه السنة. والمتبقي هو الزكاة المستحقة مطروحًا منها ما أخرجتَه، ولا يقل عن صفر.';
+
+  @override
+  String get zakatErrExtraUnit =>
+      'اختر عملة. الذهب والفضة مكانهما قسم الاستثمارات.';
 }

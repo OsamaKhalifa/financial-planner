@@ -1441,4 +1441,28 @@ void main() {
       });
     });
   }
+
+  group('S4 frozen-year banner (Z17)', () {
+    testScreen('AC-24 a note from a frozen zakat year shows at the top', (
+      tester,
+    ) async {
+      await pumpScreen(
+        tester,
+        const ItemDetailScreen(investmentId: 'us', frozenNote: 'FROZEN NOTE'),
+        seed: seedUsStock,
+      );
+      expect(find.text('FROZEN NOTE'), findsOneWidget);
+      expect(find.byKey(const ValueKey('frozen-note')), findsOneWidget);
+      expect(find.byKey(const ValueKey('value-now')), findsOneWidget);
+    });
+
+    testScreen('without a note nothing changes', (tester) async {
+      await pumpScreen(
+        tester,
+        const ItemDetailScreen(investmentId: 'us'),
+        seed: seedUsStock,
+      );
+      expect(find.byKey(const ValueKey('frozen-note')), findsNothing);
+    });
+  });
 }

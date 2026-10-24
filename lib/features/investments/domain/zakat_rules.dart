@@ -5,6 +5,9 @@ import 'package:decimal/decimal.dart';
 import '../../../core/assumptions/domain/settings.dart';
 import 'investment.dart';
 
+/// The two answers `resolve()` needs from the user and would throw without.
+enum ZakatQuestion { jewellery, longTermMethod }
+
 enum ZakatNotice {
   dividendsCountedWithCash,
   cryptoDisputed,
@@ -85,6 +88,19 @@ ZakatOffer? offeredShare(AssetType type, Intent? intent) {
   return switch (intent) {
     Intent.personalUse || Intent.rental => ZakatOffer(Decimal.zero, 'B5'),
     Intent.trading => ZakatOffer(Decimal.one, 'B5'),
+    _ => null,
+  };
+}
+
+ZakatQuestion? pendingQuestion(Investment item, Settings settings) {
+  if (item.type == AssetType.privateEquity) return null;
+  return switch (item.zakatRule) {
+    ZakatRule.jewelleryPerSetting when settings.jewelleryZakatable == null =>
+      ZakatQuestion.jewellery,
+    ZakatRule.longTermPerSetting
+        when settings.longTermMethod == null ||
+            settings.longTermMethod == LongTermMethod.perItem =>
+      ZakatQuestion.longTermMethod,
     _ => null,
   };
 }

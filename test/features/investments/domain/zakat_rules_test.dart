@@ -184,4 +184,51 @@ void main() {
       expect(r.notice, ZakatNotice.capitalBackIsDebt);
     }
   });
+
+  test(
+    'pendingQuestion names the two answers resolve() would throw without',
+    () {
+      final jewellery = withRule(AssetType.gold, ZakatRule.jewelleryPerSetting);
+      final longTerm = withRule(AssetType.stock, ZakatRule.longTermPerSetting);
+      expect(pendingQuestion(jewellery, base), ZakatQuestion.jewellery);
+      expect(
+        pendingQuestion(jewellery, const Settings(jewelleryZakatable: false)),
+        isNull,
+      );
+      expect(pendingQuestion(longTerm, base), ZakatQuestion.longTermMethod);
+      expect(
+        pendingQuestion(
+          longTerm,
+          const Settings(longTermMethod: LongTermMethod.perItem),
+        ),
+        ZakatQuestion.longTermMethod,
+      );
+      expect(
+        pendingQuestion(
+          longTerm,
+          const Settings(longTermMethod: LongTermMethod.proxy25),
+        ),
+        isNull,
+      );
+      expect(
+        pendingQuestion(
+          withRule(AssetType.cashDeposit, ZakatRule.cash100),
+          base,
+        ),
+        isNull,
+      );
+    },
+  );
+
+  test('pendingQuestion is null exactly where resolve() does not throw', () {
+    final items = [
+      for (final r in ZakatRule.values)
+        if (r != ZakatRule.custom) withRule(AssetType.stock, r),
+      withRule(AssetType.privateEquity, ZakatRule.longTermPerSetting),
+    ];
+    for (final i in items) {
+      final asks = pendingQuestion(i, base) != null;
+      expect(() => resolve(i, base), asks ? throwsStateError : returnsNormally);
+    }
+  });
 }

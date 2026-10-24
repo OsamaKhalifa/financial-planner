@@ -206,4 +206,98 @@ void main() {
     await repo.setNoZakatYear(2026, noZakat: false);
     expect(await repo.watchNoZakatYears().first, {2025});
   });
+
+  test('zakat prefs: a fresh store reads the product defaults; every field round-trips', () async {
+    expect((await repo.watchSettings().first).zakat.reminderMinute, 540);
+    await repo.saveSettings(const Settings(baseCurrency: usd));
+    final fresh = (await repo.watchSettings().first).zakat;
+    expect(fresh.nisab, isNull);
+    expect(
+      (fresh.reminderOn, fresh.reminderDays, fresh.reminderMinute),
+      (true, 0, 540),
+    );
+    expect((fresh.reminderAsked, fresh.givingRateView), (false, null));
+
+    await repo.saveSettings(
+      const Settings(
+        baseCurrency: usd,
+        zakat: ZakatPrefs(
+          nisab: NisabMetal.silver,
+          reminderOn: false,
+          reminderDays: 3,
+          reminderMinute: 1230,
+          reminderAsked: true,
+          givingRateView: GivingRateView.dueDate,
+        ),
+      ),
+    );
+    final z = (await repo.watchSettings().first).zakat;
+    expect(z.nisab, NisabMetal.silver);
+    expect(
+      (z.reminderOn, z.reminderDays, z.reminderMinute, z.reminderAsked),
+      (false, 3, 1230, true),
+    );
+    expect(z.givingRateView, GivingRateView.dueDate);
+  });
+
+  test('ZakatPrefs.copyWith changes only the named fields', () {
+    const base = ZakatPrefs(nisab: NisabMetal.gold, reminderDays: 2);
+    final c = base.copyWith(reminderOn: false);
+    expect(
+      (c.nisab, c.reminderOn, c.reminderDays, c.reminderMinute),
+      (NisabMetal.gold, false, 2, 540),
+    );
+  });
+
+  ZakatCycle cycle(
+    String id,
+    DateTime from, {
+    int month = 10,
+    int dayOf = 20,
+  }) => ZakatCycle(
+    id: id,
+    calendar: ZakatYear.solar,
+    month: month,
+    day: dayOf,
+    from: from,
+  );
+
+  test('saveZakatCycle writes settings and the cycle together; cycles come back ordered by from', () async {
+    const s1 = Settings(baseCurrency: egp, zakatYear: ZakatYear.solar);
+    await repo.saveZakatCycle(s1, cycle('a', day(2026, 10, 23), month: 3));
+    await repo.saveZakatCycle(s1, cycle('b', day(2027, 10, 21)));
+    final cycles = await repo.watchZakatCycles().first;
+    expect([for (final c in cycles) c.id], ['a', 'b']);
+    expect(cycles.first.calendar, ZakatYear.solar);
+    expect((cycles.first.month, cycles.first.day), (3, 20));
+    expect(cycles.first.from, day(2026, 10, 23));
+    expect((await repo.watchSettings().first).zakatYear, ZakatYear.solar);
+  });
+
+  test('AC-6 saveZakatCycle deletes cycles with from at or after the new one and keeps earlier ones', () async {
+    const s = Settings(baseCurrency: egp, zakatYear: ZakatYear.solar);
+    await repo.saveZakatCycle(s, cycle('a', day(2026, 10, 23)));
+    await repo.saveZakatCycle(s, cycle('b', day(2027, 10, 21)));
+    await repo.saveZakatCycle(s, cycle('c', day(2027, 10, 21), month: 11));
+    await repo.saveZakatCycle(s, cycle('d', day(2026, 12, 1)));
+    final cycles = await repo.watchZakatCycles().first;
+    expect([for (final c in cycles) c.id], ['a', 'd']);
+  });
+
+  test('saveZakatCycle is one transaction: a failing insert leaves the settings as they were', () async {
+    const before = Settings(baseCurrency: egp, zakatYear: ZakatYear.lunar);
+    await repo.saveZakatCycle(before, cycle('a', day(2026, 10, 23)));
+    await expectLater(
+      repo.saveZakatCycle(
+        const Settings(baseCurrency: egp, zakatYear: ZakatYear.solar),
+        cycle('a', day(2027, 1, 1)),
+      ),
+      throwsA(anything),
+    );
+    expect((await repo.watchSettings().first).zakatYear, ZakatYear.lunar);
+    expect(
+      (await repo.watchZakatCycles().first).single.from,
+      day(2026, 10, 23),
+    );
+  });
 }

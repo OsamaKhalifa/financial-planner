@@ -3,6 +3,7 @@
 import 'package:financial_planner/features/investments/presentation/home_screen.dart';
 import 'package:financial_planner/features/overview/presentation/overview_screen.dart';
 import 'package:financial_planner/features/settings/settings_screen.dart';
+import 'package:financial_planner/features/zakat/presentation/zakat_screen.dart';
 import 'package:financial_planner/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -104,11 +105,14 @@ void main() {
           await tester.pumpAndSettle();
         }
 
-        for (final title in [l10n.tabZakat, l10n.tabPlan]) {
-          await tab(title);
-          expect(find.text(l10n.comingSoon), findsOneWidget);
-          expect(find.text(l10n.emptyTitle), findsNothing);
-        }
+        await tab(l10n.tabZakat);
+        expect(find.text(l10n.comingSoon), findsNothing);
+        expect(find.byType(ZakatScreen), findsOneWidget);
+        expect(find.text(l10n.zakatSetupNisabTitle), findsOneWidget);
+        expect(find.text(l10n.emptyTitle), findsNothing);
+        await tab(l10n.tabPlan);
+        expect(find.text(l10n.comingSoon), findsOneWidget);
+        expect(find.text(l10n.emptyTitle), findsNothing);
         await tab(l10n.tabInvestments);
         expect(find.byType(HomeScreen), findsOneWidget);
         expect(find.text(l10n.dataStaysOnPhone), findsOneWidget);

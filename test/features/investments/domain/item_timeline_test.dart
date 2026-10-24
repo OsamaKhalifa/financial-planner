@@ -250,4 +250,36 @@ void main() {
     );
     expect(tl.closedAt(day(2026, 6, 1)), isFalse);
   });
+
+  test('Z16 valueDateAt is the latest value update or money flow on or before the day', () {
+    final tl = ItemTimeline(
+      InvestmentWithHistory(
+        investment: inv(egp),
+        history: [
+          mIn(day(2026, 1, 1), '1000', egp),
+          ValueUpdate(
+            investmentId: 'a',
+            date: day(2026, 1, 15),
+            value: d('1100'),
+          ),
+          InterestRecord(
+            investmentId: 'a',
+            date: day(2026, 1, 20),
+            amount: Money(d('5'), egp),
+            kind: InterestKind.keptInside,
+          ),
+          ValueUpdate(
+            investmentId: 'a',
+            date: day(2026, 1, 25),
+            value: d('1200'),
+          ),
+        ],
+      ),
+      RateBook(const []),
+    );
+    expect(tl.valueDateAt(day(2026, 1, 22)), day(2026, 1, 15));
+    expect(tl.valueDateAt(day(2026, 1, 25)), day(2026, 1, 25));
+    expect(tl.valueDateAt(day(2026, 12, 31)), day(2026, 1, 25));
+    expect(tl.valueDateAt(day(2025, 12, 31)), day(2026, 1, 1));
+  });
 }
