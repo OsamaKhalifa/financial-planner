@@ -180,13 +180,39 @@ final class SinceStartFigures {
   final Decimal? totalInBase;
 }
 
-/// One asset type's share of the base total (Overview, UC-2).
-final class TypeSlice {
-  const TypeSlice(this.type, this.value, this.share);
+/// One group's share of the base total (Overview, UC-2): by asset type or by
+/// item currency.
+final class Slice<K> {
+  const Slice(this.key, this.value, this.share);
 
-  final AssetType type;
+  final K key;
   final Decimal value;
   final Decimal share;
+}
+
+/// One calendar month of the Overview charts, in the base currency. Null
+/// fields are gaps, never zeros.
+final class MonthPoint {
+  const MonthPoint({
+    required this.period,
+    this.value,
+    this.paidIn,
+    this.r,
+    this.rz,
+  });
+
+  final Period period;
+
+  /// Total value at the end of the month.
+  final Decimal? value;
+
+  /// Money in minus money out up to the end of the month, each flow at its own
+  /// date's rate.
+  final Decimal? paidIn;
+
+  /// Month return, and after the estimated zakat set-aside.
+  final Decimal? r;
+  final Decimal? rz;
 }
 
 /// Simple ROI over every started item, in the base currency. Not Dietz: it
@@ -526,19 +552,65 @@ final class PortfolioCalculator {
     );
   }
 
-  /// Largest first; types worth nothing are left out.
-  List<TypeSlice> byType(Period p) {
-    final byType = <AssetType, Decimal>{};
+  List<Slice<AssetType>> byType(Period p) => _slices(p, (i) => i.type);
+
+  List<Slice<Unit>> byCurrency(Period p) => _slices(p, (i) => i.unit);
+
+  /// Largest first; groups worth nothing are left out.
+  List<Slice<K>> _slices<K>(Period p, K Function(Investment) key) {
+    final groups = <K, Decimal>{};
     for (final (inv, ev) in _heldInBase(p)) {
-      byType.update(inv.type, (v) => v + ev, ifAbsent: () => ev);
+      groups.update(key(inv), (v) => v + ev, ifAbsent: () => ev);
     }
-    final total = sumOf(byType.values);
+    final total = sumOf(groups.values);
     if (total == Decimal.zero) return const [];
     return [
-      for (final e in byType.entries)
+      for (final e in groups.entries)
         if (e.value != Decimal.zero)
-          TypeSlice(e.key, e.value, divide(e.value, total)),
+          Slice(e.key, e.value, divide(e.value, total)),
     ]..sort((a, b) => b.value.compareTo(a.value));
+  }
+
+  /// The last [months] calendar months, oldest first, from the first item's
+  /// month. Months with nothing held are left out.
+  List<MonthPoint> monthly({int months = 12}) {
+    if (_items.isEmpty) return const [];
+    final first = _items
+        .map((h) => h.investment.startDate)
+        .reduce((a, b) => a.isBefore(b) ? a : b);
+    final periods = periodsBetween(first, today, Granularity.month);
+    final recent = periods.length > months
+        ? periods.sublist(periods.length - months)
+        : periods;
+    return [
+      for (final p in recent)
+        if (portfolio(p, ViewUnit.base) case final f when f.items.isNotEmpty)
+          MonthPoint(
+            period: p,
+            value: f.totals?.dietz.ev,
+            paidIn: _paidInBase(f, p),
+            r: f.totals?.dietz.r,
+            rz: f.totals?.rz,
+          ),
+    ];
+  }
+
+  /// Null when a rate is missing for any flow of the items in [f].
+  Decimal? _paidInBase(PortfolioFigures f, Period p) {
+    var total = Decimal.zero;
+    for (final fig in f.items) {
+      if (fig.base == null) continue;
+      final tl = timeline(fig.id);
+      final inv = tl.investment;
+      final flows = tl.flowsIn(
+        inv.startDate.subtract(const Duration(days: 1)),
+        p.e,
+      );
+      final inBase = _inBase(inv.unit, flows);
+      if (inBase == null) return null;
+      total += inBase.net;
+    }
+    return total;
   }
 
   SinceStartTotal sinceStartTotal() {

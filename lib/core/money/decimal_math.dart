@@ -29,3 +29,7 @@ Decimal powRatio(Decimal base, Decimal exponent) {
 
 /// A 0..1 fraction for drawing a bar; never used for money.
 double progressOf(Decimal fraction) => fraction.toDouble().clamp(0, 1);
+
+/// A chart coordinate; for drawing only, never money math. Tooltips and labels
+/// read the Decimal kept next to each point.
+double toChart(Decimal value) => value.toDouble();

@@ -70,8 +70,16 @@ final sinceStartProvider = Provider.family<SinceStartFigures?, String>((
   return calc != null && calc.hasItem(id) ? calc.sinceStart(id) : null;
 });
 
-final byTypeProvider = Provider.family<List<TypeSlice>?, Period>(
+final byTypeProvider = Provider.family<List<Slice<AssetType>>?, Period>(
   (ref, p) => ref.watch(calculatorProvider).value?.byType(p),
+);
+
+final byCurrencyProvider = Provider.family<List<Slice<Unit>>?, Period>(
+  (ref, p) => ref.watch(calculatorProvider).value?.byCurrency(p),
+);
+
+final monthlyProvider = Provider<List<MonthPoint>?>(
+  (ref) => ref.watch(calculatorProvider).value?.monthly(),
 );
 
 final sinceStartTotalProvider = Provider<SinceStartTotal?>(

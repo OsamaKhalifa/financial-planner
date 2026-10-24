@@ -1909,4 +1909,26 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get shariahNoScreening =>
       'The app does not screen companies for halal yet.';
+
+  @override
+  String get trendTitle => 'Value, last 12 months';
+
+  @override
+  String get paidInTitle => 'Paid in vs value';
+
+  @override
+  String get monthlyReturnTitle => 'Monthly return';
+
+  @override
+  String get byCurrencyTitle => 'By currency';
+
+  @override
+  String get chartValue => 'Value';
+
+  @override
+  String get chartPaidIn => 'Paid in';
+
+  @override
+  String get notEnoughMonths =>
+      'Not enough months yet. A chart needs at least 2.';
 }

@@ -1,5 +1,6 @@
 /* Copyright (c) 2026-Present Osama Khalifa. All rights reserved. */
 
+import 'package:fl_chart/fl_chart.dart';
 import 'package:financial_planner/core/dates.dart';
 import 'package:financial_planner/core/money/format.dart';
 import 'package:financial_planner/core/reference/markets.dart';
@@ -96,7 +97,7 @@ void main() {
           findsOneWidget,
         );
         expect(find.text(l10n.rowSetAside), findsOneWidget);
-        expect(find.text(l10n.setAsideNote), findsOneWidget);
+        expect(find.text(l10n.setAsideNote), findsWidgets);
         expect(find.text(l10n.realLabel), findsOneWidget);
         expect(find.byKey(const ValueKey('type-fund')), findsOneWidget);
         expect(textPlain('100.00 %'), findsWidgets);
@@ -183,6 +184,93 @@ void main() {
         await tester.pumpAndSettle();
         expect(find.text(l10n.whyToPurifyTitle), findsOneWidget);
         expect(find.text(l10n.src_Z6), findsOneWidget);
+      });
+
+      testScreen('charts: trend, paid in vs value, monthly return', (
+        tester,
+      ) async {
+        await pumpScreen(
+          tester,
+          const OverviewScreen(),
+          locale: locale,
+          seed: seedBasic,
+        );
+        final l10n = l10nOf(tester);
+        Future<void> show(Finder f) => tester.scrollUntilVisible(
+          f,
+          300,
+          scrollable: find.byType(Scrollable).first,
+        );
+
+        await show(find.text(l10n.trendTitle));
+        await show(find.text(l10n.paidInTitle));
+        await show(find.text(l10n.chartPaidIn));
+        final lines = [
+          for (final c in tester.widgetList<LineChart>(find.byType(LineChart)))
+            c.data.lineBarsData,
+        ];
+        expect(lines.map((l) => l.length).toList()..sort(), [1, 2]);
+        for (final l in lines) {
+          expect(l.first.spots, hasLength(10));
+        }
+
+        await show(find.text(l10n.monthlyReturnTitle));
+        final bars = tester.widget<BarChart>(find.byType(BarChart));
+        expect(bars.data.barGroups, hasLength(10));
+        expect(find.text(l10n.rowReturnAfter), findsWidgets);
+        expect(find.text(l10n.setAsideNote), findsWidgets);
+      });
+
+      testScreen('one month of data says a chart needs at least 2', (
+        tester,
+      ) async {
+        await pumpScreen(
+          tester,
+          const OverviewScreen(),
+          locale: locale,
+          seed: (h) async {
+            await h.setup();
+            await h.addItem(item('f', name: 'Fund', start: day(2026, 10, 1)), [
+              moneyIn('f', day(2026, 10, 1), '1000'),
+              value('f', day(2026, 10, 10), '1100'),
+            ]);
+          },
+        );
+        final l10n = l10nOf(tester);
+        await tester.drag(
+          find.byType(Scrollable).first,
+          const Offset(0, -2000),
+        );
+        await tester.pumpAndSettle();
+        expect(find.text(l10n.notEnoughMonths), findsWidgets);
+        expect(find.byType(LineChart), findsNothing);
+        expect(find.byType(BarChart), findsNothing);
+      });
+
+      testScreen('by currency lists each item currency with its share', (
+        tester,
+      ) async {
+        await pumpScreen(
+          tester,
+          const OverviewScreen(),
+          locale: locale,
+          seed: (h) async {
+            await seedBasic(h);
+            await h.rate(usd, egp, '50', day(2025, 12, 31));
+            await h.addItem(item('us', name: 'US fund', unit: usd), [
+              moneyIn('us', day(2026, 2, 1), '10', usd),
+              value('us', day(2026, 10, 2), '12'),
+            ]);
+          },
+        );
+        final l10n = l10nOf(tester);
+        await tester.scrollUntilVisible(
+          find.text(l10n.byCurrencyTitle),
+          300,
+          scrollable: find.byType(Scrollable).first,
+        );
+        expect(find.byKey(const ValueKey('currency-EGP')), findsOneWidget);
+        expect(find.byKey(const ValueKey('currency-USD')), findsOneWidget);
       });
 
       testScreen('the stale line leads to Update all', (tester) async {

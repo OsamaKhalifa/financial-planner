@@ -491,5 +491,12 @@
   "shariahCheckTitle": "ملاحظات شرعية",
   "exposureRisk": "القيمة في عناصر عليها علامة «مخاطرة شرعية»",
   "exposureCrypto": "القيمة في العملات الرقمية",
-  "shariahNoScreening": "التطبيق لا يفحص الشركات شرعيًا بعد."
+  "shariahNoScreening": "التطبيق لا يفحص الشركات شرعيًا بعد.",
+  "trendTitle": "القيمة، آخر 12 شهرًا",
+  "paidInTitle": "المدفوع مقابل القيمة",
+  "monthlyReturnTitle": "العائد الشهري",
+  "byCurrencyTitle": "حسب العملة",
+  "chartValue": "القيمة",
+  "chartPaidIn": "المدفوع",
+  "notEnoughMonths": "لا توجد أشهر كافية بعد. الرسم يحتاج شهرين على الأقل."
 }

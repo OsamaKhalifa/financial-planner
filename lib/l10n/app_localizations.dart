@@ -3068,6 +3068,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The app does not screen companies for halal yet.'**
   String get shariahNoScreening;
+
+  /// No description provided for @trendTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Value, last 12 months'**
+  String get trendTitle;
+
+  /// No description provided for @paidInTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid in vs value'**
+  String get paidInTitle;
+
+  /// No description provided for @monthlyReturnTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly return'**
+  String get monthlyReturnTitle;
+
+  /// No description provided for @byCurrencyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'By currency'**
+  String get byCurrencyTitle;
+
+  /// No description provided for @chartValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Value'**
+  String get chartValue;
+
+  /// No description provided for @chartPaidIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid in'**
+  String get chartPaidIn;
+
+  /// No description provided for @notEnoughMonths.
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough months yet. A chart needs at least 2.'**
+  String get notEnoughMonths;
 }
 
 class _AppLocalizationsDelegate

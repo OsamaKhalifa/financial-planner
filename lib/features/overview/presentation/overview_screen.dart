@@ -19,6 +19,7 @@ import '../../investments/presentation/why_builders.dart';
 import '../../investments/presentation/why_sheet.dart';
 import '../../investments/presentation/widgets/inflation_tag.dart';
 import '../../investments/presentation/widgets/labels.dart';
+import 'widgets/overview_charts.dart';
 
 /// Overview tab (UC-2). Every figure comes from [PortfolioCalculator]; this
 /// screen only lays them out.
@@ -42,7 +43,9 @@ class OverviewScreen extends ConsumerWidget {
 
     final year = Period.year(today.year, today);
     final p = ref.watch(portfolioFiguresProvider((year, ViewUnit.base)));
-    final slices = ref.watch(byTypeProvider(year)) ?? const [];
+    final byType = ref.watch(byTypeProvider(year)) ?? const [];
+    final byCurrency = ref.watch(byCurrencyProvider(year)) ?? const [];
+    final months = ref.watch(monthlyProvider) ?? const [];
     final since = ref.watch(sinceStartTotalProvider);
     final exposure = ref.watch(exposureProvider(year));
     final stale = calc.staleNow();
@@ -59,7 +62,33 @@ class OverviewScreen extends ConsumerWidget {
           if (p != null) _totalCard(context, p, base, today),
           if (totals != null)
             _thisYearCard(context, ref, p!, totals, base, today, toYear),
-          if (slices.isNotEmpty) _byTypeCard(context, slices, base),
+          if (months.isNotEmpty) ...[
+            _trendCard(context, months, base),
+            _paidInCard(context, months, base),
+            _returnCard(context, months),
+          ],
+          if (byType.isNotEmpty)
+            _slicesCard(
+              context,
+              context.l10n.byTypeTitle,
+              byType,
+              base,
+              keyPrefix: 'type',
+              label: (k) => context.assetTypeName(k),
+              keyName: (k) => k.name,
+            ),
+          if (byCurrency.isNotEmpty)
+            _slicesCard(
+              context,
+              context.l10n.byCurrencyTitle,
+              byCurrency,
+              base,
+              keyPrefix: 'currency',
+              label: (u) => u.isMetal
+                  ? context.unitName(u)
+                  : '${context.unitName(u)} (${u.code})',
+              keyName: (u) => u.code,
+            ),
           if (since != null) _sinceStartCard(context, since, base),
           if (exposure != null && p != null)
             _shariahCard(context, exposure, p, base),
@@ -205,24 +234,31 @@ class OverviewScreen extends ConsumerWidget {
     );
   }
 
-  Widget _byTypeCard(BuildContext context, List<TypeSlice> slices, Unit base) {
+  Widget _slicesCard<K>(
+    BuildContext context,
+    String title,
+    List<Slice<K>> slices,
+    Unit base, {
+    required String keyPrefix,
+    required String Function(K) label,
+    required String Function(K) keyName,
+  }) {
     final l10n = context.l10n;
-    final theme = Theme.of(context).textTheme;
     return _card(
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(l10n.byTypeTitle, style: theme.titleMedium),
+          Text(title, style: Theme.of(context).textTheme.titleMedium),
           for (final s in slices)
             Padding(
-              key: ValueKey('type-${s.type.name}'),
+              key: ValueKey('$keyPrefix-${keyName(s.key)}'),
               padding: const EdgeInsets.only(top: 12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
-                      Expanded(child: Text(context.assetTypeName(s.type))),
+                      Expanded(child: Text(label(s.key))),
                       Text(
                         l10n.typeShare(
                           context.money(s.value, base),
@@ -237,6 +273,94 @@ class OverviewScreen extends ConsumerWidget {
               ),
             ),
         ],
+      ),
+    );
+  }
+
+  /// A chart needs two points to draw a line.
+  Widget _chartCard(
+    BuildContext context,
+    String title,
+    List<MonthPoint> months,
+    Widget Function() chart, {
+    Widget? footer,
+  }) {
+    final l10n = context.l10n;
+    return _card(
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 8),
+          if (months.length < 2)
+            Text(l10n.notEnoughMonths)
+          else ...[
+            chart(),
+            ?footer,
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _trendCard(BuildContext context, List<MonthPoint> months, Unit base) {
+    final l10n = context.l10n;
+    return _chartCard(
+      context,
+      l10n.trendTitle,
+      months,
+      () => TrendChart(
+        months: months,
+        format: (v) => context.money(v, base),
+        series: [
+          ChartSeries(l10n.chartValue, Theme.of(context).colorScheme.primary, [
+            for (final m in months) m.value,
+          ]),
+        ],
+      ),
+    );
+  }
+
+  Widget _paidInCard(BuildContext context, List<MonthPoint> months, Unit base) {
+    final l10n = context.l10n;
+    final scheme = Theme.of(context).colorScheme;
+    return _chartCard(
+      context,
+      l10n.paidInTitle,
+      months,
+      () => TrendChart(
+        months: months,
+        format: (v) => context.money(v, base),
+        series: [
+          ChartSeries(l10n.chartValue, scheme.primary, [
+            for (final m in months) m.value,
+          ]),
+          ChartSeries(l10n.chartPaidIn, scheme.tertiary, [
+            for (final m in months) m.paidIn,
+          ]),
+        ],
+      ),
+    );
+  }
+
+  Widget _returnCard(BuildContext context, List<MonthPoint> months) {
+    final l10n = context.l10n;
+    return _chartCard(
+      context,
+      l10n.monthlyReturnTitle,
+      months,
+      () => ReturnBars(
+        months: months,
+        returnLabel: l10n.rowReturn,
+        afterLabel: l10n.rowReturnAfter,
+        format: (v) => context.percent(v),
+      ),
+      footer: Padding(
+        padding: const EdgeInsets.only(top: 8),
+        child: Text(
+          l10n.setAsideNote,
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
       ),
     );
   }

@@ -1477,5 +1477,12 @@
   "shariahCheckTitle": "Shariah notes",
   "exposureRisk": "Value in items tagged Shariah risk",
   "exposureCrypto": "Value in crypto",
-  "shariahNoScreening": "The app does not screen companies for halal yet."
+  "shariahNoScreening": "The app does not screen companies for halal yet.",
+  "trendTitle": "Value, last 12 months",
+  "paidInTitle": "Paid in vs value",
+  "monthlyReturnTitle": "Monthly return",
+  "byCurrencyTitle": "By currency",
+  "chartValue": "Value",
+  "chartPaidIn": "Paid in",
+  "notEnoughMonths": "Not enough months yet. A chart needs at least 2."
 }

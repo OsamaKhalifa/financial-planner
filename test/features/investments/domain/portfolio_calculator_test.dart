@@ -491,7 +491,7 @@ void main() {
       ]);
       final slices = c.byType(year);
       expect(
-        [for (final s in slices) (s.type, s.value, s.share)],
+        [for (final s in slices) (s.key, s.value, s.share)],
         [
           (AssetType.stock, d('60000'), d('0.6')),
           (AssetType.cashDeposit, d('40000'), d('0.4')),
@@ -508,7 +508,7 @@ void main() {
         held('s', AssetType.stock, '1000', '1000'),
         held('us', AssetType.fund, '10', '12', unit: usd),
       ]);
-      expect([for (final s in c.byType(year)) s.type], [AssetType.stock]);
+      expect([for (final s in c.byType(year)) s.key], [AssetType.stock]);
     });
 
     test('since start: gain over money paid in; an item with no rate is counted out', () {
@@ -544,6 +544,120 @@ void main() {
       ]);
       final e = c.exposure(year);
       expect((e.shariahRisk, e.crypto), (d('5000'), d('2500')));
+    });
+
+    test('by currency: value in base per item currency, largest first', () {
+      final c = calc(
+        [
+          held('e', AssetType.stock, '6000', '6000'),
+          held('us', AssetType.fund, '80', '80', unit: usd),
+        ],
+        rates: [
+          Rate(from: usd, to: egp, rate: d('50'), asOf: day(2025, 12, 31)),
+        ],
+      );
+      expect(
+        [for (final s in c.byCurrency(year)) (s.key, s.value, s.share)],
+        [(egp, d('6000'), d('0.6')), (usd, d('4000'), d('0.4'))],
+      );
+    });
+
+    group('monthly', () {
+      final c = calc([
+        fund(
+          'a',
+          egp,
+          day(2026, 8, 10),
+          '1000',
+          value: '1100',
+          valueOn: day(2026, 8, 31),
+          more: [
+            MoneyIn(
+              investmentId: 'a',
+              date: day(2026, 9, 15),
+              amount: Money(d('500'), egp),
+            ),
+            ValueUpdate(
+              investmentId: 'a',
+              date: day(2026, 9, 30),
+              value: d('1700'),
+            ),
+            ValueUpdate(
+              investmentId: 'a',
+              date: day(2026, 10, 10),
+              value: d('1800'),
+            ),
+          ],
+        ),
+      ]);
+
+      test(
+        'one point per month from the first item, the last one ends today',
+        () {
+          final m = c.monthly();
+          expect(
+            [for (final x in m) x.period.e],
+            [day(2026, 8, 31), day(2026, 9, 30), today],
+          );
+        },
+      );
+
+      test(
+        'value, return and set-aside return equal the month portfolio figures',
+        () {
+          for (final x in c.monthly()) {
+            final t = c.portfolio(x.period, ViewUnit.base).totals!;
+            expect((x.value, x.r, x.rz), (t.dietz.ev, t.dietz.r, t.rz));
+          }
+          expect(c.monthly().map((x) => x.value), [
+            d('1100'),
+            d('1700'),
+            d('1800'),
+          ]);
+        },
+      );
+
+      test('paid in steps up at a money-in and stays after', () {
+        expect(c.monthly().map((x) => x.paidIn), [
+          d('1000'),
+          d('1500'),
+          d('1500'),
+        ]);
+      });
+
+      test('only the last months are returned', () {
+        expect(c.monthly(months: 2).map((x) => x.period.e), [
+          day(2026, 9, 30),
+          today,
+        ]);
+      });
+
+      test('no items, no points', () {
+        expect(calc([]).monthly(), isEmpty);
+      });
+
+      test('an item with no rate is left out of value and paid in alike', () {
+        final m = calc([
+          fund(
+            'e',
+            egp,
+            day(2026, 8, 10),
+            '1000',
+            value: '1000',
+            valueOn: day(2026, 9, 1),
+          ),
+          fund(
+            'us',
+            usd,
+            day(2026, 8, 10),
+            '10',
+            value: '12',
+            valueOn: day(2026, 9, 1),
+          ),
+        ]).monthly();
+        expect(m.last.value, d('1000'));
+        expect(m.last.paidIn, d('1000'));
+      });
     });
   });
 }
